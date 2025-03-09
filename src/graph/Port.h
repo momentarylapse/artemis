@@ -7,35 +7,66 @@
 
 #include <lib/base/base.h>
 #include <lib/base/optional.h>
+#include <lib/kaba/kaba.h>
+#include <data/mesh/PolygonMesh.h>
 
 namespace graph {
 
 class Node;
 
-enum class PortDirection {
-	Input,
-	Output
-};
+// TODO type registry (map typeinfo -> kaba.Class)
+template<class T>
+	const kaba::Class* to_class() {
+	if constexpr (std::is_same_v<T, float>)
+		return kaba::TypeFloat32;
+	if constexpr (std::is_same_v<T, int>)
+		return kaba::TypeInt32;
+	if constexpr (std::is_same_v<T, string>)
+		return kaba::TypeString;
+	if constexpr (std::is_same_v<T, PolygonMesh>)
+		return (const kaba::Class*)0x05;
+	return nullptr;
+}
 
-class PortBase {
+class OutPortBase {
 public:
-	explicit PortBase(Node* owner, const string& name, PortDirection direction);
+	explicit OutPortBase(Node* owner, const string& name, const kaba::Class* class_);
 	Node* owner;
 	string name;
-	PortDirection direction;
+	const kaba::Class* class_;
+};
+
+class InPortBase {
+public:
+	explicit InPortBase(Node* owner, const string& name, const kaba::Class* class_);
+	Node* owner;
+	string name;
+	const kaba::Class* class_;
+	OutPortBase* source = nullptr;
+};
+
+
+template<class T>
+class OutPort;
+
+template<class T>
+class InPort : public InPortBase {
+public:
+	InPort(Node* owner, const string& name) : InPortBase(owner, name, to_class<T>()) {}
+	const T* value() const {
+		if (!source)
+			return nullptr;
+		auto typed_source = reinterpret_cast<OutPort<T>*>(source);
+		if (!typed_source->value)
+			return nullptr;
+		return &(*typed_source->value);
+	}
 };
 
 template<class T>
-class InPort : public PortBase {
+class OutPort : public OutPortBase {
 public:
-	InPort(Node* owner, const string& name) : PortBase(owner, name, PortDirection::Input) {}
-	//T value() const;
-};
-
-template<class T>
-class OutPort : public PortBase {
-public:
-	OutPort(Node* owner, const string& name) : PortBase(owner, name, PortDirection::Output) {}
+	OutPort(Node* owner, const string& name) : OutPortBase(owner, name, to_class<T>()) {}
 	void operator()(const T& v) {
 		value = v;
 	}

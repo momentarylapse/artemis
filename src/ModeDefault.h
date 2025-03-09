@@ -6,6 +6,11 @@
 #define MODEDEFAULT_H
 
 #include "view/Mode.h"
+#include <lib/base/pointer.h>
+
+namespace graph {
+	class Graph;
+}
 
 
 class ModeDefault : public Mode {
@@ -15,6 +20,9 @@ public:
 	void on_draw_win(const RenderParams& params, MultiViewWindow* win) override;
 	void on_draw_post(Painter*) override;
 
+	void draw_graph(Painter*);
+
+	owned<graph::Graph> graph;
 };
 
 

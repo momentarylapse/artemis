@@ -7,14 +7,18 @@
 
 namespace graph {
 
-PortBase::PortBase(Node* owner, const string& name, PortDirection direction) {
+OutPortBase::OutPortBase(Node* owner, const string& name, const kaba::Class* class_) {
 	this->owner = owner;
 	this->name = name;
-	this->direction = direction;
-	if (direction == PortDirection::Input)
-		owner->in_ports.add(this);
-	else
-		owner->out_ports.add(this);
+	this->class_ = class_;
+	owner->out_ports.add(this);
+}
+
+InPortBase::InPortBase(Node* owner, const string& name, const kaba::Class* class_) {
+	this->owner = owner;
+	this->name = name;
+	this->class_ = class_;
+	owner->in_ports.add(this);
 }
 
 } // graph

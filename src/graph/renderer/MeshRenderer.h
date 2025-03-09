@@ -14,7 +14,7 @@ namespace graph {
 
 class MeshRenderer : public Node {
 public:
-	MeshRenderer() : Node("meshRenderer") {}
+	MeshRenderer() : Node("MeshRenderer") {}
 
 	InPort<PolygonMesh> in_mesh{this, "mesh"};
 };

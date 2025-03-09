@@ -12,6 +12,8 @@ class Session;
 namespace graph {
 
 class Node;
+class InPortBase;
+class OutPortBase;
 
 class Graph {
 public:
@@ -22,6 +24,9 @@ public:
 	Array<Node*> nodes;
 
 	void add_node(Node* node);
+
+	void connect(OutPortBase& out, InPortBase& in);
+	void connect(Node* source, int source_port, Node* sink, int sink_port);
 };
 
 } // graph

@@ -12,7 +12,8 @@
 namespace graph {
 
 class SettingBase;
-class PortBase;
+class InPortBase;
+class OutPortBase;
 
 class Node : public obs::Node<VirtualBase> {
 public:
@@ -23,8 +24,8 @@ public:
 	string name;
 	vec2 pos;
 	Array<SettingBase*> settings;
-	Array<PortBase*> in_ports;
-	Array<PortBase*> out_ports;
+	Array<InPortBase*> in_ports;
+	Array<OutPortBase*> out_ports;
 };
 
 } // graph
