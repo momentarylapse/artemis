@@ -7,12 +7,14 @@
 
 #include <lib/base/base.h>
 
+class Session;
+
 namespace graph {
 
 class Node;
 
 Array<string> enumerate_nodes();
-Node* create_node(const string& name);
+Node* create_node(Session* s, const string& name);
 
 } // graph
 

@@ -3,11 +3,15 @@
 //
 
 #include "MeshRenderer.h"
+
+#include <Session.h>
 #include <y/graphics-impl.h>
 
 namespace graph {
 
-	MeshRenderer::MeshRenderer() : Node("MeshRenderer") {}
+	MeshRenderer::MeshRenderer(Session* s) : Node("MeshRenderer") {
+		material = new Material(s->resource_manager);
+	}
 
 	MeshRenderer::~MeshRenderer() = default;
 
@@ -16,11 +20,16 @@ namespace graph {
 		if (!mesh)
 			return;
 
-
-		if (vertex_buffer)
-			return;
-		vertex_buffer = new VertexBuffer("3f,3f,2f");
+		if (!vertex_buffer)
+			vertex_buffer = new VertexBuffer("3f,3f,2f");
 		mesh->build(vertex_buffer.get());
+
+		material->roughness = roughness();
+		material->metal = metal();
+		material->albedo = albedo();
+		material->emission = emission();
+
+		dirty = false;
 	}
 
 } // graph

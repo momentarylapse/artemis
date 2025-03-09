@@ -400,6 +400,7 @@ add_executable(artemis
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
 	src/view/DrawingHelper.cpp
+	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
 	src/view/MultiView.cpp
 	src/y/audio/audio.cpp

@@ -5,6 +5,7 @@
 #ifndef PORT_H
 #define PORT_H
 
+#include "Node.h"
 #include <lib/base/base.h>
 #include <lib/base/optional.h>
 #include <lib/kaba/kaba.h>
@@ -13,6 +14,7 @@
 namespace graph {
 
 class Node;
+class InPortBase;
 
 class OutPortBase {
 public:
@@ -20,6 +22,7 @@ public:
 	Node* owner;
 	string name;
 	const kaba::Class* class_;
+	Array<InPortBase*> targets;
 };
 
 class InPortBase {
@@ -55,6 +58,8 @@ public:
 	OutPort(Node* owner, const string& name) : OutPortBase(owner, name, artemis::get_class<T>()) {}
 	void operator()(const T& v) {
 		value = v;
+		for (auto t: targets)
+			t->owner->dirty = true;
 	}
 	base::optional<T> value;
 };

@@ -15,11 +15,11 @@ Array<string> enumerate_nodes() {
 		"MeshRenderer"
 	};
 }
-Node* create_node(const string& name) {
+Node* create_node(Session* s, const string& name) {
 	if (name == "TeapotMesh")
 		return new TeapotMesh();
 	if (name == "MeshRenderer")
-		return new MeshRenderer();
+		return new MeshRenderer(s);
 	return nullptr;
 }
 

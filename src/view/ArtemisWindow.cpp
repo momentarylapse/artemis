@@ -20,6 +20,7 @@
 
 #include "ActionController.h"
 #include "DrawingHelper.h"
+#include "GraphEditor.h"
 #include "MultiView.h"
 #include "lib/os/msg.h"
 #include "lib/xhui/Theme.h"
@@ -159,7 +160,7 @@ Dialog x x
 		Toolbar toolbar ''
 		---|
 		Grid main-grid ''
-			DrawingArea graph '' grabfocus
+			.
 			Overlay ? ''
 				DrawingArea area '' grabfocus
 				Grid overlay-main-grid '' margin=25
@@ -174,6 +175,8 @@ Dialog x x
 )foodelim");
 
 	toolbar = (xhui::Toolbar*)get_control("toolbar");
+
+	embed("main-grid", 0, 0, new GraphEditor(session));
 
 	event("undo", [this] {
 		session->cur_mode->on_command("undo");

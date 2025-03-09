@@ -18,12 +18,17 @@ void Graph::add_node(Node* node) {
 	nodes.add(node);
 }
 
-void Graph::connect(OutPortBase& out, InPortBase& in) {
-	if (in.class_ != out.class_) {
-		msg_error(format("failed to connect: %s  vs  %s", out.class_->name, in.class_->name));
+void Graph::connect(OutPortBase& source, InPortBase& sink) {
+	if (sink.class_ != source.class_) {
+		msg_error(format("failed to connect: %s  vs  %s", source.class_->name, sink.class_->name));
 		return;
 	}
-	in.source = &out;
+	if (sink.source) {
+		msg_error(format("failed to connect: sink already connected"));
+		return;
+	}
+	sink.source = &source;
+	source.targets.add(&sink);
 }
 
 void Graph::connect(Node* source, int source_port, Node* sink, int sink_port) {
@@ -32,9 +37,9 @@ void Graph::connect(Node* source, int source_port, Node* sink, int sink_port) {
 
 void Graph::iterate() {
 	// TODO DAG
-	// TODO state/only when needed
 	for (auto n: nodes)
-		n->process();
+		if (n->dirty)
+			n->process();
 }
 
 

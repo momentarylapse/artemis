@@ -20,9 +20,7 @@ public:
 	void on_draw_win(const RenderParams& params, MultiViewWindow* win) override;
 	void on_draw_post(Painter*) override;
 
-	void draw_graph(Painter*);
-
-	owned<graph::Graph> graph;
+	graph::Graph* graph;
 };
 
 

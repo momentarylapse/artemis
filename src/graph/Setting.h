@@ -7,6 +7,8 @@
 
 #include <lib/base/base.h>
 
+#include "Node.h"
+
 namespace graph {
 
 class Node;
@@ -27,6 +29,11 @@ public:
 	const T& operator()() const {
 		return this->value;
 	}
+	void set(const T& value) {
+		this->value = value;
+		owner->dirty = true;
+	}
+private:
 	T value;
 };
 

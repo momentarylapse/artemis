@@ -28,17 +28,17 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	//data = new DataModel(session);
 	//generic_data = data.get();
 
-	graph = new graph::Graph(session);
-	graph->add_node(graph::create_node("TeapotMesh"));
-	graph->add_node(graph::create_node("MeshRenderer"));
+	graph = session->graph.get();
+	graph->add_node(graph::create_node(s, "TeapotMesh"));
+	graph->add_node(graph::create_node(s, "MeshRenderer"));
 	graph->connect(graph->nodes[0], 0, graph->nodes[1], 0);
 
 	graph->nodes[0]->pos = {200, 100};
 	graph->nodes[1]->pos = {200, 500};
 
-	session->win->event_xp("graph", xhui::event_id::Draw, [this] (Painter* p) {
+	/*session->win->event_xp("graph", xhui::event_id::Draw, [this] (Painter* p) {
 		draw_graph(p);
-	});
+	});*/
 
 	xhui::run_repeated(1.0f, [this] {
 		graph->iterate();
@@ -53,52 +53,11 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 			if (!vb)
 				continue;
 
-			session->drawing_helper->draw_mesh(params, win->rvd, mat4::ID, vb, session->drawing_helper->material_creation);
+			session->drawing_helper->draw_mesh(params, win->rvd, mat4::ID, vb, r->material.get());
 		}
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
-}
-
-vec2 node_in_port_pos(graph::Node* n, int i) {
-	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->in_ports.num - 1) / 2) * PORT_DX, -PORT_DY);
-}
-
-vec2 node_out_port_pos(graph::Node* n, int i) {
-	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->out_ports.num - 1) / 2) * PORT_DX, NODE_HEIGHT + PORT_DY);
-}
-
-void ModeDefault::draw_graph(Painter* p) {
-	float w = (float)p->width;
-	float h = (float)p->height;
-
-	p->set_color(xhui::Theme::_default.background_low);
-	p->draw_rect({0,w, 0,h});
-
-	for (auto n: graph->nodes) {
-		p->set_color(Red.with_alpha(0.3f));
-		p->set_roundness(10);
-		p->draw_rect({n->pos, n->pos + vec2(NODE_WIDTH, NODE_HEIGHT)});
-
-		p->set_color(Red);
-		p->draw_str(n->pos + vec2(20, 5), n->name);
-
-		for (int i=0; i<n->in_ports.num; i++) {
-			p->set_color(Red);
-			p->draw_circle(node_in_port_pos(n, i), 5);
-		}
-		for (int i=0; i<n->out_ports.num; i++) {
-			p->set_color(Red);
-			p->draw_circle(node_out_port_pos(n, i), 5);
-		}
-
-
-		for (int i=0; i<n->in_ports.num; i++)
-			if (n->in_ports[i]->source) {
-				p->set_color(Red);
-				p->draw_line(node_out_port_pos(n->in_ports[i]->source->owner, 0), node_in_port_pos(n, i));
-			}
-	}
 }
 
 

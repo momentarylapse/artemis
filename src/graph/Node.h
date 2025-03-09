@@ -23,6 +23,8 @@ public:
 
 	string name;
 	vec2 pos;
+	bool dirty = true;
+
 	Array<SettingBase*> settings;
 	Array<InPortBase*> in_ports;
 	Array<OutPortBase*> out_ports;

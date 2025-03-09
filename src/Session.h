@@ -56,6 +56,10 @@ enum class MultiViewType {
 	ACTION_MANAGER
 };
 
+namespace graph {
+	class Graph;
+}
+
 
 class Session : public obs::Node<VirtualBase> {
 public:
@@ -111,6 +115,8 @@ public:
 	os::Timer timer;
 
 	base::promise<Session*> promise_started;
+
+	owned<graph::Graph> graph;
 };
 
 Session *create_session();
