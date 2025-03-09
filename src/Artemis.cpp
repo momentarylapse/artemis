@@ -2,9 +2,10 @@
 #include <ModeDefault.h>
 #include <storage/format/Format.h>
 #include "Session.h"
-#include "view/ArtemisWindow.h"
+#include <view/ArtemisWindow.h>
+#include <plugins/PluginManager.h>
 #include <lib/kaba/lib/lib.h>
-#include "lib/os/msg.h"
+#include <lib/os/msg.h>
 
 string AppVersion = "0.0.1";
 string AppName = "Artemis";
@@ -28,6 +29,15 @@ int xhui_main(const Array<string>& args) {
 	}
 
 	kaba::init();
+	if (xhui::Application::installed)
+		kaba::config.directory = xhui::Application::directory_static | "plugins";
+	else
+		kaba::config.directory = xhui::Application::directory_static.parent() | "plugins";
+	try {
+		artemis::PluginManager::init();
+	} catch (Exception &e) {
+		msg_error(e.message());
+	}
 
 	auto s = create_session();
 	emit_empty_session(s).then([] (Session* ss) {

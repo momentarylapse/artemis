@@ -20,7 +20,7 @@ void Graph::add_node(Node* node) {
 
 void Graph::connect(OutPortBase& out, InPortBase& in) {
 	if (in.class_ != out.class_) {
-		msg_error(format("failed to connect: ..."));
+		msg_error(format("failed to connect: %s  vs  %s", out.class_->name, in.class_->name));
 		return;
 	}
 	in.source = &out;

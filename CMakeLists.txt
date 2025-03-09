@@ -394,6 +394,7 @@ add_executable(artemis
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
 	src/multiview/SingleData.cpp
+	src/plugins/PluginManager.cpp
 	src/storage/format/Format.cpp
 	src/storage/Storage.cpp
 	src/view/ActionController.cpp

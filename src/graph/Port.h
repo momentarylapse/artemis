@@ -8,25 +8,11 @@
 #include <lib/base/base.h>
 #include <lib/base/optional.h>
 #include <lib/kaba/kaba.h>
-#include <data/mesh/PolygonMesh.h>
+#include <plugins/PluginManager.h>
 
 namespace graph {
 
 class Node;
-
-// TODO type registry (map typeinfo -> kaba.Class)
-template<class T>
-	const kaba::Class* to_class() {
-	if constexpr (std::is_same_v<T, float>)
-		return kaba::TypeFloat32;
-	if constexpr (std::is_same_v<T, int>)
-		return kaba::TypeInt32;
-	if constexpr (std::is_same_v<T, string>)
-		return kaba::TypeString;
-	if constexpr (std::is_same_v<T, PolygonMesh>)
-		return (const kaba::Class*)0x05;
-	return nullptr;
-}
 
 class OutPortBase {
 public:
@@ -52,7 +38,7 @@ class OutPort;
 template<class T>
 class InPort : public InPortBase {
 public:
-	InPort(Node* owner, const string& name) : InPortBase(owner, name, to_class<T>()) {}
+	InPort(Node* owner, const string& name) : InPortBase(owner, name, artemis::get_class<T>()) {}
 	const T* value() const {
 		if (!source)
 			return nullptr;
@@ -66,7 +52,7 @@ public:
 template<class T>
 class OutPort : public OutPortBase {
 public:
-	OutPort(Node* owner, const string& name) : OutPortBase(owner, name, to_class<T>()) {}
+	OutPort(Node* owner, const string& name) : OutPortBase(owner, name, artemis::get_class<T>()) {}
 	void operator()(const T& v) {
 		value = v;
 	}
