@@ -11,6 +11,7 @@
 #include <lib/xhui/Panel.h>
 
 class Session;
+class NodePanel;
 
 namespace graph {
 	class Graph;
@@ -27,6 +28,7 @@ public:
 
 	Session* session;
 	graph::Graph* graph;
+	NodePanel* node_panel = nullptr;
 
 	enum class HoverType {
 		Node,

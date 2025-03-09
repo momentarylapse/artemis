@@ -17,11 +17,6 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
-static constexpr float NODE_WIDTH = 150.0f;
-static constexpr float NODE_HEIGHT = 50.0f;
-static constexpr float PORT_DX = 50.0f;
-static constexpr float PORT_DY = 10.0f;
-
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
@@ -35,10 +30,6 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 
 	graph->nodes[0]->pos = {200, 100};
 	graph->nodes[1]->pos = {200, 500};
-
-	/*session->win->event_xp("graph", xhui::event_id::Draw, [this] (Painter* p) {
-		draw_graph(p);
-	});*/
 
 	xhui::run_repeated(1.0f, [this] {
 		graph->iterate();

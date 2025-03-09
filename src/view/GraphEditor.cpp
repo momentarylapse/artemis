@@ -7,6 +7,8 @@
 #include <graph/Graph.h>
 #include <graph/Node.h>
 #include <graph/Port.h>
+#include <graph/Setting.h>
+#include <lib/base/iter.h>
 #include <lib/os/msg.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
@@ -16,13 +18,63 @@ static constexpr float NODE_HEIGHT = 50.0f;
 static constexpr float PORT_DX = 50.0f;
 static constexpr float PORT_DY = 10.0f;
 
+class NodePanel : public xhui::Panel {
+public:
+	explicit NodePanel(graph::Node* n) : xhui::Panel("node-panel") {
+		node = n;
+		from_source(R"foodelim(
+Dialog x ''
+	Grid node-panel '' class=card
+		Group node-group 'Test'
+			Grid settings-grid ''
+)foodelim");
+
+		set_string("node-group", node->name);
+
+		for (const auto& [i, s]: enumerate(node->settings)) {
+			set_target("settings-grid");
+			add_control("Label", s->name, 0, i, "");
+			string id = format("setting-%d", i);
+			if (s->class_ == kaba::TypeFloat32) {
+				auto ss = static_cast<graph::Setting<float>*>(node->settings[i]);
+				add_control("SpinButton", "", 1, i, id);
+				set_options(id, "expandx");
+				set_options(id, "range=::0.001");
+				set_float(id, (*ss)());
+				event(id, [this, id, ss] {
+					ss->set(get_float(id));
+				});
+			} else if (s->class_ == kaba::TypeColor) {
+				auto ss = static_cast<graph::Setting<color>*>(node->settings[i]);
+				add_control("ColorButton", "", 1, i, id);
+				set_options(id, "expandx");
+				set_color(id, (*ss)());
+				event(id, [this, id, ss] {
+					ss->set(get_color(id));
+				});
+			}
+		}
+		size_mode_x = SizeMode::Shrink;
+		size_mode_y = SizeMode::Shrink;
+		min_width_user = 320;
+	}
+	graph::Node* node;
+};
+
 GraphEditor::GraphEditor(Session* s) : Panel("graph-editor") {
 	session = s;
 	graph = s->graph.get();
 
 	from_source(R"foodelim(
 Dialog x ''
-	DrawingArea graph '' grabfocus
+	Overlay ? ''
+		DrawingArea graph '' grabfocus
+		Grid overlay-grid '' margin=20
+			Label ? '' expandy
+			Label ? '' expandx
+			---|
+			Grid dock ''
+			.
 )foodelim");
 
 
@@ -54,7 +106,7 @@ void GraphEditor::on_draw(Painter* p) {
 	float h = (float)p->height;
 
 	p->set_color(xhui::Theme::_default.background_low);
-	p->draw_rect({0,w, 0,h});
+	p->draw_rect(_area);
 
 	for (auto n: graph->nodes) {
 		color bg = Orange.with_alpha(0.5f);
@@ -120,7 +172,15 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 	hover = get_hover(m);
 	selection = hover;
 
+	if (node_panel) {
+		unembed(node_panel);
+		node_panel = nullptr;
+	}
+
 	if (selection and selection->type == HoverType::Node) {
+		node_panel = new NodePanel(selection->node);
+		embed("dock", 0, 0, node_panel);
+
 		dnd_offset = m - selection->node->pos;
 	}
 

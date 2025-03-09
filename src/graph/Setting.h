@@ -5,9 +5,13 @@
 #ifndef SETTING_H
 #define SETTING_H
 
-#include <lib/base/base.h>
-
 #include "Node.h"
+#include <lib/base/base.h>
+#include <plugins/PluginManager.h>
+
+namespace kaba {
+	class Class;
+}
 
 namespace graph {
 
@@ -15,15 +19,16 @@ class Node;
 
 class SettingBase {
 public:
-	explicit SettingBase(Node* owner, const string& name);
+	explicit SettingBase(Node* owner, const string& name, const kaba::Class* class_);
 	Node* owner;
 	string name;
+	const kaba::Class* class_;
 };
 
 template<class T>
 class Setting : public SettingBase {
 public:
-	Setting(Node* owner, const string& name, const T& value) : SettingBase(owner, name) {
+	Setting(Node* owner, const string& name, const T& value) : SettingBase(owner, name, artemis::get_class<T>()) {
 		this->value = value;
 	}
 	const T& operator()() const {

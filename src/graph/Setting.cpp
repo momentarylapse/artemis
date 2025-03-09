@@ -8,9 +8,10 @@
 
 namespace graph {
 
-SettingBase::SettingBase(Node* _owner, const string& _name) {
+SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _class_) {
 	owner = _owner;
 	name = _name;
+	class_ = _class_;
 	owner->settings.add(this);
 }
 
