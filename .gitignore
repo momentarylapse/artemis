@@ -1,0 +1,5 @@
+.idea
+artemis
+build
+cmake-build*
+
