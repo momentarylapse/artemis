@@ -27,6 +27,8 @@ public:
 
 	void connect(OutPortBase& out, InPortBase& in);
 	void connect(Node* source, int source_port, Node* sink, int sink_port);
+
+	void iterate();
 };
 
 } // graph

@@ -9,14 +9,20 @@
 #include "../Setting.h"
 #include "../Port.h"
 #include <data/mesh/PolygonMesh.h>
+#include <y/graphics-fwd.h>
 
 namespace graph {
 
 class MeshRenderer : public Node {
 public:
-	MeshRenderer() : Node("MeshRenderer") {}
+	MeshRenderer();
+	~MeshRenderer() override;
+
+	void process() override;
 
 	InPort<PolygonMesh> in_mesh{this, "mesh"};
+
+	owned<VertexBuffer> vertex_buffer;
 };
 
 } // graph

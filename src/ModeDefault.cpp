@@ -9,9 +9,12 @@
 #include <graph/Node.h>
 #include <graph/NodeFactory.h>
 #include <graph/Port.h>
+#include <graph/renderer/MeshRenderer.h>
 #include <lib/image/Painter.h>
 #include <lib/xhui/Theme.h>
+#include <lib/os/msg.h>
 #include <view/ArtemisWindow.h>
+#include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
 static constexpr float NODE_WIDTH = 150.0f;
@@ -36,10 +39,22 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	session->win->event_xp("graph", xhui::event_id::Draw, [this] (Painter* p) {
 		draw_graph(p);
 	});
+
+	xhui::run_repeated(1.0f, [this] {
+		graph->iterate();
+		session->win->request_redraw();
+	});
 }
 
 void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) {
+	for (auto n: graph->nodes)
+		if (auto r = dynamic_cast<graph::MeshRenderer*>(n)) {
+			auto vb = r->vertex_buffer.get();
+			if (!vb)
+				continue;
 
+			session->drawing_helper->draw_mesh(params, win->rvd, mat4::ID, vb, session->drawing_helper->material_creation);
+		}
 }
 
 void ModeDefault::on_draw_post(Painter* p) {

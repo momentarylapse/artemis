@@ -30,6 +30,14 @@ void Graph::connect(Node* source, int source_port, Node* sink, int sink_port) {
 	connect(*source->out_ports[source_port], *sink->in_ports[sink_port]);
 }
 
+void Graph::iterate() {
+	// TODO DAG
+	// TODO state/only when needed
+	for (auto n: nodes)
+		n->process();
+}
+
+
 
 
 } // graph
