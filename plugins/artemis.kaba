@@ -8,6 +8,11 @@ class ScalarField
 class VectorField
 	func extern __init__()
 
+struct RegularGrid
+	func extern __init__()
+	var nx, ny, nz: i32
+	var dx, dy, dz: vec3
+
 
 class Node
 	func extern set(key: string, value: any)

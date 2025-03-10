@@ -10,6 +10,7 @@
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
 #include <Session.h>
+#include <data/grid/RegularGrid.h>
 #include <graph/NodeFactory.h>
 
 extern Session* _current_session_;
@@ -57,6 +58,15 @@ void PluginManager::export_kaba() {
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<VectorField>);
 
 
+	ext->declare_class_size("RegularGrid", sizeof(RegularGrid));
+	ext->declare_class_element("RegularGrid.nx", &RegularGrid::nx);
+	ext->declare_class_element("RegularGrid.ny", &RegularGrid::ny);
+	ext->declare_class_element("RegularGrid.nz", &RegularGrid::nz);
+	ext->declare_class_element("RegularGrid.dx", &RegularGrid::dx);
+	ext->declare_class_element("RegularGrid.dy", &RegularGrid::dy);
+	ext->declare_class_element("RegularGrid.dz", &RegularGrid::dz);
+	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<RegularGrid>);
+
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
 
@@ -95,6 +105,7 @@ void PluginManager::import_kaba() {
 
 	auto m = kaba::default_context->load_module("artemis.kaba");
 	import_component_class<PolygonMesh>(m, "Mesh");
+	import_component_class<RegularGrid>(m, "RegularGrid");
 }
 
 }

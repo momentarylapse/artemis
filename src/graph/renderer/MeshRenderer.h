@@ -5,22 +5,22 @@
 #ifndef MESHRENDERER_H
 #define MESHRENDERER_H
 
-#include "../Node.h"
+#include "RendererNode.h"
 #include "../Setting.h"
 #include "../Port.h"
 #include <data/mesh/PolygonMesh.h>
 #include <y/graphics-fwd.h>
 
-class Session;
-
 namespace graph {
 
-class MeshRenderer : public Node {
+class MeshRenderer : public RendererNode {
 public:
 	explicit MeshRenderer(Session* s);
 	~MeshRenderer() override;
 
 	void process() override;
+
+	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
 	InPort<PolygonMesh> in_mesh{this, "mesh"};
 

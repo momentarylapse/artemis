@@ -7,15 +7,11 @@
 #include <Session.h>
 #include <graph/Graph.h>
 #include <graph/Node.h>
-#include <graph/NodeFactory.h>
 #include <graph/Port.h>
-#include <graph/renderer/MeshRenderer.h>
-#include <lib/image/Painter.h>
-#include <lib/xhui/Theme.h>
+#include <graph/renderer/RendererNode.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/os/msg.h>
 #include <view/ArtemisWindow.h>
-#include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
 
@@ -34,13 +30,8 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 
 void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) {
 	for (auto n: graph->nodes)
-		if (auto r = dynamic_cast<graph::MeshRenderer*>(n)) {
-			auto vb = r->vertex_buffer.get();
-			if (!vb)
-				continue;
-
-			session->drawing_helper->draw_mesh(params, win->rvd, mat4::ID, vb, r->material.get());
-		}
+		if (auto r = dynamic_cast<graph::RendererNode*>(n))
+			r->draw_win(params, win);
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
