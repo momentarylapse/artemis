@@ -4,6 +4,7 @@
 
 #include "NodeFactory.h"
 
+#include "field/Gradient.h"
 #include "field/ScalarField.h"
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
@@ -11,6 +12,7 @@
 #include "renderer/GridRenderer.h"
 #include "renderer/MeshRenderer.h"
 #include "renderer/PointListRenderer.h"
+#include "renderer/VectorFieldRenderer.h"
 #include "renderer/VolumeRenderer.h"
 
 namespace graph {
@@ -21,10 +23,12 @@ Array<string> enumerate_nodes() {
 		"TeapotMesh",
 		"RegularGrid",
 		"ScalarField",
+		"Gradient",
 		"GridRenderer",
 		"MeshRenderer",
 		"PointListRenderer",
 		"VolumeRenderer",
+		"VectorFieldRenderer",
 	};
 }
 Node* create_node(Session* s, const string& name) {
@@ -36,6 +40,8 @@ Node* create_node(Session* s, const string& name) {
 		return new RegularGrid();
 	if (name == "ScalarField")
 		return new ScalarField();
+	if (name == "Gradient")
+		return new Gradient();
 	if (name == "GridRenderer")
 		return new GridRenderer(s);
 	if (name == "MeshRenderer")
@@ -44,6 +50,8 @@ Node* create_node(Session* s, const string& name) {
 		return new PointListRenderer(s);
 	if (name == "VolumeRenderer")
 		return new VolumeRenderer(s);
+	if (name == "VectorFieldRenderer")
+		return new VectorFieldRenderer(s);
 	return nullptr;
 }
 

@@ -11,6 +11,7 @@
 #include <lib/math/rect.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
+#include <data/field/VectorField.h>
 #include <data/grid/RegularGrid.h>
 #include <graph/NodeFactory.h>
 
@@ -113,6 +114,7 @@ void PluginManager::import_kaba() {
 	import_component_class<PolygonMesh>(m, "Mesh");
 	import_component_class<artemis::data::RegularGrid>(m, "RegularGrid");
 	import_component_class<artemis::data::ScalarField>(m, "ScalarField");
+	import_component_class<artemis::data::VectorField>(m, "VectorField");
 }
 
 }

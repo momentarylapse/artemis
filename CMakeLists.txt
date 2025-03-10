@@ -189,6 +189,7 @@ add_executable(artemis
 	src/action/ActionManager.cpp
 	src/action/ActionMultiView.cpp
 	src/data/field/ScalarField.cpp
+	src/data/field/VectorField.cpp
 	src/data/grid/RegularGrid.cpp
 	src/data/mesh/GeometryBall.cpp
 	src/data/mesh/GeometryCube.cpp
@@ -205,6 +206,7 @@ add_executable(artemis
 	src/data/mesh/SkinGenerator.cpp
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/Data.cpp
+	src/graph/field/Gradient.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/grid/RegularGrid.cpp
 	src/graph/mesh/SphereMesh.cpp
@@ -213,6 +215,7 @@ add_executable(artemis
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp
+	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
 	src/graph/Graph.cpp
 	src/graph/Node.cpp
