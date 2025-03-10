@@ -32,22 +32,23 @@ void Graph::remove_node(graph::Node* node) {
 }
 
 
-void Graph::connect(OutPortBase& source, InPortBase& sink) {
+bool Graph::connect(OutPortBase& source, InPortBase& sink) {
 	if (sink.class_ != source.class_) {
 		msg_error(format("failed to connect: %s  vs  %s", source.class_->name, sink.class_->name));
-		return;
+		return false;
 	}
 	if (sink.source) {
 		msg_error(format("failed to connect: sink already connected"));
-		return;
+		return false;
 	}
 	sink.source = &source;
 	source.targets.add(&sink);
 	out_changed();
+	return true;
 }
 
-void Graph::connect(graph::Node* source, int source_port, graph::Node* sink, int sink_port) {
-	connect(*source->out_ports[source_port], *sink->in_ports[sink_port]);
+bool Graph::connect(graph::Node* source, int source_port, graph::Node* sink, int sink_port) {
+	return connect(*source->out_ports[source_port], *sink->in_ports[sink_port]);
 }
 
 void Graph::iterate() {

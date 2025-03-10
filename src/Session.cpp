@@ -27,6 +27,8 @@
 #include <y/renderer/target/XhuiRenderer.h>
 #include <graph/Graph.h>
 
+Session* _current_session_ = nullptr;
+
 Session *create_session() {
 	auto s = new Session;
 	s->storage = new Storage(s);
@@ -34,6 +36,7 @@ Session *create_session() {
 	//s->mode_world = new ModeWorld(s);
 	s->win = new ArtemisWindow(s);
 	s->win->renderer = new XhuiRenderer();
+	_current_session_ = s;
 	return s;
 }
 

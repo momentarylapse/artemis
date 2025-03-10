@@ -4,7 +4,7 @@
 #include "Session.h"
 #include <view/ArtemisWindow.h>
 #include <plugins/PluginManager.h>
-#include <lib/kaba/lib/lib.h>
+#include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
 
 string AppVersion = "0.0.1";
@@ -19,6 +19,31 @@ namespace hui {
 }
 
 base::future<Session*> emit_empty_session(Session* parent);
+
+void start_session_empty(Session* parent) {
+	emit_empty_session(parent).then([] (Session* s) {
+		s->set_mode(new ModeDefault(s));
+	});
+}
+
+void start_session_load_file(Session* parent, const Path& filename) {
+	emit_empty_session(parent).then([filename] (Session* s) {
+		s->set_mode(new ModeDefault(s));
+
+		string ext = filename.extension();
+		if (ext == "kaba") {
+			auto m = kaba::default_context->load_module(filename.absolute());
+			typedef void (*f_p)();
+			if (auto f = (f_p)m->match_function("main", "void", {})) {
+				f();
+			} else {
+				s->set_message(format("script %s does not contain 'func main()'", filename));
+			}
+		} else {
+			s->set_message(format("unknown file extension: %s", filename));
+		}
+	});
+}
 
 int xhui_main(const Array<string>& args) {
 	try {
@@ -40,9 +65,11 @@ int xhui_main(const Array<string>& args) {
 	}
 
 	auto s = create_session();
-	emit_empty_session(s).then([] (Session* ss) {
-		ss->set_mode(new ModeDefault(ss));
-	});
+	if (args.num >= 2) {
+		start_session_load_file(s, args[1]);
+	} else {
+		start_session_empty(s);
+	}
 
 	try {
 		xhui::run();

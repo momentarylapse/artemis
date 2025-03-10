@@ -17,9 +17,18 @@ namespace graph {
 
 class Node;
 
+
+template<class T>
+class Setting;
+
 class SettingBase {
 public:
 	explicit SettingBase(Node* owner, const string& name, const kaba::Class* class_);
+	void set_generic(const Any& value);
+	template<class T>
+	Setting<T>* as() {
+		return static_cast<Setting<T>*>(this);
+	}
 	Node* owner;
 	string name;
 	const kaba::Class* class_;

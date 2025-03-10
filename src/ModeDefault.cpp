@@ -25,12 +25,6 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	//generic_data = data.get();
 
 	graph = session->graph.get();
-	graph->add_node(graph::create_node(s, "TeapotMesh"));
-	graph->add_node(graph::create_node(s, "MeshRenderer"));
-	graph->connect(graph->nodes[0], 0, graph->nodes[1], 0);
-
-	graph->nodes[0]->pos = {200, 100};
-	graph->nodes[1]->pos = {200, 500};
 
 	xhui::run_repeated(1.0f, [this] {
 		graph->iterate();
@@ -54,7 +48,7 @@ void ModeDefault::on_draw_post(Painter* p) {
 
 void ModeDefault::on_key_down(int key) {
 	if (key == xhui::KEY_S + xhui::KEY_CONTROL) {
-		
+
 	}
 }
 

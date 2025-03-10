@@ -4,9 +4,15 @@
 
 #include "PluginManager.h"
 #include <data/mesh/PolygonMesh.h>
+#include <graph/Graph.h>
+#include <graph/Node.h>
 #include <lib/kaba/kaba.h>
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
+#include <Session.h>
+#include <graph/NodeFactory.h>
+
+extern Session* _current_session_;
 
 namespace artemis {
 
@@ -21,8 +27,25 @@ void PluginManager::init() {
 	import_kaba();
 }
 
+Session* current_session() {
+	return _current_session_;
+}
+
+graph::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, const vec2& pos) {
+	auto n = graph::create_node(g->session, _class);
+	n->pos = pos;
+	g->add_node(n);
+	return n;
+}
+
+bool graph_connect(graph::Graph* g, graph::Node* source, int source_port, graph::Node* sink, int sink_port) {
+	return g->connect(source, source_port, sink, sink_port);
+}
+
 void PluginManager::export_kaba() {
 	auto ext = kaba::default_context->external.get();
+
+	ext->link("current_session", (void*)&current_session);
 
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
@@ -32,6 +55,18 @@ void PluginManager::export_kaba() {
 
 	ext->declare_class_size("VectorField", sizeof(VectorField));
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<VectorField>);
+
+
+	ext->declare_class_size("Session", sizeof(Session));
+	ext->declare_class_element("Session.graph", &Session::graph);
+
+
+	ext->declare_class_size("Node", sizeof(graph::Node));
+	ext->link_class_func("Node.set", &graph::Node::set);
+
+	ext->declare_class_size("Graph", sizeof(graph::Graph));
+	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
+	ext->link_class_func("Graph.connect", &graph_connect);
 }
 
 template<class C>

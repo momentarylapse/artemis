@@ -7,3 +7,20 @@ class ScalarField
 
 class VectorField
 	func extern __init__()
+
+
+class Node
+	func extern set(key: string, value: any)
+	
+
+class Graph
+	func extern add_node(name: string, pos: vec2) -> Node&
+	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
+
+
+class Session
+	graph: owned![Graph]
+
+
+func extern current_session() -> Session&
+

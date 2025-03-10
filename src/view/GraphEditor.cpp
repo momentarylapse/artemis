@@ -65,7 +65,7 @@ Dialog x ''
 			add_control("Label", s->name, 0, i, "");
 			string id = format("setting-%d", i);
 			if (s->class_ == kaba::TypeFloat32) {
-				auto ss = static_cast<graph::Setting<float>*>(node->settings[i]);
+				auto ss = node->settings[i]->as<float>();
 				add_control("SpinButton", "", 1, i, id);
 				set_options(id, "expandx");
 				set_options(id, "range=::0.001");
@@ -74,7 +74,7 @@ Dialog x ''
 					ss->set(get_float(id));
 				});
 			} else if (s->class_ == kaba::TypeInt32) {
-				auto ss = static_cast<graph::Setting<int>*>(node->settings[i]);
+				auto ss = node->settings[i]->as<int>();
 				add_control("SpinButton", "", 1, i, id);
 				set_options(id, "expandx");
 				set_int(id, (*ss)());
@@ -82,7 +82,7 @@ Dialog x ''
 					ss->set(get_int(id));
 				});
 			} else if (s->class_ == kaba::TypeColor) {
-				auto ss = static_cast<graph::Setting<color>*>(node->settings[i]);
+				auto ss = node->settings[i]->as<color>();
 				add_control("ColorButton", "", 1, i, id);
 				set_options(id, "expandx");
 				set_color(id, (*ss)());

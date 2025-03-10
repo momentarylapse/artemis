@@ -9,6 +9,8 @@
 #include <lib/math/vec2.h>
 #include <lib/pattern/Observable.h>
 
+class Any;
+
 namespace graph {
 
 class SettingBase;
@@ -20,6 +22,8 @@ public:
 	explicit Node(const string& name);
 
 	virtual void process() {}
+
+	void set(const string& key, const Any& value);
 
 	string name;
 	vec2 pos;

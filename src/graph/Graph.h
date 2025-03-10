@@ -29,8 +29,8 @@ public:
 	void add_node(graph::Node* node);
 	void remove_node(graph::Node* node);
 
-	void connect(OutPortBase& source, InPortBase& sink);
-	void connect(graph::Node* source, int source_port, graph::Node* sink, int sink_port);
+	bool connect(OutPortBase& source, InPortBase& sink);
+	bool connect(graph::Node* source, int source_port, graph::Node* sink, int sink_port);
 	void unconnect(OutPortBase& source, InPortBase& sink);
 	void unconnect(graph::Node* source, int source_port, graph::Node* sink, int sink_port);
 
