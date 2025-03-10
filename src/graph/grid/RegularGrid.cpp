@@ -7,7 +7,7 @@
 namespace graph {
 
 void RegularGrid::process() {
-	out(::RegularGrid(nx(), ny(), nz()));
+	out(artemis::data::RegularGrid(nx(), ny(), nz()));
 	out_points(out.value->grid_points());
 }
 

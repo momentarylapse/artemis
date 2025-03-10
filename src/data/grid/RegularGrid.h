@@ -8,6 +8,8 @@
 #include <lib/math/vec3.h>
 #include <lib/math/Box.h>
 
+namespace artemis::data {
+
 struct RegularGrid {
 	RegularGrid();
 	RegularGrid(int nx, int ny, int nz);
@@ -19,9 +21,9 @@ struct RegularGrid {
 
 	int nx, ny, nz;
 	vec3 dx, dy, dz;
-
 };
 
+}
 
 
 #endif //REGULARGRID_H

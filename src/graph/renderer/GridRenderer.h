@@ -22,7 +22,7 @@ public:
 	Setting<float> line_width{this, "line-width", 1.0f};
 	Setting<color> _color{this, "color", Gray};
 
-	InPort<::RegularGrid> regular{this, "regular"};
+	InPort<artemis::data::RegularGrid> regular{this, "regular"};
 };
 
 } // graph

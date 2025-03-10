@@ -18,8 +18,14 @@ void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* wi
 		material = new Material(session->resource_manager);
 	if (!vertex_buffer)
 		vertex_buffer = new VertexBuffer("3f,3f,2f");
-	GeometrySphere mesh(v_0, radius(), 2);
-	mesh.build(vertex_buffer.get());
+
+	// mesh -> vb
+	if (in_mesh.value()) {
+		in_mesh.value()->build(vertex_buffer.get());
+	} else {
+		GeometrySphere mesh(v_0, radius(), 2);
+		mesh.build(vertex_buffer.get());
+	}
 
 	material->albedo = Black;
 	material->emission = _color();

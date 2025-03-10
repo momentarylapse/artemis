@@ -8,6 +8,7 @@
 #include "RendererNode.h"
 #include <graph/Port.h>
 #include <graph/Setting.h>
+#include <data/mesh/PolygonMesh.h>
 #include <lib/image/color.h>
 
 class Material;
@@ -24,6 +25,7 @@ public:
 	Setting<color> _color{this, "color", White};
 
 	InPort<Array<vec3>> in_points{this, "points"};
+	InPort<PolygonMesh> in_mesh{this, "mesh"};
 
 	owned<VertexBuffer> vertex_buffer;
 	owned<Material> material;

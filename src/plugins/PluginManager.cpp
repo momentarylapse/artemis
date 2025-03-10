@@ -10,6 +10,7 @@
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
 #include <Session.h>
+#include <data/field/ScalarField.h>
 #include <data/grid/RegularGrid.h>
 #include <graph/NodeFactory.h>
 
@@ -62,14 +63,14 @@ void PluginManager::export_kaba() {
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<VectorField>);
 
 
-	ext->declare_class_size("RegularGrid", sizeof(RegularGrid));
-	ext->declare_class_element("RegularGrid.nx", &RegularGrid::nx);
-	ext->declare_class_element("RegularGrid.ny", &RegularGrid::ny);
-	ext->declare_class_element("RegularGrid.nz", &RegularGrid::nz);
-	ext->declare_class_element("RegularGrid.dx", &RegularGrid::dx);
-	ext->declare_class_element("RegularGrid.dy", &RegularGrid::dy);
-	ext->declare_class_element("RegularGrid.dz", &RegularGrid::dz);
-	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<RegularGrid>);
+	ext->declare_class_size("RegularGrid", sizeof(artemis::data::RegularGrid));
+	ext->declare_class_element("RegularGrid.nx", &artemis::data::RegularGrid::nx);
+	ext->declare_class_element("RegularGrid.ny", &artemis::data::RegularGrid::ny);
+	ext->declare_class_element("RegularGrid.nz", &artemis::data::RegularGrid::nz);
+	ext->declare_class_element("RegularGrid.dx", &artemis::data::RegularGrid::dx);
+	ext->declare_class_element("RegularGrid.dy", &artemis::data::RegularGrid::dy);
+	ext->declare_class_element("RegularGrid.dz", &artemis::data::RegularGrid::dz);
+	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<artemis::data::RegularGrid>);
 
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
@@ -110,7 +111,8 @@ void PluginManager::import_kaba() {
 
 	auto m = kaba::default_context->load_module("artemis.kaba");
 	import_component_class<PolygonMesh>(m, "Mesh");
-	import_component_class<RegularGrid>(m, "RegularGrid");
+	import_component_class<artemis::data::RegularGrid>(m, "RegularGrid");
+	import_component_class<artemis::data::ScalarField>(m, "ScalarField");
 }
 
 }

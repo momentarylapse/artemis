@@ -22,7 +22,7 @@ public:
 	Setting<int> ny{this, "ny", 8};
 	Setting<int> nz{this, "nz", 1};
 
-	OutPort<::RegularGrid> out{this, "out"};
+	OutPort<artemis::data::RegularGrid> out{this, "out"};
 	OutPort<Array<vec3>> out_points{this, "points"};
 };
 

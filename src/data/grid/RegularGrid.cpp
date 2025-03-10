@@ -4,7 +4,7 @@
 
 #include "RegularGrid.h"
 
-#include <lib/kaba/parser/lexical.h>
+namespace artemis::data {
 
 RegularGrid::RegularGrid(int _nx, int _ny, int _nz) {
 	nx = _nx;
@@ -34,6 +34,8 @@ Array<vec3> RegularGrid::grid_points() const {
 			for (int k=0; k<=nz; k++)
 				points.add(index_to_pos(i, j, k));
 	return points;
+}
+
 }
 
 

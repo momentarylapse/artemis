@@ -1,11 +1,13 @@
 
-class Mesh
+struct Mesh
 	func extern __init__()
 
-class ScalarField
+struct ScalarField
 	func extern __init__()
+	var nx, ny, nz: i32
+	var v: f32[]
 
-class VectorField
+struct VectorField
 	func extern __init__()
 
 struct RegularGrid
@@ -24,7 +26,7 @@ class Graph
 
 
 class Session
-	graph: owned![Graph]
+	var graph: owned![Graph]
 
 
 func extern current_session() -> Session&
