@@ -3,6 +3,9 @@
 //
 
 #include "Graph.h"
+
+#include <lib/base/algo.h>
+
 #include "Port.h"
 #include "Node.h"
 #include <lib/os/msg.h>
@@ -13,10 +16,21 @@ Graph::Graph(Session* s) {
 	session = s;
 }
 
-
-void Graph::add_node(Node* node) {
-	nodes.add(node);
+void Graph::clear() {
+	auto _nodes = nodes;
+	for (auto n: _nodes)
+		remove_node(n);
 }
+
+void Graph::add_node(graph::Node* node) {
+	nodes.add(node);
+	out_changed();
+}
+
+void Graph::remove_node(graph::Node* node) {
+	//base::remove(nodes, node);
+}
+
 
 void Graph::connect(OutPortBase& source, InPortBase& sink) {
 	if (sink.class_ != source.class_) {
@@ -29,9 +43,10 @@ void Graph::connect(OutPortBase& source, InPortBase& sink) {
 	}
 	sink.source = &source;
 	source.targets.add(&sink);
+	out_changed();
 }
 
-void Graph::connect(Node* source, int source_port, Node* sink, int sink_port) {
+void Graph::connect(graph::Node* source, int source_port, graph::Node* sink, int sink_port) {
 	connect(*source->out_ports[source_port], *sink->in_ports[sink_port]);
 }
 

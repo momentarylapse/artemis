@@ -203,6 +203,7 @@ add_executable(artemis
 	src/data/mesh/SkinGenerator.cpp
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/Data.cpp
+	src/graph/mesh/SphereMesh.cpp
 	src/graph/mesh/TeapotMesh.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/Graph.cpp

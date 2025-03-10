@@ -1,9 +1,9 @@
 //
-// Created by michi on 09.03.25.
+// Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef TEAPOTMESH_H
-#define TEAPOTMESH_H
+#ifndef SPHEREMESH_H
+#define SPHEREMESH_H
 
 #include "../Node.h"
 #include "../Setting.h"
@@ -12,9 +12,9 @@
 
 namespace graph {
 
-class TeapotMesh : public Node {
+class SphereMesh : public Node {
 public:
-	TeapotMesh() : Node("TeapotMesh") {}
+	SphereMesh() : Node("SphereMesh") {}
 
 	void process() override;
 
@@ -26,4 +26,4 @@ public:
 
 } // graph
 
-#endif //TEAPOTMESH_H
+#endif //SPHEREMESH_H

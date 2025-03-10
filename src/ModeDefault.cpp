@@ -12,6 +12,7 @@
 #include <graph/renderer/MeshRenderer.h>
 #include <lib/image/Painter.h>
 #include <lib/xhui/Theme.h>
+#include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/os/msg.h>
 #include <view/ArtemisWindow.h>
 #include <view/DrawingHelper.h>
@@ -50,6 +51,13 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 
 void ModeDefault::on_draw_post(Painter* p) {
 }
+
+void ModeDefault::on_key_down(int key) {
+	if (key == xhui::KEY_S + xhui::KEY_CONTROL) {
+		
+	}
+}
+
 
 
 

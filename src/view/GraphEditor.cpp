@@ -6,9 +6,11 @@
 #include <Session.h>
 #include <graph/Graph.h>
 #include <graph/Node.h>
+#include <graph/NodeFactory.h>
 #include <graph/Port.h>
 #include <graph/Setting.h>
 #include <lib/base/iter.h>
+#include <lib/base/sort.h>
 #include <lib/os/msg.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
@@ -17,6 +19,33 @@ static constexpr float NODE_WIDTH = 150.0f;
 static constexpr float NODE_HEIGHT = 50.0f;
 static constexpr float PORT_DX = 50.0f;
 static constexpr float PORT_DY = 10.0f;
+
+class NodeListPanel : public xhui::Panel {
+public:
+	explicit NodeListPanel() : xhui::Panel("node-list-panel") {
+		from_source(R"foodelim(
+Dialog x ''
+	Grid ? '' class=card
+		Group node-list-group 'New node' height=350
+			ListView list 'class' nobar expandy dragsource=new-node
+)foodelim");
+
+		classes = graph::enumerate_nodes();
+		for (const auto& c: classes) {
+			add_string("list", c);
+		}
+		event_x("list", xhui::event_id::DragStart, [this] {
+			int i = get_int("list");
+			if (i >= 0)
+				get_window()->start_drag(classes[i], "add-node:" + classes[i]);
+		});
+
+		size_mode_x = SizeMode::Shrink;
+		size_mode_y = SizeMode::Shrink;
+		min_width_user = 320;
+	}
+	Array<string> classes;
+};
 
 class NodePanel : public xhui::Panel {
 public:
@@ -44,6 +73,14 @@ Dialog x ''
 				event(id, [this, id, ss] {
 					ss->set(get_float(id));
 				});
+			} else if (s->class_ == kaba::TypeInt32) {
+				auto ss = static_cast<graph::Setting<int>*>(node->settings[i]);
+				add_control("SpinButton", "", 1, i, id);
+				set_options(id, "expandx");
+				set_int(id, (*ss)());
+				event(id, [this, id, ss] {
+					ss->set(get_int(id));
+				});
 			} else if (s->class_ == kaba::TypeColor) {
 				auto ss = static_cast<graph::Setting<color>*>(node->settings[i]);
 				add_control("ColorButton", "", 1, i, id);
@@ -61,7 +98,7 @@ Dialog x ''
 	graph::Node* node;
 };
 
-GraphEditor::GraphEditor(Session* s) : Panel("graph-editor") {
+GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
 	session = s;
 	graph = s->graph.get();
 
@@ -87,6 +124,20 @@ Dialog x ''
 	event_x("graph", xhui::event_id::LeftButtonDown, [this] {
 		on_left_button_down(get_window()->mouse_position());
 	});
+	event_x("graph", xhui::event_id::LeftButtonUp, [this] {
+		on_left_button_up(get_window()->mouse_position());
+	});
+
+	event_x("graph", xhui::event_id::DragDrop, [this] {
+		if (get_window()->drag.payload.match("add-node:*")) {
+			graph->add_node(::graph::create_node(session, get_window()->drag.payload.sub(9)));
+			graph->nodes.back()->pos = get_window()->mouse_position();
+		}
+	});
+
+	graph->out_changed >> create_sink([this] {
+		get_window()->request_redraw();
+	});
 }
 
 rect node_area(graph::Node* n) {
@@ -102,18 +153,18 @@ vec2 node_out_port_pos(graph::Node* n, int i) {
 }
 
 void GraphEditor::on_draw(Painter* p) {
-	float w = (float)p->width;
-	float h = (float)p->height;
-
 	p->set_color(xhui::Theme::_default.background_low);
 	p->draw_rect(_area);
 
 	for (auto n: graph->nodes) {
-		color bg = Orange.with_alpha(0.5f);
-		if (selection and selection->type == HoverType::Node and selection->node == n)
-			bg = Red.with_alpha(0.7f);
+		if (selection and selection->type == HoverType::Node and selection->node == n) {
+			p->set_color(Red.with_alpha(0.7f));
+			p->set_roundness(14);
+			p->draw_rect(node_area(n).grow(4));
+		}
+		color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
 		if (hover and hover->type == HoverType::Node and hover->node == n)
-			bg = color::interpolate(bg, White, 0.3f);
+			bg = color::interpolate(bg, White, 0.2f);
 		p->set_color(bg);
 		p->set_roundness(10);
 		p->draw_rect(node_area(n));
@@ -142,6 +193,15 @@ void GraphEditor::on_draw(Painter* p) {
 				p->draw_line(node_out_port_pos(n->in_ports[i]->source->owner, 0), node_in_port_pos(n, i));
 			}
 	}
+
+
+	if (get_window()->button(0)) {
+		if (selection and selection->type == HoverType::OutPort) {
+			p->set_color(White);
+			p->set_line_width(3);
+			p->draw_line(node_out_port_pos(selection->node, selection->index), get_window()->mouse_position());
+		}
+	}
 }
 
 base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
@@ -159,10 +219,16 @@ base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
 }
 
 void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
-	hover = get_hover(m);
 
-	if (get_window()->button(0) and selection and selection->type == HoverType::Node) {
-		selection->node->pos = m - dnd_offset;
+	if (get_window()->button(0)) {
+		if (selection and selection->type == HoverType::Node) {
+			selection->node->pos = m - dnd_offset;
+		} else if (selection and selection->type == HoverType::OutPort) {
+			// new connection
+			hover = get_hover(m);
+		}
+	} else {
+		hover = get_hover(m);
 	}
 
 	request_redraw();
@@ -182,10 +248,22 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 		embed("dock", 0, 0, node_panel);
 
 		dnd_offset = m - selection->node->pos;
+	} else if (!selection) {
+		node_panel = new NodeListPanel();
+		embed("dock", 0, 0, node_panel);
 	}
 
 	request_redraw();
 }
+
+void GraphEditor::on_left_button_up(const vec2& m) {
+	if (selection and selection->type == HoverType::OutPort) {
+		if (hover and hover->type == HoverType::InPort) {
+			graph->connect(selection->node, selection->index, hover->node, hover->index);
+		}
+	}
+}
+
 
 
 

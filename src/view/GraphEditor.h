@@ -7,28 +7,28 @@
 
 
 #include <lib/base/optional.h>
-#include <lib/kaba/syntax/Node.h>
+#include <lib/pattern/Observable.h>
 #include <lib/xhui/Panel.h>
 
 class Session;
-class NodePanel;
 
 namespace graph {
 	class Graph;
 	class Node;
 }
 
-class GraphEditor : public xhui::Panel {
+class GraphEditor : public obs::Node<xhui::Panel> {
 public:
 	explicit GraphEditor(Session* s);
 
 	void on_left_button_down(const vec2& m) override;
+	void on_left_button_up(const vec2& m) override;
 	void on_mouse_move(const vec2& m, const vec2& d) override;
 	void on_draw(Painter* p);
 
 	Session* session;
 	graph::Graph* graph;
-	NodePanel* node_panel = nullptr;
+	xhui::Panel* node_panel = nullptr;
 
 	enum class HoverType {
 		Node,
