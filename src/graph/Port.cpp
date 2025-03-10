@@ -11,6 +11,7 @@ OutPortBase::OutPortBase(Node* owner, const string& name, const kaba::Class* cla
 	this->owner = owner;
 	this->name = name;
 	this->class_ = class_;
+	port_index = owner->out_ports.num;
 	owner->out_ports.add(this);
 }
 

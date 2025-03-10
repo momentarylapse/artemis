@@ -12,9 +12,9 @@
 
 namespace graph {
 
-class SphereMesh : public Node {
+class SphereMesh : public ResourceNode {
 public:
-	SphereMesh() : Node("SphereMesh") {}
+	SphereMesh() : ResourceNode("SphereMesh") {}
 
 	void process() override;
 

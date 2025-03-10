@@ -12,9 +12,9 @@
 
 namespace graph {
 
-class TeapotMesh : public Node {
+class TeapotMesh : public ResourceNode {
 public:
-	TeapotMesh() : Node("TeapotMesh") {}
+	TeapotMesh() : ResourceNode("TeapotMesh") {}
 
 	void process() override;
 

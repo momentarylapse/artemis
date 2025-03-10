@@ -1,0 +1,19 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var a = g.add_node("RegularGrid", [300,100])
+
+	var b = g.add_node("GridRenderer", [150,400])
+	b.set("line-width", 2.0)
+	b.set("color", dyn([0.5,0.5,0.5,1]))
+
+	var c = g.add_node("PointListRenderer", [450,400])
+	c.set("radius", 0.1)
+	c.set("color", dyn([0.7,0,1,1]))
+
+	g.connect(a, 0, b, 0)
+	g.connect(a, 1, c, 0)
+
+

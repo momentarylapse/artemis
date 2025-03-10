@@ -8,13 +8,14 @@
 #include <lib/math/vec3.h>
 #include <lib/math/Box.h>
 
-class RegularGrid {
-public:
+struct RegularGrid {
 	RegularGrid();
 	RegularGrid(int nx, int ny, int nz);
 
 	vec3 index_to_pos(int i, int j, int k) const;
 	Box bounding_box() const;
+
+	Array<vec3> grid_points() const;
 
 	int nx, ny, nz;
 	vec3 dx, dy, dz;

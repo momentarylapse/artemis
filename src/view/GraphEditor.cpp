@@ -163,6 +163,8 @@ void GraphEditor::on_draw(Painter* p) {
 			p->draw_rect(node_area(n).grow(4));
 		}
 		color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
+		if (n->is_resource_node)
+			bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
 		if (hover and hover->type == HoverType::Node and hover->node == n)
 			bg = color::interpolate(bg, White, 0.2f);
 		p->set_color(bg);
@@ -190,7 +192,7 @@ void GraphEditor::on_draw(Painter* p) {
 			if (n->in_ports[i]->source) {
 				p->set_color(Gray);
 				p->set_line_width(3);
-				p->draw_line(node_out_port_pos(n->in_ports[i]->source->owner, 0), node_in_port_pos(n, i));
+				p->draw_line(node_out_port_pos(n->in_ports[i]->source->owner, n->in_ports[i]->source->port_index), node_in_port_pos(n, i));
 			}
 	}
 

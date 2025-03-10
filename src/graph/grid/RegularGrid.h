@@ -12,9 +12,9 @@
 
 namespace graph {
 
-class RegularGridSource : public Node {
+class RegularGrid : public ResourceNode {
 public:
-	RegularGridSource() : Node("RegularGridSource") {}
+	RegularGrid() : ResourceNode("RegularGrid") {}
 
 	void process() override;
 
@@ -22,7 +22,8 @@ public:
 	Setting<int> ny{this, "ny", 8};
 	Setting<int> nz{this, "nz", 1};
 
-	OutPort<RegularGrid> out{this, "out"};
+	OutPort<::RegularGrid> out{this, "out"};
+	OutPort<Array<vec3>> out_points{this, "points"};
 };
 
 } // graph

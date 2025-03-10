@@ -28,10 +28,18 @@ public:
 	string name;
 	vec2 pos;
 	bool dirty = true;
+	bool is_resource_node = false;
 
 	Array<SettingBase*> settings;
 	Array<InPortBase*> in_ports;
 	Array<OutPortBase*> out_ports;
+};
+
+class ResourceNode : public Node {
+public:
+	explicit ResourceNode(const string& name) : Node(name) {
+		is_resource_node = true;
+	}
 };
 
 } // graph

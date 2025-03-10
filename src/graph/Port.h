@@ -20,6 +20,7 @@ class OutPortBase {
 public:
 	explicit OutPortBase(Node* owner, const string& name, const kaba::Class* class_);
 	Node* owner;
+	int port_index;
 	string name;
 	const kaba::Class* class_;
 	Array<InPortBase*> targets;

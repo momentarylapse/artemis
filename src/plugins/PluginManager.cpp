@@ -15,6 +15,10 @@
 
 extern Session* _current_session_;
 
+namespace kaba {
+	extern const Class* TypeVec3List;
+}
+
 namespace artemis {
 
 base::map<const std::type_info*, const kaba::Class*> PluginManager::type_map;
@@ -98,6 +102,7 @@ void PluginManager::import_kaba() {
 	type_map.set(&typeid(string), kaba::TypeString);
 	type_map.set(&typeid(vec2), kaba::TypeVec2);
 	type_map.set(&typeid(vec3), kaba::TypeVec3);
+	type_map.set(&typeid(Array<vec3>), kaba::TypeVec3List);
 	type_map.set(&typeid(rect), kaba::TypeRect);
 	//type_map.set(&typeid(mat4), kaba::TypeMatrix4);
 	//type_map.set(&typeid(box), kaba::TypeBox);

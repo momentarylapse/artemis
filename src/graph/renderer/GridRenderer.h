@@ -8,6 +8,8 @@
 #include "RendererNode.h"
 #include <data/grid/RegularGrid.h>
 #include <graph/Port.h>
+#include <graph/Setting.h>
+#include <lib/image/color.h>
 
 namespace graph {
 
@@ -17,7 +19,10 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	InPort<RegularGrid> regular{this, "regular"};
+	Setting<float> line_width{this, "line-width", 1.0f};
+	Setting<color> _color{this, "color", Gray};
+
+	InPort<::RegularGrid> regular{this, "regular"};
 };
 
 } // graph

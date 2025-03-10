@@ -3,11 +3,12 @@
 //
 
 #include "NodeFactory.h"
-#include "grid/RegularGridSource.h"
+#include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
 #include "renderer/GridRenderer.h"
 #include "renderer/MeshRenderer.h"
+#include "renderer/PointListRenderer.h"
 
 namespace graph {
 
@@ -15,9 +16,10 @@ Array<string> enumerate_nodes() {
 	return {
 		"SphereMesh",
 		"TeapotMesh",
-		"RegularGridSource",
+		"RegularGrid",
 		"GridRenderer",
 		"MeshRenderer",
+		"PointListRenderer",
 	};
 }
 Node* create_node(Session* s, const string& name) {
@@ -25,12 +27,14 @@ Node* create_node(Session* s, const string& name) {
 		return new SphereMesh();
 	if (name == "TeapotMesh")
 		return new TeapotMesh();
-	if (name == "RegularGridSource")
-		return new RegularGridSource();
+	if (name == "RegularGrid")
+		return new RegularGrid();
 	if (name == "GridRenderer")
 		return new GridRenderer(s);
 	if (name == "MeshRenderer")
 		return new MeshRenderer(s);
+	if (name == "PointListRenderer")
+		return new PointListRenderer(s);
 	return nullptr;
 }
 
