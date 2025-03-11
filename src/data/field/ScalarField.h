@@ -16,6 +16,7 @@ struct ScalarField {
 	Array<float> v;
 
 	float value(int i, int j, int k) const;
+	void set(int i, int j, int k, float f);
 };
 
 }

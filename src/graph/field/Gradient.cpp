@@ -21,6 +21,7 @@ void Gradient::process() {
 				}
 
 		out(v);
+		dirty = false;
 	}
 }
 

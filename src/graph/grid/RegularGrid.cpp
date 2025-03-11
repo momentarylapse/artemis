@@ -9,6 +9,7 @@ namespace graph {
 void RegularGrid::process() {
 	out(artemis::data::RegularGrid(nx(), ny(), nz()));
 	out_points(out.value->grid_points());
+	dirty = false;
 }
 
 

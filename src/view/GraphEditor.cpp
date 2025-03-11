@@ -81,6 +81,22 @@ Dialog x ''
 				event(id, [this, id, ss] {
 					ss->set(get_int(id));
 				});
+			} else if (s->class_ == kaba::TypeString) {
+				auto ss = node->settings[i]->as<string>();
+				add_control("Edit", "", 1, i, id);
+				set_options(id, "expandx");
+				set_string(id, (*ss)());
+				event(id, [this, id, ss] {
+					ss->set(get_string(id));
+				});
+			} else if (s->class_ == kaba::TypeBool) {
+				auto ss = node->settings[i]->as<bool>();
+				add_control("CheckBox", "", 1, i, id);
+				set_options(id, "expandx");
+				check(id, (*ss)());
+				event(id, [this, id, ss] {
+					ss->set(is_checked(id));
+				});
 			} else if (s->class_ == kaba::TypeColor) {
 				auto ss = node->settings[i]->as<color>();
 				add_control("ColorButton", "", 1, i, id);

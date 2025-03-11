@@ -8,6 +8,7 @@
 #include <graph/Port.h>
 #include <data/grid/RegularGrid.h>
 #include <data/field/ScalarField.h>
+#include <graph/Setting.h>
 
 namespace graph {
 
@@ -16,6 +17,8 @@ public:
 	ScalarField() : ResourceNode("ScalarField") {}
 
 	void process() override;
+
+	Setting<string> formula{this, "formula", "0"};
 
 	InPort<artemis::data::RegularGrid> in_grid{this, "grid"};
 
