@@ -408,6 +408,8 @@ add_executable(artemis
 	src/lib/xhui/xhui.cpp
 	src/multiview/SingleData.cpp
 	src/plugins/PluginManager.cpp
+	src/processing/field/Gradient.cpp
+	src/processing/field/IsoSurface.cpp
 	src/storage/format/Format.cpp
 	src/storage/Storage.cpp
 	src/view/ActionController.cpp
