@@ -11,14 +11,14 @@
 #include <graph/renderer/RendererNode.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/os/msg.h>
+#include <lib/xhui/Theme.h>
 #include <view/ArtemisWindow.h>
+#include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
-	//data = new DataModel(session);
-	//generic_data = data.get();
 
 	graph = session->graph.get();
 
@@ -29,9 +29,12 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 }
 
 void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) {
+	session->drawing_helper->clear(params, xhui::Theme::_default.background_low);
+
 	for (auto n: graph->nodes)
 		if (auto r = dynamic_cast<graph::RendererNode*>(n))
-			r->draw_win(params, win);
+			if (r->active())
+				r->draw_win(params, win);
 }
 
 void ModeDefault::on_draw_post(Painter* p) {

@@ -15,6 +15,9 @@ void ScalarField::process() {
 		try {
 			auto m = ctx->create_module_for_source(format(R"foodelim(
 func f(p: vec3) -> f32
+	let x = p.x
+	let y = p.y
+	let z = p.z
 	return %s
 )foodelim", formula()));
 

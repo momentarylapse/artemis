@@ -251,5 +251,18 @@ void DrawingHelper::draw_data_points(Painter* p, MultiViewWindow* win, const Dyn
 	}
 }
 
+void DrawingHelper::draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d) {
+	Array<vec2> points;
+	vec2 A = (a + b - c - d);
+	vec2 B = (-a - 2*b + c + 2*d);
+	vec2 C = b - a;
+	vec2 D = a;
+	for (float t=0; t<1; t+=0.05f)
+		points.add(A*t*t*t + B*t*t + C*t + D);
+	points.add(d);
+	p->draw_lines(points);
+}
+
+
 
 

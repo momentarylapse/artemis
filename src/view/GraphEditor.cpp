@@ -15,6 +15,8 @@
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
 
+#include "DrawingHelper.h"
+
 static constexpr float NODE_WIDTH = 150.0f;
 static constexpr float NODE_HEIGHT = 50.0f;
 static constexpr float PORT_DX = 50.0f;
@@ -169,7 +171,7 @@ vec2 node_out_port_pos(graph::Node* n, int i) {
 }
 
 void GraphEditor::on_draw(Painter* p) {
-	p->set_color(xhui::Theme::_default.background_low);
+	p->set_color(xhui::Theme::_default.background);
 	p->draw_rect(_area);
 
 	for (auto n: graph->nodes) {
@@ -188,7 +190,8 @@ void GraphEditor::on_draw(Painter* p) {
 		p->draw_rect(node_area(n));
 
 		p->set_color(White);
-		p->draw_str(n->pos + vec2(20, 5), n->name);
+		float w = p->get_str_width(n->name);
+		p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), n->name);
 
 		for (int i=0; i<n->in_ports.num; i++) {
 			p->set_color(Gray);
@@ -208,7 +211,10 @@ void GraphEditor::on_draw(Painter* p) {
 			if (n->in_ports[i]->source) {
 				p->set_color(Gray);
 				p->set_line_width(3);
-				p->draw_line(node_out_port_pos(n->in_ports[i]->source->owner, n->in_ports[i]->source->port_index), node_in_port_pos(n, i));
+				vec2 A = node_out_port_pos(n->in_ports[i]->source->owner, n->in_ports[i]->source->port_index);
+				vec2 B = node_in_port_pos(n, i);
+				session->drawing_helper->draw_spline(p, A, A + vec2(0, 160), B - vec2(0, 160), B);
+				//p->draw_line(A, B);
 			}
 	}
 
@@ -220,6 +226,15 @@ void GraphEditor::on_draw(Painter* p) {
 			p->draw_line(node_out_port_pos(selection->node, selection->index), get_window()->mouse_position());
 		}
 	}
+
+	string tip;
+	if (hover and hover->type == HoverType::OutPort)
+		tip = format("output '%s': %s", hover->node->out_ports[hover->index]->name, hover->node->out_ports[hover->index]->class_->name);
+	if (hover and hover->type == HoverType::InPort)
+		tip = format("input '%s': %s", hover->node->in_ports[hover->index]->name, hover->node->in_ports[hover->index]->class_->name);
+
+	if (tip != "")
+		session->drawing_helper->draw_boxed_str(p, get_window()->mouse_position() + vec2(-10, 30), tip);
 }
 
 base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
