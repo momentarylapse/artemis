@@ -1,0 +1,35 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var grid = g.add_node("RegularGrid", [300,100])
+	grid.set("nz", 30)
+
+	var gr = g.add_node("GridRenderer", [150,400])
+	gr.set("line-width", 2.0)
+	gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var field = g.add_node("ScalarField", [370,250])
+	field.set("formula", "sin(z*0.5 + (cos(x*0.5) + cos(y*0.5)) * 0.2)")
+	
+	var vol = g.add_node("VolumeRenderer", [350, 400])
+	
+	var grad = g.add_node("Gradient", [550, 400])
+	var vec = g.add_node("VectorFieldRenderer", [550, 550])
+	
+	var iso = g.add_node("IsoSurface", [600, 500])
+	iso.set("iso-value", -0.3)
+	var mr = g.add_node("MeshRenderer", [600, 800])
+	mr.set("emission", dyn([0.4, 0.4, 0.9, 1]))
+
+	g.connect(grid, 0, gr, 0)
+	g.connect(grid, 0, field, 0)
+	g.connect(field, 0, vol, 0)
+	g.connect(field, 0, grad, 0)
+	g.connect(grad, 0, vec, 0)
+	
+	g.connect(field, 0, iso, 0)
+	g.connect(iso, 0, mr, 0)
+
+

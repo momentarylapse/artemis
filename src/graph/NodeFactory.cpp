@@ -5,6 +5,7 @@
 #include "NodeFactory.h"
 
 #include "field/Gradient.h"
+#include "field/IsoSurface.h"
 #include "field/ScalarField.h"
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
@@ -21,6 +22,7 @@ Array<string> enumerate_nodes() {
 	return {
 		"SphereMesh",
 		"TeapotMesh",
+		"IsoSurface",
 		"RegularGrid",
 		"ScalarField",
 		"Gradient",
@@ -36,6 +38,8 @@ Node* create_node(Session* s, const string& name) {
 		return new SphereMesh();
 	if (name == "TeapotMesh")
 		return new TeapotMesh();
+	if (name == "IsoSurface")
+		return new IsoSurface();
 	if (name == "RegularGrid")
 		return new RegularGrid();
 	if (name == "ScalarField")

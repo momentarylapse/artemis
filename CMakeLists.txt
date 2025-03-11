@@ -207,6 +207,7 @@ add_executable(artemis
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/Data.cpp
 	src/graph/field/Gradient.cpp
+	src/graph/field/IsoSurface.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/grid/RegularGrid.cpp
 	src/graph/mesh/SphereMesh.cpp
