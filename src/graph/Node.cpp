@@ -3,8 +3,9 @@
 //
 
 #include "Node.h"
-#include <lib/os/msg.h>
 #include "Setting.h"
+#include <view/DefaultNodePanel.h>
+#include <lib/os/msg.h>
 
 namespace graph {
 
@@ -22,6 +23,11 @@ void Node::set(const string& key, const Any& value) {;
 
 	msg_error(format("unknown setting '%s' of Node '%s'", key, name));
 }
+
+xhui::Panel* Node::create_panel() {
+	return new DefaultNodePanel(this);
+}
+
 
 
 } // graph

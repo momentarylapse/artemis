@@ -29,6 +29,8 @@
 
 Session* _current_session_ = nullptr;
 
+float _current_simulation_time_ = 0;
+
 Session *create_session() {
 	auto s = new Session;
 	s->storage = new Storage(s);

@@ -21,6 +21,7 @@ static constexpr float NODE_WIDTH = 150.0f;
 static constexpr float NODE_HEIGHT = 50.0f;
 static constexpr float PORT_DX = 50.0f;
 static constexpr float PORT_DY = 10.0f;
+static constexpr float PANEL_WIDTH = 320.0f;
 
 class NodeListPanel : public xhui::Panel {
 public:
@@ -44,76 +45,8 @@ Dialog x ''
 
 		size_mode_x = SizeMode::Shrink;
 		size_mode_y = SizeMode::Shrink;
-		min_width_user = 320;
 	}
 	Array<string> classes;
-};
-
-class NodePanel : public xhui::Panel {
-public:
-	explicit NodePanel(graph::Node* n) : xhui::Panel("node-panel") {
-		node = n;
-		from_source(R"foodelim(
-Dialog x ''
-	Grid node-panel '' class=card
-		Group node-group 'Test'
-			Grid settings-grid ''
-)foodelim");
-
-		set_string("node-group", node->name);
-
-		for (const auto& [i, s]: enumerate(node->settings)) {
-			set_target("settings-grid");
-			add_control("Label", s->name, 0, i, "");
-			string id = format("setting-%d", i);
-			if (s->class_ == kaba::TypeFloat32) {
-				auto ss = node->settings[i]->as<float>();
-				add_control("SpinButton", "", 1, i, id);
-				set_options(id, "expandx");
-				set_options(id, "range=::0.001");
-				set_float(id, (*ss)());
-				event(id, [this, id, ss] {
-					ss->set(get_float(id));
-				});
-			} else if (s->class_ == kaba::TypeInt32) {
-				auto ss = node->settings[i]->as<int>();
-				add_control("SpinButton", "", 1, i, id);
-				set_options(id, "expandx");
-				set_int(id, (*ss)());
-				event(id, [this, id, ss] {
-					ss->set(get_int(id));
-				});
-			} else if (s->class_ == kaba::TypeString) {
-				auto ss = node->settings[i]->as<string>();
-				add_control("Edit", "", 1, i, id);
-				set_options(id, "expandx");
-				set_string(id, (*ss)());
-				event(id, [this, id, ss] {
-					ss->set(get_string(id));
-				});
-			} else if (s->class_ == kaba::TypeBool) {
-				auto ss = node->settings[i]->as<bool>();
-				add_control("CheckBox", "", 1, i, id);
-				set_options(id, "expandx");
-				check(id, (*ss)());
-				event(id, [this, id, ss] {
-					ss->set(is_checked(id));
-				});
-			} else if (s->class_ == kaba::TypeColor) {
-				auto ss = node->settings[i]->as<color>();
-				add_control("ColorButton", "", 1, i, id);
-				set_options(id, "expandx");
-				set_color(id, (*ss)());
-				event(id, [this, id, ss] {
-					ss->set(get_color(id));
-				});
-			}
-		}
-		size_mode_x = SizeMode::Shrink;
-		size_mode_y = SizeMode::Shrink;
-		min_width_user = 320;
-	}
-	graph::Node* node;
 };
 
 GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
@@ -277,12 +210,14 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 	}
 
 	if (selection and selection->type == HoverType::Node) {
-		node_panel = new NodePanel(selection->node);
+		node_panel = selection->node->create_panel();
+		node_panel->min_width_user = PANEL_WIDTH;
 		embed("dock", 0, 0, node_panel);
 
 		dnd_offset = m - selection->node->pos;
 	} else if (!selection) {
 		node_panel = new NodeListPanel();
+		node_panel->min_width_user = PANEL_WIDTH;
 		embed("dock", 0, 0, node_panel);
 	}
 

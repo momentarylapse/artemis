@@ -16,13 +16,15 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
+extern float _current_simulation_time_;
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
 
 	graph = session->graph.get();
 
-	xhui::run_repeated(1.0f, [this] {
+	xhui::run_repeated(0.1f, [this] {
+		_current_simulation_time_ += 0.1f;
 		graph->iterate();
 		session->win->request_redraw();
 	});

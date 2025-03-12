@@ -11,6 +11,10 @@
 
 class Any;
 
+namespace xhui {
+	class Panel;
+}
+
 namespace graph {
 
 class SettingBase;
@@ -22,6 +26,8 @@ public:
 	explicit Node(const string& name);
 
 	virtual void process() {}
+
+	virtual xhui::Panel* create_panel();
 
 	void set(const string& key, const Any& value);
 

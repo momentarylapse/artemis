@@ -6,13 +6,13 @@
 
 namespace artemis::data {
 
-RegularGrid::RegularGrid(int _nx, int _ny, int _nz) {
+RegularGrid::RegularGrid(int _nx, int _ny, int _nz, const vec3& _dx, const vec3& _dy, const vec3& _dz) {
 	nx = _nx;
 	ny = _ny;
 	nz = _nz;
-	dx = vec3::EX;
-	dy = vec3::EY;
-	dz = vec3::EZ;
+	dx = _dx;
+	dy = _dy;
+	dz = _dz;
 }
 
 RegularGrid::RegularGrid() : RegularGrid(8, 8, 8) {}

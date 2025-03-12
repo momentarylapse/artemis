@@ -414,6 +414,7 @@ add_executable(artemis
 	src/storage/Storage.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
+	src/view/DefaultNodePanel.cpp
 	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp

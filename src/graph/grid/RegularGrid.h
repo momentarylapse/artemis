@@ -21,6 +21,9 @@ public:
 	Setting<int> nx{this, "nx", 8};
 	Setting<int> ny{this, "ny", 8};
 	Setting<int> nz{this, "nz", 1};
+	Setting<float> dx{this, "dx", 1.0f};
+	Setting<float> dy{this, "dy", 1.0f};
+	Setting<float> dz{this, "dz", 1.0f};
 
 	OutPort<artemis::data::RegularGrid> out{this, "out"};
 	OutPort<Array<vec3>> out_points{this, "points"};

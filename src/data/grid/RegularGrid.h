@@ -12,7 +12,7 @@ namespace artemis::data {
 
 struct RegularGrid {
 	RegularGrid();
-	RegularGrid(int nx, int ny, int nz);
+	RegularGrid(int nx, int ny, int nz, const vec3& dx = vec3::EX, const vec3& dy = vec3::EY, const vec3& dz = vec3::EZ);
 
 	vec3 index_to_pos(int i, int j, int k) const;
 	Box bounding_box() const;
