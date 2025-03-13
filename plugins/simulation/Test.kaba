@@ -1,0 +1,21 @@
+use artemis.*
+
+class Test extends Node
+	func __init__()
+		super.__init__("Test")
+		in_x.__init__(self, "x", PortFlags.MUTABLE)
+		#out_y.__init__(self, "y")
+	
+	func override process()
+		for f in in_x.value()
+			for i in 0:f.grid.nx+1
+				for j in 0:f.grid.ny+1
+					for k in 0:f.grid.nz+1
+						f.set(i, j, k, sin(k*0.3 + simulation_time))
+			in_x.mutated()
+			#out_y.set(laplace(f))
+			#dirty = false
+		
+	
+	var in_x: InPortScalarField
+	#var out_y: OutPortScalarField

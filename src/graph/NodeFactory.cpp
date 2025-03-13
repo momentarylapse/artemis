@@ -3,8 +3,8 @@
 //
 
 #include "NodeFactory.h"
-
 #include "field/Gradient.h"
+#include "field/Laplace.h"
 #include "field/IsoSurface.h"
 #include "field/ScalarField.h"
 #include "grid/RegularGrid.h"
@@ -15,24 +15,30 @@
 #include "renderer/PointListRenderer.h"
 #include "renderer/VectorFieldRenderer.h"
 #include "renderer/VolumeRenderer.h"
+#include "../plugins/PluginManager.h"
 
 namespace graph {
 
 Array<string> enumerate_nodes() {
-	return {
+	Array<string> a = {
 		"SphereMesh",
 		"TeapotMesh",
 		"IsoSurface",
 		"RegularGrid",
 		"ScalarField",
 		"Gradient",
+		"Laplace",
 		"GridRenderer",
 		"MeshRenderer",
 		"PointListRenderer",
 		"VolumeRenderer",
 		"VectorFieldRenderer",
 	};
+	for (const auto& [n, f] : artemis::PluginManager::plugin_classes)
+		a.add(n);
+	return a;
 }
+
 Node* create_node(Session* s, const string& name) {
 	if (name == "SphereMesh")
 		return new SphereMesh();
@@ -46,6 +52,8 @@ Node* create_node(Session* s, const string& name) {
 		return new ScalarField();
 	if (name == "Gradient")
 		return new Gradient();
+	if (name == "Laplace")
+		return new Laplace();
 	if (name == "GridRenderer")
 		return new GridRenderer(s);
 	if (name == "MeshRenderer")
@@ -56,6 +64,9 @@ Node* create_node(Session* s, const string& name) {
 		return new VolumeRenderer(s);
 	if (name == "VectorFieldRenderer")
 		return new VectorFieldRenderer(s);
+	for (const auto& [n, f] : artemis::PluginManager::plugin_classes)
+		if (name == n)
+			return (graph::Node*)artemis::PluginManager::create_instance(name);
 	return nullptr;
 }
 

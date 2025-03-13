@@ -103,6 +103,13 @@ vec2 node_out_port_pos(graph::Node* n, int i) {
 	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->out_ports.num - 1) / 2) * PORT_DX, NODE_HEIGHT + PORT_DY);
 }
 
+template<class P>
+string port_description(P* p) {
+	if (p->flags & graph::PortFlags::Mutable)
+		return format("'%s': %s  (mutable)", p->name, p->class_->name);
+	return format("'%s': %s", p->name, p->class_->name);
+}
+
 void GraphEditor::on_draw(Painter* p) {
 	p->set_color(xhui::Theme::_default.background);
 	p->draw_rect(_area);
@@ -162,9 +169,9 @@ void GraphEditor::on_draw(Painter* p) {
 
 	string tip;
 	if (hover and hover->type == HoverType::OutPort)
-		tip = format("output '%s': %s", hover->node->out_ports[hover->index]->name, hover->node->out_ports[hover->index]->class_->name);
+		tip = format("output %s", port_description(hover->node->out_ports[hover->index]));
 	if (hover and hover->type == HoverType::InPort)
-		tip = format("input '%s': %s", hover->node->in_ports[hover->index]->name, hover->node->in_ports[hover->index]->class_->name);
+		tip = format("input %s", port_description(hover->node->in_ports[hover->index]));
 
 	if (tip != "")
 		session->drawing_helper->draw_boxed_str(p, get_window()->mouse_position() + vec2(-10, 30), tip);

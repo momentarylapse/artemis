@@ -34,9 +34,11 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 	session->drawing_helper->clear(params, xhui::Theme::_default.background_low);
 
 	for (auto n: graph->nodes)
-		if (auto r = dynamic_cast<graph::RendererNode*>(n))
+		if (n->is_renderer) {
+			auto r = static_cast<graph::RendererNode*>(n);
 			if (r->active())
 				r->draw_win(params, win);
+		}
 }
 
 void ModeDefault::on_draw_post(Painter* p) {

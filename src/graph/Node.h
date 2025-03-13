@@ -24,6 +24,7 @@ class OutPortBase;
 class Node : public obs::Node<VirtualBase> {
 public:
 	explicit Node(const string& name);
+	~Node() override = default;
 
 	virtual void process() {}
 
@@ -35,6 +36,7 @@ public:
 	vec2 pos;
 	bool dirty = true;
 	bool is_resource_node = false;
+	bool is_renderer = false;
 
 	Array<SettingBase*> settings;
 	Array<InPortBase*> in_ports;

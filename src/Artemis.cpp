@@ -6,6 +6,7 @@
 #include <plugins/PluginManager.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
+#include <y/plugins/PluginManager.h>
 
 string AppVersion = "0.0.1";
 string AppName = "Artemis";
@@ -54,10 +55,6 @@ int xhui_main(const Array<string>& args) {
 	}
 
 	kaba::init();
-	if (xhui::Application::installed)
-		kaba::config.directory = xhui::Application::directory_static | "plugins";
-	else
-		kaba::config.directory = xhui::Application::directory_static.parent() | "plugins";
 	try {
 		artemis::PluginManager::init();
 	} catch (Exception &e) {

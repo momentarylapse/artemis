@@ -23,7 +23,7 @@ public:
 
 	InPort<artemis::data::RegularGrid> in_grid{this, "grid"};
 
-	OutPort<artemis::data::ScalarField> out_field{this, "out"};
+	OutPort<artemis::data::ScalarField> out_field{this, "out", PortFlags::Mutable};
 };
 
 } // graph

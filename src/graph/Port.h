@@ -16,23 +16,33 @@ namespace graph {
 class Node;
 class InPortBase;
 
+enum class PortFlags {
+	None,
+	Mutable
+};
+bool operator&(PortFlags a, PortFlags b);
+
 class OutPortBase {
 public:
-	explicit OutPortBase(Node* owner, const string& name, const kaba::Class* class_);
+	explicit OutPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags);
 	Node* owner;
 	int port_index;
 	string name;
 	const kaba::Class* class_;
+	PortFlags flags;
 	Array<InPortBase*> targets;
+	void mutated();
 };
 
 class InPortBase {
 public:
-	explicit InPortBase(Node* owner, const string& name, const kaba::Class* class_);
+	explicit InPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags);
 	Node* owner;
 	string name;
 	const kaba::Class* class_;
+	PortFlags flags;
 	OutPortBase* source = nullptr;
+	void mutated();
 };
 
 
@@ -42,7 +52,7 @@ class OutPort;
 template<class T>
 class InPort : public InPortBase {
 public:
-	InPort(Node* owner, const string& name) : InPortBase(owner, name, artemis::get_class<T>()) {}
+	InPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : InPortBase(owner, name, artemis::get_class<T>(), flags) {}
 	const T* value() const {
 		if (!source)
 			return nullptr;
@@ -56,11 +66,10 @@ public:
 template<class T>
 class OutPort : public OutPortBase {
 public:
-	OutPort(Node* owner, const string& name) : OutPortBase(owner, name, artemis::get_class<T>()) {}
+	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, artemis::get_class<T>(), flags) {}
 	void operator()(const T& v) {
 		value = v;
-		for (auto t: targets)
-			t->owner->dirty = true;
+		mutated();
 	}
 	base::optional<T> value;
 };

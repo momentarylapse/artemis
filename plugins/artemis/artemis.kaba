@@ -1,0 +1,74 @@
+
+struct Mesh
+	func extern __init__()
+
+struct RegularGrid
+	func extern __init__()
+	var nx, ny, nz: i32
+	var dx, dy, dz: vec3
+
+struct ScalarField
+	func extern __init__()
+	var grid: RegularGrid
+	var v: f32[]
+	func extern mut set(i: i32, j: i32, k: i32, v: f32)
+	func extern value(i: i32, j: i32, k: i32) -> f32
+
+struct VectorField
+	func extern __init__()
+	var grid: RegularGrid
+	var v: vec3[]
+	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
+	func extern value(i: i32, j: i32, k: i32) -> vec3
+
+
+
+class Node
+	func extern __init__(name: string)
+	func extern virtual __delete__()
+	func extern virtual mut process()
+	func extern virtual mut create_panel() -> void*
+	func extern mut set(key: string, value: any)
+	var dirty: bool
+
+enum PortFlags
+	NONE
+	MUTABLE
+
+# TODO kaba template classes!
+class InPortScalarField
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern value() -> ScalarField*
+	func extern mutated()
+class OutPortScalarField
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern set(x: ScalarField)
+
+class InPortVectorField
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern value() -> VectorField*
+	func extern mutated()
+class OutPortVectorField
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern set(x: VectorField)
+	
+
+class Graph
+	func extern add_node(name: string, pos: vec2) -> Node&
+	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
+
+
+
+class Session
+	var graph: owned![Graph]
+
+
+var extern simulation_time: f32
+
+func extern current_session() -> Session&
+
+
+func extern gradient(f: ScalarField) -> VectorField
+func extern laplace(f: ScalarField) -> ScalarField
+
+

@@ -21,8 +21,13 @@ public:
 	static void init();
 	static void export_kaba();
 	static void import_kaba();
+	static void find_plugins();
+
+	static Path directory();
 
 	static base::map<const std::type_info*, const kaba::Class*> type_map;
+	static base::map<string, Path> plugin_classes;
+	static void* create_instance(const string& name);
 };
 
 template<class T>

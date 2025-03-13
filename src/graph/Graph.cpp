@@ -41,6 +41,10 @@ bool Graph::connect(OutPortBase& source, InPortBase& sink) {
 		msg_error(format("failed to connect: sink already connected"));
 		return false;
 	}
+	if ((sink.flags & PortFlags::Mutable) and !(source.flags & PortFlags::Mutable)) {
+		msg_error(format("failed to connect: sink is mutable, source is not"));
+		return false;
+	}
 	sink.source = &source;
 	source.targets.add(&sink);
 	out_changed();

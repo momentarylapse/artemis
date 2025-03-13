@@ -208,6 +208,7 @@ add_executable(artemis
 	src/data/Data.cpp
 	src/graph/field/Gradient.cpp
 	src/graph/field/IsoSurface.cpp
+	src/graph/field/Laplace.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/grid/RegularGrid.cpp
 	src/graph/mesh/SphereMesh.cpp
@@ -408,7 +409,7 @@ add_executable(artemis
 	src/lib/xhui/xhui.cpp
 	src/multiview/SingleData.cpp
 	src/plugins/PluginManager.cpp
-	src/processing/field/Gradient.cpp
+	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp
 	src/storage/format/Format.cpp
 	src/storage/Storage.cpp

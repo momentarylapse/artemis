@@ -3,7 +3,7 @@
 //
 
 #include "Gradient.h"
-#include <processing/field/Gradient.h>
+#include <processing/field/Calculus.h>
 
 namespace graph {
 

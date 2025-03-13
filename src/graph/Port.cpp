@@ -7,19 +7,37 @@
 
 namespace graph {
 
-OutPortBase::OutPortBase(Node* owner, const string& name, const kaba::Class* class_) {
+bool operator&(PortFlags a, PortFlags b) {
+	return ((int)a) & ((int)b);
+}
+
+OutPortBase::OutPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags) {
 	this->owner = owner;
 	this->name = name;
 	this->class_ = class_;
+	this->flags = flags;
 	port_index = owner->out_ports.num;
 	owner->out_ports.add(this);
 }
 
-InPortBase::InPortBase(Node* owner, const string& name, const kaba::Class* class_) {
+void OutPortBase::mutated() {
+	for (auto t: targets)
+		t->owner->dirty = true;
+}
+
+
+InPortBase::InPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags) {
 	this->owner = owner;
 	this->name = name;
 	this->class_ = class_;
+	this->flags = flags;
 	owner->in_ports.add(this);
 }
+
+void InPortBase::mutated() {
+	if (source)
+		source->mutated();
+}
+
 
 } // graph

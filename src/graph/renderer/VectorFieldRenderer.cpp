@@ -22,8 +22,8 @@ void VectorFieldRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 				points.add(f->grid.index_to_pos(i, j, k) + f->value(i, j, k));
 			}
 
-	session->drawing_helper->set_color(Green);//_color());
-	session->drawing_helper->set_line_width(2);//line_width());
+	session->drawing_helper->set_color(_color());
+	session->drawing_helper->set_line_width(line_width());
 	session->drawing_helper->draw_lines(points, false);
 }
 
