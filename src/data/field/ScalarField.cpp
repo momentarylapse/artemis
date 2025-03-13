@@ -8,17 +8,17 @@ namespace artemis::data {
 
 ScalarField::ScalarField(const RegularGrid& g) {
 	grid = g;
-	v.resize((grid.nx + 1) * (grid.ny + 1) * (grid.nz + 1));
+	v.resize(grid.nx * grid.ny * grid.nz);
 }
 
 ScalarField::ScalarField() : ScalarField(RegularGrid()) {}
 
 float ScalarField::value(int i, int j, int k) const {
-	return v[i + j * (grid.nx + 1) + k * (grid.nx + 1) * (grid.ny + 1)];
+	return v[i + j * grid.nx + k * grid.nx * grid.ny];
 }
 
 void ScalarField::set(int i, int j, int k, float f) {
-	v[i + j * (grid.nx + 1) + k * (grid.nx + 1) * (grid.ny + 1)] = f;
+	v[i + j * grid.nx + k * grid.nx * grid.ny] = f;
 }
 
 

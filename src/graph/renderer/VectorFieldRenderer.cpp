@@ -15,9 +15,9 @@ void VectorFieldRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 		return;
 
 	Array<vec3> points;
-	for (int i=0; i<=f->grid.nx; i++)
-		for (int j=0; j<=f->grid.ny; j++)
-			for (int k=0; k<=f->grid.nz; k++) {
+	for (int i=0; i<f->grid.nx; i++)
+		for (int j=0; j<f->grid.ny; j++)
+			for (int k=0; k<f->grid.nz; k++) {
 				points.add(f->grid.index_to_pos(i, j, k));
 				points.add(f->grid.index_to_pos(i, j, k) + f->value(i, j, k));
 			}

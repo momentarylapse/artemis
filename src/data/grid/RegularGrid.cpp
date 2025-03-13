@@ -23,15 +23,15 @@ vec3 RegularGrid::index_to_pos(int i, int j, int k) const {
 
 Box RegularGrid::bounding_box() const {
 	// FIXME... :P
-	return {v_0, index_to_pos(nx, ny, nz)};
+	return {v_0, index_to_pos(nx-1, ny-1, nz-1)};
 }
 
 Array<vec3> RegularGrid::grid_points() const {
 	Array<vec3> points;
-	//points.resize((nx + 1) * (nx + 1) * (nz * 1));
-	for (int i=0; i<=nx; i++)
-		for (int j=0; j<=ny; j++)
-			for (int k=0; k<=nz; k++)
+	//points.resize(nx * ny * nz);
+	for (int i=0; i<nx; i++)
+		for (int j=0; j<ny; j++)
+			for (int k=0; k<nz; k++)
 				points.add(index_to_pos(i, j, k));
 	return points;
 }
