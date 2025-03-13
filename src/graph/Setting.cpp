@@ -53,7 +53,6 @@ Array<float> any_to_float_list(const Any& a) {
 
 color any_to_color(const Any& a) {
 	const auto list = any_to_float_list(a);
-	msg_write(str(list));
 	// rgb-a  :P
 	if (list.num >= 4)
 		return color(list[3], list[0], list[1], list[2]);

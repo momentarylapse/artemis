@@ -3,6 +3,9 @@
 //
 
 #include "NodeFactory.h"
+
+#include <lib/os/msg.h>
+
 #include "field/Gradient.h"
 #include "field/Laplace.h"
 #include "field/IsoSurface.h"
@@ -19,54 +22,84 @@
 
 namespace graph {
 
-Array<string> enumerate_nodes() {
-	Array<string> a = {
-		"SphereMesh",
-		"TeapotMesh",
-		"IsoSurface",
-		"RegularGrid",
-		"ScalarField",
-		"Gradient",
-		"Laplace",
-		"GridRenderer",
-		"MeshRenderer",
-		"PointListRenderer",
-		"VolumeRenderer",
-		"VectorFieldRenderer",
-	};
-	for (const auto& [n, f] : artemis::PluginManager::plugin_classes)
-		a.add(n);
-	return a;
+struct NodeClassDescriptor {
+	string name;
+	base::set<NodeCategory> categories;
+	std::function<Node*(Session*)> f_create;
+};
+
+static Array<NodeClassDescriptor> node_class_db;
+
+base::set<NodeCategory> category_set(const Array<NodeCategory>& categories) {
+	base::set<NodeCategory> r;
+	for (auto c: categories)
+		r.add(c);
+	return r;
+}
+
+template<class T>
+void register_node_class(const string& name, const Array<NodeCategory>& categories) {
+	node_class_db.add({
+		name,
+		category_set(categories),
+		[] (Session*) {
+			return new T();
+		}
+	});
+}
+template<class T>
+void register_node_class_p(const string& name, const Array<NodeCategory>& categories) {
+	node_class_db.add({
+		name,
+		category_set(categories),
+		[] (Session* s) {
+			return new T(s);
+		}
+	});
+}
+
+void init_factory() {
+	register_node_class<RegularGrid>("RegularGrid", {NodeCategory::Grid});
+
+	register_node_class<SphereMesh>("SphereMesh", {NodeCategory::Mesh});
+	register_node_class<TeapotMesh>("TeapotMesh", {NodeCategory::Mesh});
+	register_node_class<IsoSurface>("IsoSurface", {NodeCategory::Field, NodeCategory::Mesh});
+
+	register_node_class<ScalarField>("ScalarField", {NodeCategory::Field});
+	register_node_class<Gradient>("Gradient", {NodeCategory::Field});
+	register_node_class<Laplace>("Laplace", {NodeCategory::Field});
+
+	register_node_class_p<GridRenderer>("GridRenderer", {NodeCategory::Renderer});
+	register_node_class_p<MeshRenderer>("MeshRenderer", {NodeCategory::Renderer});
+	register_node_class_p<PointListRenderer>("PointListRenderer", {NodeCategory::Renderer});
+	register_node_class_p<VolumeRenderer>("VolumeRenderer", {NodeCategory::Renderer});
+	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {NodeCategory::Renderer});
+
+
+	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {
+		node_class_db.add({
+			name,
+			{NodeCategory::Simulation}, // TODO
+			[name=name] (Session*) {
+				return (Node*)artemis::PluginManager::create_instance(name);
+			}
+		});
+	}
+}
+
+
+Array<string> enumerate_nodes(NodeCategory category) {
+	base::set<string> _classes;
+	for (const auto& d: node_class_db)
+		if (d.categories.contains(category))
+			_classes.add(d.name);
+	return _classes;
 }
 
 Node* create_node(Session* s, const string& name) {
-	if (name == "SphereMesh")
-		return new SphereMesh();
-	if (name == "TeapotMesh")
-		return new TeapotMesh();
-	if (name == "IsoSurface")
-		return new IsoSurface();
-	if (name == "RegularGrid")
-		return new RegularGrid();
-	if (name == "ScalarField")
-		return new ScalarField();
-	if (name == "Gradient")
-		return new Gradient();
-	if (name == "Laplace")
-		return new Laplace();
-	if (name == "GridRenderer")
-		return new GridRenderer(s);
-	if (name == "MeshRenderer")
-		return new MeshRenderer(s);
-	if (name == "PointListRenderer")
-		return new PointListRenderer(s);
-	if (name == "VolumeRenderer")
-		return new VolumeRenderer(s);
-	if (name == "VectorFieldRenderer")
-		return new VectorFieldRenderer(s);
-	for (const auto& [n, f] : artemis::PluginManager::plugin_classes)
-		if (name == n)
-			return (graph::Node*)artemis::PluginManager::create_instance(name);
+	for (auto& d: node_class_db)
+		if (d.name == name)
+			return d.f_create(s);
 	return nullptr;
 }
 

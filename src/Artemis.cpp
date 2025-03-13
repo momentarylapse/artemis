@@ -1,5 +1,6 @@
 
 #include <ModeDefault.h>
+#include <graph/NodeFactory.h>
 #include <storage/format/Format.h>
 #include "Session.h"
 #include <view/ArtemisWindow.h>
@@ -62,6 +63,7 @@ int xhui_main(const Array<string>& args) {
 	}
 
 	auto s = create_session();
+	graph::init_factory();
 	if (args.num >= 2) {
 		start_session_load_file(s, args[1]);
 	} else {

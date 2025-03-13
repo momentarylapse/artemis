@@ -84,6 +84,15 @@ void link_ports(kaba::ExternalLinkData* ext, const string& name) {
 	ext->link_class_func("OutPort" + name + ".set", &graph::OutPort<T>::operator());
 }
 
+template<class T>
+class GenericVDeleter : public T {
+public:
+	void __delete__() override {
+		((T*)this)->~T();
+	}
+
+};
+
 void PluginManager::export_kaba() {
 	auto ext = kaba::default_context->external.get();
 
@@ -128,7 +137,7 @@ void PluginManager::export_kaba() {
 		ext->declare_class_size("Node", sizeof(graph::Node));
 		ext->link_class_func("Node.__init__", &node_init);
 		ext->link_class_func("Node.set", &graph::Node::set);
-		ext->link_virtual("Node.__delete__", &kaba::generic_delete<graph::Node>, &n);
+		ext->link_virtual("Node.__delete__", &GenericVDeleter<graph::Node>::__delete__, &n);
 		ext->link_virtual("Node.process", &graph::Node::process, &n);
 		ext->link_virtual("Node.create_panel", &graph::Node::create_panel, &n);
 	}

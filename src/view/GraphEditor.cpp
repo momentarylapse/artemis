@@ -30,23 +30,41 @@ public:
 Dialog x ''
 	Grid ? '' class=card
 		Group node-list-group 'New node' height=350
-			ListView list 'class' nobar expandy dragsource=new-node
+			TabControl category 'field\\grid\\mesh\\render\\sim'
+				ListView list-field 'class' nobar expandy dragsource=new-node
+				ListView list-grid 'class' nobar expandy dragsource=new-node
+				ListView list-mesh 'class' nobar expandy dragsource=new-node
+				ListView list-renderer 'class' nobar expandy dragsource=new-node
+				ListView list-simulation 'class' nobar expandy dragsource=new-node
 )foodelim");
 
-		classes = graph::enumerate_nodes();
-		for (const auto& c: classes) {
-			add_string("list", c);
+		struct X {
+			graph::NodeCategory category;
+			string name, title;
+		};
+		Array<X> categories = {
+			{graph::NodeCategory::Field, "field", "field"},
+			{graph::NodeCategory::Grid, "grid", "grid"},
+			{graph::NodeCategory::Mesh, "mesh", "mesh"},
+			{graph::NodeCategory::Renderer, "renderer", "render"},
+			{graph::NodeCategory::Simulation, "simulation", "sim"}
+		};
+		for (const auto& [category, name, title]: categories) {
+			string list_id = "list-" + name;
+			const auto classes = graph::enumerate_nodes(category);
+			for (const auto& c: classes) {
+				add_string(list_id, c);
+			}
+			event_x(list_id, xhui::event_id::DragStart, [this, classes, list_id] {
+				int i = get_int(list_id);
+				if (i >= 0)
+					get_window()->start_drag(classes[i], "add-node:" + classes[i]);
+			});
 		}
-		event_x("list", xhui::event_id::DragStart, [this] {
-			int i = get_int("list");
-			if (i >= 0)
-				get_window()->start_drag(classes[i], "add-node:" + classes[i]);
-		});
 
 		size_mode_x = SizeMode::Shrink;
 		size_mode_y = SizeMode::Shrink;
 	}
-	Array<string> classes;
 };
 
 GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
@@ -114,6 +132,7 @@ void GraphEditor::on_draw(Painter* p) {
 	p->set_color(xhui::Theme::_default.background);
 	p->draw_rect(_area);
 
+	p->set_font("", xhui::Theme::_default.font_size, true, false);
 	for (auto n: graph->nodes) {
 		if (selection and selection->type == HoverType::Node and selection->node == n) {
 			p->set_color(Red.with_alpha(0.7f));
@@ -157,6 +176,7 @@ void GraphEditor::on_draw(Painter* p) {
 				//p->draw_line(A, B);
 			}
 	}
+	p->set_font("", xhui::Theme::_default.font_size, false, false);
 
 
 	if (get_window()->button(0)) {

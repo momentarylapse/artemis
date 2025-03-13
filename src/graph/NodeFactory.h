@@ -12,8 +12,10 @@ class Session;
 namespace graph {
 
 class Node;
+enum class NodeCategory;
 
-Array<string> enumerate_nodes();
+void init_factory();
+Array<string> enumerate_nodes(NodeCategory category);
 Node* create_node(Session* s, const string& name);
 
 } // graph

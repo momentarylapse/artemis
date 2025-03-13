@@ -21,6 +21,14 @@ class SettingBase;
 class InPortBase;
 class OutPortBase;
 
+enum class NodeCategory {
+	Field,
+	Grid,
+	Mesh,
+	Renderer,
+	Simulation
+};
+
 class Node : public obs::Node<VirtualBase> {
 public:
 	explicit Node(const string& name);
