@@ -106,6 +106,7 @@ Node* create_node(Session* s, const string& name) {
 	for (auto& d: node_class_db)
 		if (d.name == name)
 			return d.f_create(s);
+	msg_error(format("unknown node: %s", name));
 	return nullptr;
 }
 

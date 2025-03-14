@@ -18,6 +18,13 @@ struct VectorField {
 
 	vec3 value(int i, int j, int k) const;
 	void set(int i, int j, int k, const vec3& v);
+
+	void operator+=(const VectorField& o);
+	VectorField operator+(const VectorField& o) const;
+	void operator-=(const VectorField& o);
+	VectorField operator-(const VectorField& o) const;
+	void operator*=(float o);
+	VectorField operator*(float o) const;
 };
 
 }

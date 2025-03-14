@@ -1,0 +1,36 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var grid = g.add_node("RegularGrid", [300,100])
+	grid.set("nx", 15)
+	grid.set("ny", 15)
+	grid.set("nz", 15)
+
+	var gr = g.add_node("GridRenderer", [150,400])
+	gr.set("line-width", 1.0)
+	gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var E = g.add_node("VectorField", [370,250])
+	E.set("formula", "vec3(1,0,0) * exp( -(len(p - vec3(8,8,8))^2))")
+	#field.set("time-dependent", true)
+	
+	var B = g.add_node("VectorField", [500,250])
+	
+	var rE = g.add_node("VectorFieldRenderer", [370, 550])
+	rE.set("color", dyn([1,0,0,1]))
+	var rB = g.add_node("VectorFieldRenderer", [550, 550])
+	rB.set("color", dyn([0.1,0.1,1,1]))
+	
+	var mw = g.add_node("MaxwellFDTD", [500, 400])
+	
+	g.connect(grid, 0, gr, 0)
+	g.connect(grid, 0, E, 0)
+	g.connect(E, 0, rE, 0)
+	g.connect(grid, 0, B, 0)
+	g.connect(B, 0, rB, 0)
+	#g.connect(E, 0, mw, 0)
+	#g.connect(B, 0, mw, 1)
+
+

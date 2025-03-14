@@ -20,6 +20,12 @@ struct VectorField
 	var v: vec3[]
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
 	func extern value(i: i32, j: i32, k: i32) -> vec3
+	func extern mut __iadd__(o: VectorField)
+	func extern __add__(o: VectorField) -> VectorField
+	func extern mut __isub__(o: VectorField)
+	func extern __sub__(o: VectorField) -> VectorField
+	func extern mut __imul__(o: f32)
+	func extern __mul__(o: f32) -> VectorField
 
 
 
@@ -69,6 +75,9 @@ func extern current_session() -> Session&
 
 
 func extern gradient(f: ScalarField) -> VectorField
+func extern divergence(f: VectorField) -> ScalarField
+func extern rotation_fw(f: VectorField) -> VectorField
+func extern rotation_bw(f: VectorField) -> VectorField
 func extern laplace(f: ScalarField) -> ScalarField
 
 

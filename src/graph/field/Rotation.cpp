@@ -9,7 +9,10 @@ namespace graph {
 
 void Rotation::process() {
 	if (auto f = in_field.value()) {
-		out(artemis::processing::rotation(*f));
+		if (backwards())
+			out(artemis::processing::rotation_bw(*f));
+		else
+			out(artemis::processing::rotation_fw(*f));
 		dirty = false;
 	}
 }

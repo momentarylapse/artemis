@@ -98,6 +98,9 @@ void PluginManager::export_kaba() {
 
 	ext->link("current_session", (void*)&current_session);
 	ext->link("gradient", (void*)&processing::gradient);
+	ext->link("divergence", (void*)&processing::divergence);
+	ext->link("rotation_fw", (void*)&processing::rotation_fw);
+	ext->link("rotation_bw", (void*)&processing::rotation_bw);
 	ext->link("laplace", (void*)&processing::laplace);
 	ext->link("simulation_time", &_current_simulation_time_);
 
@@ -117,6 +120,12 @@ void PluginManager::export_kaba() {
 	ext->declare_class_element("VectorField.v", &data::VectorField::v);
 	ext->link_class_func("VectorField.set", &data::VectorField::set);
 	ext->link_class_func("VectorField.value", &data::VectorField::value);
+	ext->link_class_func("VectorField.__add__", &data::VectorField::operator+);
+	ext->link_class_func("VectorField.__iadd__", &data::VectorField::operator+=);
+	ext->link_class_func("VectorField.__sub__", &data::VectorField::operator-);
+	ext->link_class_func("VectorField.__isub__", &data::VectorField::operator-=);
+	ext->link_class_func("VectorField.__mul__", &data::VectorField::operator*);
+	ext->link_class_func("VectorField.__imul__", &data::VectorField::operator*=);
 
 
 	ext->declare_class_size("RegularGrid", sizeof(data::RegularGrid));

@@ -40,7 +40,7 @@ data::ScalarField divergence(const data::VectorField& v) {
 	return div;
 }
 
-data::VectorField rotation(const data::VectorField& v) {
+data::VectorField rotation_fw(const data::VectorField& v) {
 	data::VectorField rot(v.grid);
 
 	for (int i=0; i<v.grid.nx-1; i++)
@@ -51,6 +51,22 @@ data::VectorField rotation(const data::VectorField& v) {
 				vec3 vy = v.value(i, j+1, k);
 				vec3 vz = v.value(i, j, k+1);
 				rot.set(i, j, k, vec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.z - v0.z)));
+			}
+
+	return rot;
+}
+
+data::VectorField rotation_bw(const data::VectorField& v) {
+	data::VectorField rot(v.grid);
+
+	for (int i=1; i<v.grid.nx; i++)
+		for (int j=1; j<v.grid.ny; j++)
+			for (int k=1; k<v.grid.nz; k++) {
+				vec3 v0 = v.value(i, j, k);
+				vec3 vnx = v.value(i-1, j, k);
+				vec3 vny = v.value(i, j-1, k);
+				vec3 vnz = v.value(i, j, k-1);
+				rot.set(i, j, k, vec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.z - vny.z)));
 			}
 
 	return rot;

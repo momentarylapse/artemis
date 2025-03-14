@@ -7,6 +7,7 @@
 #include <graph/Node.h>
 #include <graph/Port.h>
 #include <data/field/VectorField.h>
+#include <graph/Setting.h>
 
 namespace graph {
 
@@ -15,6 +16,8 @@ public:
 	Rotation() : Node("Rotation") {}
 
 	void process() override;
+
+	Setting<bool> backwards{this, "backwards", false};
 
 	InPort<artemis::data::VectorField> in_field{this, "in"};
 
