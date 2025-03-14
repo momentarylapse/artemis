@@ -1,0 +1,25 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var grid = g.add_node("RegularGrid", [300,100])
+	grid.set("nx", 15)
+	grid.set("ny", 15)
+	grid.set("nz", 15)
+
+	var gr = g.add_node("GridRenderer", [150,400])
+	gr.set("line-width", 2.0)
+	gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var field = g.add_node("VectorField", [370,250])
+	field.set("formula", "vec3.cross(p - vec3(7,7,7), [0,0,1])")
+	field.set("time-dependent", true)
+	
+	var vfr = g.add_node("VectorFieldRenderer", [550, 550])
+	
+	g.connect(grid, 0, gr, 0)
+	g.connect(grid, 0, field, 0)
+	g.connect(field, 0, vfr, 0)
+
+

@@ -8,8 +8,11 @@
 
 #include "field/Gradient.h"
 #include "field/Laplace.h"
+#include "field/Divergence.h"
+#include "field/Rotation.h"
 #include "field/IsoSurface.h"
 #include "field/ScalarField.h"
+#include "field/VectorField.h"
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
@@ -66,7 +69,10 @@ void init_factory() {
 	register_node_class<IsoSurface>("IsoSurface", {NodeCategory::Field, NodeCategory::Mesh});
 
 	register_node_class<ScalarField>("ScalarField", {NodeCategory::Field});
+	register_node_class<VectorField>("VectorField", {NodeCategory::Field});
 	register_node_class<Gradient>("Gradient", {NodeCategory::Field});
+	register_node_class<Divergence>("Divergence", {NodeCategory::Field});
+	register_node_class<Rotation>("Rotation", {NodeCategory::Field});
 	register_node_class<Laplace>("Laplace", {NodeCategory::Field});
 
 	register_node_class_p<GridRenderer>("GridRenderer", {NodeCategory::Renderer});

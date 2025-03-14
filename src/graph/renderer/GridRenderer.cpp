@@ -13,20 +13,20 @@ namespace graph {
 void GridRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 	if (auto r = regular.value()) {
 		Array<vec3> points;
-		for (int i=0; i<r->nx; i++)
-			for (int j=0; j<r->ny; j++) {
-				points.add(r->index_to_pos(i, j, 0));
-				points.add(r->index_to_pos(i, j, r->nz-1));
+		for (int i=0; i<=r->nx; i++)
+			for (int j=0; j<=r->ny; j++) {
+				points.add(r->vertex(i, j, 0));
+				points.add(r->vertex(i, j, r->nz));
 			}
-		for (int i=0; i<r->nx; i++)
-			for (int k=0; k<r->nz; k++) {
-				points.add(r->index_to_pos(i, 0, k));
-				points.add(r->index_to_pos(i, r->ny-1, k));
+		for (int i=0; i<=r->nx; i++)
+			for (int k=0; k<=r->nz; k++) {
+				points.add(r->vertex(i, 0, k));
+				points.add(r->vertex(i, r->ny, k));
 			}
-		for (int j=0; j<r->ny; j++)
-			for (int k=0; k<r->nz; k++) {
-				points.add(r->index_to_pos(0, j, k));
-				points.add(r->index_to_pos(r->nx-1, j, k));
+		for (int j=0; j<=r->ny; j++)
+			for (int k=0; k<=r->nz; k++) {
+				points.add(r->vertex(0, j, k));
+				points.add(r->vertex(r->nx, j, k));
 			}
 
 		session->drawing_helper->set_color(_color());

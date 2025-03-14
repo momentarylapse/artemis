@@ -28,7 +28,7 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) 
 			for (int k=0; k<f->grid.nz; k++) {
 				float v = f->value(i, j, k);
 				session->drawing_helper->draw_mesh(params, win->rvd,
-					mat4::translation(f->grid.index_to_pos(i, j, k)) * mat4::scale(v, v, v),
+					mat4::translation(f->grid.cell_center(i, j, k)) * mat4::scale(v, v, v),
 					vertex_buffer.get(),
 					session->drawing_helper->material_selection);
 			}

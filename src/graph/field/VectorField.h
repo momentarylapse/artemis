@@ -1,5 +1,5 @@
 //
-// Created by Michael Ankele on 2025-03-10.
+// Created by Michael Ankele on 2025-03-14.
 //
 
 #pragma once
@@ -7,15 +7,15 @@
 #include <graph/Node.h>
 #include <graph/Port.h>
 #include <data/grid/RegularGrid.h>
-#include <data/field/ScalarField.h>
+#include <data/field/VectorField.h>
 #include <graph/Setting.h>
 #include <lib/kaba/kaba.h>
 
 namespace graph {
 
-class ScalarField : public ResourceNode {
+class VectorField : public ResourceNode {
 public:
-	ScalarField() : ResourceNode("ScalarField") {}
+	VectorField() : ResourceNode("VectorField") {}
 
 	void process() override;
 
@@ -24,12 +24,12 @@ public:
 
 	InPort<artemis::data::RegularGrid> in_grid{this, "grid"};
 
-	OutPort<artemis::data::ScalarField> out_field{this, "out", PortFlags::Mutable};
+	OutPort<artemis::data::VectorField> out_field{this, "out", PortFlags::Mutable};
 
 	string cached_formula;
 	owned<kaba::Context> ctx;
 	shared<kaba::Module> module;
-	typedef float (*f_t)(const vec3&, float);
+	typedef vec3 (*f_t)(const vec3&, float);
 	f_t f_p = nullptr;
 };
 

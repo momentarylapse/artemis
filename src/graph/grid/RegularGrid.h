@@ -26,7 +26,8 @@ public:
 	Setting<float> dz{this, "dz", 1.0f};
 
 	OutPort<artemis::data::RegularGrid> out{this, "out"};
-	OutPort<Array<vec3>> out_points{this, "points"};
+	OutPort<Array<vec3>> out_vertices{this, "vertices"};
+	OutPort<Array<vec3>> out_cell_centers{this, "cell_centers"};
 };
 
 } // graph

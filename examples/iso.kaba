@@ -4,6 +4,8 @@ func main()
 	var g = weak(current_session().graph)
 
 	var grid = g.add_node("RegularGrid", [300,100])
+	grid.set("nx", 9)
+	grid.set("ny", 9)
 	grid.set("nz", 30)
 
 	var gr = g.add_node("GridRenderer", [150,400])
@@ -11,7 +13,7 @@ func main()
 	gr.set("color", dyn([0.5,0.5,0.5,1]))
 	
 	var field = g.add_node("ScalarField", [370,250])
-	field.set("formula", "sin(0.8 * len(p-vec3(4,4,4)) + t)")
+	field.set("formula", "sin(0.8 * len(p-vec3(4,4,15)) + t)")
 	field.set("time-dependent", true)
 	
 	var vol = g.add_node("VolumeRenderer", [350, 400])

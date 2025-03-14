@@ -12,4 +12,6 @@ struct VectorField;
 namespace artemis::processing {
 data::VectorField gradient(const data::ScalarField& f);
 data::ScalarField laplace(const data::ScalarField& f);
+data::ScalarField divergence(const data::VectorField& f);
+data::VectorField rotation(const data::VectorField& f);
 }

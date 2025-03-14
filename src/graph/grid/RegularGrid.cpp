@@ -11,7 +11,8 @@ void RegularGrid::process() {
 		vec3::EX * dx(),
 		vec3::EY * dy(),
 		vec3::EZ * dz()));
-	out_points(out.value->grid_points());
+	out_vertices(out.value->vertices());
+	out_cell_centers(out.value->cell_centers());
 	dirty = false;
 }
 

@@ -14,10 +14,13 @@ struct RegularGrid {
 	RegularGrid();
 	RegularGrid(int nx, int ny, int nz, const vec3& dx = vec3::EX, const vec3& dy = vec3::EY, const vec3& dz = vec3::EZ);
 
-	vec3 index_to_pos(int i, int j, int k) const;
+	vec3 index_to_pos(float i, float j, float k) const;
+	vec3 vertex(int i, int j, int k) const;
+	vec3 cell_center(int i, int j, int k) const;
 	Box bounding_box() const;
 
-	Array<vec3> grid_points() const;
+	Array<vec3> vertices() const;
+	Array<vec3> cell_centers() const;
 
 	int nx, ny, nz;
 	vec3 dx, dy, dz;
