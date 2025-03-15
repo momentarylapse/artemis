@@ -43,6 +43,7 @@ data::ScalarField divergence(const data::VectorField& v) {
 data::VectorField rotation_fw(const data::VectorField& v) {
 	data::VectorField rot(v.grid);
 
+	// volume
 	for (int i=0; i<v.grid.nx-1; i++)
 		for (int j=0; j<v.grid.ny-1; j++)
 			for (int k=0; k<v.grid.nz-1; k++) {
@@ -50,13 +51,70 @@ data::VectorField rotation_fw(const data::VectorField& v) {
 				vec3d vx = v.value(i+1, j, k);
 				vec3d vy = v.value(i, j+1, k);
 				vec3d vz = v.value(i, j, k+1);
-				rot.set(i, j, k, vec3d((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.z - v0.z)));
+				rot.set(i, j, k, vec3d((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
 			}
-	// TODO edge x/y + face x/y/z
-	for (int k=0; k<v.grid.nz-1; k++) {
-		vec3d v0 = v.value(v.grid.nx-1, v.grid.ny-1, k);
-		vec3d vz = v.value(v.grid.nx-1, v.grid.ny-1, k+1);
-		rot.set(v.grid.nx-1, v.grid.ny-1, k, vec3d(- (vz.y - v0.y), (vz.x - v0.x), 0));
+	// face x/y
+	{
+		int k = v.grid.nz-1;
+		for (int i=0; i<v.grid.nx-1; i++)
+			for (int j=0; j<v.grid.ny-1; j++) {
+					vec3d v0 = v.value(i, j, k);
+					vec3d vx = v.value(i+1, j, k);
+					vec3d vy = v.value(i, j+1, k);
+					rot.set(i, j, k, vec3d((vy.z - v0.z), - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
+				}
+	}
+	// face x/z
+	{
+		int j = v.grid.ny-1;
+		for (int i=0; i<v.grid.nx-1; i++)
+			for (int k=0; k<v.grid.nz-1; k++) {
+				vec3d v0 = v.value(i, j, k);
+				vec3d vx = v.value(i+1, j, k);
+				vec3d vz = v.value(i, j, k+1);
+				rot.set(i, j, k, vec3d(- (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y)));
+			}
+	}
+	// face y/z
+	{
+		int i = v.grid.nx-1;
+		for (int j=0; j<v.grid.ny-1; j++)
+			for (int k=0; k<v.grid.nz-1; k++) {
+				vec3d v0 = v.value(i, j, k);
+				vec3d vy = v.value(i, j+1, k);
+				vec3d vz = v.value(i, j, k+1);
+				rot.set(i, j, k, vec3d((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x), - (vy.x - v0.x)));
+			}
+	}
+	// edge x
+	{
+		int j = v.grid.ny-1;
+		int k = v.grid.nz-1;
+		for (int i=0; i<v.grid.nx-1; i++) {
+			vec3d v0 = v.value(i, j, k);
+			vec3d vx = v.value(i+1, j, k);
+			rot.set(i, j, k, vec3d(0, - (vx.z - v0.z), (vx.y - v0.y)));
+		}
+	}
+	// edge y
+	{
+		int i = v.grid.nx-1;
+		int k = v.grid.nz-1;
+		for (int j=0; j<v.grid.ny-1; j++) {
+			vec3d v0 = v.value(i, j, k);
+			vec3d vy = v.value(i, j+1, k);
+			rot.set(i, j, k, vec3d((vy.z - v0.z), 0, - (vy.x - v0.x)));
+		}
+	}
+	// edge z
+	{
+		int i = v.grid.nx-1;
+		int j = v.grid.ny-1;
+		for (int k=0; k<v.grid.nz-1; k++) {
+			vec3d v0 = v.value(i, j, k);
+			vec3d vz = v.value(i, j, k+1);
+			rot.set(i, j, k, vec3d(- (vz.y - v0.y), (vz.x - v0.x), 0));
+		}
 	}
 
 	return rot;
@@ -72,12 +130,70 @@ data::VectorField rotation_bw(const data::VectorField& v) {
 				vec3d vnx = v.value(i-1, j, k);
 				vec3d vny = v.value(i, j-1, k);
 				vec3d vnz = v.value(i, j, k-1);
-				rot.set(i, j, k, vec3d((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.z - vny.z)));
+				rot.set(i, j, k, vec3d((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
 			}
-	for (int k=1; k<v.grid.nz; k++) {
-		vec3d v0 = v.value(0, 0, k);
-		vec3d vnz = v.value(0, 0, k-1);
-		rot.set(0, 0, k, vec3d(- (v0.y - vnz.y), (v0.x - vnz.x), 0));
+	// face x/y
+	{
+		int k = 0;
+		for (int i=1; i<v.grid.nx; i++)
+			for (int j=1; j<v.grid.ny; j++) {
+				vec3d v0 = v.value(i, j, k);
+				vec3d vnx = v.value(i-1, j, k);
+				vec3d vny = v.value(i, j-1, k);
+				rot.set(i, j, k, vec3d((v0.z - vny.z), - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
+			}
+	}
+	// face x/z
+	{
+		int j = 0;
+		for (int i=1; i<v.grid.nx; i++)
+			for (int k=1; k<v.grid.nz; k++) {
+				vec3d v0 = v.value(i, j, k);
+				vec3d vnx = v.value(i-1, j, k);
+				vec3d vnz = v.value(i, j, k-1);
+				rot.set(i, j, k, vec3d(- (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y)));
+			}
+	}
+	// face y/z
+	{
+		int i = 0;
+		for (int j=1; j<v.grid.ny; j++)
+			for (int k=1; k<v.grid.nz; k++) {
+				vec3d v0 = v.value(i, j, k);
+				vec3d vny = v.value(i, j-1, k);
+				vec3d vnz = v.value(i, j, k-1);
+				rot.set(i, j, k, vec3d((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x), - (v0.x - vny.x)));
+			}
+	}
+	// edge x
+	{
+		int j = 0;
+		int k = 0;
+		for (int i=1; i<v.grid.nx; i++) {
+			vec3d v0 = v.value(i, j, k);
+			vec3d vnx = v.value(i-1, j, k);
+				rot.set(i, j, k, vec3d(0, - (v0.z - vnx.z), (v0.y - vnx.y)));
+		}
+	}
+	// edge y
+	{
+		int i = 0;
+		int k = 0;
+		for (int j=1; j<v.grid.ny; j++) {
+			vec3d v0 = v.value(i, j, k);
+			vec3d vny = v.value(i, j-1, k);
+				rot.set(i, j, k, vec3d((v0.z - vny.z), 0, - (v0.x - vny.x)));
+		}
+	}
+	// edge z
+	{
+		int i = 0;
+		int j = 0;
+		for (int k=1; k<v.grid.nz; k++) {
+			vec3d v0 = v.value(i, j, k);
+			vec3d vnz = v.value(i, j, k-1);
+				rot.set(i, j, k, vec3d(- (v0.y - vnz.y), (v0.x - vnz.x), 0));
+		}
 	}
 
 	return rot;
