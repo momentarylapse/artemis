@@ -43,7 +43,7 @@ func f(p: vec3, t: f32) -> vec3
 			for (int i=0; i<g->nx; i++)
 				for (int j=0; j<g->ny; j++)
 					for (int k=0; k<g->nz; k++)
-						s.set(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
+						s.set(i, j, k, vec3d(f({(float)i, (float)j, (float)k}, _current_simulation_time_)));
 			out_field(s);
 		}
 

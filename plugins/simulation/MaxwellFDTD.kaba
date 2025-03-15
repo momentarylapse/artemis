@@ -6,14 +6,17 @@ class MaxwellFDTD extends Node
 		in_e.__init__(self, "e", PortFlags.MUTABLE)
 		in_b.__init__(self, "b", PortFlags.MUTABLE)
 	#	in_rho.__init__(self, "rho", PortFlags.NONE)
-	#	in_j.__init__(self, "j", PortFlags.NONE)
+		in_j.__init__(self, "j", PortFlags.NONE)
 	
 	func override process()
-		let dt = 0.01
+		let dt = 0.05
 		for E in in_e.value()
 			for B in in_b.value()
+				#for k in 0:10
 				B += rotation_fw(E) * dt
-				E -= rotation_fw(B) * dt
+				E -= rotation_bw(B) * dt
+				for j in in_j.value()
+					E -= j * dt
 				in_e.mutated()
 				in_b.mutated()
 			#out_y.set(laplace(f))
@@ -23,4 +26,4 @@ class MaxwellFDTD extends Node
 	var in_e: InPortVectorField
 	var in_b: InPortVectorField
 	#var in_rho: InPortScalarField
-	#var in_j: InPortVectorField
+	var in_j: InPortVectorField

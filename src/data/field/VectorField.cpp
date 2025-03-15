@@ -13,12 +13,20 @@ VectorField::VectorField(const RegularGrid& g) {
 
 VectorField::VectorField() : VectorField(RegularGrid()) {}
 
-vec3 VectorField::value(int i, int j, int k) const {
+vec3d VectorField::value(int i, int j, int k) const {
 	return v[i + j * grid.nx + k * grid.nx * grid.ny];
 }
 
-void VectorField::set(int i, int j, int k, const vec3& vv) {
+void VectorField::set(int i, int j, int k, const vec3d& vv) {
 	v[i + j * grid.nx + k * grid.nx * grid.ny] = vv;
+}
+
+vec3 VectorField::value32(int i, int j, int k) const {
+	return v[i + j * grid.nx + k * grid.nx * grid.ny].to32();
+}
+
+void VectorField::set32(int i, int j, int k, const vec3& vv) {
+	v[i + j * grid.nx + k * grid.nx * grid.ny] = vec3d(vv);
 }
 
 void VectorField::operator+=(const VectorField& o) {

@@ -13,10 +13,12 @@ struct ScalarField {
 	explicit ScalarField(const RegularGrid& grid);
 
 	RegularGrid grid;
-	Array<float> v;
+	Array<double> v;
 
-	float value(int i, int j, int k) const;
-	void set(int i, int j, int k, float f);
+	double value(int i, int j, int k) const;
+	void set(int i, int j, int k, double f);
+	float value32(int i, int j, int k) const;
+	void set32(int i, int j, int k, float f);
 };
 
 }

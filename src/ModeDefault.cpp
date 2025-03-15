@@ -24,8 +24,10 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	graph = session->graph.get();
 
 	xhui::run_repeated(0.1f, [this] {
-		_current_simulation_time_ += 0.1f;
-		graph->iterate();
+		for (int i=0; i<10; i++) {
+			_current_simulation_time_ += 0.01f;
+			graph->iterate();
+		}
 		session->win->request_redraw();
 	});
 }

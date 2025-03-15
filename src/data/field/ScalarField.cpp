@@ -13,12 +13,20 @@ ScalarField::ScalarField(const RegularGrid& g) {
 
 ScalarField::ScalarField() : ScalarField(RegularGrid()) {}
 
-float ScalarField::value(int i, int j, int k) const {
+double ScalarField::value(int i, int j, int k) const {
 	return v[i + j * grid.nx + k * grid.nx * grid.ny];
 }
 
-void ScalarField::set(int i, int j, int k, float f) {
+void ScalarField::set(int i, int j, int k, double f) {
 	v[i + j * grid.nx + k * grid.nx * grid.ny] = f;
+}
+
+float ScalarField::value32(int i, int j, int k) const {
+	return (float)value(i, j, k);
+}
+
+void ScalarField::set32(int i, int j, int k, float f) {
+	set(i, j, k, (double)f);
 }
 
 

@@ -10,14 +10,14 @@ struct RegularGrid
 struct ScalarField
 	func extern __init__()
 	var grid: RegularGrid
-	var v: f32[]
+	var v: f64[]
 	func extern mut set(i: i32, j: i32, k: i32, v: f32)
 	func extern value(i: i32, j: i32, k: i32) -> f32
 
 struct VectorField
 	func extern __init__()
 	var grid: RegularGrid
-	var v: vec3[]
+#	var v: vec3d[]
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
 	func extern value(i: i32, j: i32, k: i32) -> vec3
 	func extern mut __iadd__(o: VectorField)

@@ -19,7 +19,7 @@ void VectorFieldRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 		for (int j=0; j<f->grid.ny; j++)
 			for (int k=0; k<f->grid.nz; k++) {
 				points.add(f->grid.cell_center(i, j, k));
-				points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k));
+				points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k).to32());
 			}
 
 	session->drawing_helper->set_color(_color());

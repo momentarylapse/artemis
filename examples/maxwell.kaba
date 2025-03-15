@@ -4,24 +4,34 @@ func main()
 	var g = weak(current_session().graph)
 
 	var grid = g.add_node("RegularGrid", [300,100])
-	grid.set("nx", 15)
-	grid.set("ny", 15)
-	grid.set("nz", 15)
+	grid.set("nx", 1)
+	grid.set("ny", 1)
+	grid.set("nz", 150)
 
 	var gr = g.add_node("GridRenderer", [150,400])
 	gr.set("line-width", 1.0)
 	gr.set("color", dyn([0.5,0.5,0.5,1]))
 	
 	var E = g.add_node("VectorField", [370,250])
-	E.set("formula", "vec3(1,0,0) * exp( -(len(p - vec3(8,8,8))^2))")
+	#E.set("formula", "vec3(1,0,0) * exp( -(len(p - vec3(8,8,8))^2))")
+	#E.set("formula", "vec3(1,0,0) * exp( -(len(p - vec3(0.5,0.5,80.5))^2)/20)")
 	#field.set("time-dependent", true)
 	
-	var B = g.add_node("VectorField", [500,250])
+	var B = g.add_node("VectorField", [550,250])
+	#B.set("formula", "vec3(0,1,0) * exp( -(len(p - vec3(0.5,0.5,80))^2)/20)")
+	
+	var j = g.add_node("VectorField", [50,250])
+	j.set("formula", "vec3(5,0,0) * exp( -(len(p - vec3(0,0,20))^2)*5) * exp(-((t-10)^2)*0.5)")
+	j.set("time-dependent", true)
 	
 	var rE = g.add_node("VectorFieldRenderer", [370, 550])
 	rE.set("color", dyn([1,0,0,1]))
+	rE.set("line-width", 5)
 	var rB = g.add_node("VectorFieldRenderer", [550, 550])
 	rB.set("color", dyn([0.1,0.1,1,1]))
+	rB.set("line-width", 5)
+	var rj = g.add_node("VectorFieldRenderer", [50, 550])
+	rj.set("color", dyn([0,1,0,1]))
 	
 	var mw = g.add_node("MaxwellFDTD", [500, 400])
 	
@@ -30,7 +40,10 @@ func main()
 	g.connect(E, 0, rE, 0)
 	g.connect(grid, 0, B, 0)
 	g.connect(B, 0, rB, 0)
-	#g.connect(E, 0, mw, 0)
-	#g.connect(B, 0, mw, 1)
+	g.connect(grid, 0, j, 0)
+	g.connect(j, 0, rj, 0)
+	g.connect(E, 0, mw, 0)
+	g.connect(B, 0, mw, 1)
+	g.connect(j, 0, mw, 2)
 
 
