@@ -8,7 +8,7 @@ namespace graph {
 
 RendererNode::RendererNode(Session* s, const string& name) : Node(name) {
 	session = s;
-	is_renderer = true;
+	flags = NodeFlags::Renderer;
 }
 
 } // graph

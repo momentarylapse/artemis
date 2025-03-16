@@ -10,7 +10,6 @@ namespace graph {
 void IsoSurface::process() {
 	if (auto f = in_field.value()) {
 		out_mesh(artemis::processing::iso_surface(*f, iso_value()));
-		dirty = false;
 	}
 }
 

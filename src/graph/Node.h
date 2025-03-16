@@ -29,6 +29,15 @@ enum class NodeCategory {
 	Simulation
 };
 
+enum class NodeFlags {
+	None = 0,
+	Resource = 1,
+	Renderer = 2,
+	TimeDependent = 4
+};
+NodeFlags operator|(NodeFlags a, NodeFlags b);
+bool operator&(NodeFlags a, NodeFlags b);
+
 class Node : public obs::Node<VirtualBase> {
 public:
 	explicit Node(const string& name);
@@ -43,8 +52,9 @@ public:
 	string name;
 	vec2 pos;
 	bool dirty = true;
-	bool is_resource_node = false;
-	bool is_renderer = false;
+	NodeFlags flags = NodeFlags::None;
+
+	bool has_necessary_inputs() const;
 
 	Array<SettingBase*> settings;
 	Array<InPortBase*> in_ports;
@@ -54,7 +64,7 @@ public:
 class ResourceNode : public Node {
 public:
 	explicit ResourceNode(const string& name) : Node(name) {
-		is_resource_node = true;
+		flags = NodeFlags::Resource;
 	}
 };
 

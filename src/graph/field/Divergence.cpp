@@ -10,7 +10,6 @@ namespace graph {
 void Divergence::process() {
 	if (auto f = in_field.value()) {
 		out(artemis::processing::divergence(*f));
-		dirty = false;
 	}
 }
 

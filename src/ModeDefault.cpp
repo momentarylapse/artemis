@@ -24,19 +24,44 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	graph = session->graph.get();
 
 	xhui::run_repeated(0.1f, [this] {
-		for (int i=0; i<10; i++) {
-			_current_simulation_time_ += 0.01f;
-			graph->iterate();
-		}
-		session->win->request_redraw();
+		if (simulation_active)
+			graph->iterate_simulation(0.1f);
+		if (graph->iterate())
+			session->win->request_redraw();
 	});
+
+	auto win = session->win;
+	win->event("simulation-start", [this] {
+		simulation_active = true;
+		update_menu();
+	});
+	win->event("simulation-pause", [this] {
+		simulation_active = !simulation_active;
+		update_menu();
+	});
+	win->event("simulation-stop", [this] {
+		simulation_active = false;
+		_current_simulation_time_ = 0;
+		graph->reset_state();
+		update_menu();
+	});
+
+	update_menu();
 }
+
+void ModeDefault::update_menu() {
+	auto win = session->win;
+	win->enable("simulation-start", !simulation_active);
+	win->enable("simulation-pause", simulation_active or _current_simulation_time_ > 0);
+	win->enable("simulation-stop", simulation_active or _current_simulation_time_ > 0);
+}
+
 
 void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) {
 	session->drawing_helper->clear(params, xhui::Theme::_default.background_low);
 
 	for (auto n: graph->nodes)
-		if (n->is_renderer) {
+		if (n->flags & graph::NodeFlags::Renderer) {
 			auto r = static_cast<graph::RendererNode*>(n);
 			if (r->active())
 				r->draw_win(params, win);
@@ -44,6 +69,8 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
+	p->set_color(White);
+	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", _current_simulation_time_));
 }
 
 void ModeDefault::on_key_down(int key) {

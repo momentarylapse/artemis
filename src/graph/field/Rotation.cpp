@@ -13,7 +13,6 @@ void Rotation::process() {
 			out(artemis::processing::rotation_bw(*f));
 		else
 			out(artemis::processing::rotation_fw(*f));
-		dirty = false;
 	}
 }
 

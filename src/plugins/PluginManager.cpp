@@ -22,6 +22,7 @@
 
 extern Session* _current_session_;
 extern float _current_simulation_time_;
+extern float _current_simulation_dt_;
 
 namespace kaba {
 	extern const Class* TypeVec3List;
@@ -103,6 +104,7 @@ void PluginManager::export_kaba() {
 	ext->link("rotation_bw", (void*)&processing::rotation_bw);
 	ext->link("laplace", (void*)&processing::laplace);
 	ext->link("simulation_time", &_current_simulation_time_);
+	ext->link("simulation_dt", &_current_simulation_dt_);
 
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
@@ -146,6 +148,8 @@ void PluginManager::export_kaba() {
 	{
 		graph::Node n("");
 		ext->declare_class_size("Node", sizeof(graph::Node));
+		ext->declare_class_element("Node.dirty", &graph::Node::dirty);
+		ext->declare_class_element("Node.flags", &graph::Node::flags);
 		ext->link_class_func("Node.__init__", &node_init);
 		ext->link_class_func("Node.set", &graph::Node::set);
 		ext->link_virtual("Node.__delete__", &GenericVDeleter<graph::Node>::__delete__, &n);

@@ -43,7 +43,9 @@ public:
 
 	Array<CableInfo> cables() const;
 
-	void iterate();
+	void reset_state();
+	bool iterate();
+	void iterate_simulation(float dt);
 };
 
 } // graph

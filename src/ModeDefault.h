@@ -22,6 +22,10 @@ public:
 	void on_key_down(int key) override;
 
 	graph::Graph* graph;
+
+	bool simulation_active = false;
+
+	void update_menu();
 };
 
 

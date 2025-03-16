@@ -13,7 +13,6 @@ void RegularGrid::process() {
 		vec3::EZ * dz()));
 	out_vertices(out.value->vertices());
 	out_cell_centers(out.value->cell_centers());
-	dirty = false;
 }
 
 

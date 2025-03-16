@@ -39,5 +39,11 @@ void InPortBase::mutated() {
 		source->mutated();
 }
 
+bool InPortBase::has_value() const {
+	if (source)
+		return source->has_value();
+	return false;
+}
+
 
 } // graph

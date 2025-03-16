@@ -7,18 +7,20 @@ class MaxwellFDTD extends Node
 		in_b.__init__(self, "b", PortFlags.MUTABLE)
 	#	in_rho.__init__(self, "rho", PortFlags.NONE)
 		in_j.__init__(self, "j", PortFlags.OPTIONAL)
+		flags = NodeFlags.TIME_DEPENDENT
 	
 	func override process()
-		let dt = 0.05
+		let N = 5
+		let dt = simulation_dt / N
 		for E in in_e.value()
 			for B in in_b.value()
-				B += rotation_fw(E) * dt
-				E -= rotation_bw(B) * dt
-				for j in in_j.value()
-					E -= j * dt
+				for step in 0:N
+					B += rotation_fw(E) * dt
+					E -= rotation_bw(B) * dt
+					for j in in_j.value()
+						E -= j * dt
 				in_e.mutated()
 				in_b.mutated()
-			#dirty = false
 		
 	
 	var in_e: InPortVectorField

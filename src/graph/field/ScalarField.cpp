@@ -10,6 +10,15 @@ extern float _current_simulation_time_;
 
 namespace graph {
 
+ScalarField::ScalarField() : ResourceNode("ScalarField") {
+	time_dependent.on_update = [this] {
+		if (time_dependent())
+			flags = NodeFlags::Resource | NodeFlags::TimeDependent;
+		else
+			flags = NodeFlags::Resource;
+	};
+}
+
 void ScalarField::process() {
 	if (auto g = in_grid.value()) {
 
@@ -32,7 +41,6 @@ func f(p: vec3, t: f32) -> f32
 					msg_write("not found");
 			} catch (kaba::Exception& e) {
 				msg_error(e.message());
-				dirty = false;
 				return;
 			}
 		}
@@ -46,9 +54,6 @@ func f(p: vec3, t: f32) -> f32
 						s.set(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
 			out_field(s);
 		}
-
-		if (!time_dependent())
-			dirty = false;
 	}
 }
 

@@ -3,12 +3,13 @@
 //
 
 #include "Graph.h"
-
-#include <lib/base/algo.h>
-
 #include "Port.h"
 #include "Node.h"
+#include <lib/base/algo.h>
 #include <lib/os/msg.h>
+
+extern float _current_simulation_time_;
+extern float _current_simulation_dt_;
 
 namespace graph {
 
@@ -81,12 +82,33 @@ Array<CableInfo> Graph::cables() const {
 }
 
 
-void Graph::iterate() {
+bool Graph::iterate() {
 	// TODO DAG
+	bool updated_any = false;
 	for (auto n: nodes)
-		if (n->dirty)
+		if (n->dirty and n->has_necessary_inputs()) {
 			n->process();
+			n->dirty = false;
+			updated_any = true;
+		}
+	return updated_any;
 }
+
+void Graph::iterate_simulation(float dt) {
+	_current_simulation_dt_ = dt;
+	_current_simulation_time_ += dt;
+	for (auto n: nodes)
+		if (n->flags & NodeFlags::TimeDependent and n->has_necessary_inputs()) {
+			n->process();
+			n->dirty = false;
+		}
+}
+
+void Graph::reset_state() {
+	for (auto n: nodes)
+		n->dirty = true;
+}
+
 
 
 

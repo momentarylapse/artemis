@@ -5,6 +5,7 @@ class Test extends Node
 		super.__init__("Test")
 		in_x.__init__(self, "x", PortFlags.MUTABLE)
 		#out_y.__init__(self, "y")
+		flags = NodeFlags.TIME_DEPENDENT
 	
 	func override process()
 		for f in in_x.value()
@@ -14,7 +15,6 @@ class Test extends Node
 						f.set(i, j, k, sin(k*0.3 + simulation_time))
 			in_x.mutated()
 			#out_y.set(laplace(f))
-			#dirty = false
 		
 	
 	var in_x: InPortScalarField

@@ -9,7 +9,6 @@ namespace graph {
 
 void TeapotMesh::process() {
 	out_mesh(GeometryTeapot(v_0, radius(), samples()));
-	dirty = false;
 }
 
 } // graph

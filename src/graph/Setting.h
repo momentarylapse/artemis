@@ -32,6 +32,8 @@ public:
 	Node* owner;
 	string name;
 	const kaba::Class* class_;
+
+	std::function<void()> on_update;
 };
 
 template<class T>
@@ -46,6 +48,8 @@ public:
 	void set(const T& value) {
 		this->value = value;
 		owner->dirty = true;
+		if (on_update)
+			on_update();
 	}
 private:
 	T value;

@@ -194,8 +194,10 @@ void GraphEditor::draw_node(Painter* p, graph::Node* n) {
 		p->draw_rect(node_area(n).grow(4));
 	}
 	color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
-	if (n->is_resource_node)
+	if (n->flags & graph::NodeFlags::Resource)
 		bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
+	else if (n->flags & graph::NodeFlags::TimeDependent)
+		bg = color::interpolate(color(1, 0, 0.7f, 0), xhui::Theme::_default.background_low, 0.3f);
 	if (hover and hover->type == HoverType::Node and hover->node == n)
 		bg = color::interpolate(bg, White, 0.2f);
 	p->set_color(bg);
@@ -205,6 +207,8 @@ void GraphEditor::draw_node(Painter* p, graph::Node* n) {
 	p->set_color(White);
 	float w = p->get_str_width(n->name);
 	p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), n->name);
+	if (n->dirty)
+		p->draw_str(n->pos + vec2(NODE_WIDTH / 2, 35), "X");
 
 	for (int i=0; i<n->in_ports.num; i++) {
 		p->set_color(Gray);

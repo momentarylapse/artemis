@@ -10,7 +10,6 @@ namespace graph {
 void Gradient::process() {
 	if (auto f = in_field.value()) {
 		out(artemis::processing::gradient(*f));
-		dirty = false;
 	}
 }
 

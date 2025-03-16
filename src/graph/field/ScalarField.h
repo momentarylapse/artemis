@@ -15,7 +15,7 @@ namespace graph {
 
 class ScalarField : public ResourceNode {
 public:
-	ScalarField() : ResourceNode("ScalarField") {}
+	ScalarField();
 
 	void process() override;
 

@@ -30,6 +30,11 @@ struct VectorField
 	func extern __mul__(o: f32) -> VectorField
 
 
+enum NodeFlags
+	NONE = 0
+	RESOURCE = 1
+	RENDERER = 2
+	TIME_DEPENDENT = 4
 
 class Node
 	func extern __init__(name: string)
@@ -37,6 +42,7 @@ class Node
 	func extern virtual mut process()
 	func extern virtual mut create_panel() -> void*
 	func extern mut set(key: string, value: any)
+	var flags: NodeFlags
 	var dirty: bool
 
 enum PortFlags
@@ -73,6 +79,7 @@ class Session
 
 
 var extern simulation_time: f32
+var extern simulation_dt: f32
 
 func extern current_session() -> Session&
 

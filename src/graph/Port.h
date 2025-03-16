@@ -33,6 +33,7 @@ public:
 	PortFlags flags;
 	Array<InPortBase*> targets;
 	void mutated();
+	std::function<bool()> has_value;
 };
 
 class InPortBase {
@@ -44,6 +45,7 @@ public:
 	PortFlags flags;
 	OutPortBase* source = nullptr;
 	void mutated();
+	bool has_value() const;
 };
 
 
@@ -67,7 +69,11 @@ public:
 template<class T>
 class OutPort : public OutPortBase {
 public:
-	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, artemis::get_class<T>(), flags) {}
+	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, artemis::get_class<T>(), flags) {
+		has_value = [this] {
+			return value.has_value();
+		};
+	}
 	void operator()(const T& v) {
 		value = v;
 		mutated();

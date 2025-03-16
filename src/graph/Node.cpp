@@ -7,7 +7,17 @@
 #include <view/DefaultNodePanel.h>
 #include <lib/os/msg.h>
 
+#include "Port.h"
+
 namespace graph {
+
+NodeFlags operator|(NodeFlags a, NodeFlags b) {
+	return (NodeFlags)((int)a | (int)b);
+}
+
+bool operator&(NodeFlags a, NodeFlags b) {
+	return (int)a & (int)b;
+}
 
 Node::Node(const string& name) {
 	this->name = name;
@@ -23,6 +33,14 @@ void Node::set(const string& key, const Any& value) {;
 
 	msg_error(format("unknown setting '%s' of Node '%s'", key, name));
 }
+
+bool Node::has_necessary_inputs() const {
+	for (auto p: in_ports)
+		if (!(p->flags & PortFlags::Optional) and !p->has_value())
+			return false;
+	return true;
+}
+
 
 xhui::Panel* Node::create_panel() {
 	return new DefaultNodePanel(this);

@@ -155,26 +155,30 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 	session = _session;
 
 	from_source(R"foodelim(
-Dialog x x
+Dialog x x padding=0
 	Grid grid ''
-		Toolbar toolbar ''
-		---|
 		Grid main-grid ''
 			.
 			Overlay ? ''
 				DrawingArea area '' grabfocus
 				Grid overlay-main-grid '' margin=25
-					Grid overlay-button-grid-left '' spacing=20
-						Button mouse-action 'T' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
-					.
 					Label ? '' ignorehover expandx
 					Grid overlay-button-grid-right '' spacing=20
 						Button cam-rotate 'R' image=rf-rotate height=50 width=50 padding=7 noexpandx ignorefocus
 						---|
 						Button cam-move 'M' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
+					---|
+					Label ? '' ignorehover expandy
+					---|
+					Grid overlay-button-grid-bottom '' spacing=20
+						Button simulation-start 'Start' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-pause 'Pause' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-stop 'Stop' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-step 'Step' height=50 width=50 padding=7 noexpandx ignorefocus
 )foodelim");
+	Panel::set_option("padding", "0");
 
-	toolbar = (xhui::Toolbar*)get_control("toolbar");
+	//toolbar = (xhui::Toolbar*)get_control("toolbar");
 
 	embed("main-grid", 0, 0, new GraphEditor(session));
 
@@ -309,10 +313,6 @@ Dialog x x
 			if (a == xhui::Answer::Yes)
 				request_destroy();
 		});
-	});
-
-	xhui::run_repeated(0.02f, [this] {
-		request_redraw();
 	});
 }
 

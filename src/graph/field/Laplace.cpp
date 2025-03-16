@@ -10,7 +10,6 @@ namespace graph {
 void Laplace::process() {
 	if (auto f = in_field.value()) {
 		out(artemis::processing::laplace(*f));
-		dirty = false;
 	}
 }
 

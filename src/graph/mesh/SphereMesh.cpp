@@ -9,7 +9,6 @@ namespace graph {
 
 void SphereMesh::process() {
 	out_mesh(GeometrySphere(v_0, radius(), samples()));
-	dirty = false;
 }
 
 } // graph

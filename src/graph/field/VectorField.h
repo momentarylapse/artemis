@@ -15,7 +15,7 @@ namespace graph {
 
 class VectorField : public ResourceNode {
 public:
-	VectorField() : ResourceNode("VectorField") {}
+	VectorField();
 
 	void process() override;
 
