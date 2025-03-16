@@ -17,8 +17,9 @@ class Node;
 class InPortBase;
 
 enum class PortFlags {
-	None,
-	Mutable
+	None = 0,
+	Mutable = 1,
+	Optional = 2
 };
 bool operator&(PortFlags a, PortFlags b);
 

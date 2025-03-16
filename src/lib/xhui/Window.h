@@ -67,9 +67,6 @@ public:
 	void set_mouse_mode(int mode);
 	vec2 mouse_position() const;
 
-protected:
-	GLFWwindow *window;
-
 	struct InputState {
 		vec2 m;
 		vec2 scroll;
@@ -77,6 +74,9 @@ protected:
 		bool key[256];
 		int key_code;
 	} state, state_prev;
+
+protected:
+	GLFWwindow *window;
 
 	Array<Event> event_stack;
 

@@ -15,6 +15,7 @@ class Session;
 namespace graph {
 	class Graph;
 	class Node;
+	struct CableInfo;
 }
 
 class GraphEditor : public obs::Node<xhui::Panel> {
@@ -24,7 +25,12 @@ public:
 	void on_left_button_down(const vec2& m) override;
 	void on_left_button_up(const vec2& m) override;
 	void on_mouse_move(const vec2& m, const vec2& d) override;
+	void on_key_down(int key) override;
 	void on_draw(Painter* p);
+
+	void draw_node(Painter* p, graph::Node* node);
+
+	Array<vec2> cable_spline(const graph::CableInfo& c) const;
 
 	Session* session;
 	graph::Graph* graph;
@@ -33,7 +39,8 @@ public:
 	enum class HoverType {
 		Node,
 		InPort,
-		OutPort
+		OutPort,
+		Cable
 	};
 
 	struct Hover {

@@ -17,9 +17,10 @@
 
 #include "DrawingHelper.h"
 
+
 static constexpr float NODE_WIDTH = 150.0f;
 static constexpr float NODE_HEIGHT = 50.0f;
-static constexpr float PORT_DX = 50.0f;
+static constexpr float PORT_DX = 30.0f;
 static constexpr float PORT_DY = 10.0f;
 static constexpr float PANEL_WIDTH = 320.0f;
 
@@ -96,6 +97,9 @@ Dialog x ''
 	event_x("graph", xhui::event_id::LeftButtonUp, [this] {
 		on_left_button_up(get_window()->mouse_position());
 	});
+	event_x("graph", xhui::event_id::KeyDown, [this] {
+		on_key_down(get_window()->state.key_code);
+	});
 
 	event_x("graph", xhui::event_id::DragDrop, [this] {
 		if (get_window()->drag.payload.match("add-node:*")) {
@@ -123,59 +127,43 @@ vec2 node_out_port_pos(graph::Node* n, int i) {
 
 template<class P>
 string port_description(P* p) {
+	Array<string> flags;
 	if (p->flags & graph::PortFlags::Mutable)
-		return format("'%s': %s  (mutable)", p->name, p->class_->name);
+		flags.add("mutable");
+	if (p->flags & graph::PortFlags::Optional)
+		flags.add("optional");
+	if (flags.num > 0)
+		return format("'%s': %s  (%s)", p->name, p->class_->name, implode(flags, ", "));
 	return format("'%s': %s", p->name, p->class_->name);
 }
+
+Array<vec2> GraphEditor::cable_spline(const graph::CableInfo& c) const {
+	vec2 A = node_out_port_pos(c.source, c.source_port);
+	vec2 B = node_in_port_pos(c.sink, c.sink_port);
+	return DrawingHelper::spline(A, A + vec2(0, 160), B - vec2(0, 160), B);
+}
+
 
 void GraphEditor::on_draw(Painter* p) {
 	p->set_color(xhui::Theme::_default.background);
 	p->draw_rect(_area);
 
-	p->set_font("", xhui::Theme::_default.font_size, true, false);
-	for (auto n: graph->nodes) {
-		if (selection and selection->type == HoverType::Node and selection->node == n) {
-			p->set_color(Red.with_alpha(0.7f));
-			p->set_roundness(14);
-			p->draw_rect(node_area(n).grow(4));
+
+	for (const auto& [i, c]: enumerate(graph->cables())) {
+		p->set_color(Gray);
+		p->set_line_width(3);
+		if (selection and selection->type == HoverType::Cable and selection->index == i) {
+			p->set_color(White);
+			p->set_line_width(4);
+		} else if (hover and hover->type == HoverType::Cable and hover->index == i) {
+			p->set_color(color::interpolate(Gray, White, 0.3f));
+			p->set_line_width(3);
 		}
-		color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
-		if (n->is_resource_node)
-			bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
-		if (hover and hover->type == HoverType::Node and hover->node == n)
-			bg = color::interpolate(bg, White, 0.2f);
-		p->set_color(bg);
-		p->set_roundness(10);
-		p->draw_rect(node_area(n));
-
-		p->set_color(White);
-		float w = p->get_str_width(n->name);
-		p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), n->name);
-
-		for (int i=0; i<n->in_ports.num; i++) {
-			p->set_color(Gray);
-			if (hover and hover->type == HoverType::InPort and hover->node == n and hover->index == i)
-				p->set_color(White);
-			p->draw_circle(node_in_port_pos(n, i), 5);
-		}
-		for (int i=0; i<n->out_ports.num; i++) {
-			p->set_color(Gray);
-			if (hover and hover->type == HoverType::OutPort and hover->node == n and hover->index == i)
-				p->set_color(White);
-			p->draw_circle(node_out_port_pos(n, i), 5);
-		}
-
-
-		for (int i=0; i<n->in_ports.num; i++)
-			if (n->in_ports[i]->source) {
-				p->set_color(Gray);
-				p->set_line_width(3);
-				vec2 A = node_out_port_pos(n->in_ports[i]->source->owner, n->in_ports[i]->source->port_index);
-				vec2 B = node_in_port_pos(n, i);
-				session->drawing_helper->draw_spline(p, A, A + vec2(0, 160), B - vec2(0, 160), B);
-				//p->draw_line(A, B);
-			}
+		p->draw_lines(cable_spline(c));
 	}
+
+	for (auto n: graph->nodes)
+		draw_node(p, n);
 	p->set_font("", xhui::Theme::_default.font_size, false, false);
 
 
@@ -197,6 +185,48 @@ void GraphEditor::on_draw(Painter* p) {
 		session->drawing_helper->draw_boxed_str(p, get_window()->mouse_position() + vec2(-10, 30), tip);
 }
 
+void GraphEditor::draw_node(Painter* p, graph::Node* n) {
+	p->set_font("", xhui::Theme::_default.font_size, true, false);
+
+	if (selection and selection->type == HoverType::Node and selection->node == n) {
+		p->set_color(Red.with_alpha(0.7f));
+		p->set_roundness(14);
+		p->draw_rect(node_area(n).grow(4));
+	}
+	color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
+	if (n->is_resource_node)
+		bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
+	if (hover and hover->type == HoverType::Node and hover->node == n)
+		bg = color::interpolate(bg, White, 0.2f);
+	p->set_color(bg);
+	p->set_roundness(10);
+	p->draw_rect(node_area(n));
+
+	p->set_color(White);
+	float w = p->get_str_width(n->name);
+	p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), n->name);
+
+	for (int i=0; i<n->in_ports.num; i++) {
+		p->set_color(Gray);
+		if (hover and hover->type == HoverType::InPort and hover->node == n and hover->index == i)
+			p->set_color(White);
+		p->draw_circle(node_in_port_pos(n, i), 5);
+	}
+	for (int i=0; i<n->out_ports.num; i++) {
+		p->set_color(Gray);
+		if (hover and hover->type == HoverType::OutPort and hover->node == n and hover->index == i)
+			p->set_color(White);
+		p->draw_circle(node_out_port_pos(n, i), 5);
+	}
+}
+
+bool spline_hover(const Array<vec2>& points, const vec2& m) {
+	for (const vec2& p: points)
+		if ((p - m).length() < 20)
+			return true;
+	return false;
+}
+
 base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
 	for (auto n: graph->nodes) {
 		for (int i=0; i<n->in_ports.num; i++)
@@ -208,6 +238,9 @@ base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
 		if (node_area(n).inside(m))
 			return Hover{HoverType::Node, n, -1};
 	}
+	for (const auto& [i, c]: enumerate(graph->cables()))
+		if (spline_hover(cable_spline(c), m))
+			return Hover{HoverType::Cable, nullptr, i};
 	return base::None;
 }
 
@@ -258,6 +291,23 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 		}
 	}
 }
+
+void GraphEditor::on_key_down(int key) {
+	if (key == xhui::KEY_DELETE or key == xhui::KEY_BACKSPACE) {
+		if (selection and selection->type == HoverType::Cable) {
+			const auto c = graph->cables()[selection->index];
+			graph->unconnect(c.source, c.source_port, c.sink, c.sink_port);
+			selection = base::None;
+			hover = base::None;
+		}
+		if (selection and selection->type == HoverType::Node) {
+			graph->remove_node(selection->node);
+			selection = base::None;
+			hover = base::None;
+		}
+	}
+}
+
 
 
 

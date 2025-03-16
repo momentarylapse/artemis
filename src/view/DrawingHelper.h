@@ -43,6 +43,8 @@ public:
 	void draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& a, MultiViewType kind, const base::optional<Hover>& hover);
 	void draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d);
 
+	static Array<vec2> spline(const vec2& a, const vec2& b, const vec2& c, const vec2& d);
+
 	xhui::Context* context;
 	ResourceManager* resource_manager;
 	MultiViewWindow* window;

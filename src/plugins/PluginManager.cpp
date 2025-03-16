@@ -111,11 +111,13 @@ void PluginManager::export_kaba() {
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
 	ext->declare_class_element("ScalarField.v", &data::ScalarField::v);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
+	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value32);
 
 	ext->declare_class_size("VectorField", sizeof(data::VectorField));
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<data::VectorField>);
+	ext->link_class_func("VectorField.__delete__", &kaba::generic_delete<data::VectorField>);
 	ext->declare_class_element("VectorField.grid", &data::VectorField::grid);
 	ext->declare_class_element("VectorField.v", &data::VectorField::v);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);

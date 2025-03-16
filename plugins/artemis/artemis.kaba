@@ -8,16 +8,18 @@ struct RegularGrid
 	var dx, dy, dz: vec3
 
 struct ScalarField
-	func extern __init__()
 	var grid: RegularGrid
 	var v: f64[]
+	func extern __init__()
+	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: f32)
 	func extern value(i: i32, j: i32, k: i32) -> f32
 
 struct VectorField
-	func extern __init__()
 	var grid: RegularGrid
 #	var v: vec3d[]
+	func extern __init__()
+	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
 	func extern value(i: i32, j: i32, k: i32) -> vec3
 	func extern mut __iadd__(o: VectorField)
@@ -38,8 +40,9 @@ class Node
 	var dirty: bool
 
 enum PortFlags
-	NONE
-	MUTABLE
+	NONE = 0
+	MUTABLE = 1
+	OPTIONAL = 2
 
 # TODO kaba template classes!
 class InPortScalarField

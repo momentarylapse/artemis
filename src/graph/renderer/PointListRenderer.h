@@ -25,7 +25,7 @@ public:
 	Setting<color> _color{this, "color", White};
 
 	InPort<Array<vec3>> in_points{this, "points"};
-	InPort<PolygonMesh> in_mesh{this, "mesh"};
+	InPort<PolygonMesh> in_mesh{this, "mesh", PortFlags::Optional};
 
 	owned<VertexBuffer> vertex_buffer;
 	owned<Material> material;
