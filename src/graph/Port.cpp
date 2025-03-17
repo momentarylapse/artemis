@@ -35,13 +35,14 @@ InPortBase::InPortBase(Node* owner, const string& name, const kaba::Class* class
 }
 
 void InPortBase::mutated() {
-	if (source)
-		source->mutated();
+	for (auto s: sources)
+		s->mutated();
 }
 
 bool InPortBase::has_value() const {
-	if (source)
-		return source->has_value();
+	for (auto s: sources)
+		if (s->has_value())
+			return true;
 	return false;
 }
 

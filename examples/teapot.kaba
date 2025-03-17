@@ -3,12 +3,15 @@ use plugins.artemis.*
 func main()
 	var g = weak(current_session().graph)
 
-	var a = g.add_node("TeapotMesh", [300,100])
-	a.set("radius", 10.0)
+	var teapot = g.add_node("TeapotMesh", [300,100])
+	teapot.set("radius", 10.0)
 
-	var b = g.add_node("MeshRenderer", [300,500])
-	b.set("emission", dyn([1,0,0,1]))
+	var renderer = g.add_node("MeshRenderer", [300,300])
+	renderer.set("emission", dyn([1,0,0,1]))
 
-	g.connect(a, 0, b, 0)
+	var canvas = g.add_node("Canvas", [300,500])
+
+	g.connect(teapot, 0, renderer, 0)
+	g.connect(renderer, 0, canvas, 0)
 
 

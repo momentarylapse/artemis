@@ -33,7 +33,8 @@ enum class NodeFlags {
 	None = 0,
 	Resource = 1,
 	Renderer = 2,
-	TimeDependent = 4
+	TimeDependent = 4,
+	Canvas = 8
 };
 NodeFlags operator|(NodeFlags a, NodeFlags b);
 bool operator&(NodeFlags a, NodeFlags b);

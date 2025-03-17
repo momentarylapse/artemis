@@ -19,7 +19,8 @@ class InPortBase;
 enum class PortFlags {
 	None = 0,
 	Mutable = 1,
-	Optional = 2
+	Optional = 2,
+	Multi = 4
 };
 bool operator&(PortFlags a, PortFlags b);
 
@@ -43,7 +44,7 @@ public:
 	string name;
 	const kaba::Class* class_;
 	PortFlags flags;
-	OutPortBase* source = nullptr;
+	Array<OutPortBase*> sources;
 	void mutated();
 	bool has_value() const;
 };
@@ -57,12 +58,21 @@ class InPort : public InPortBase {
 public:
 	InPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : InPortBase(owner, name, artemis::get_class<T>(), flags) {}
 	const T* value() const {
-		if (!source)
+		if (sources.num == 0)
 			return nullptr;
-		auto typed_source = reinterpret_cast<OutPort<T>*>(source);
+		auto typed_source = reinterpret_cast<OutPort<T>*>(sources[0]);
 		if (!typed_source->value)
 			return nullptr;
 		return &(*typed_source->value);
+	}
+	const Array<T*> values() const {
+		Array<T*> r;
+		for (auto s: sources) {
+			auto typed_source = reinterpret_cast<OutPort<T>*>(s);
+			if (typed_source->value)
+				r.add(&(*typed_source->value));
+		}
+		return r;
 	}
 };
 

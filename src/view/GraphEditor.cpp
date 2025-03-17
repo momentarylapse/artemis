@@ -4,6 +4,7 @@
 
 #include "GraphEditor.h"
 #include <Session.h>
+#include <graph/AutoConnect.h>
 #include <graph/Graph.h>
 #include <graph/Node.h>
 #include <graph/NodeFactory.h>
@@ -14,7 +15,6 @@
 #include <lib/os/msg.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
-
 #include "DrawingHelper.h"
 
 
@@ -167,11 +167,17 @@ void GraphEditor::on_draw(Painter* p) {
 	p->set_font("", xhui::Theme::_default.font_size, false, false);
 
 
+	// new cable?
 	if (get_window()->button(0)) {
 		if (selection and selection->type == HoverType::OutPort) {
 			p->set_color(White);
 			p->set_line_width(3);
 			p->draw_line(node_out_port_pos(selection->node, selection->index), get_window()->mouse_position());
+		}
+		if (selection and selection->type == HoverType::InPort) {
+			p->set_color(White);
+			p->set_line_width(3);
+			p->draw_line(node_in_port_pos(selection->node, selection->index), get_window()->mouse_position());
 		}
 	}
 
@@ -180,6 +186,10 @@ void GraphEditor::on_draw(Painter* p) {
 		tip = format("output %s", port_description(hover->node->out_ports[hover->index]));
 	if (hover and hover->type == HoverType::InPort)
 		tip = format("input %s", port_description(hover->node->in_ports[hover->index]));
+	if (hover and hover->type == HoverType::Cable) {
+		const auto c = graph->cables()[hover->index];
+		tip = format("cable: %s", c.source->out_ports[c.source_port]->class_->name);
+	}
 
 	if (tip != "")
 		session->drawing_helper->draw_boxed_str(p, get_window()->mouse_position() + vec2(-10, 30), tip);
@@ -253,7 +263,7 @@ void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 	if (get_window()->button(0)) {
 		if (selection and selection->type == HoverType::Node) {
 			selection->node->pos = m - dnd_offset;
-		} else if (selection and selection->type == HoverType::OutPort) {
+		} else if (selection and (selection->type == HoverType::OutPort or selection->type == HoverType::InPort)) {
 			// new connection
 			hover = get_hover(m);
 		}
@@ -291,7 +301,20 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 void GraphEditor::on_left_button_up(const vec2& m) {
 	if (selection and selection->type == HoverType::OutPort) {
 		if (hover and hover->type == HoverType::InPort) {
-			graph->connect(selection->node, selection->index, hover->node, hover->index);
+			try {
+				::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
+			} catch (Exception& e) {
+				session->set_message(e.message());
+			}
+		}
+	}
+	if (selection and selection->type == HoverType::InPort) {
+		if (hover and hover->type == HoverType::OutPort) {
+			try {
+				::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
+			} catch (Exception& e) {
+				session->set_message(e.message());
+			}
 		}
 	}
 }
@@ -299,8 +322,7 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 void GraphEditor::on_key_down(int key) {
 	if (key == xhui::KEY_DELETE or key == xhui::KEY_BACKSPACE) {
 		if (selection and selection->type == HoverType::Cable) {
-			const auto c = graph->cables()[selection->index];
-			graph->unconnect(c.source, c.source_port, c.sink, c.sink_port);
+			graph->unconnect(graph->cables()[selection->index]);
 			selection = base::None;
 			hover = base::None;
 		}

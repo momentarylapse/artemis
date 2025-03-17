@@ -30,7 +30,7 @@ namespace graph {
 		material->albedo = albedo();
 		material->emission = emission();
 
-		dirty = false;
+		out_draw({});
 	}
 
 void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {

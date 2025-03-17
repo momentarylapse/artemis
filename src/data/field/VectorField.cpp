@@ -62,6 +62,15 @@ VectorField VectorField::operator*(float o) const {
 	return r;
 }
 
+VectorField VectorField::componentwise_product(const VectorField& o) const {
+	auto times = [] (const vec3d& a, const vec3d& b) {
+		return vec3d(a.x * b.x, a.y * b.y, a.z * b.z);
+	};
+	auto r = VectorField(grid);
+	for (int i=0; i<v.num; i++)
+		r.v[i] = times(v[i], o.v[i]);
+	return r;
+}
 
 
 

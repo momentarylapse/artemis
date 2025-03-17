@@ -17,6 +17,7 @@
 #include <data/grid/RegularGrid.h>
 #include <graph/NodeFactory.h>
 #include <graph/Port.h>
+#include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 #include <lib/os/msg.h>
 
@@ -61,7 +62,13 @@ graph::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, cons
 }
 
 bool graph_connect(graph::Graph* g, graph::Node* source, int source_port, graph::Node* sink, int sink_port) {
-	return g->connect(source, source_port, sink, sink_port);
+	try {
+		g->connect({source, source_port, sink, sink_port});
+		return true;
+	} catch (Exception& e) {
+		msg_error(e.message());
+		return false;
+	}
 }
 
 void node_init(graph::Node* n, const string& name) {
@@ -130,6 +137,7 @@ void PluginManager::export_kaba() {
 	ext->link_class_func("VectorField.__isub__", &data::VectorField::operator-=);
 	ext->link_class_func("VectorField.__mul__", &data::VectorField::operator*);
 	ext->link_class_func("VectorField.__imul__", &data::VectorField::operator*=);
+	ext->link_class_func("VectorField.componentwise_product", &data::VectorField::componentwise_product);
 
 
 	ext->declare_class_size("RegularGrid", sizeof(data::RegularGrid));
@@ -196,6 +204,7 @@ void PluginManager::import_kaba() {
 	import_component_class<artemis::data::RegularGrid>(m, "RegularGrid");
 	import_component_class<artemis::data::ScalarField>(m, "ScalarField");
 	import_component_class<artemis::data::VectorField>(m, "VectorField");
+	import_component_class<graph::RenderData>(m, "RenderData");
 }
 
 void PluginManager::find_plugins() {

@@ -16,11 +16,13 @@
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
+#include "renderer/Canvas.h"
 #include "renderer/GridRenderer.h"
 #include "renderer/MeshRenderer.h"
 #include "renderer/PointListRenderer.h"
 #include "renderer/VectorFieldRenderer.h"
 #include "renderer/VolumeRenderer.h"
+#include "draw2d/Plot.h"
 #include "../plugins/PluginManager.h"
 
 namespace graph {
@@ -75,11 +77,14 @@ void init_factory() {
 	register_node_class<Rotation>("Rotation", {NodeCategory::Field});
 	register_node_class<Laplace>("Laplace", {NodeCategory::Field});
 
+	register_node_class_p<Canvas>("Canvas", {NodeCategory::Renderer});
 	register_node_class_p<GridRenderer>("GridRenderer", {NodeCategory::Renderer});
 	register_node_class_p<MeshRenderer>("MeshRenderer", {NodeCategory::Renderer});
 	register_node_class_p<PointListRenderer>("PointListRenderer", {NodeCategory::Renderer});
 	register_node_class_p<VolumeRenderer>("VolumeRenderer", {NodeCategory::Renderer});
 	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {NodeCategory::Renderer});
+
+	register_node_class_p<Plot>("Plot", {NodeCategory::Renderer});
 
 
 	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {

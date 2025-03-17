@@ -36,10 +36,10 @@ public:
 	void add_node(graph::Node* node);
 	void remove_node(graph::Node* node);
 
-	bool connect(OutPortBase& source, InPortBase& sink);
-	bool connect(graph::Node* source, int source_port, graph::Node* sink, int sink_port);
+	void connect(OutPortBase& source, InPortBase& sink);
+	void connect(const CableInfo& c);
 	void unconnect(OutPortBase& source, InPortBase& sink);
-	void unconnect(graph::Node* source, int source_port, graph::Node* sink, int sink_port);
+	void unconnect(const CableInfo& c);
 
 	Array<CableInfo> cables() const;
 

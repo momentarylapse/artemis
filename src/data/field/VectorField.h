@@ -75,6 +75,8 @@ struct VectorField {
 	VectorField operator-(const VectorField& o) const;
 	void operator*=(float o);
 	VectorField operator*(float o) const;
+
+	VectorField componentwise_product(const VectorField& o) const;
 };
 
 }

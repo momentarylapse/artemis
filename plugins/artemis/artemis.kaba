@@ -28,6 +28,9 @@ struct VectorField
 	func extern __sub__(o: VectorField) -> VectorField
 	func extern mut __imul__(o: f32)
 	func extern __mul__(o: f32) -> VectorField
+	func extern componentwise_product(o: VectorField) -> VectorField
+
+struct RenderData
 
 
 enum NodeFlags
@@ -49,6 +52,7 @@ enum PortFlags
 	NONE = 0
 	MUTABLE = 1
 	OPTIONAL = 2
+	MULTI = 4
 
 # TODO kaba template classes!
 class InPortScalarField
