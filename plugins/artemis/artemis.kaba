@@ -30,6 +30,8 @@ struct VectorField
 	func extern __mul__(o: f32) -> VectorField
 	func extern componentwise_product(o: VectorField) -> VectorField
 
+struct PlotData
+
 struct RenderData
 
 

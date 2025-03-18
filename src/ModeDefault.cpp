@@ -8,6 +8,7 @@
 #include <graph/Graph.h>
 #include <graph/Node.h>
 #include <graph/Port.h>
+#include <graph/renderer/Canvas.h>
 #include <graph/renderer/RendererNode.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/os/msg.h>
@@ -69,6 +70,13 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
+
+	for (auto n: graph->nodes)
+		if (n->flags & graph::NodeFlags::Canvas) {
+			auto c = static_cast<graph::Canvas*>(n);
+			c->draw_2d(p);
+		}
+
 	p->set_color(White);
 	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", _current_simulation_time_));
 }

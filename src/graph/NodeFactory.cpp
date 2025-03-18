@@ -22,7 +22,8 @@
 #include "renderer/PointListRenderer.h"
 #include "renderer/VectorFieldRenderer.h"
 #include "renderer/VolumeRenderer.h"
-#include "draw2d/Plot.h"
+#include "draw2d/Plotter.h"
+#include "draw2d/FunctionPlot.h"
 #include "../plugins/PluginManager.h"
 
 namespace graph {
@@ -84,7 +85,8 @@ void init_factory() {
 	register_node_class_p<VolumeRenderer>("VolumeRenderer", {NodeCategory::Renderer});
 	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {NodeCategory::Renderer});
 
-	register_node_class_p<Plot>("Plot", {NodeCategory::Renderer});
+	register_node_class<FunctionPlot>("FunctionPlot", {NodeCategory::Renderer});
+	register_node_class_p<Plotter>("Plotter", {NodeCategory::Renderer});
 
 
 	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {

@@ -206,6 +206,8 @@ add_executable(artemis
 	src/data/mesh/SkinGenerator.cpp
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/Data.cpp
+	src/graph/draw2d/FunctionPlot.cpp
+	src/graph/draw2d/Plotter.cpp
 	src/graph/field/Divergence.cpp
 	src/graph/field/Gradient.cpp
 	src/graph/field/IsoSurface.cpp

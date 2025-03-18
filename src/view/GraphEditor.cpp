@@ -132,6 +132,8 @@ string port_description(P* p) {
 		flags.add("mutable");
 	if (p->flags & graph::PortFlags::Optional)
 		flags.add("optional");
+	if (p->flags & graph::PortFlags::Multi)
+		flags.add("multi");
 	if (flags.num > 0)
 		return format("'%s': %s  (%s)", p->name, p->class_->name, implode(flags, ", "));
 	return format("'%s': %s", p->name, p->class_->name);

@@ -42,6 +42,8 @@ void auto_connect(Graph* g, const CableInfo& c) {
 		connect_through(g, c, {"VectorFieldRenderer"});
 	} else if (source->class_->name == "vec3[]" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"PointsRenderer"});
+	} else if (source->class_->name == "PlotData" and sink->class_->name == "RenderData") {
+		connect_through(g, c, {"Plotter"});
 	} else {
 		throw Exception(format("can not connect  %s  to  %s", source->class_->name, sink->class_->name));
 	}

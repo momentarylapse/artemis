@@ -14,12 +14,14 @@
 class MultiViewWindow;
 struct RenderParams;
 class Session;
+class Painter;
 
 namespace graph {
 
 struct RenderData {
 	// TODO
 	int dummy;
+	std::function<void(Painter*)> f_draw_2d;
 };
 
 class RendererNode : public Node {

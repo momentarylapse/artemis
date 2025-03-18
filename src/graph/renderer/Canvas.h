@@ -7,6 +7,8 @@
 
 #include "RendererNode.h"
 
+class rect;
+
 namespace graph {
 
 class Canvas : public Node {
@@ -15,7 +17,10 @@ public:
 		flags = NodeFlags::Canvas;
 	}
 
-	InPort<RenderData> in_draw_3d{this, "draw-3d", PortFlags::Multi};
+	void draw_win(const RenderParams& params, MultiViewWindow* win);
+	void draw_2d(Painter* p);
+
+	InPort<RenderData> in_draw{this, "draw", PortFlags::Multi};
 };
 
 } // graph

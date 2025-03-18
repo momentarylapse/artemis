@@ -1,0 +1,16 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var f = g.add_node("FunctionPlot", [300, 100])
+	f.set("formula", "exp(-(x^2))")
+	
+	var plotter = g.add_node("Plotter", [300, 300])
+	
+	var canvas = g.add_node("Canvas", [300, 500])
+	
+	g.connect(f, 0, plotter, 0)
+	g.connect(plotter, 0, canvas, 0)
+
+

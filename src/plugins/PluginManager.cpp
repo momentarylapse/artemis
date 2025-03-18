@@ -17,6 +17,7 @@
 #include <data/grid/RegularGrid.h>
 #include <graph/NodeFactory.h>
 #include <graph/Port.h>
+#include <graph/draw2d/Plotter.h>
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 #include <lib/os/msg.h>
@@ -204,6 +205,7 @@ void PluginManager::import_kaba() {
 	import_component_class<artemis::data::RegularGrid>(m, "RegularGrid");
 	import_component_class<artemis::data::ScalarField>(m, "ScalarField");
 	import_component_class<artemis::data::VectorField>(m, "VectorField");
+	import_component_class<graph::PlotData>(m, "PlotData");
 	import_component_class<graph::RenderData>(m, "RenderData");
 }
 
