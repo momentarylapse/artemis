@@ -44,6 +44,10 @@ void auto_connect(Graph* g, const CableInfo& c) {
 		connect_through(g, c, {"PointsRenderer"});
 	} else if (source->class_->name == "PlotData" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"Plotter"});
+	} else if (source->class_->name == "f32[]" and sink->class_->name == "RenderData") {
+		connect_through(g, c, {"ListPlot", "Plotter"});
+	} else if (source->class_->name == "f32[]" and sink->class_->name == "PlotData") {
+		connect_through(g, c, {"ListPlot"});
 	} else {
 		throw Exception(format("can not connect  %s  to  %s", source->class_->name, sink->class_->name));
 	}

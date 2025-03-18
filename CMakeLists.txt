@@ -207,6 +207,7 @@ add_executable(artemis
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/Data.cpp
 	src/graph/draw2d/FunctionPlot.cpp
+	src/graph/draw2d/ListPlot.cpp
 	src/graph/draw2d/Plotter.cpp
 	src/graph/field/Divergence.cpp
 	src/graph/field/Gradient.cpp
@@ -225,6 +226,8 @@ add_executable(artemis
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
+	src/graph/value/NumberListAccumulator.cpp
+	src/graph/value/RandomNumber.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp
 	src/graph/Node.cpp

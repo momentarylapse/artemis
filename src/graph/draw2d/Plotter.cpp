@@ -61,15 +61,21 @@ void Plotter::draw_2d(Painter* p) {
 		p->draw_line(project({x_min(), y}), project({x_max(), y}));
 
 	for (const auto d: in_plot.values()) {
-		Array<float> xs = lin_spacing(x_min(), x_max(), 200), ys;
-		for (float x: xs) {
-			float y = (*d->f)(x);
-			ys.add(y);
-		}
-
 		Array<vec2> points;
-		for (int i=0; i<xs.num; i++)
-			points.add(project({xs[i], ys[i]}));
+
+		if (d->f) {
+			Array<float> xs = lin_spacing(x_min(), x_max(), 200), ys;
+			for (float x: xs) {
+				float y = (*d->f)(x);
+				ys.add(y);
+			}
+
+			for (int i=0; i<xs.num; i++)
+				points.add(project({xs[i], ys[i]}));
+		} else {
+			for (const vec2& v: d->points)
+				points.add(project(v));
+		}
 
 		p->set_color(d->_color);
 		p->set_line_width(d->line_width);

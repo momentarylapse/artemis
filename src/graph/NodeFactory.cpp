@@ -24,7 +24,10 @@
 #include "renderer/VolumeRenderer.h"
 #include "draw2d/Plotter.h"
 #include "draw2d/FunctionPlot.h"
+#include "value/NumberListAccumulator.h"
+#include "value/RandomNumber.h"
 #include "../plugins/PluginManager.h"
+#include "draw2d/ListPlot.h"
 
 namespace graph {
 
@@ -86,7 +89,11 @@ void init_factory() {
 	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {NodeCategory::Renderer});
 
 	register_node_class<FunctionPlot>("FunctionPlot", {NodeCategory::Renderer});
+	register_node_class<ListPlot>("ListPlot", {NodeCategory::Renderer});
 	register_node_class_p<Plotter>("Plotter", {NodeCategory::Renderer});
+
+	register_node_class<RandomNumber>("RandomNumber", {NodeCategory::Field});
+	register_node_class<NumberListAccumulator>("NumberListAccumulator", {NodeCategory::Field});
 
 
 	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {

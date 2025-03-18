@@ -17,6 +17,7 @@ struct PlotData {
 	float line_width;
 	color _color;
 	scalar_function_1d f;
+	Array<vec2> points;
 };
 
 class Plotter : public RendererNode {

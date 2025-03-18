@@ -28,6 +28,7 @@ extern float _current_simulation_dt_;
 
 namespace kaba {
 	extern const Class* TypeVec3List;
+	extern const Class* TypeFloatList;
 }
 
 namespace artemis {
@@ -187,6 +188,7 @@ void import_component_class(shared<kaba::Module> m, const string &name) {
 
 void PluginManager::import_kaba() {
 	type_map.set(&typeid(float), kaba::TypeFloat32);
+	type_map.set(&typeid(Array<float>), kaba::TypeFloatList);
 	type_map.set(&typeid(double), kaba::TypeFloat64);
 	type_map.set(&typeid(int), kaba::TypeInt32);
 	type_map.set(&typeid(int64), kaba::TypeInt64);

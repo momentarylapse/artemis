@@ -1,0 +1,20 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var rn = g.add_node("RandomNumber", [300, 100])
+	var acc = g.add_node("NumberListAccumulator", [300, 250])
+	acc.set("capacity", 80)
+	var list = g.add_node("ListPlot", [300, 400])
+	
+	var plotter = g.add_node("Plotter", [300, 550])
+	
+	var canvas = g.add_node("Canvas", [300, 700])
+	
+	g.connect(rn, 0, acc, 0)
+	g.connect(acc, 0, list, 0)
+	g.connect(list, 0, plotter, 0)
+	g.connect(plotter, 0, canvas, 0)
+
+

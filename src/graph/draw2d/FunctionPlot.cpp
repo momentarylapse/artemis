@@ -3,7 +3,6 @@
 //
 
 #include "FunctionPlot.h"
-
 #include <lib/os/msg.h>
 
 namespace graph {
