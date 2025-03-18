@@ -9,10 +9,10 @@
 #include <helper/ResourceManager.h>
 #include <y/graphics-fwd.h>
 #include <lib/image/color.h>
+#include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
 #include <lib/math/mat4.h>
 #include <lib/xhui/Context.h>
-
 #include "MultiView.h"
 
 struct RenderViewData;
@@ -21,6 +21,22 @@ class ResourceManager;
 class MultiViewWindow;
 class Material;
 class Painter;
+
+struct TextLayout {
+	struct Part {
+		string text;
+		float font_size;
+		base::optional<color> col;
+		bool bold;
+		bool italic;
+		vec2 pos;
+		rect box;
+	};
+	Array<Part> parts;
+	rect box() const;
+
+	static TextLayout from_format_string(const string& s);
+};
 
 class DrawingHelper {
 public:
@@ -38,12 +54,14 @@ public:
 
 	void draw_mesh(const RenderParams& params, RenderViewData& rvd, const mat4& matrix, VertexBuffer* vb, Material* material, int pass_no = 0, const string& vertex_module = "default");
 
-	void draw_boxed_str(Painter* p, const vec2& pos, const string& str, int align = -1);
+	static void draw_boxed_str(Painter* p, const vec2& pos, const string& str, int align = -1);
 
-	void draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& a, MultiViewType kind, const base::optional<Hover>& hover);
-	void draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d);
+	static void draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& a, MultiViewType kind, const base::optional<Hover>& hover);
+	static void draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d);
 
 	static Array<vec2> spline(const vec2& a, const vec2& b, const vec2& c, const vec2& d);
+	static void draw_text_layout(Painter* p, const vec2& pos, const TextLayout& l);
+	static void draw_text_layout_with_box(Painter* p, const vec2& pos, const TextLayout& l);
 
 	xhui::Context* context;
 	ResourceManager* resource_manager;

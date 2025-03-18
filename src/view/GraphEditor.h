@@ -30,7 +30,7 @@ public:
 
 	void draw_node(Painter* p, graph::Node* node);
 
-	Array<vec2> cable_spline(const graph::CableInfo& c) const;
+	static Array<vec2> cable_spline(const graph::CableInfo& c);
 
 	Session* session;
 	graph::Graph* graph;

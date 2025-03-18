@@ -11,8 +11,12 @@
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/xhui.h>
+#include <lib/xhui/draw/font.h>
+
 #include "MultiView.h"
 #include "../multiview/SingleData.h"
+
+
 
 
 Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
@@ -266,6 +270,78 @@ Array<vec2> DrawingHelper::spline(const vec2& a, const vec2& b, const vec2& c, c
 	points.add(d);
 	return points;
 }
+
+TextLayout TextLayout::from_format_string(const string& s) {
+	float font_size = xhui::Theme::_default.font_size;
+	vec2 pos = vec2(0, 0);
+	TextLayout l;
+	auto add = [&] (const string& text, bool bold) {
+		auto face = xhui::pick_font(xhui::Theme::_default.font_name, font_size, bold, false);
+		l.parts.add({text, font_size, base::None, bold, false, pos});
+
+		const auto dims = face->get_text_dimensions(text);
+		vec2 size = {dims.bounding_width / xhui::ui_scale, dims.inner_height() / xhui::ui_scale};
+		l.parts.back().box = {pos.x, pos.x + size.x, pos.y, pos.y + size.y};
+		pos += vec2(size.x, 0);
+	};
+
+	// TODO better format parsing...
+	int offset = 0;
+	while (true) {
+		int next = s.find("<b>", offset);
+		if (next > offset) {
+			add(s.sub_ref(offset, next), false);
+			offset = next + 3;
+			next = s.find("</b>", offset);
+			if (next > offset) {
+				add(s.sub_ref(offset, next), true);
+				offset = next + 4;
+			}
+		} else {
+			add(s.sub_ref(offset), false);
+			break;
+		}
+	}
+	return l;
+}
+
+rect TextLayout::box() const {
+	rect r = rect::EMPTY;
+	for (const auto& t: parts)
+		r = r or t.box;
+	return r;
+}
+
+
+void DrawingHelper::draw_text_layout(Painter* p, const vec2& pos, const TextLayout& l) {
+	for (const auto& t: l.parts) {
+		if (t.col)
+			p->set_color(*t.col);
+		p->set_font("", t.font_size, t.bold, t.italic);
+		p->draw_str(pos + t.pos, t.text);
+	}
+}
+
+void DrawingHelper::draw_text_layout_with_box(Painter* p, const vec2& pos, const TextLayout& l) {
+	/*vec2 size = p->get_str_size(str);
+	vec2 pos = _pos;
+	if (align == 0)
+		pos.x -= size.x / 2;
+	if (align == 1)
+		pos.x -= size.x;*/
+	p->set_color(xhui::Theme::_default.background_button);
+	p->set_roundness(7);
+	auto box = l.box();
+	p->draw_rect(rect(pos + box.p00(), pos + box.p11()).grow(7));
+	p->set_color(xhui::Theme::_default.text_label);
+	p->set_roundness(0);
+	draw_text_layout(p, pos, l);
+
+	//draw_boxed_str(p, pos, l.parts[0].text);
+}
+
+
+
 
 
 

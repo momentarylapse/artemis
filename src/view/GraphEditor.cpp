@@ -135,11 +135,11 @@ string port_description(P* p) {
 	if (p->flags & graph::PortFlags::Multi)
 		flags.add("multi");
 	if (flags.num > 0)
-		return format("'%s': %s  (%s)", p->name, p->class_->name, implode(flags, ", "));
-	return format("'%s': %s", p->name, p->class_->name);
+		return format("<b>%s</b>, type <b>%s</b>  (%s)", p->name, p->class_->name, implode(flags, ", "));
+	return format("<b>%s</b>, type <b>%s</b>", p->name, p->class_->name);
 }
 
-Array<vec2> GraphEditor::cable_spline(const graph::CableInfo& c) const {
+Array<vec2> GraphEditor::cable_spline(const graph::CableInfo& c) {
 	vec2 A = node_out_port_pos(c.source, c.source_port);
 	vec2 B = node_in_port_pos(c.sink, c.sink_port);
 	return DrawingHelper::spline(A, A + vec2(0, 160), B - vec2(0, 160), B);
@@ -190,11 +190,13 @@ void GraphEditor::on_draw(Painter* p) {
 		tip = format("input %s", port_description(hover->node->in_ports[hover->index]));
 	if (hover and hover->type == HoverType::Cable) {
 		const auto c = graph->cables()[hover->index];
-		tip = format("cable: %s", c.source->out_ports[c.source_port]->class_->name);
+		tip = format("cable, type <b>%s</b>", c.source->out_ports[c.source_port]->class_->name);
 	}
 
-	if (tip != "")
-		session->drawing_helper->draw_boxed_str(p, get_window()->mouse_position() + vec2(-10, 30), tip);
+	if (tip != "") {
+		const auto l = TextLayout::from_format_string(tip);
+		DrawingHelper::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l);
+	}
 }
 
 void GraphEditor::draw_node(Painter* p, graph::Node* n) {
