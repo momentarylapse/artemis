@@ -21,7 +21,7 @@ func main()
 	#B.set("formula", "vec3(0,1,0) * exp( -(len(p - vec3(0.5,0.5,80))^2)/20)")
 	
 	var j = g.add_node("VectorField", [50,250])
-	j.set("formula", "vec3(5,0,0) * exp( -(len(p - vec3(0,0,20))^2)*5) * exp(-((t-10)^2)*0.5)")
+	j.set("formula", "vec3(5,0,0) * exp( -0.5*len(p - vec3(0,0,20))^2) * exp(-0.5*(t-10)^2)")
 	j.set("time-dependent", true)
 	
 	var rE = g.add_node("VectorFieldRenderer", [370, 550])
