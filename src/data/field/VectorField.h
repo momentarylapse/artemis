@@ -4,26 +4,27 @@
 
 #pragma once
 
+#include "base.h"
 #include "../grid/RegularGrid.h"
 #include <lib/math/vec3.h>
 
-struct vec3d {
+struct dvec3 {
 	double x, y, z;
-	vec3d(double x, double y, double z) : x(x), y(y), z(z) {}
-	vec3d() : x(0), y(0), z(0) {}
+	dvec3(double x, double y, double z) : x(x), y(y), z(z) {}
+	dvec3() : x(0), y(0), z(0) {}
 	//vec3d(const vec3d& v) : x(v.x), y(v.y), z(v.z) {}
-	explicit vec3d(const vec3& v) : vec3d(v.x, v.y, v.z) {}
-	void operator=(const vec3d& v) {
+	explicit dvec3(const vec3& v) : dvec3(v.x, v.y, v.z) {}
+	void operator=(const dvec3& v) {
 		x = v.x;
 		y = v.y;
 		z = v.z;
 	}
-	void operator+=(const vec3d& v) {
+	void operator+=(const dvec3& v) {
 		x += v.x;
 		y += v.y;
 		z += v.z;
 	}
-	void operator-=(const vec3d& v) {
+	void operator-=(const dvec3& v) {
 		x -= v.x;
 		y -= v.y;
 		z -= v.z;
@@ -38,17 +39,17 @@ struct vec3d {
 		y /= s;
 		z /= s;
 	}
-	vec3d operator+(const vec3d& v) const {
-		return vec3d(x + v.x, y + v.y, z + v.z);
+	dvec3 operator+(const dvec3& v) const {
+		return dvec3(x + v.x, y + v.y, z + v.z);
 	}
-	vec3d operator-(const vec3d& v) const {
-		return vec3d(x - v.x, y - v.y, z - v.z);
+	dvec3 operator-(const dvec3& v) const {
+		return dvec3(x - v.x, y - v.y, z - v.z);
 	}
-	vec3d operator*(double s) const {
-		return vec3d(x * s, y * s, z * s);
+	dvec3 operator*(double s) const {
+		return dvec3(x * s, y * s, z * s);
 	}
-	vec3d operator/(double s) const {
-		return vec3d(x / s, y / s, z / s);
+	dvec3 operator/(double s) const {
+		return dvec3(x / s, y / s, z / s);
 	}
 	vec3 to32() const {
 		return vec3((float)x, (float)y, (float)z);
@@ -57,15 +58,31 @@ struct vec3d {
 
 namespace artemis::data {
 
+struct _VectorField32 {
+	using ScalarType = float;
+	using VectorType = vec3;
+	Array<vec3> v;
+	void init(const RegularGrid& grid);
+};
+
+struct _VectorField64 {
+	using ScalarType = double;
+	using VectorType = dvec3;
+	Array<dvec3> v;
+	void init(const RegularGrid& grid);
+};
+
 struct VectorField {
 	VectorField();
-	explicit VectorField(const RegularGrid& grid);
+	explicit VectorField(const RegularGrid& grid, ScalarType type);
 
+	ScalarType type;
 	RegularGrid grid;
-	Array<vec3d> v;
+	_VectorField32 v32;
+	_VectorField64 v64;
 
-	vec3d value(int i, int j, int k) const;
-	void set(int i, int j, int k, const vec3d& v);
+	dvec3 value(int i, int j, int k) const;
+	void set(int i, int j, int k, const dvec3& v);
 	vec3 value32(int i, int j, int k) const;
 	void set32(int i, int j, int k, const vec3& v);
 

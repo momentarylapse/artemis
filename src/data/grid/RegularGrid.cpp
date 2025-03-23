@@ -17,6 +17,19 @@ RegularGrid::RegularGrid(int _nx, int _ny, int _nz, const vec3& _dx, const vec3&
 
 RegularGrid::RegularGrid() : RegularGrid(8, 8, 8) {}
 
+int RegularGrid::cell_count() const {
+	return nx * ny * nz;
+}
+
+int RegularGrid::vertex_count() const {
+	return (nx + 1) * (ny + 1) * (nz + 1);
+}
+
+int RegularGrid::cell_index(int i, int j, int k) const {
+	return i + j * nx + k * nx * ny;
+}
+
+
 vec3 RegularGrid::index_to_pos(float i, float j, float k) const {
 	return i * dx + j * dy + k * dz;
 }
@@ -37,7 +50,7 @@ Box RegularGrid::bounding_box() const {
 
 Array<vec3> RegularGrid::vertices() const {
 	Array<vec3> points;
-	//points.resize((nx + 1) * (ny + 1) * (nz + 1));
+	//points.resize(vertex_count());
 	for (int i=0; i<=nx; i++)
 		for (int j=0; j<=ny; j++)
 			for (int k=0; k<=nz; k++)
@@ -47,7 +60,7 @@ Array<vec3> RegularGrid::vertices() const {
 
 Array<vec3> RegularGrid::cell_centers() const {
 	Array<vec3> points;
-	//points.resize(nx * ny * nz);
+	//points.resize(cell_count());
 	for (int i=0; i<nx; i++)
 		for (int j=0; j<ny; j++)
 			for (int k=0; k<nz; k++)

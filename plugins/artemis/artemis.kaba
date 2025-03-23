@@ -1,3 +1,4 @@
+use kaba
 
 struct Mesh
 	func extern __init__()
@@ -9,11 +10,12 @@ struct RegularGrid
 
 struct ScalarField
 	var grid: RegularGrid
-	var v: f64[]
+	#var v: f64[]
 	func extern __init__()
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: f32)
 	func extern value(i: i32, j: i32, k: i32) -> f32
+	func extern mut __assign__(o: ScalarField)
 
 struct VectorField
 	var grid: RegularGrid
@@ -22,6 +24,7 @@ struct VectorField
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
 	func extern value(i: i32, j: i32, k: i32) -> vec3
+	func extern mut __assign__(o: VectorField)
 	func extern mut __iadd__(o: VectorField)
 	func extern __add__(o: VectorField) -> VectorField
 	func extern mut __isub__(o: VectorField)
@@ -93,8 +96,8 @@ var extern simulation_dt: f32
 
 func extern current_session() -> Session&
 
-func extern create_scalar_field(g: RegularGrid) -> ScalarField
-func extern create_vector_field(g: RegularGrid) -> VectorField
+func extern create_scalar_field(g: RegularGrid, t: kaba.Class&) -> ScalarField
+func extern create_vector_field(g: RegularGrid, t: kaba.Class&) -> VectorField
 
 func extern gradient(f: ScalarField) -> VectorField
 func extern divergence(f: VectorField) -> ScalarField

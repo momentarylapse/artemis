@@ -12,14 +12,14 @@ namespace artemis::processing {
 
 void iso_cell(const artemis::data::ScalarField& f, PolygonMesh& mesh, int i, int j, int k, float t0) {
 	float v[8];
-	v[0] = f.value(i, j, k) - t0;
-	v[1] = f.value(i, j, k+1) - t0;
-	v[2] = f.value(i, j+1, k) - t0;
-	v[3] = f.value(i, j+1, k+1) - t0;
-	v[4] = f.value(i+1, j, k) - t0;
-	v[5] = f.value(i+1, j, k+1) - t0;
-	v[6] = f.value(i+1, j+1, k) - t0;
-	v[7] = f.value(i+1, j+1, k+1) - t0;
+	v[0] = f.value32(i, j, k) - t0;
+	v[1] = f.value32(i, j, k+1) - t0;
+	v[2] = f.value32(i, j+1, k) - t0;
+	v[3] = f.value32(i, j+1, k+1) - t0;
+	v[4] = f.value32(i+1, j, k) - t0;
+	v[5] = f.value32(i+1, j, k+1) - t0;
+	v[6] = f.value32(i+1, j+1, k) - t0;
+	v[7] = f.value32(i+1, j+1, k+1) - t0;
 	bool s[8];
 	for (int n=0; n<8; n++)
 		s[n] = v[n] > 0;
@@ -76,14 +76,14 @@ void iso_cell(const artemis::data::ScalarField& f, PolygonMesh& mesh, int i, int
 // lazy-man's method :D
 void iso_cell_approx(const artemis::data::ScalarField& f, PolygonMesh& mesh, int i, int j, int k, float t0) {
 	float v[8];
-	v[0] = f.value(i, j, k) - t0;
-	v[1] = f.value(i, j, k+1) - t0;
-	v[2] = f.value(i, j+1, k) - t0;
-	v[3] = f.value(i, j+1, k+1) - t0;
-	v[4] = f.value(i+1, j, k) - t0;
-	v[5] = f.value(i+1, j, k+1) - t0;
-	v[6] = f.value(i+1, j+1, k) - t0;
-	v[7] = f.value(i+1, j+1, k+1) - t0;
+	v[0] = f.value32(i, j, k) - t0;
+	v[1] = f.value32(i, j, k+1) - t0;
+	v[2] = f.value32(i, j+1, k) - t0;
+	v[3] = f.value32(i, j+1, k+1) - t0;
+	v[4] = f.value32(i+1, j, k) - t0;
+	v[5] = f.value32(i+1, j, k+1) - t0;
+	v[6] = f.value32(i+1, j+1, k) - t0;
+	v[7] = f.value32(i+1, j+1, k+1) - t0;
 	bool s[8];
 	for (int n=0; n<8; n++)
 		s[n] = v[n] > 0;

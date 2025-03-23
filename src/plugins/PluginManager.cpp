@@ -102,12 +102,25 @@ public:
 	}
 };
 
-data::ScalarField create_scalar_field(const data::RegularGrid& grid) {
-	return data::ScalarField(grid);
+data::ScalarType type2type(const kaba::Class* type) {
+	if (type == kaba::TypeFloat32)
+		return data::ScalarType::Float32;
+	if (type == kaba::TypeFloat64)
+		return data::ScalarType::Float64;
+	return data::ScalarType::None;
 }
 
-data::VectorField create_vector_field(const data::RegularGrid& grid) {
-	return data::VectorField(grid);
+data::ScalarField create_scalar_field(const data::RegularGrid& grid, const kaba::Class* type) {
+	return data::ScalarField(grid, type2type(type));
+}
+
+data::VectorField create_vector_field(const data::RegularGrid& grid, const kaba::Class* type) {
+	return data::VectorField(grid, type2type(type));
+}
+
+template<class T>
+void generic_assign(T& a, const T& b) {
+	a = b;
 }
 
 void PluginManager::export_kaba() {
@@ -129,19 +142,21 @@ void PluginManager::export_kaba() {
 
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
-	ext->declare_class_element("ScalarField.v", &data::ScalarField::v);
+	//ext->declare_class_element("ScalarField.v", &data::ScalarField::v);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value32);
+	ext->link_class_func("ScalarField.__assign__", &generic_assign<data::ScalarField>);
 
 	ext->declare_class_size("VectorField", sizeof(data::VectorField));
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<data::VectorField>);
 	ext->link_class_func("VectorField.__delete__", &kaba::generic_delete<data::VectorField>);
 	ext->declare_class_element("VectorField.grid", &data::VectorField::grid);
-	ext->declare_class_element("VectorField.v", &data::VectorField::v);
+	//ext->declare_class_element("VectorField.v", &data::VectorField::v);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
+	ext->link_class_func("VectorField.__assign__", &generic_assign<data::VectorField>);
 	ext->link_class_func("VectorField.__add__", &data::VectorField::operator+);
 	ext->link_class_func("VectorField.__iadd__", &data::VectorField::operator+=);
 	ext->link_class_func("VectorField.__sub__", &data::VectorField::operator-);

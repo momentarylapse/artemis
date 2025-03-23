@@ -14,6 +14,9 @@ struct RegularGrid {
 	RegularGrid();
 	RegularGrid(int nx, int ny, int nz, const vec3& dx = vec3::EX, const vec3& dy = vec3::EY, const vec3& dz = vec3::EZ);
 
+	int vertex_count() const;
+	int cell_count() const;
+	int cell_index(int i, int j, int k) const;
 	vec3 index_to_pos(float i, float j, float k) const;
 	vec3 vertex(int i, int j, int k) const;
 	vec3 cell_center(int i, int j, int k) const;

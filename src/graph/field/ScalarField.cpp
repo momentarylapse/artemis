@@ -46,12 +46,12 @@ func f(p: vec3, t: f32) -> f32
 		}
 
 		if (auto f = f_p) {
-			artemis::data::ScalarField s(*g);
+			artemis::data::ScalarField s(*g, (artemis::data::ScalarType)type());
 
 			for (int i=0; i<g->nx; i++)
 				for (int j=0; j<g->ny; j++)
 					for (int k=0; k<g->nz; k++)
-						s.set(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
+						s.set32(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
 			out_field(s);
 		}
 	}

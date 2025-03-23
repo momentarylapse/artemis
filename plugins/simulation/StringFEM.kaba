@@ -104,7 +104,7 @@ class StringFEM extends Node
 			for i in 0:N
 				substep(dt / N)
 			
-			var vu = create_vector_field(g)
+			var vu = create_vector_field(g, f32)
 			
 			for i in 0:g.nx
 				vu.set(i, 0, 0, [ux[i*2]*10,uy[i*2]*10,0])
