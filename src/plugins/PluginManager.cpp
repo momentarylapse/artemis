@@ -100,13 +100,22 @@ public:
 	void __delete__() override {
 		((T*)this)->~T();
 	}
-
 };
+
+data::ScalarField create_scalar_field(const data::RegularGrid& grid) {
+	return data::ScalarField(grid);
+}
+
+data::VectorField create_vector_field(const data::RegularGrid& grid) {
+	return data::VectorField(grid);
+}
 
 void PluginManager::export_kaba() {
 	auto ext = kaba::default_context->external.get();
 
 	ext->link("current_session", (void*)&current_session);
+	ext->link("create_scalar_field", (void*)&create_scalar_field);
+	ext->link("create_vector_field", (void*)&create_vector_field);
 	ext->link("gradient", (void*)&processing::gradient);
 	ext->link("divergence", (void*)&processing::divergence);
 	ext->link("rotation_fw", (void*)&processing::rotation_fw);
@@ -169,6 +178,7 @@ void PluginManager::export_kaba() {
 
 	link_ports<artemis::data::ScalarField>(ext, "ScalarField");
 	link_ports<artemis::data::VectorField>(ext, "VectorField");
+	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
 
 	ext->declare_class_size("Graph", sizeof(graph::Graph));
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);

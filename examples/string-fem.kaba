@@ -1,0 +1,27 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var grid = g.add_node("RegularGrid", [200,100])
+	grid.set("nx", 50)
+	grid.set("ny", 1)
+	grid.set("nz", 1)
+
+	var sim = g.add_node("StringFEM", [300,250])
+
+	var gr = g.add_node("GridRenderer", [100,400])
+	#gr.set("line-width", 2.0)
+	#gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var vr = g.add_node("VectorFieldRenderer", [300,400])
+
+	var canvas = g.add_node("Canvas", [200,550])
+
+	g.connect(grid, 0, sim, 0)
+	g.connect(grid, 0, gr, 0)
+	g.connect(gr, 0, canvas, 0)
+	g.connect(sim, 0, vr, 0)
+	g.connect(vr, 0, canvas, 0)
+
+

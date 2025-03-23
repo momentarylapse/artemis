@@ -73,6 +73,10 @@ class OutPortVectorField
 	func extern __init__(node: Node, name: string, flags: PortFlags)
 	func extern set(x: VectorField)
 	
+class InPortRegularGrid
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern value() -> RegularGrid*
+	func extern mutated()
 
 class Graph
 	func extern add_node(name: string, pos: vec2) -> Node&
@@ -89,6 +93,8 @@ var extern simulation_dt: f32
 
 func extern current_session() -> Session&
 
+func extern create_scalar_field(g: RegularGrid) -> ScalarField
+func extern create_vector_field(g: RegularGrid) -> VectorField
 
 func extern gradient(f: ScalarField) -> VectorField
 func extern divergence(f: VectorField) -> ScalarField

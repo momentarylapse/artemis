@@ -1,0 +1,57 @@
+struct x2vec3
+	var xy, yz, zx: float
+
+struct Material
+	#var Cxx = 1.0
+	#var Cxy = 0.5
+	var density: float # [kg/m³]
+	var E: vec3 # Young's modulus along main axes [Pa=N/m²]
+	var v: x2vec3 # Poisson's ratio
+	var G: x2vec3 # shear modulus
+	
+	
+
+#let NICKEL: Material = [8908.0]
+
+func metal(density: float, E: float, G: float, v: float) -> Material
+	let bulk_modulus = E / 3 / (1 - 2*v)
+	return [density, [E,E,E], [v,v,v], [G,G,G]]
+
+# grain along x
+func wood(density: float, E: vec3, v: x2vec3, G: x2vec3) -> Material
+	return [density, E, v, G]
+	
+# https://www.engineeringtoolbox.com/timber-mechanical-properties-d_1789.html
+func wood1(density: float, E1: float, E2: float, G: float) -> Material
+	return [density, [E1, E2, E], [0,0,0], [G,G,G]]
+
+
+func nickel() -> Material
+	return metal(9808.0, 200.0e9, 76.0e9, 0.31)
+
+func zinc() -> Material
+	return metal(7140.0, 108.0e9, 43.0e9, 0.25)
+
+func copper() -> Material
+	return metal(8935.0, 120.0e9, 48.0e9, 0.33)
+
+func magnesium() -> Material
+	return metal(1737.0, 45.0e9, 17.0e9, 0.28)
+
+func aluminium() -> Material
+	return metal(2699.0, 70.0e9, 26.0e9, 0.35)
+
+func iron() -> Material
+	return metal(7874.0, 211.0e9, 82.0e9, 0.29)
+
+func steel() -> Material
+	return metal(7900, 190.0e9, 72.0e9, 0.30)
+
+func gold() -> Material
+	return metal(19283.0, 79.0e9, 27.0e9, 0.43)
+
+
+# http://archive.sciendo.com/ACE/ace.2018.64.issue-3/ace-2018-0027/ace-2018-0027.pdf
+func maple() -> Material
+	return wood(690.0, [13810.0e6, 678.0e6, 1311.0e6], [0.5,0.46,0.42], [753.0e6,1013.0e6,255.0e6])
+

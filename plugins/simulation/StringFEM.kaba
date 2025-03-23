@@ -1,0 +1,114 @@
+use artemis.*
+use helper.linalg.*
+#use helper.d1p1.*
+use helper.d1p2.*
+#use d1x.*
+use helper.material.*
+
+class StringFEM extends Node
+	var in_grid: InPortRegularGrid
+	var out_u: OutPortVectorField
+	
+	let length = 0.648 # m
+	let tension = 84.0 # N
+	#let gauge = 0.017 # inch
+	let diameter = 0.0004318 # m
+		
+	var grid: Grid
+	var mat: Material
+#	var tension: f32 # [N]
+	var radius: f32 # [m]
+	var ux, uy: f32[]
+	var dt_ux, dt_uy: f32[]
+	var phi_dx_phi: SparseRowMatrix
+	var phi_dx_dx_phi: SparseRowMatrix
+	var phi_phi: SparseRowMatrix
+	var phi_phi_inv: Matrix
+	
+	
+	func __init__()
+		super.__init__("StringFEM")
+		in_grid.__init__(self, "grid", PortFlags.NONE)
+		out_u.__init__(self, "u", PortFlags.NONE)
+		flags = NodeFlags.TIME_DEPENDENT
+		
+		radius = diameter / 2
+		mat = nickel()
+		
+		grid.N = 0
+	
+	func mut reset(g: RegularGrid)
+		grid.N = g.nx
+		grid.D = length / grid.N #len(g.dx)
+		let n = grid.n()
+		ux.resize(n)
+		uy.resize(n)
+		dt_ux.resize(n)
+		dt_uy.resize(n)
+		phi_dx_phi = grid.phi_dphi()
+		phi_dx_dx_phi = grid.phi_ddphi()
+		phi_phi = grid.phi_phi()
+		phi_phi_inv = inverse(phi_phi)
+		
+		ux = 0
+		uy = 0
+		dt_ux = 0
+		dt_uy = 0		
+		for mut i=>v in dt_uy
+			v = exp( - 0.01 * (i-n/4)^2) *100
+	
+	func mut substep(dt: f32)
+		let phi_laplace_ux = mul(phi_dx_dx_phi, ux)
+		let phi_laplace_uy = mul(phi_dx_dx_phi, uy)
+		
+		let A = pi * radius^2
+		let µ = mat.density * A # [kg/m]
+		let C = tension / µ / 2 # [m²/s²]
+	
+		let phi_dt_dt_ux = phi_laplace_ux * C
+		let phi_dt_dt_uy = phi_laplace_uy * C
+#		print(ddu_phi)
+	
+		#let ddux = phi_phi.solve(ddux_phi)
+		#let dduy = phi_phi.solve(dduy_phi)
+		let dt_dt_ux = mul(phi_phi_inv, phi_dt_dt_ux)
+		let dt_dt_uy = mul(phi_phi_inv, phi_dt_dt_uy)
+#		print(ddu)
+	
+		dt_ux += dt_dt_ux * dt
+		dt_uy += dt_dt_uy * dt
+		ux += dt_ux * dt
+		uy += dt_uy * dt
+			
+			
+			
+		# boundary
+		let n = grid.n()
+		ux[0] = 0
+		uy[0] = 0
+		dt_ux[0] = 0
+		dt_uy[0] = 0
+		ux[n-1] = 0
+		uy[n-1] = 0
+		dt_ux[n-1] = 0
+		dt_uy[n-1] = 0
+	
+	func override process()
+		for g in in_grid.value()
+			if g.nx != grid.N
+				# grid changed... recreate everything
+				reset(g)
+		
+			let dt = 0.00002 #simulation_dt
+			let N = 100
+			for i in 0:N
+				substep(dt / N)
+			
+			var vu = create_vector_field(g)
+			
+			for i in 0:g.nx
+				vu.set(i, 0, 0, [ux[i*2]*10,uy[i*2]*10,0])
+			
+			out_u.set(vu)
+	
+		

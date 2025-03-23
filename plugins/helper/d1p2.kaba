@@ -1,0 +1,97 @@
+use linalg.*
+
+# p(t)=At²+Bt+C
+# (t-1)(t-2)/2 = (t^2-3t+2)/2
+# -(t-2)t
+# (t-1)t/2
+
+struct Grid
+	var N = 8   # cells
+	var D = 0.1 # cell size
+	
+	# function components
+	func n() -> int
+		return N*2+1
+
+	# <phi[i], laplace u>
+	func phi_laplace_u(u: float[]) -> float[]
+		let M = phi_ddphi()
+		return mul(M, u)
+	
+	# <phi[i], phi[j]>
+	func phi_phi() -> SparseRowMatrix
+		var m: Ret
+		m.clear(n(), n())
+		let A = D/30
+		# diagonal
+		for i in 0:N
+			m.set(i*2,i*2, 8*A)
+			m.set(i*2+1,i*2+1, 16*A)
+		m.set(0,0, 4*A)
+		m.set(N*2,N*2, 4*A)
+		# 1st parallel
+		for i in 0:2*N
+			m.set(i,i+1, 2*A)
+			m.set(i+1,i, 2*A)
+		# 2nd parallel
+		for i in 0:N
+			m.set(2*i,2*i+2, -A)
+			m.set(2*i+2,2*i, -A)
+		return m
+
+	# M = <phi[i], d/dx phi[j]>
+	# M * u = <phi, d/dx u>
+	func phi_dphi() -> SparseRowMatrix
+		var m: Ret
+		m.clear(n(), n())
+		let A = 1.0/6
+		# diagonal
+		m.set(0,0, -3*A)
+		m.set(N*2,N*2, 3*A)
+		# 1st parallel
+		for i in 0:N
+			m.set(i*2+1,i*2  , 4*A)
+			m.set(i*2+2,i*2+1, 4*A)
+			m.set(i*2  ,i*2+1, -4*A)
+			m.set(i*2+1,i*2+2, -4*A)
+		# 2nd parallel
+		for i in 0:N
+			m.set(2*i,2*i+2, A)
+			m.set(2*i+2,2*i, -A)
+		return m
+
+	# M = <phi[i], d²/dx²phi[j]>
+	# M * u = <phi, d²/dx² u>
+	func phi_ddphi() -> SparseRowMatrix
+		var m: Ret
+		m.clear(n(), n())
+		let A = 1.0/3/D
+		# diagonal
+		for i in 0:N
+			m.set(i*2,i*2, -14*A)
+			m.set(i*2+1,i*2+1, -16*A)
+		m.set(0,0, 7*A)
+		m.set(N*2,N*2, 7*A)
+		# 1st parallel
+		for i in 0:N
+			m.set(i*2+1,i*2  , 8*A)
+			m.set(i*2+2,i*2+1, 8*A)
+			m.set(i*2  ,i*2+1, 8*A)
+			m.set(i*2+1,i*2+2, 8*A)
+		# 2nd parallel
+		for i in 0:N
+			m.set(2*i,2*i+2, -A)
+			m.set(2*i+2,2*i, -A)
+		return m
+
+
+func __test()
+func main()
+	var g: Grid
+	g.D = 2.0/3
+	g.N = 3
+	print(g.phi_phi().to_matrix())
+	print("")
+	print(g.phi_dphi().to_matrix())
+	print("")
+	print(g.phi_ddphi().to_matrix())
