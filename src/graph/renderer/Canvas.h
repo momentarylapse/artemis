@@ -6,6 +6,7 @@
 #define CANVAS_H
 
 #include "RendererNode.h"
+#include <lib/image/color.h>
 
 class rect;
 
@@ -19,6 +20,8 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win);
 	void draw_2d(Painter* p);
+
+	Setting<color> background{this, "background", color(-1,-1,-1,-1)};
 
 	InPort<RenderData> in_draw{this, "draw", PortFlags::Multi};
 };

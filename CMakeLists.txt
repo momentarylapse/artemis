@@ -220,6 +220,7 @@ add_executable(artemis
 	src/graph/mesh/SphereMesh.cpp
 	src/graph/mesh/TeapotMesh.cpp
 	src/graph/renderer/Canvas.cpp
+	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp

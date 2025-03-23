@@ -57,9 +57,21 @@ void ModeDefault::update_menu() {
 	win->enable("simulation-stop", simulation_active or _current_simulation_time_ > 0);
 }
 
+graph::Canvas* get_canvas(graph::Graph* graph) {
+	for (auto n: graph->nodes)
+		if (n->flags & graph::NodeFlags::Canvas)
+			return static_cast<graph::Canvas*>(n);
+	return nullptr;
+}
 
 void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) {
-	session->drawing_helper->clear(params, xhui::Theme::_default.background_low);
+	if (auto c = get_canvas(graph)) {
+		if (c->background().a < 0)
+			c->background.set(xhui::Theme::_default.background_low);
+		session->drawing_helper->clear(params, c->background());
+	} else {
+		session->drawing_helper->clear(params, xhui::Theme::_default.background_low);
+	}
 
 	for (auto n: graph->nodes)
 		if (n->flags & graph::NodeFlags::Renderer) {
@@ -70,12 +82,8 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
-
-	for (auto n: graph->nodes)
-		if (n->flags & graph::NodeFlags::Canvas) {
-			auto c = static_cast<graph::Canvas*>(n);
-			c->draw_2d(p);
-		}
+	if (auto c = get_canvas(graph))
+		c->draw_2d(p);
 
 	p->set_color(White);
 	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", _current_simulation_time_));

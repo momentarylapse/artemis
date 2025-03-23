@@ -1,0 +1,106 @@
+use os
+
+enum Mode
+	Default
+	Resource
+	Renderer
+
+func create(name: string, dir: os.Path, mode: Mode)
+	match mode
+		Mode.Default =>
+			os.fs.write_text(dir | "{{name}}.h", "
+#pragma once
+
+#include <graph/Node.h>
+#include <graph/Port.h>
+#include <graph/Setting.h>
+
+namespace graph {
+
+class {{name}} : public Node {
+public:
+	{{name}}() : Node(\"{{name}}\") {}
+
+	void process() override;
+
+	Setting<int> dummy{this, \"dummy\", 0};
+
+	InPort<...> in_x{this, \"x\"};
+	OutPort<...> out_x{this, \"y\"};
+};
+
+} // graph
+")
+		Mode.Resource =>
+			os.fs.write_text(dir | "{{name}}.h", "
+#pragma once
+
+#include <graph/Node.h>
+#include <graph/Port.h>
+#include <graph/Setting.h>
+
+namespace graph {
+
+class {{name}} : public ResourceNode {
+public:
+	{{name}}() : ResourceNode(\"{{name}}\") {}
+
+	void process() override;
+
+	Setting<int> dummy{this, \"dummy\", 0};
+
+	InPort<...> in_x{this, \"x\"};
+	OutPort<...> out_x{this, \"y\"};
+};
+
+} // graph
+")
+		Mode.Renderer =>
+			print("TODO renderer!")
+			os.fs.write_text(dir | "{{name}}.h", "
+#pragma once
+
+#include \"RendererNode.h\"
+#include <graph/Port.h>
+#include <graph/Setting.h>
+
+namespace graph {
+
+explicit class {{name}} : public RendererNode {
+public:
+	explicit {{name}}(Session* s) : RendererNode(s, \"{{name}}\") {}
+	
+	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
+
+	Setting<int> dummy{this, \"dummy\", 0};
+
+	InPort<...> in_x{this, \"x\"};
+};
+
+} // graph
+")
+
+	os.fs.write_text(dir | "{{name}}.cpp", "#include \"{{name}}.h\"
+
+namespace graph {
+
+{{name}}::process() {
+}
+
+} // graph
+")
+
+func main(args: string[])
+	if len(args) < 2
+		raise(new Exception("[--resource]  [--render]  NAME  DIR"))
+	if len(args) >= 3
+		if args[0] == "--resource"
+			create(args[1], args[2], Mode.Resource)
+		else if args[0] == "--render"
+			create(args[1], args[2], Mode.Renderer)
+		else
+			raise(new Exception("[--resource]  [--render]  NAME  DIR"))
+	else		
+		create(args[0], args[1], Mode.Default)
+	
+	print("TODO add to factory!")

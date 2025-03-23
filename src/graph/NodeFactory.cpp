@@ -17,6 +17,7 @@
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
 #include "renderer/Canvas.h"
+#include "renderer/DeformationRenderer.h"
 #include "renderer/GridRenderer.h"
 #include "renderer/MeshRenderer.h"
 #include "renderer/PointListRenderer.h"
@@ -87,6 +88,7 @@ void init_factory() {
 	register_node_class_p<PointListRenderer>("PointListRenderer", {NodeCategory::Renderer});
 	register_node_class_p<VolumeRenderer>("VolumeRenderer", {NodeCategory::Renderer});
 	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {NodeCategory::Renderer});
+	register_node_class_p<DeformationRenderer>("DeformationRenderer", {NodeCategory::Renderer});
 
 	register_node_class<FunctionPlot>("FunctionPlot", {NodeCategory::Renderer});
 	register_node_class<ListPlot>("ListPlot", {NodeCategory::Renderer});
