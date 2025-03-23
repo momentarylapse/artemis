@@ -5,10 +5,10 @@
 #ifndef RENDERERNODE_H
 #define RENDERERNODE_H
 
+#include "../Node.h"
 #include <graph/Port.h>
 #include <graph/Setting.h>
-
-#include "../Node.h"
+#include <lib/math/Box.h>
 #include <y/graphics-fwd.h>
 
 class MultiViewWindow;
@@ -20,7 +20,7 @@ namespace graph {
 
 struct RenderData {
 	// TODO
-	int dummy;
+	base::optional<Box> bounding_box;
 	std::function<void(Painter*)> f_draw_2d;
 };
 

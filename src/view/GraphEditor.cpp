@@ -75,7 +75,7 @@ GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
 	from_source(R"foodelim(
 Dialog x ''
 	Overlay ? ''
-		DrawingArea graph '' grabfocus
+		DrawingArea graph '' grabfocus width=400 expandx
 		Grid overlay-grid '' margin=20
 			Label ? '' expandy
 			Label ? '' expandx
@@ -96,6 +96,9 @@ Dialog x ''
 	});
 	event_x("graph", xhui::event_id::LeftButtonUp, [this] {
 		on_left_button_up(get_window()->mouse_position());
+	});
+	event_x("graph", xhui::event_id::MouseLeave, [this] {
+		on_mouse_leave(get_window()->mouse_position());
 	});
 	event_x("graph", xhui::event_id::KeyDown, [this] {
 		on_key_down(get_window()->state.key_code);
@@ -147,6 +150,8 @@ Array<vec2> GraphEditor::cable_spline(const graph::CableInfo& c) {
 
 
 void GraphEditor::on_draw(Painter* p) {
+	auto clip0 = p->clip();
+	p->set_clip(_area);
 	p->set_color(xhui::Theme::_default.background);
 	p->draw_rect(_area);
 
@@ -197,6 +202,8 @@ void GraphEditor::on_draw(Painter* p) {
 		const auto l = TextLayout::from_format_string(tip);
 		DrawingHelper::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l);
 	}
+
+	p->set_clip(clip0);
 }
 
 void GraphEditor::draw_node(Painter* p, graph::Node* n) {
@@ -263,7 +270,6 @@ base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
 }
 
 void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
-
 	if (get_window()->button(0)) {
 		if (selection and selection->type == HoverType::Node) {
 			selection->node->pos = m - dnd_offset;
@@ -321,6 +327,11 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 			}
 		}
 	}
+}
+
+void GraphEditor::on_mouse_leave(const vec2& m) {
+	hover = base::None;
+	request_redraw();
 }
 
 void GraphEditor::on_key_down(int key) {

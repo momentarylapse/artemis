@@ -26,18 +26,24 @@ base::future<Session*> emit_empty_session(Session* parent);
 
 void start_session_empty(Session* parent) {
 	emit_empty_session(parent).then([] (Session* s) {
-		auto teapot = graph::create_node(s, "TeapotMesh");
-		teapot->pos = {300, 200};
-		s->graph->add_node(teapot);
-		auto renderer = graph::create_node(s, "MeshRenderer");
-		renderer->pos = {300, 400};
-		//renderer->set("emission", color_to_any(Green));
-		s->graph->add_node(renderer);
-		auto canvas = graph::create_node(s, "Canvas");
-		canvas->pos = {300, 600};
-		s->graph->add_node(canvas);
-		s->graph->connect({teapot, 0, renderer, 0});
-		s->graph->connect({renderer, 0, canvas, 0});
+		if (true) {
+			auto canvas = graph::create_node(s, "Canvas");
+			canvas->pos = {300, 600};
+			s->graph->add_node(canvas);
+		} else {
+			auto teapot = graph::create_node(s, "TeapotMesh");
+			teapot->pos = {300, 200};
+			s->graph->add_node(teapot);
+			auto renderer = graph::create_node(s, "MeshRenderer");
+			renderer->pos = {300, 400};
+			//renderer->set("emission", color_to_any(Green));
+			s->graph->add_node(renderer);
+			auto canvas = graph::create_node(s, "Canvas");
+			canvas->pos = {300, 600};
+			s->graph->add_node(canvas);
+			s->graph->connect({teapot, 0, renderer, 0});
+			s->graph->connect({renderer, 0, canvas, 0});
+		}
 		s->set_mode(new ModeDefault(s));
 	});
 }

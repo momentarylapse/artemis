@@ -11,6 +11,14 @@ namespace graph {
 
 VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {}
 
+void VolumeRenderer::process() {
+	auto f = in_field.value();
+	if (!f)
+		return;
+	out_draw(RenderData{f->grid.bounding_box()});
+}
+
+
 void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 	auto f = in_field.value();
 	if (!f)

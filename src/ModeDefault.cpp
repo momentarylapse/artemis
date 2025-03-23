@@ -7,7 +7,6 @@
 #include <Session.h>
 #include <graph/Graph.h>
 #include <graph/Node.h>
-#include <graph/Port.h>
 #include <graph/renderer/Canvas.h>
 #include <graph/renderer/RendererNode.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
@@ -68,9 +67,9 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 	if (auto c = get_canvas(graph)) {
 		if (c->background().a < 0)
 			c->background.set(xhui::Theme::_default.background_low);
-		session->drawing_helper->clear(params, c->background());
+		c->draw_win(params, win);
 	} else {
-		session->drawing_helper->clear(params, xhui::Theme::_default.background_low);
+		session->drawing_helper->clear(params, Red);//xhui::Theme::_default.background_low);
 	}
 
 	for (auto n: graph->nodes)

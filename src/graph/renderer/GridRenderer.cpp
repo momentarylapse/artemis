@@ -10,6 +10,13 @@
 
 namespace graph {
 
+void GridRenderer::process() {
+	if (auto r = regular.value()) {
+		out_draw(RenderData{r->bounding_box()});
+	}
+}
+
+
 void GridRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 	if (auto r = regular.value()) {
 		Array<vec3> points;

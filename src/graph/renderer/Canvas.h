@@ -15,6 +15,7 @@ namespace graph {
 class Canvas : public Node {
 public:
 	explicit Canvas(Session* s) : Node("Canvas") {
+		session = s;
 		flags = NodeFlags::Canvas;
 	}
 
@@ -24,6 +25,9 @@ public:
 	Setting<color> background{this, "background", color(-1,-1,-1,-1)};
 
 	InPort<RenderData> in_draw{this, "draw", PortFlags::Multi};
+
+	Session* session;
+	bool camera_defined = false;
 };
 
 } // graph

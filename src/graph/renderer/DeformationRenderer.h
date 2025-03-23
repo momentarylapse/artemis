@@ -13,6 +13,8 @@ class DeformationRenderer : public RendererNode {
 public:
 	explicit DeformationRenderer(Session* s);
 
+	void process() override;
+
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
 	Setting<float> scale{this, "scale", 1.0f};

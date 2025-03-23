@@ -19,6 +19,8 @@ class PointListRenderer : public RendererNode {
 public:
 	explicit PointListRenderer(Session* s);
 
+	void process() override;
+
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
 	Setting<float> radius{this, "radius", 0.2f};

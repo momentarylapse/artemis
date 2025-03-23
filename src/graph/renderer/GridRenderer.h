@@ -17,6 +17,8 @@ class GridRenderer : public RendererNode {
 public:
 	explicit GridRenderer(Session* s) : RendererNode(s, "GridRenderer") {}
 
+	void process() override;
+
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
 	Setting<float> line_width{this, "line-width", 1.0f};

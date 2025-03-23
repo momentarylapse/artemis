@@ -7,6 +7,15 @@ namespace graph {
 
 DeformationRenderer::DeformationRenderer(Session* s) : RendererNode(s, "DeformationRenderer") {}
 
+void DeformationRenderer::process() {
+	auto d = in_diff.value();
+	if (!d)
+		return;
+
+	out_draw(RenderData{d->grid.bounding_box()});
+}
+
+
 void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 
 	auto d = in_diff.value();

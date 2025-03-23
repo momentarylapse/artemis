@@ -17,6 +17,8 @@ class VolumeRenderer : public RendererNode {
 public:
 	explicit VolumeRenderer(Session* s);
 
+	void process() override;
+
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
 	InPort<artemis::data::ScalarField> in_field{this, "field"};

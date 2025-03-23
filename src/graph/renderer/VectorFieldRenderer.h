@@ -15,6 +15,8 @@ class VectorFieldRenderer : public RendererNode {
 public:
 	explicit VectorFieldRenderer(Session* s) : RendererNode(s, "VectorFieldRenderer") {}
 
+	void process() override;
+
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
 	Setting<float> line_width{this, "line-width", 2.0f};

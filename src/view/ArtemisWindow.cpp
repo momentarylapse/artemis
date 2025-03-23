@@ -157,10 +157,10 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 	from_source(R"foodelim(
 Dialog x x padding=0
 	Grid grid ''
-		Grid main-grid ''
+		Grid main-grid '' spacing=0
 			.
 			Overlay ? ''
-				DrawingArea area '' grabfocus
+				DrawingArea area '' grabfocus width=400 expandx
 				Grid overlay-main-grid '' margin=25
 					Label ? '' ignorehover expandx
 					Grid overlay-button-grid-right '' spacing=20

@@ -10,8 +10,25 @@
 
 namespace graph {
 
+base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
+	if (points.num == 0)
+		return base::None;
+	Box b = {points[0], points[0]};
+	for (const vec3& p: points)
+		b = b or Box{p, p};
+	return b;
+}
+
 PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRenderer") {
 }
+
+void PointListRenderer::process() {
+	if (auto points = in_points.value()) {
+		// TODO
+		out_draw(RenderData{point_list_bounding_box(*points)});
+	}
+}
+
 
 void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 	if (!material)

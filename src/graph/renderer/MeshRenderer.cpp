@@ -10,6 +10,15 @@
 
 namespace graph {
 
+base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
+	if (mesh.vertices.num == 0)
+		return base::None;
+	Box b = {mesh.vertices[0].pos, mesh.vertices[0].pos};
+	for (const auto& v: mesh.vertices)
+		b = b or Box{v.pos, v.pos};
+	return b;
+}
+
 	MeshRenderer::MeshRenderer(Session* s) : RendererNode(s, "MeshRenderer") {
 		material = new Material(s->resource_manager);
 	}
@@ -30,7 +39,7 @@ namespace graph {
 		material->albedo = albedo();
 		material->emission = emission();
 
-		out_draw({});
+		out_draw({mesh_bounding_box(*mesh)});
 	}
 
 void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
