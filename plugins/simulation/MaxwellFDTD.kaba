@@ -23,19 +23,40 @@ class MaxwellFDTD extends Node
 						B += mb.componentwise_product(rotation_fw(E) * dt)
 					else
 						B += rotation_fw(E) * dt
+					dampen_y(B)
+					dampen_z(B)
 					
 					# B -> E
 					for me in in_me.value()
 						E -= me.componentwise_product(rotation_bw(B) * dt)
 					else
 						E -= rotation_bw(B) * dt
+					dampen_y(E)
+					dampen_z(E)
 					
 					# source current?
 					for j in in_j.value()
 						E -= j * dt
 				in_e.mutated()
 				in_b.mutated()
-		
+	
+	func dampen_y(out v: VectorField)
+		for i in 0:v.grid.nx
+			for j in 0:10
+				for k in 0:v.grid.nz
+					let f = 1 - 0.2*exp(-0.2 * j^2)
+					v.set(i, j, k, v.value(i, j, k) * f)
+					let jj = v.grid.ny - j - 1
+					v.set(i, jj, k, v.value(i, jj, k) * f)
+	
+	func dampen_z(out v: VectorField)
+		for i in 0:v.grid.nx
+			for j in 0:v.grid.ny
+				for k in 0:10
+					let f = 1 - 0.2*exp(-0.2 * k^2)
+					v.set(i, j, k, v.value(i, j, k) * f)
+					let kk = v.grid.nz - k - 1
+					v.set(i, j, kk, v.value(i, j, kk) * f)
 	
 	var in_e: InPortVectorField
 	var in_b: InPortVectorField

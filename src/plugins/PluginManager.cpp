@@ -110,12 +110,12 @@ data::ScalarType type2type(const kaba::Class* type) {
 	return data::ScalarType::None;
 }
 
-data::ScalarField create_scalar_field(const data::RegularGrid& grid, const kaba::Class* type) {
-	return data::ScalarField(grid, type2type(type));
+data::ScalarField create_scalar_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode) {
+	return data::ScalarField(grid, type2type(type), mode);
 }
 
-data::VectorField create_vector_field(const data::RegularGrid& grid, const kaba::Class* type) {
-	return data::VectorField(grid, type2type(type));
+data::VectorField create_vector_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode) {
+	return data::VectorField(grid, type2type(type), mode);
 }
 
 template<class T>

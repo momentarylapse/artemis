@@ -45,13 +45,24 @@ func f(p: vec3, t: f32) -> f32
 			}
 		}
 
-		if (auto f = f_p) {
-			artemis::data::ScalarField s(*g, (artemis::data::ScalarType)type());
+		auto _sampling_mode = (artemis::data::SamplingMode)sampling_mode();
 
-			for (int i=0; i<g->nx; i++)
-				for (int j=0; j<g->ny; j++)
-					for (int k=0; k<g->nz; k++)
-						s.set32(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
+		if (auto f = f_p) {
+			artemis::data::ScalarField s(*g,
+				(artemis::data::ScalarType)type(),
+				_sampling_mode);
+
+			if (_sampling_mode == artemis::data::SamplingMode::PerCell) {
+				for (int i=0; i<g->nx; i++)
+					for (int j=0; j<g->ny; j++)
+						for (int k=0; k<g->nz; k++)
+							s.set32(i, j, k, f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, _current_simulation_time_));
+			} else if (_sampling_mode == artemis::data::SamplingMode::PerVertex) {
+				for (int i=0; i<=g->nx; i++)
+					for (int j=0; j<=g->ny; j++)
+						for (int k=0; k<=g->nz; k++)
+							s.set32(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
+			}
 			out_field(s);
 		}
 	}

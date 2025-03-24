@@ -21,6 +21,7 @@ public:
 
 	Setting<string> formula{this, "formula", "[0,0,0]"};
 	Setting<int> type{this, "type", 1};
+	Setting<int> sampling_mode{this, "sampling-mode", 0};
 	Setting<bool> time_dependent{this, "time-dependent", false};
 
 	InPort<artemis::data::RegularGrid> in_grid{this, "grid"};

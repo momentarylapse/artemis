@@ -9,26 +9,15 @@
 
 namespace artemis::data {
 
-struct _ScalarField32 {
-	using ScalarType = float;
-	Array<float> v;
-	void init(const RegularGrid& grid);
-};
-
-struct _ScalarField64 {
-	using ScalarType = double;
-	Array<double> v;
-	void init(const RegularGrid& grid);
-};
-
 struct ScalarField {
 	ScalarField();
-	explicit ScalarField(const RegularGrid& grid, ScalarType type);
+	explicit ScalarField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode);
 
 	RegularGrid grid;
 	ScalarType type;
-	_ScalarField32 v32;
-	_ScalarField64 v64;
+	SamplingMode sampling_mode;
+	SampledData<float, float> v32;
+	SampledData<double, double> v64;
 
 	double value(int i, int j, int k) const;
 	void set(int i, int j, int k, double f);

@@ -6,6 +6,7 @@
 #include <data/mesh/PolygonMesh.h>
 #include <data/field/ScalarField.h>
 #include <lib/base/sort.h>
+#include <lib/math/mat4.h>
 
 namespace artemis::processing {
 
@@ -140,10 +141,18 @@ void iso_cell_approx(const artemis::data::ScalarField& f, PolygonMesh& mesh, int
 
 PolygonMesh iso_surface(const data::ScalarField& f, float t0) {
 	PolygonMesh mesh;
-	for (int i=0; i<f.grid.nx-1; i++)
-		for (int j=0; j<f.grid.ny-1; j++)
-			for (int k=0; k<f.grid.nz-1; k++)
-				iso_cell_approx(f, mesh, i, j, k, t0);
+	if (f.sampling_mode == artemis::data::SamplingMode::PerCell) {
+		for (int i=0; i<f.grid.nx-1; i++)
+			for (int j=0; j<f.grid.ny-1; j++)
+				for (int k=0; k<f.grid.nz-1; k++)
+					iso_cell_approx(f, mesh, i, j, k, t0);
+		mesh.transform(mat4::translation(f.grid.cell_center(0,0,0)));
+	} else if (f.sampling_mode == artemis::data::SamplingMode::PerVertex) {
+		for (int i=0; i<f.grid.nx; i++)
+			for (int j=0; j<f.grid.ny; j++)
+				for (int k=0; k<f.grid.nz; k++)
+					iso_cell_approx(f, mesh, i, j, k, t0);
+	}
 	return mesh;
 }
 

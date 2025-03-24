@@ -58,28 +58,15 @@ struct dvec3 {
 
 namespace artemis::data {
 
-struct _VectorField32 {
-	using ScalarType = float;
-	using VectorType = vec3;
-	Array<vec3> v;
-	void init(const RegularGrid& grid);
-};
-
-struct _VectorField64 {
-	using ScalarType = double;
-	using VectorType = dvec3;
-	Array<dvec3> v;
-	void init(const RegularGrid& grid);
-};
-
 struct VectorField {
 	VectorField();
-	explicit VectorField(const RegularGrid& grid, ScalarType type);
+	explicit VectorField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode);
 
 	ScalarType type;
 	RegularGrid grid;
-	_VectorField32 v32;
-	_VectorField64 v64;
+	SamplingMode sampling_mode;
+	SampledData<vec3, float> v32;
+	SampledData<dvec3, double> v64;
 
 	dvec3 value(int i, int j, int k) const;
 	void set(int i, int j, int k, const dvec3& v);

@@ -6,53 +6,46 @@
 
 namespace artemis::data {
 
-void _VectorField32::init(const RegularGrid& grid) {
-	v.resize(grid.cell_count());
-}
-
-void _VectorField64::init(const RegularGrid& grid) {
-	v.resize(grid.cell_count());
-}
-
-VectorField::VectorField(const RegularGrid& g, ScalarType t) {
+VectorField::VectorField(const RegularGrid& g, ScalarType t, SamplingMode s) {
 	grid = g;
 	type = t;
+	sampling_mode = s;
 	if (type == ScalarType::Float32)
-		v32.init(grid);
+		v32.init(grid, sampling_mode);
 	else if (type == ScalarType::Float64)
-		v64.init(grid);
+		v64.init(grid, sampling_mode);
 }
 
-VectorField::VectorField() : VectorField(RegularGrid(), ScalarType::None) {}
+VectorField::VectorField() : VectorField(RegularGrid(), ScalarType::None, SamplingMode::PerCell) {}
 
 dvec3 VectorField::value(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
-		return dvec3(v32.v[grid.cell_index(i, j, k)]);
+		return dvec3(v32.at(grid, sampling_mode, i, j, k));
 	if (type == ScalarType::Float64)
-		return v64.v[grid.cell_index(i, j, k)];
+		return v64.at(grid, sampling_mode, i, j, k);
 	return {0,0,0};
 }
 
 void VectorField::set(int i, int j, int k, const dvec3& vv) {
 	if (type == ScalarType::Float32)
-		v32.v[grid.cell_index(i, j, k)] = vv.to32();
+		v32.at(grid, sampling_mode, i, j, k) = vv.to32();
 	else if (type == ScalarType::Float64)
-		v64.v[grid.cell_index(i, j, k)] = vv;
+		v64.at(grid, sampling_mode, i, j, k) = vv;
 }
 
 vec3 VectorField::value32(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
-		return v32.v[grid.cell_index(i, j, k)];
+		return v32.at(grid, sampling_mode, i, j, k);
 	if (type == ScalarType::Float64)
-		return v64.v[grid.cell_index(i, j, k)].to32();
+		return v64.at(grid, sampling_mode, i, j, k).to32();
 	return {0,0,0};
 }
 
 void VectorField::set32(int i, int j, int k, const vec3& vv) {
 	if (type == ScalarType::Float32)
-		v32.v[grid.cell_index(i, j, k)] = vv;
+		v32.at(grid, sampling_mode, i, j, k) = vv;
 	else if (type == ScalarType::Float64)
-		v64.v[grid.cell_index(i, j, k)] = dvec3(vv);
+		v64.at(grid, sampling_mode, i, j, k) = dvec3(vv);
 }
 
 template<class T>
@@ -74,7 +67,7 @@ void list_mul_single(T& a, float s) {
 }
 
 void VectorField::operator+=(const VectorField& o) {
-	if (o.type != type)
+	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
 		list_add(v32.v, o.v32.v);
@@ -89,7 +82,7 @@ VectorField VectorField::operator+(const VectorField& o) const {
 }
 
 void VectorField::operator-=(const VectorField& o) {
-	if (o.type != type)
+	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
 		list_sub(v32.v, o.v32.v);
@@ -117,8 +110,8 @@ VectorField VectorField::operator*(float o) const {
 }
 
 VectorField VectorField::componentwise_product(const VectorField& o) const {
-	auto r = VectorField(grid, o.type);
-	if (type != o.type)
+	auto r = VectorField(grid, type, sampling_mode);
+	if (type != o.type or sampling_mode != o.sampling_mode)
 		return r;
 	auto times32 = [] (const vec3& a, const vec3& b) {
 		return vec3(a.x * b.x, a.y * b.y, a.z * b.z);

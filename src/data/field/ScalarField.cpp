@@ -6,39 +6,31 @@
 
 namespace artemis::data {
 
-void _ScalarField32::init(const RegularGrid& grid) {
-	v.resize(grid.cell_count());
-}
-
-void _ScalarField64::init(const RegularGrid& grid) {
-	v.resize(grid.cell_count());
-}
-
-
-ScalarField::ScalarField(const RegularGrid& g, ScalarType t) {
+ScalarField::ScalarField(const RegularGrid& g, ScalarType t, SamplingMode s) {
 	grid = g;
 	type = t;
+	sampling_mode = s;
 	if (type == ScalarType::Float32)
-		v32.init(grid);
+		v32.init(grid, sampling_mode);
 	else if (type == ScalarType::Float64)
-		v64.init(grid);
+		v64.init(grid, sampling_mode);
 }
 
-ScalarField::ScalarField() : ScalarField(RegularGrid(), ScalarType::None) {}
+ScalarField::ScalarField() : ScalarField(RegularGrid(), ScalarType::None, SamplingMode::PerCell) {}
 
 double ScalarField::value(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
-		return (double)v32.v[grid.cell_index(i, j, k)];
+		return (double)v32.at(grid, sampling_mode, i, j, k);
 	if (type == ScalarType::Float64)
-		return v64.v[grid.cell_index(i, j, k)];
+		return v64.at(grid, sampling_mode, i, j, k);
 	return 0.0;
 }
 
 void ScalarField::set(int i, int j, int k, double f) {
 	if (type == ScalarType::Float32)
-		v32.v[grid.cell_index(i, j, k)] = (float)f;
+		v32.at(grid, sampling_mode, i, j, k) = (float)f;
 	else if (type == ScalarType::Float64)
-		v64.v[grid.cell_index(i, j, k)] = f;
+		v64.at(grid, sampling_mode, i, j, k) = f;
 }
 
 float ScalarField::value32(int i, int j, int k) const {

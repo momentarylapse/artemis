@@ -9,7 +9,7 @@
 namespace artemis::processing {
 
 data::VectorField gradient(const data::ScalarField& f) {
-	data::VectorField v(f.grid, f.type);
+	data::VectorField v(f.grid, f.type, f.sampling_mode);
 
 	for (int i=0; i<f.grid.nx-1; i++)
 		for (int j=0; j<f.grid.ny-1; j++)
@@ -25,7 +25,7 @@ data::VectorField gradient(const data::ScalarField& f) {
 }
 
 data::ScalarField divergence(const data::VectorField& v) {
-	data::ScalarField div(v.grid, v.type);
+	data::ScalarField div(v.grid, v.type, v.sampling_mode);
 
 	for (int i=0; i<v.grid.nx-1; i++)
 		for (int j=0; j<v.grid.ny-1; j++)
@@ -41,7 +41,7 @@ data::ScalarField divergence(const data::VectorField& v) {
 }
 
 data::VectorField rotation_fw(const data::VectorField& v) {
-	data::VectorField rot(v.grid, v.type);
+	data::VectorField rot(v.grid, v.type, v.sampling_mode);
 
 	// volume
 	for (int i=0; i<v.grid.nx-1; i++)
@@ -121,7 +121,7 @@ data::VectorField rotation_fw(const data::VectorField& v) {
 }
 
 data::VectorField rotation_bw(const data::VectorField& v) {
-	data::VectorField rot(v.grid, v.type);
+	data::VectorField rot(v.grid, v.type, v.sampling_mode);
 
 	for (int i=1; i<v.grid.nx; i++)
 		for (int j=1; j<v.grid.ny; j++)
@@ -216,7 +216,7 @@ void t_laplace(const data::RegularGrid& grid, const T& f, T& f_out) {
 }
 
 data::ScalarField laplace(const data::ScalarField& f) {
-	data::ScalarField out(f.grid, f.type);
+	data::ScalarField out(f.grid, f.type, f.sampling_mode);
 	if (f.type == data::ScalarType::Float32)
 		t_laplace(f.grid, f.v32, out.v32);
 	else if (f.type == data::ScalarType::Float64)

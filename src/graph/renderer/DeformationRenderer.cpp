@@ -31,15 +31,27 @@ void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 	float s = scale();
 	float r = radius();
 
-	for (int i=0; i<d->grid.nx; i++)
-		for (int j=0; j<d->grid.ny; j++)
-			for (int k=0; k<d->grid.nz; k++) {
-				vec3 pos = d->grid.cell_center(i, j, k) + d->value32(i, j, k) * s;
-				session->drawing_helper->draw_mesh(params, win->rvd,
-					mat4::translation(pos) * mat4::scale(r, r, r),
-					vertex_buffer.get(),
-					session->drawing_helper->material_selection);
-			}
+	if (d->sampling_mode == artemis::data::SamplingMode::PerCell) {
+		for (int i=0; i<d->grid.nx; i++)
+			for (int j=0; j<d->grid.ny; j++)
+				for (int k=0; k<d->grid.nz; k++) {
+					vec3 pos = d->grid.cell_center(i, j, k) + d->value32(i, j, k) * s;
+					session->drawing_helper->draw_mesh(params, win->rvd,
+						mat4::translation(pos) * mat4::scale(r, r, r),
+						vertex_buffer.get(),
+						session->drawing_helper->material_selection);
+				}
+	} else if (d->sampling_mode == artemis::data::SamplingMode::PerVertex) {
+		for (int i=0; i<=d->grid.nx; i++)
+			for (int j=0; j<=d->grid.ny; j++)
+				for (int k=0; k<=d->grid.nz; k++) {
+					vec3 pos = d->grid.vertex(i, j, k) + d->value32(i, j, k) * s;
+					session->drawing_helper->draw_mesh(params, win->rvd,
+						mat4::translation(pos) * mat4::scale(r, r, r),
+						vertex_buffer.get(),
+						session->drawing_helper->material_selection);
+				}
+	}
 }
 
 

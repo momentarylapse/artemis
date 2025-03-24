@@ -8,6 +8,10 @@ struct RegularGrid
 	var nx, ny, nz: i32
 	var dx, dy, dz: vec3
 
+enum SamplingMode
+	PER_CELL
+	PER_VERTEX
+
 struct ScalarField
 	var grid: RegularGrid
 	#var v: f64[]
@@ -96,8 +100,8 @@ var extern simulation_dt: f32
 
 func extern current_session() -> Session&
 
-func extern create_scalar_field(g: RegularGrid, t: kaba.Class&) -> ScalarField
-func extern create_vector_field(g: RegularGrid, t: kaba.Class&) -> VectorField
+func extern create_scalar_field(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> ScalarField
+func extern create_vector_field(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> VectorField
 
 func extern gradient(f: ScalarField) -> VectorField
 func extern divergence(f: VectorField) -> ScalarField

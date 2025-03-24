@@ -30,15 +30,27 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) 
 	GeometrySphere mesh(v_0, 1, 2);
 	mesh.build(vertex_buffer.get());
 
-	for (int i=0; i<f->grid.nx; i++)
-		for (int j=0; j<f->grid.ny; j++)
-			for (int k=0; k<f->grid.nz; k++) {
-				float v = f->value32(i, j, k);
-				session->drawing_helper->draw_mesh(params, win->rvd,
-					mat4::translation(f->grid.cell_center(i, j, k)) * mat4::scale(v, v, v),
-					vertex_buffer.get(),
-					session->drawing_helper->material_selection);
-			}
+	if (f->sampling_mode == artemis::data::SamplingMode::PerCell) {
+		for (int i=0; i<f->grid.nx; i++)
+			for (int j=0; j<f->grid.ny; j++)
+				for (int k=0; k<f->grid.nz; k++) {
+					float v = f->value32(i, j, k);
+					session->drawing_helper->draw_mesh(params, win->rvd,
+						mat4::translation(f->grid.cell_center(i, j, k)) * mat4::scale(v, v, v),
+						vertex_buffer.get(),
+						session->drawing_helper->material_selection);
+				}
+	} else if (f->sampling_mode == artemis::data::SamplingMode::PerVertex) {
+		for (int i=0; i<=f->grid.nx; i++)
+			for (int j=0; j<=f->grid.ny; j++)
+				for (int k=0; k<=f->grid.nz; k++) {
+					float v = f->value32(i, j, k);
+					session->drawing_helper->draw_mesh(params, win->rvd,
+						mat4::translation(f->grid.vertex(i, j, k)) * mat4::scale(v, v, v),
+						vertex_buffer.get(),
+						session->drawing_helper->material_selection);
+				}
+	}
 }
 
 } // graph

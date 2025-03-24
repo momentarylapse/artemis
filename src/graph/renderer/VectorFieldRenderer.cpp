@@ -23,12 +23,21 @@ void VectorFieldRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 		return;
 
 	Array<vec3> points;
-	for (int i=0; i<f->grid.nx; i++)
-		for (int j=0; j<f->grid.ny; j++)
-			for (int k=0; k<f->grid.nz; k++) {
-				points.add(f->grid.cell_center(i, j, k));
-				points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k).to32());
-			}
+	if (f->sampling_mode == artemis::data::SamplingMode::PerCell) {
+		for (int i=0; i<f->grid.nx; i++)
+			for (int j=0; j<f->grid.ny; j++)
+				for (int k=0; k<f->grid.nz; k++) {
+					points.add(f->grid.cell_center(i, j, k));
+					points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k).to32());
+				}
+	} else if (f->sampling_mode == artemis::data::SamplingMode::PerVertex) {
+		for (int i=0; i<=f->grid.nx; i++)
+			for (int j=0; j<=f->grid.ny; j++)
+				for (int k=0; k<=f->grid.nz; k++) {
+					points.add(f->grid.vertex(i, j, k));
+					points.add(f->grid.vertex(i, j, k) + f->value(i, j, k).to32());
+				}
+	}
 
 	session->drawing_helper->set_color(_color());
 	session->drawing_helper->set_line_width(line_width());

@@ -29,6 +29,10 @@ int RegularGrid::cell_index(int i, int j, int k) const {
 	return i + j * nx + k * nx * ny;
 }
 
+int RegularGrid::vertex_index(int i, int j, int k) const {
+	return i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
+}
+
 
 vec3 RegularGrid::index_to_pos(float i, float j, float k) const {
 	return i * dx + j * dy + k * dz;
