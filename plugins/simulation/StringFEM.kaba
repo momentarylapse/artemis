@@ -1,12 +1,13 @@
 use artemis.*
 use helper.linalg.*
 use helper.d1p1.*
-#use helper.d1p2.*
-#use d1x.*
 use helper.material.*
 
 class StringFEM extends Node
-	var in_grid: InPortRegularGrid
+	var in_ux: InPortScalarField
+	var in_uy: InPortScalarField
+	var in_dt_ux: InPortScalarField
+	var in_dt_uy: InPortScalarField
 	var out_u: OutPortVectorField
 	
 	let length = 0.648 # m
@@ -18,8 +19,6 @@ class StringFEM extends Node
 	var mat: Material
 #	var tension: f32 # [N]
 	var radius: f32 # [m]
-	var ux, uy: f32[]
-	var dt_ux, dt_uy: f32[]
 	var phi_dx_phi: SparseRowMatrix
 	var phi_dx_dx_phi: SparseRowMatrix
 	var phi_phi: SparseRowMatrix
@@ -28,7 +27,10 @@ class StringFEM extends Node
 	
 	func __init__()
 		super.__init__("StringFEM")
-		in_grid.__init__(self, "grid", PortFlags.NONE)
+		in_ux.__init__(self, "ux", PortFlags.NONE)
+		in_uy.__init__(self, "uy", PortFlags.NONE)
+		in_dt_ux.__init__(self, "dt-ux", PortFlags.NONE)
+		in_dt_uy.__init__(self, "dt-uy", PortFlags.NONE)
 		out_u.__init__(self, "u", PortFlags.NONE)
 		flags = NodeFlags.TIME_DEPENDENT
 		
@@ -40,24 +42,12 @@ class StringFEM extends Node
 	func mut reset(g: RegularGrid)
 		grid.N = g.nx
 		grid.D = length / grid.N #len(g.dx)
-		let n = grid.n()
-		ux.resize(n)
-		uy.resize(n)
-		dt_ux.resize(n)
-		dt_uy.resize(n)
 		phi_dx_phi = grid.phi_dphi()
 		phi_dx_dx_phi = grid.phi_ddphi()
 		phi_phi = grid.phi_phi()
 		phi_phi_inv = inverse(phi_phi)
-		
-		ux = 0
-		uy = 0
-		dt_ux = 0
-		dt_uy = 0		
-		for mut i=>v in dt_uy
-			v = exp( - 0.02 * (i-n/4)^2) *100
 	
-	func mut substep(dt: f32)
+	func mut substep(dt: f32, out ux: f32[], out uy: f32[], out dt_ux: f32[], out dt_uy: f32[])
 		let phi_laplace_ux = mul(phi_dx_dx_phi, ux)
 		let phi_laplace_uy = mul(phi_dx_dx_phi, uy)
 		
@@ -80,8 +70,6 @@ class StringFEM extends Node
 		ux += dt_ux * dt
 		uy += dt_uy * dt
 			
-			
-			
 		# boundary
 		let n = grid.n()
 		ux[0] = 0
@@ -94,21 +82,27 @@ class StringFEM extends Node
 		dt_uy[n-1] = 0
 	
 	func override process()
-		for g in in_grid.value()
-			if g.nx != grid.N
-				# grid changed... recreate everything
-				reset(g)
+		# assume f32
+		# assume PER_VERTEX
+		for ux in in_ux.value()
+			for uy in in_uy.value()
+				for dt_ux in in_dt_ux.value()
+					for dt_uy in in_dt_uy.value()
+						let g = ux.grid
+						if g.nx != grid.N
+							# grid changed... recreate everything
+							reset(g)
 		
-			let dt = 0.00002 #simulation_dt
-			let N = 100
-			for i in 0:N
-				substep(dt / N)
+						let dt = 0.00002 #simulation_dt
+						let N = 100
+						for i in 0:N
+							substep(dt / N, ux.v32, uy.v32, dt_ux.v32, dt_uy.v32)
 			
-			var vu = create_vector_field(g, f32, SamplingMode.PER_CELL)
+						var vu = create_vector_field(g, f32, SamplingMode.PER_VERTEX)
 			
-			for i in 0:g.nx
-				vu.set(i, 0, 0, [ux[i]*10,uy[i]*10,0])
+						for i in 0:g.nx+1
+							vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,0])
 			
-			out_u.set(vu)
+						out_u.set(vu)
 	
 		

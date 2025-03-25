@@ -14,7 +14,8 @@ enum SamplingMode
 
 struct ScalarField
 	var grid: RegularGrid
-	#var v: f64[]
+	var v32: f32[]
+	var v64: f64[]
 	func extern __init__()
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: f32)
@@ -23,7 +24,7 @@ struct ScalarField
 
 struct VectorField
 	var grid: RegularGrid
-#	var v: vec3d[]
+	var v32: vec3[]
 	func extern __init__()
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
