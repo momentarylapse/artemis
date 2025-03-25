@@ -1,0 +1,78 @@
+use linalg.*
+use d1p1
+
+struct Grid
+	var NX = 4   # cells
+	var NY = 3
+	var DX = 0.1 # cell size
+	var DY = 0.1
+	var gx, gy: d1p1.Grid
+	var nx: int
+	
+	func mut init(D: vec2, N: (int,int))
+		NX = N[0]
+		NY = N[1]
+		DX = D.x
+		DY = D.y
+		gx.N = NX
+		gx.D = DX
+		gy.N = NY
+		gy.D = DY
+		nx = gx.n()
+	
+	func n() -> int
+		#let (gx, gy) = components()
+		return gx.n() * gy.n()
+	
+	func index(i: int, j: int) -> int
+		return j*nx + i
+	
+	func pos(i: int, j: int) -> vec2
+		return [i*DX, j*DY]
+		
+	# M * u = <Op u, phi[.]>
+
+	# M = <phi[i], d/dx phi[j]>
+	func phi_dx_phi() -> SparseRowMatrix
+		let mx = gx.phi_dphi()
+		let my = gy.phi_phi()
+		return outer_product(mx, my)
+
+	# M = <phi[i], d/dy phi[j]>
+	func phi_dy_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_dphi()
+		return outer_product(mx, my)
+
+	# M = <phi[i], d²/dx² phi[j]>
+	func phi_dx_dx_phi() -> SparseRowMatrix
+		let mx = gx.phi_ddphi()
+		let my = gy.phi_phi()
+		return outer_product(mx, my)
+
+	# M = <phi[i], d²/dy² phi[j]>
+	func phi_dy_dy_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_ddphi()
+		return outer_product(mx, my)
+
+	# M = <phi[i], d²/dx/dy phi[j]>
+	func phi_dx_dy_phi() -> SparseRowMatrix
+		let mx = gx.phi_dphi()
+		let my = gy.phi_dphi()
+		return outer_product(mx, my)
+	
+	# <phi[i] phi[j], phi[k] phi[l]>
+	func phi_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_phi()
+		return outer_product(mx, my)
+
+func main()
+	var g: Grid
+	g.init((1,1), (4,4))
+	
+	print(g.phi_phi())
+	
+	print(g.phi_phi().to_matrix())
+	

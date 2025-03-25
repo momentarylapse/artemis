@@ -1,0 +1,151 @@
+use artemis.*
+use helper.linalg.*
+use helper.d2.*
+use helper.material.*
+
+class Elastic2dFEM extends Node
+	var in_ux: InPortScalarField
+	var in_uy: InPortScalarField
+	var in_uz: InPortScalarField
+	var in_dt_ux: InPortScalarField
+	var in_dt_uy: InPortScalarField
+	var in_dt_uz: InPortScalarField
+	var out_u: OutPortVectorField
+	
+	var grid: Grid
+	var mat: Material
+	var phi_dx_phi: SparseRowMatrix
+	var phi_dy_phi: SparseRowMatrix
+	var phi_dx_dx_phi: SparseRowMatrix
+	var phi_dx_dy_phi: SparseRowMatrix
+	var phi_dy_dy_phi: SparseRowMatrix
+	var phi_phi: SparseRowMatrix
+	var phi_phi_inv: Matrix
+	var thickness: f32
+	
+	
+	func __init__()
+		super.__init__("Elastic2dFEM")
+		in_ux.__init__(self, "ux", PortFlags.NONE)
+		in_uy.__init__(self, "uy", PortFlags.NONE)
+		in_uz.__init__(self, "uz", PortFlags.NONE)
+		in_dt_ux.__init__(self, "dt-ux", PortFlags.NONE)
+		in_dt_uy.__init__(self, "dt-uy", PortFlags.NONE)
+		in_dt_uz.__init__(self, "dt-uz", PortFlags.NONE)
+		out_u.__init__(self, "u", PortFlags.NONE)
+		flags = NodeFlags.TIME_DEPENDENT
+		
+		thickness = 0.01
+		mat = nickel()
+		
+		#grid.N = 0
+	
+	func mut reset(g: RegularGrid)
+		grid.init([len(g.dx), len(g.dy)], [g.nx, g.ny])
+		phi_dx_phi = grid.phi_dx_phi()
+		phi_dy_phi = grid.phi_dy_phi()
+		phi_dx_dx_phi = grid.phi_dx_dx_phi()
+		phi_dx_dy_phi = grid.phi_dx_dy_phi()
+		phi_dy_dy_phi = grid.phi_dy_dy_phi()
+		phi_phi = grid.phi_phi()
+		phi_phi_inv = inverse(phi_phi)
+	
+	func mut substep(dt: f32, out ux: f32[], out uy: f32[], out uz: f32[], out dt_ux: f32[], out dt_uy: f32[], out dt_uz: f32[])
+	#	print("---------------------")
+	
+	# i: C_ijkl d_j d_k u_l 
+
+		let dx_dx_ux_phi = mul(phi_dx_dx_phi, ux)
+		let dx_dx_uy_phi = mul(phi_dx_dx_phi, uy)
+		let dx_dx_uz_phi = mul(phi_dx_dx_phi, uz)
+		
+		let dx_dy_ux_phi = mul(phi_dx_dy_phi, ux)
+		let dx_dy_uy_phi = mul(phi_dx_dy_phi, uy)
+		let dx_dy_uz_phi = mul(phi_dx_dy_phi, uz)
+		
+		let dy_dy_ux_phi = mul(phi_dy_dy_phi, ux)
+		let dy_dy_uy_phi = mul(phi_dy_dy_phi, uy)
+		let dy_dy_uz_phi = mul(phi_dy_dy_phi, uz)
+		
+		var m: mat3
+		m._11 = 1.0/mat.E.x
+		m._22 = 1.0/mat.E.y
+		m._33 = 1.0/mat.E.z
+		m._12 = -mat.v.xy/mat.E.x
+		m._23 = -mat.v.yz/mat.E.y
+		m._13 = -mat.v.zx/mat.E.z
+		m._21 = m._12
+		m._32 = m._23
+		m._31 = m._13
+		let mi = m.inverse()
+		
+		let Cxxxx = mat.E.x #mi._11
+		let Cyyyy = mat.E.y #mi._22
+		let Czzzz = mat.E.z #mi._33
+		let Cxxyy = 0#mi._12 # = Cyyxx
+		let Cyyzz = 0#mi._23
+		let Cxxzz = 0#mi._13
+		let Cxyxy = mat.G.xy # = Cyxyx = Cxyyx = Cyxxy
+		let Cyzyz = mat.G.yz
+		let Cxzxz = mat.G.zx
+	
+		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
+#		var ddux_phi = dx_dx_ux_phi * Cxxxx + dx_dy_uy_phi * Cxxyy
+#		ddux_phi += dx_dy_uy_phi * Cxyxy + dy_dy_ux_phi * Cxyxy
+		# yyyy + yyxx + (yyzz)   + yxyx + yxxy + (yzyz) + (yzzy)
+#		var dduy_phi = dy_dy_uy_phi * Cyyyy + dx_dy_ux_phi * Cxxyy
+#		dduy_phi += dx_dy_ux_phi * Cxyxy + dx_dx_uy_phi * Cxyxy
+		# (zzzz) + (zzxx) + (zzyy)   + (zxzx) + zxxz + (zyzy) + zyyz
+#		let dduz_phi = dx_dx_uz_phi * Cxzxz + dy_dy_uz_phi * Cyzyz
+		
+		
+		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
+		var ddux_phi = dx_dx_ux_phi * Cxxxx
+		ddux_phi += dx_dy_uy_phi * Cxyxy + dy_dy_ux_phi * Cxyxy
+		# yyyy + yyxx + (yyzz)   + yxyx + yxxy + (yzyz) + (yzzy)
+		var dduy_phi = dy_dy_uy_phi * Cyyyy
+		dduy_phi += dx_dy_ux_phi * Cxyxy + dx_dx_uy_phi * Cxyxy
+		# (zzzz) + (zzxx) + (zzyy)   + (zxzx) + zxxz + (zyzy) + zyyz
+		let dduz_phi = dx_dx_uz_phi * Cxzxz + dy_dy_uz_phi * Cyzyz
+		
+	
+		let ddux = mul(phi_phi_inv, ddux_phi)
+		let dduy = mul(phi_phi_inv, dduy_phi)
+		let dduz = mul(phi_phi_inv, dduz_phi)
+#		print(ddu)
+	
+		dt_ux += ddux * dt
+		dt_uy += dduy * dt
+		dt_uz += dduz * dt
+		ux += dt_ux * dt
+		uy += dt_uy * dt
+		uz += dt_uz * dt
+		#print(dux|>log)
+	
+	func override process()
+		# assume f32
+		# assume PER_VERTEX
+		for ux in in_ux.value()
+			for uy in in_uy.value()
+				for uz in in_uz.value()
+					for dt_ux in in_dt_ux.value()
+						for dt_uy in in_dt_uy.value()
+							for dt_uz in in_dt_uz.value()
+								let g = ux.grid
+								if g.nx != grid.NX or g.ny != grid.NY
+									# grid changed... recreate everything
+									reset(g)
+		
+								let dt = 0.0000002 #simulation_dt
+								let N = 100
+								for i in 0:N
+									substep(dt / N, ux.v32, uy.v32, uz.v32, dt_ux.v32, dt_uy.v32, dt_uz.v32)
+				
+								var vu = create_vector_field(g, f32, SamplingMode.PER_VERTEX)
+			
+								for i in 0:len(ux.v32)
+									vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,uz.v32[i]*10])
+			
+								out_u.set(vu)
+	
+		
