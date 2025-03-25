@@ -12,10 +12,11 @@
 
 namespace graph {
 
-SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _class_) {
+SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _class_, const string& _options) {
 	owner = _owner;
 	name = _name;
 	class_ = _class_;
+	options = _options;
 	owner->settings.add(this);
 }
 

@@ -142,7 +142,8 @@ void PluginManager::export_kaba() {
 
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
-	//ext->declare_class_element("ScalarField.v", &data::ScalarField::v);
+	ext->declare_class_element("ScalarField.v32", &data::ScalarField::v32);
+	ext->declare_class_element("ScalarField.v64", &data::ScalarField::v64);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
@@ -153,7 +154,8 @@ void PluginManager::export_kaba() {
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<data::VectorField>);
 	ext->link_class_func("VectorField.__delete__", &kaba::generic_delete<data::VectorField>);
 	ext->declare_class_element("VectorField.grid", &data::VectorField::grid);
-	//ext->declare_class_element("VectorField.v", &data::VectorField::v);
+	ext->declare_class_element("VectorField.v32", &data::VectorField::v32);
+	ext->declare_class_element("VectorField.v64", &data::VectorField::v64);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
 	ext->link_class_func("VectorField.__assign__", &generic_assign<data::VectorField>);
@@ -234,6 +236,7 @@ void PluginManager::import_kaba() {
 	import_component_class<artemis::data::VectorField>(m, "VectorField");
 	import_component_class<graph::PlotData>(m, "PlotData");
 	import_component_class<graph::RenderData>(m, "RenderData");
+	import_component_class<data::SamplingMode>(m, "SamplingMode");
 }
 
 void PluginManager::find_plugins() {

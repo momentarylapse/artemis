@@ -20,8 +20,10 @@ public:
 	void process() override;
 
 	Setting<string> formula{this, "formula", "[0,0,0]"};
-	Setting<int> type{this, "type", 1};
-	Setting<int> sampling_mode{this, "sampling-mode", 0};
+	SettingFromSet<artemis::data::ScalarType> type{this, "type", artemis::data::ScalarType::Float32,
+		{artemis::data::ScalarType::Float32, artemis::data::ScalarType::Float64}, {"f32", "f64"}};
+	SettingFromSet<artemis::data::SamplingMode> sampling_mode{this, "sampling-mode", artemis::data::SamplingMode::PerCell,
+		{artemis::data::SamplingMode::PerCell, artemis::data::SamplingMode::PerVertex}, {"PerCell", "PerVertex"}};
 	Setting<bool> time_dependent{this, "time-dependent", false};
 
 	InPort<artemis::data::RegularGrid> in_grid{this, "grid"};

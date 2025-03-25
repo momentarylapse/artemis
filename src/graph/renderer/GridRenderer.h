@@ -21,7 +21,7 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	Setting<float> line_width{this, "line-width", 1.0f};
+	Setting<float> line_width{this, "line-width", 1.0f, "range=0:99:0.1"};
 	Setting<color> _color{this, "color", Gray};
 
 	InPort<artemis::data::RegularGrid> regular{this, "regular"};

@@ -23,7 +23,7 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	Setting<float> radius{this, "radius", 0.2f};
+	Setting<float> radius{this, "radius", 0.2f, "range=0:99:0.1"};
 	Setting<color> _color{this, "color", White};
 
 	InPort<Array<vec3>> in_points{this, "points"};

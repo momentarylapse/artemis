@@ -7,6 +7,7 @@
 #include <graph/Setting.h>
 #include <lib/base/iter.h>
 #include <lib/kaba/syntax/Class.h>
+#include <lib/os/msg.h>
 
 
 DefaultNodePanel::DefaultNodePanel(graph::Node* n) : xhui::Panel("node-panel") {
@@ -28,19 +29,41 @@ Dialog x ''
 			auto ss = node->settings[i]->as<float>();
 			add_control("SpinButton", "", 1, i, id);
 			set_options(id, "expandx");
-			set_options(id, "range=::0.001");
+			if (s->options.find("range=") == 0)
+				set_options(id, s->options);
+			else
+				set_options(id, "range=::0.001");
 			set_float(id, (*ss)());
 			event(id, [this, id, ss] {
 				ss->set(get_float(id));
 			});
 		} else if (s->class_ == kaba::TypeInt32) {
 			auto ss = node->settings[i]->as<int>();
-			add_control("SpinButton", "", 1, i, id);
-			set_options(id, "expandx");
-			set_int(id, (*ss)());
-			event(id, [this, id, ss] {
-				ss->set(get_int(id));
-			});
+			if (s->options.head(4) == "set=") {
+				auto xx = s->options.sub(5, -1).parse_tokens(":,");
+				add_control("ComboBox", "", 1, i, id);
+				set_options(id, "expandx");
+				Array<int> values;
+				for (int si=0; si<(xx.num + 2)/4; si++) {
+					values.add(xx[si*4]._int());
+					add_string(id, xx[si*4 + 2]);
+				}
+				int index = values.find((*ss)());
+				if (index >= 0)
+					set_int(id, index);
+				event(id, [this, id, ss, values] {
+					ss->set(values[get_int(id)]);
+				});
+			} else {
+				add_control("SpinButton", "", 1, i, id);
+				set_options(id, "expandx");
+				if (s->options.find("range=") == 0)
+					set_options(id, s->options);
+				set_int(id, (*ss)());
+				event(id, [this, id, ss] {
+					ss->set(get_int(id));
+				});
+			}
 		} else if (s->class_ == kaba::TypeString) {
 			auto ss = node->settings[i]->as<string>();
 			add_control("Edit", "", 1, i, id);

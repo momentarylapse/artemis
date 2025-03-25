@@ -45,19 +45,19 @@ func f(p: vec3, t: f32) -> vec3
 			}
 		}
 
-		auto _sampling_mode = (artemis::data::SamplingMode)sampling_mode();
-
 		if (auto f = f_p) {
 			artemis::data::VectorField s(*g,
-				(artemis::data::ScalarType)type(),
-				_sampling_mode);
+				type(),
+				sampling_mode());
 
-			if (_sampling_mode == artemis::data::SamplingMode::PerCell) {
+			switch (sampling_mode()) {
+			case artemis::data::SamplingMode::PerCell:
 				for (int i=0; i<g->nx; i++)
 					for (int j=0; j<g->ny; j++)
 						for (int k=0; k<g->nz; k++)
 							s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, _current_simulation_time_)));
-			} else if (_sampling_mode == artemis::data::SamplingMode::PerVertex) {
+				break;
+			case artemis::data::SamplingMode::PerVertex:
 				for (int i=0; i<=g->nx; i++)
 					for (int j=0; j<=g->ny; j++)
 						for (int k=0; k<=g->nz; k++)
