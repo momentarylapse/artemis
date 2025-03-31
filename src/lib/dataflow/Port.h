@@ -2,8 +2,7 @@
 // Created by michi on 09.03.25.
 //
 
-#ifndef PORT_H
-#define PORT_H
+#pragma once
 
 #include "Node.h"
 #include <lib/base/base.h>
@@ -11,7 +10,7 @@
 #include <lib/kaba/kaba.h>
 #include <plugins/PluginManager.h>
 
-namespace graph {
+namespace dataflow {
 
 class Node;
 class InPortBase;
@@ -93,4 +92,3 @@ public:
 
 } // graph
 
-#endif //PORT_H

@@ -56,7 +56,7 @@ enum class MultiViewType {
 	ACTION_MANAGER
 };
 
-namespace graph {
+namespace artemis::graph {
 	class Graph;
 }
 
@@ -116,7 +116,7 @@ public:
 
 	base::promise<Session*> promise_started;
 
-	owned<graph::Graph> graph;
+	owned<artemis::graph::Graph> graph;
 };
 
 Session *create_session();

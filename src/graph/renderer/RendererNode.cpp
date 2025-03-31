@@ -4,11 +4,11 @@
 
 #include "RendererNode.h"
 
-namespace graph {
+namespace artemis::graph {
 
 RendererNode::RendererNode(Session* s, const string& name) : Node(name) {
 	session = s;
-	flags = NodeFlags::Renderer;
+	flags = dataflow::NodeFlags::Renderer;
 }
 
 } // graph

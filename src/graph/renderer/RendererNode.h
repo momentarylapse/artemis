@@ -5,9 +5,9 @@
 #ifndef RENDERERNODE_H
 #define RENDERERNODE_H
 
-#include "../Node.h"
-#include <graph/Port.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/math/Box.h>
 #include <y/graphics-fwd.h>
 
@@ -16,7 +16,7 @@ struct RenderParams;
 class Session;
 class Painter;
 
-namespace graph {
+namespace artemis::graph {
 
 struct RenderData {
 	// TODO
@@ -24,16 +24,16 @@ struct RenderData {
 	std::function<void(Painter*)> f_draw_2d;
 };
 
-class RendererNode : public Node {
+class RendererNode : public dataflow::Node {
 public:
 	explicit RendererNode(Session* s, const string& name);
 
 	// TODO send RenderData to Canvas instead!
 	virtual void draw_win(const RenderParams& params, MultiViewWindow* win) = 0;
 
-	Setting<bool> active{this, "active", true};
+	dataflow::Setting<bool> active{this, "active", true};
 
-	OutPort<RenderData> out_draw{this, "draw"};
+	dataflow::OutPort<RenderData> out_draw{this, "draw"};
 
 	Session* session;
 };

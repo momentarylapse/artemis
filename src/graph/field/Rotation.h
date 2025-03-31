@@ -4,24 +4,24 @@
 
 #pragma once
 
-#include <graph/Node.h>
-#include <graph/Port.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/field/VectorField.h>
-#include <graph/Setting.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class Rotation : public Node {
+class Rotation : public dataflow::Node {
 public:
 	Rotation() : Node("Rotation") {}
 
 	void process() override;
 
-	Setting<bool> backwards{this, "backwards", false};
+	dataflow::Setting<bool> backwards{this, "backwards", false};
 
-	InPort<artemis::data::VectorField> in_field{this, "in"};
+	dataflow::InPort<artemis::data::VectorField> in_field{this, "in"};
 
-	OutPort<artemis::data::VectorField> out{this, "out"};
+	dataflow::OutPort<artemis::data::VectorField> out{this, "out"};
 };
 
 } // graph

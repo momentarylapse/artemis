@@ -5,20 +5,20 @@
 #ifndef RANDOMNUMBER_H
 #define RANDOMNUMBER_H
 
-#include <graph/Node.h>
-#include <graph/Port.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class RandomNumber : public Node {
+class RandomNumber : public dataflow::Node {
 public:
 	RandomNumber() : Node("RandomNumber") {
-		flags = NodeFlags::TimeDependent;
+		flags = dataflow::NodeFlags::TimeDependent;
 	}
 
 	void process() override;
 
-	OutPort<float> out_number{this, "number"};
+	dataflow::OutPort<float> out_number{this, "number"};
 };
 
 } // graph

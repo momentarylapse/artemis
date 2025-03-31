@@ -5,22 +5,22 @@
 #ifndef NUMBERLISTACCUMULATOR_H
 #define NUMBERLISTACCUMULATOR_H
 
-#include <graph/Node.h>
-#include <graph/Port.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class NumberListAccumulator : public Node {
+class NumberListAccumulator : public dataflow::Node {
 public:
 	NumberListAccumulator() : Node("NumberListAccumulator") {}
 
 	void process() override;
 
-	Setting<int> capacity{this, "capacity", 1000};
+	dataflow::Setting<int> capacity{this, "capacity", 1000};
 
-	InPort<float> in_number{this, "number"};
-	OutPort<Array<float>> out_list{this, "list"};
+	dataflow::InPort<float> in_number{this, "number"};
+	dataflow::OutPort<Array<float>> out_list{this, "list"};
 };
 
 } // graph

@@ -10,21 +10,21 @@
 
 class rect;
 
-namespace graph {
+namespace artemis::graph {
 
-class Canvas : public Node {
+class Canvas : public dataflow::Node {
 public:
 	explicit Canvas(Session* s) : Node("Canvas") {
 		session = s;
-		flags = NodeFlags::Canvas;
+		flags = dataflow::NodeFlags::Canvas;
 	}
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win);
 	void draw_2d(Painter* p);
 
-	Setting<color> background{this, "background", color(-1,-1,-1,-1)};
+	dataflow::Setting<color> background{this, "background", color(-1,-1,-1,-1)};
 
-	InPort<RenderData> in_draw{this, "draw", PortFlags::Multi};
+	dataflow::InPort<RenderData> in_draw{this, "draw", dataflow::PortFlags::Multi};
 
 	Session* session;
 	bool camera_defined = false;

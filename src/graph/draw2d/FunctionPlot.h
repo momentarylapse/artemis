@@ -6,23 +6,23 @@
 #define FUNCTIONPLOT_H
 
 #include "Plotter.h"
-#include <graph/Setting.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
 #include <lib/kaba/kaba.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class FunctionPlot : public Node {
+class FunctionPlot : public dataflow::Node {
 public:
 	explicit FunctionPlot() : Node("FunctionPlot") {}
 
 	void process() override;
 
-	Setting<string> formula{this, "formula", "x^2"};
-	Setting<float> line_width{this, "line-width", 2.0f};
-	Setting<color> _color{this, "color", Red};
+	dataflow::Setting<string> formula{this, "formula", "x^2"};
+	dataflow::Setting<float> line_width{this, "line-width", 2.0f};
+	dataflow::Setting<color> _color{this, "color", Red};
 
-	OutPort<PlotData> out_plot{this, "plot"};
+	dataflow::OutPort<PlotData> out_plot{this, "plot"};
 
 	string cached_formula;
 	owned<kaba::Context> ctx;

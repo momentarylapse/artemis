@@ -8,7 +8,7 @@
 #include <view/MultiView.h>
 #include <y/graphics-impl.h>
 
-namespace graph {
+namespace artemis::graph {
 
 base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
 	if (mesh.vertices.num == 0)

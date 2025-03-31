@@ -9,7 +9,7 @@
 #include <lib/math/rect.h>
 #include <lib/xhui/Theme.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void Plotter::process() {
 	RenderData d;

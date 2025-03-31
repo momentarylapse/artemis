@@ -10,7 +10,7 @@
 #include <lib/math/vec3.h>
 #include <lib/os/msg.h>
 
-namespace graph {
+namespace dataflow {
 
 SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _class_, const string& _options) {
 	owner = _owner;

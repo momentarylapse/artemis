@@ -5,23 +5,23 @@
 #ifndef SPHEREMESH_H
 #define SPHEREMESH_H
 
-#include "../Node.h"
-#include "../Setting.h"
-#include "../Port.h"
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/mesh/PolygonMesh.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class SphereMesh : public ResourceNode {
+class SphereMesh : public dataflow::ResourceNode {
 public:
 	SphereMesh() : ResourceNode("SphereMesh") {}
 
 	void process() override;
 
-	Setting<float> radius{this, "radius", 1.0f};
-	Setting<int> samples{this, "samples", 8};
+	dataflow::Setting<float> radius{this, "radius", 1.0f};
+	dataflow::Setting<int> samples{this, "samples", 8};
 
-	OutPort<PolygonMesh> out_mesh{this, "mesh"};
+	dataflow::OutPort<PolygonMesh> out_mesh{this, "mesh"};
 };
 
 } // graph

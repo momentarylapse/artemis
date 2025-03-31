@@ -3,18 +3,17 @@
 //
 
 #include "AutoConnect.h"
-
-#include <lib/base/iter.h>
-
 #include "Graph.h"
-#include "Node.h"
 #include "NodeFactory.h"
-#include "Port.h"
+#include <lib/base/iter.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Graph.h>
+#include <lib/dataflow/Port.h>
 
-namespace graph {
+namespace artemis::graph {
 
-void connect_through(Graph* g, const CableInfo& c, const Array<string>& glue_nodes) {
-	Node* source = c.source;
+void connect_through(Graph* g, const dataflow::CableInfo& c, const Array<string>& glue_nodes) {
+	dataflow::Node* source = c.source;
 	int source_port = c.source_port;
 	for (const auto& [i, glue]: enumerate(glue_nodes)) {
 		auto n = create_node(g->session, glue);
@@ -27,7 +26,7 @@ void connect_through(Graph* g, const CableInfo& c, const Array<string>& glue_nod
 	g->connect({source, source_port, c.sink, c.sink_port});
 }
 
-void auto_connect(Graph* g, const CableInfo& c) {
+void auto_connect(Graph* g, const dataflow::CableInfo& c) {
 	auto source = c.source->out_ports[c.source_port];
 	auto sink = c.sink->in_ports[c.sink_port];
 	if (source->class_ == sink->class_) {

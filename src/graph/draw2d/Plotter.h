@@ -5,11 +5,11 @@
 #pragma once
 
 #include "../renderer/RendererNode.h"
-#include <graph/Setting.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
 #include <lib/kaba/kaba.h>
 
-namespace graph {
+namespace artemis::graph {
 
 typedef float (*scalar_function_1d)(float);
 
@@ -30,11 +30,11 @@ public:
 	void draw_2d(Painter* p);
 
 
-	Setting<bool> auto_zoom{this, "auto-zoom", true};
-	Setting<float> x_min{this, "x-min", -10};
-	Setting<float> x_max{this, "x-max", 10};
+	dataflow::Setting<bool> auto_zoom{this, "auto-zoom", true};
+	dataflow::Setting<float> x_min{this, "x-min", -10};
+	dataflow::Setting<float> x_max{this, "x-max", 10};
 
-	InPort<PlotData> in_plot{this, "plot", PortFlags::Multi};
+	dataflow::InPort<PlotData> in_plot{this, "plot", dataflow::PortFlags::Multi};
 };
 
 } // graph

@@ -12,10 +12,13 @@
 
 class Session;
 
-namespace graph {
-	class Graph;
+namespace dataflow {
 	class Node;
 	struct CableInfo;
+}
+
+namespace artemis::graph {
+	class Graph;
 }
 
 class GraphEditor : public obs::Node<xhui::Panel> {
@@ -29,12 +32,12 @@ public:
 	void on_key_down(int key) override;
 	void on_draw(Painter* p);
 
-	void draw_node(Painter* p, graph::Node* node);
+	void draw_node(Painter* p, dataflow::Node* node);
 
-	static Array<vec2> cable_spline(const graph::CableInfo& c);
+	static Array<vec2> cable_spline(const dataflow::CableInfo& c);
 
 	Session* session;
-	graph::Graph* graph;
+	artemis::graph::Graph* graph;
 	xhui::Panel* node_panel = nullptr;
 
 	enum class HoverType {
@@ -46,7 +49,7 @@ public:
 
 	struct Hover {
 		HoverType type;
-		graph::Node* node;
+		dataflow::Node* node;
 		int index;
 	};
 	base::optional<Hover> hover;

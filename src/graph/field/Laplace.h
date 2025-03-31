@@ -4,21 +4,22 @@
 
 #pragma once
 
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/field/ScalarField.h>
-#include <graph/Node.h>
-#include <graph/Port.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class Laplace : public Node {
+class Laplace : public dataflow::Node {
 public:
 	Laplace() : Node("Laplace") {}
 
 	void process() override;
 
-	InPort<artemis::data::ScalarField> in_field{this, "in"};
+	dataflow::InPort<artemis::data::ScalarField> in_field{this, "in"};
 
-	OutPort<artemis::data::ScalarField> out{this, "out"};
+	dataflow::OutPort<artemis::data::ScalarField> out{this, "out"};
 };
 
 } // graph

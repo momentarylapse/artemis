@@ -8,7 +8,7 @@
 #include <lib/os/msg.h>
 #include <view/DrawingHelper.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void GridRenderer::process() {
 	if (auto r = regular.value()) {

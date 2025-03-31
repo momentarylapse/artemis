@@ -5,7 +5,7 @@
 #include "ListPlot.h"
 #include <lib/base/iter.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void ListPlot::process() {
 	Array<vec2> points;

@@ -5,7 +5,7 @@
 #include "FunctionPlot.h"
 #include <lib/os/msg.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void FunctionPlot::process() {
 	if (formula() != cached_formula or !f_p) {

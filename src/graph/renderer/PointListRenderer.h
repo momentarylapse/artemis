@@ -6,14 +6,14 @@
 #define POINTLISTRENDERER_H
 
 #include "RendererNode.h"
-#include <graph/Port.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/mesh/PolygonMesh.h>
 #include <lib/image/color.h>
 
 class Material;
 
-namespace graph {
+namespace artemis::graph {
 
 class PointListRenderer : public RendererNode {
 public:
@@ -23,11 +23,11 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	Setting<float> radius{this, "radius", 0.2f, "range=0:99:0.1"};
-	Setting<color> _color{this, "color", White};
+	dataflow::Setting<float> radius{this, "radius", 0.2f, "range=0:99:0.1"};
+	dataflow::Setting<color> _color{this, "color", White};
 
-	InPort<Array<vec3>> in_points{this, "points"};
-	InPort<PolygonMesh> in_mesh{this, "mesh", PortFlags::Optional};
+	dataflow::InPort<Array<vec3>> in_points{this, "points"};
+	dataflow::InPort<PolygonMesh> in_mesh{this, "mesh", dataflow::PortFlags::Optional};
 
 	owned<VertexBuffer> vertex_buffer;
 	owned<Material> material;

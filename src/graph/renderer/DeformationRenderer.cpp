@@ -3,7 +3,7 @@
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
 
-namespace graph {
+namespace artemis::graph {
 
 DeformationRenderer::DeformationRenderer(Session* s) : RendererNode(s, "DeformationRenderer") {}
 

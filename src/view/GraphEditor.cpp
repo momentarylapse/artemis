@@ -6,10 +6,10 @@
 #include <Session.h>
 #include <graph/AutoConnect.h>
 #include <graph/Graph.h>
-#include <graph/Node.h>
+#include <lib/dataflow/Node.h>
 #include <graph/NodeFactory.h>
-#include <graph/Port.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/base/iter.h>
 #include <lib/base/sort.h>
 #include <lib/os/msg.h>
@@ -40,19 +40,19 @@ Dialog x ''
 )foodelim");
 
 		struct X {
-			graph::NodeCategory category;
+			dataflow::NodeCategory category;
 			string name, title;
 		};
 		Array<X> categories = {
-			{graph::NodeCategory::Field, "field", "field"},
-			{graph::NodeCategory::Grid, "grid", "grid"},
-			{graph::NodeCategory::Mesh, "mesh", "mesh"},
-			{graph::NodeCategory::Renderer, "renderer", "render"},
-			{graph::NodeCategory::Simulation, "simulation", "sim"}
+			{dataflow::NodeCategory::Field, "field", "field"},
+			{dataflow::NodeCategory::Grid, "grid", "grid"},
+			{dataflow::NodeCategory::Mesh, "mesh", "mesh"},
+			{dataflow::NodeCategory::Renderer, "renderer", "render"},
+			{dataflow::NodeCategory::Simulation, "simulation", "sim"}
 		};
 		for (const auto& [category, name, title]: categories) {
 			string list_id = "list-" + name;
-			const auto classes = graph::enumerate_nodes(category);
+			const auto classes = artemis::graph::enumerate_nodes(category);
 			for (const auto& c: classes) {
 				add_string(list_id, c);
 			}
@@ -106,7 +106,7 @@ Dialog x ''
 
 	event_x("graph", xhui::event_id::DragDrop, [this] {
 		if (get_window()->drag.payload.match("add-node:*")) {
-			graph->add_node(::graph::create_node(session, get_window()->drag.payload.sub(9)));
+			graph->add_node(artemis::graph::create_node(session, get_window()->drag.payload.sub(9)));
 			graph->nodes.back()->pos = get_window()->mouse_position();
 		}
 	});
@@ -116,33 +116,33 @@ Dialog x ''
 	});
 }
 
-rect node_area(graph::Node* n) {
+rect node_area(dataflow::Node* n) {
 	return {n->pos, n->pos + vec2(NODE_WIDTH, NODE_HEIGHT)};
 }
 
-vec2 node_in_port_pos(graph::Node* n, int i) {
+vec2 node_in_port_pos(dataflow::Node* n, int i) {
 	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->in_ports.num - 1) / 2) * PORT_DX, -PORT_DY);
 }
 
-vec2 node_out_port_pos(graph::Node* n, int i) {
+vec2 node_out_port_pos(dataflow::Node* n, int i) {
 	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->out_ports.num - 1) / 2) * PORT_DX, NODE_HEIGHT + PORT_DY);
 }
 
 template<class P>
 string port_description(P* p) {
 	Array<string> flags;
-	if (p->flags & graph::PortFlags::Mutable)
+	if (p->flags & dataflow::PortFlags::Mutable)
 		flags.add("mutable");
-	if (p->flags & graph::PortFlags::Optional)
+	if (p->flags & dataflow::PortFlags::Optional)
 		flags.add("optional");
-	if (p->flags & graph::PortFlags::Multi)
+	if (p->flags & dataflow::PortFlags::Multi)
 		flags.add("multi");
 	if (flags.num > 0)
 		return format("<b>%s</b>, type <b>%s</b>  (%s)", p->name, p->class_->name, implode(flags, ", "));
 	return format("<b>%s</b>, type <b>%s</b>", p->name, p->class_->name);
 }
 
-Array<vec2> GraphEditor::cable_spline(const graph::CableInfo& c) {
+Array<vec2> GraphEditor::cable_spline(const dataflow::CableInfo& c) {
 	vec2 A = node_out_port_pos(c.source, c.source_port);
 	vec2 B = node_in_port_pos(c.sink, c.sink_port);
 	return DrawingHelper::spline(A, A + vec2(0, 160), B - vec2(0, 160), B);
@@ -206,7 +206,7 @@ void GraphEditor::on_draw(Painter* p) {
 	p->set_clip(clip0);
 }
 
-void GraphEditor::draw_node(Painter* p, graph::Node* n) {
+void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 	p->set_font("", xhui::Theme::_default.font_size, true, false);
 
 	if (selection and selection->type == HoverType::Node and selection->node == n) {
@@ -215,9 +215,9 @@ void GraphEditor::draw_node(Painter* p, graph::Node* n) {
 		p->draw_rect(node_area(n).grow(4));
 	}
 	color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
-	if (n->flags & graph::NodeFlags::Resource)
+	if (n->flags & dataflow::NodeFlags::Resource)
 		bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
-	else if (n->flags & graph::NodeFlags::TimeDependent)
+	else if (n->flags & dataflow::NodeFlags::TimeDependent)
 		bg = color::interpolate(color(1, 0, 0.7f, 0), xhui::Theme::_default.background_low, 0.3f);
 	if (hover and hover->type == HoverType::Node and hover->node == n)
 		bg = color::interpolate(bg, White, 0.2f);
@@ -312,7 +312,7 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 	if (selection and selection->type == HoverType::OutPort) {
 		if (hover and hover->type == HoverType::InPort) {
 			try {
-				::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
+				artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
 			} catch (Exception& e) {
 				session->set_message(e.message());
 			}
@@ -321,7 +321,7 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 	if (selection and selection->type == HoverType::InPort) {
 		if (hover and hover->type == HoverType::OutPort) {
 			try {
-				::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
+				artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
 			} catch (Exception& e) {
 				session->set_message(e.message());
 			}

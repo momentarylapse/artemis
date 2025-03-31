@@ -8,7 +8,7 @@
 #include "view/Mode.h"
 #include <lib/base/pointer.h>
 
-namespace graph {
+namespace artemis::graph {
 	class Graph;
 }
 
@@ -21,7 +21,7 @@ public:
 	void on_draw_post(Painter*) override;
 	void on_key_down(int key) override;
 
-	graph::Graph* graph;
+	artemis::graph::Graph* graph;
 
 	bool simulation_active = false;
 

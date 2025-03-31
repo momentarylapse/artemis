@@ -7,14 +7,14 @@
 
 #include <lib/xhui/Panel.h>
 
-namespace graph {
+namespace dataflow {
 class Node;
 }
 
 class DefaultNodePanel : public xhui::Panel {
 public:
-	explicit DefaultNodePanel(graph::Node* n);
-	graph::Node* node;
+	explicit DefaultNodePanel(dataflow::Node* n);
+	dataflow::Node* node;
 };
 
 

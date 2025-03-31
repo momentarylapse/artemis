@@ -4,7 +4,7 @@
 
 #include "RandomNumber.h"
 
-namespace graph {
+namespace artemis::graph {
 
 void RandomNumber::process() {
 	out_number(randf(1.0f));

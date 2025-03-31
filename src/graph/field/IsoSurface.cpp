@@ -5,7 +5,7 @@
 #include "IsoSurface.h"
 #include <processing/field/IsoSurface.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void IsoSurface::process() {
 	if (auto f = in_field.value()) {

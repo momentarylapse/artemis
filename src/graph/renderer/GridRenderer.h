@@ -7,11 +7,11 @@
 
 #include "RendererNode.h"
 #include <data/grid/RegularGrid.h>
-#include <graph/Port.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
 
-namespace graph {
+namespace artemis::graph {
 
 class GridRenderer : public RendererNode {
 public:
@@ -21,10 +21,10 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	Setting<float> line_width{this, "line-width", 1.0f, "range=0:99:0.1"};
-	Setting<color> _color{this, "color", Gray};
+	dataflow::Setting<float> line_width{this, "line-width", 1.0f, "range=0:99:0.1"};
+	dataflow::Setting<color> _color{this, "color", Gray};
 
-	InPort<artemis::data::RegularGrid> regular{this, "regular"};
+	dataflow::InPort<data::RegularGrid> regular{this, "regular"};
 };
 
 } // graph

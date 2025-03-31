@@ -2,8 +2,7 @@
 // Created by michi on 09.03.25.
 //
 
-#ifndef NODE_H
-#define NODE_H
+#pragma once
 
 #include <lib/base/base.h>
 #include <lib/math/vec2.h>
@@ -15,7 +14,7 @@ namespace xhui {
 	class Panel;
 }
 
-namespace graph {
+namespace dataflow {
 
 class SettingBase;
 class InPortBase;
@@ -69,6 +68,5 @@ public:
 	}
 };
 
-} // graph
+} // dataflow
 
-#endif //NODE_H

@@ -5,7 +5,7 @@
 #include "TeapotMesh.h"
 #include <data/mesh/GeometryTeapot.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void TeapotMesh::process() {
 	out_mesh(GeometryTeapot(v_0, radius(), samples()));

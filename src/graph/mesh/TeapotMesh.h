@@ -5,23 +5,23 @@
 #ifndef TEAPOTMESH_H
 #define TEAPOTMESH_H
 
-#include "../Node.h"
-#include "../Setting.h"
-#include "../Port.h"
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/mesh/PolygonMesh.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class TeapotMesh : public ResourceNode {
+class TeapotMesh : public dataflow::ResourceNode {
 public:
 	TeapotMesh() : ResourceNode("TeapotMesh") {}
 
 	void process() override;
 
-	Setting<float> radius{this, "radius", 1.0f};
-	Setting<int> samples{this, "samples", 8};
+	dataflow::Setting<float> radius{this, "radius", 1.0f};
+	dataflow::Setting<int> samples{this, "samples", 8};
 
-	OutPort<PolygonMesh> out_mesh{this, "mesh"};
+	dataflow::OutPort<PolygonMesh> out_mesh{this, "mesh"};
 };
 
 } // graph

@@ -231,14 +231,15 @@ add_executable(artemis
 	src/graph/value/RandomNumber.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp
-	src/graph/Node.cpp
 	src/graph/NodeFactory.cpp
-	src/graph/Port.cpp
-	src/graph/Setting.cpp
 	src/lib/any/any.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
+	src/lib/dataflow/Graph.cpp
+	src/lib/dataflow/Node.cpp
+	src/lib/dataflow/Port.cpp
+	src/lib/dataflow/Setting.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp

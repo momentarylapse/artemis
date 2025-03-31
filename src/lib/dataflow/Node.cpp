@@ -9,7 +9,7 @@
 
 #include "Port.h"
 
-namespace graph {
+namespace dataflow {
 
 NodeFlags operator|(NodeFlags a, NodeFlags b) {
 	return (NodeFlags)((int)a | (int)b);

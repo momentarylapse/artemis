@@ -6,22 +6,22 @@
 #define LISTPLOT_H
 
 #include "Plotter.h"
-#include <graph/Setting.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class ListPlot : public Node {
+class ListPlot : public dataflow::Node {
 public:
 	explicit ListPlot() : Node("ListPlot") {}
 
 	void process() override;
 
-	Setting<float> line_width{this, "line-width", 2.0f};
-	Setting<color> _color{this, "color", Red};
+	dataflow::Setting<float> line_width{this, "line-width", 2.0f};
+	dataflow::Setting<color> _color{this, "color", Red};
 
-	InPort<Array<float>> in_list{this, "list"};
-	OutPort<PlotData> out_plot{this, "plot"};
+	dataflow::InPort<Array<float>> in_list{this, "list"};
+	dataflow::OutPort<PlotData> out_plot{this, "plot"};
 };
 
 } // graph

@@ -1,53 +1,24 @@
 //
-// Created by michi on 09.03.25.
+// Created by Michael Ankele on 2025-03-31.
 //
 
-#ifndef GRAPH_H
-#define GRAPH_H
+#pragma once
 
-#include <lib/base/base.h>
-#include <lib/pattern/Observable.h>
+#include <lib/dataflow/Graph.h>
 
-class Session;
+namespace artemis::graph {
 
-namespace graph {
+extern float _current_simulation_time_;
+extern float _current_simulation_dt_;
 
-class Node;
-class InPortBase;
-class OutPortBase;
 
-struct CableInfo {
-	Node* source;
-	int source_port;
-	Node* sink;
-	int sink_port;
-};
-
-class Graph : public obs::Node<VirtualBase> {
+class Graph : public dataflow::Graph {
 public:
 	explicit Graph(Session* session);
 
-	Session* session;
-
-	Array<graph::Node*> nodes;
-
-	void clear();
-
-	void add_node(graph::Node* node);
-	void remove_node(graph::Node* node);
-
-	void connect(OutPortBase& source, InPortBase& sink);
-	void connect(const CableInfo& c);
-	void unconnect(OutPortBase& source, InPortBase& sink);
-	void unconnect(const CableInfo& c);
-
-	Array<CableInfo> cables() const;
-
-	void reset_state();
-	bool iterate();
 	void iterate_simulation(float dt);
+
+	Session* session;
 };
 
-} // graph
-
-#endif //GRAPH_H
+}

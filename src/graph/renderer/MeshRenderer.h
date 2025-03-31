@@ -6,12 +6,12 @@
 #define MESHRENDERER_H
 
 #include "RendererNode.h"
-#include "../Setting.h"
-#include "../Port.h"
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/mesh/PolygonMesh.h>
 #include <y/graphics-fwd.h>
 
-namespace graph {
+namespace artemis::graph {
 
 class MeshRenderer : public RendererNode {
 public:
@@ -22,12 +22,12 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	InPort<PolygonMesh> in_mesh{this, "mesh"};
+	dataflow::InPort<PolygonMesh> in_mesh{this, "mesh"};
 
-	Setting<float> roughness{this, "roughness", 0.5f};
-	Setting<float> metal{this, "metal", 0.5f};
-	Setting<color> albedo{this, "albedo", White};
-	Setting<color> emission{this, "emission", Black};
+	dataflow::Setting<float> roughness{this, "roughness", 0.5f};
+	dataflow::Setting<float> metal{this, "metal", 0.5f};
+	dataflow::Setting<color> albedo{this, "albedo", White};
+	dataflow::Setting<color> emission{this, "emission", Black};
 
 	owned<VertexBuffer> vertex_buffer;
 	owned<Material> material;

@@ -8,7 +8,7 @@
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
 
-namespace graph {
+namespace artemis::graph {
 
 base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
 	if (points.num == 0)

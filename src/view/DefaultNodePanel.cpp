@@ -3,14 +3,14 @@
 //
 
 #include "DefaultNodePanel.h"
-#include <graph/Node.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/base/iter.h>
 #include <lib/kaba/syntax/Class.h>
 #include <lib/os/msg.h>
 
 
-DefaultNodePanel::DefaultNodePanel(graph::Node* n) : xhui::Panel("node-panel") {
+DefaultNodePanel::DefaultNodePanel(dataflow::Node* n) : xhui::Panel("node-panel") {
 	node = n;
 	from_source(R"foodelim(
 Dialog x ''

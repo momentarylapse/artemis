@@ -1,8 +1,8 @@
 
 #include <ModeDefault.h>
-#include <graph/Graph.h>
-#include <graph/Node.h>
+#include <lib/dataflow/Node.h>
 #include <graph/NodeFactory.h>
+#include <graph/Graph.h>
 #include <storage/format/Format.h>
 #include "Session.h"
 #include <view/ArtemisWindow.h>
@@ -27,18 +27,18 @@ base::future<Session*> emit_empty_session(Session* parent);
 void start_session_empty(Session* parent) {
 	emit_empty_session(parent).then([] (Session* s) {
 		if (true) {
-			auto canvas = graph::create_node(s, "Canvas");
+			auto canvas = artemis::graph::create_node(s, "Canvas");
 			canvas->pos = {300, 600};
 			s->graph->add_node(canvas);
 		} else {
-			auto teapot = graph::create_node(s, "TeapotMesh");
+			auto teapot = artemis::graph::create_node(s, "TeapotMesh");
 			teapot->pos = {300, 200};
 			s->graph->add_node(teapot);
-			auto renderer = graph::create_node(s, "MeshRenderer");
+			auto renderer = artemis::graph::create_node(s, "MeshRenderer");
 			renderer->pos = {300, 400};
 			//renderer->set("emission", color_to_any(Green));
 			s->graph->add_node(renderer);
-			auto canvas = graph::create_node(s, "Canvas");
+			auto canvas = artemis::graph::create_node(s, "Canvas");
 			canvas->pos = {300, 600};
 			s->graph->add_node(canvas);
 			s->graph->connect({teapot, 0, renderer, 0});
@@ -83,7 +83,7 @@ int xhui_main(const Array<string>& args) {
 	}
 
 	auto s = create_session();
-	graph::init_factory();
+	artemis::graph::init_factory();
 	if (args.num >= 2) {
 		start_session_load_file(s, args[1]);
 	} else {

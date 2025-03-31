@@ -4,7 +4,7 @@
 
 #include "RegularGrid.h"
 
-namespace graph {
+namespace artemis::graph {
 
 void RegularGrid::process() {
 	out(artemis::data::RegularGrid(nx(), ny(), nz(),

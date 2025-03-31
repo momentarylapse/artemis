@@ -5,7 +5,7 @@
 #include "SphereMesh.h"
 #include <data/mesh/GeometrySphere.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void SphereMesh::process() {
 	out_mesh(GeometrySphere(v_0, radius(), samples()));

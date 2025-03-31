@@ -7,11 +7,11 @@
 
 #include <data/field/ScalarField.h>
 #include <data/grid/RegularGrid.h>
-#include <graph/Port.h>
+#include <lib/dataflow/Port.h>
 
 #include "RendererNode.h"
 
-namespace graph {
+namespace artemis::graph {
 
 class VolumeRenderer : public RendererNode {
 public:
@@ -21,7 +21,7 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
 
-	InPort<artemis::data::ScalarField> in_field{this, "field"};
+	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 
 	owned<VertexBuffer> vertex_buffer;
 };

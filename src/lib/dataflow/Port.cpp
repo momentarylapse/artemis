@@ -5,7 +5,7 @@
 #include "Port.h"
 #include "Node.h"
 
-namespace graph {
+namespace dataflow {
 
 bool operator&(PortFlags a, PortFlags b) {
 	return ((int)a) & ((int)b);

@@ -5,7 +5,7 @@
 #include "Laplace.h"
 #include <processing/field/Calculus.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void Laplace::process() {
 	if (auto f = in_field.value()) {

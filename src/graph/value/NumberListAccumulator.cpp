@@ -4,7 +4,7 @@
 
 #include "NumberListAccumulator.h"
 
-namespace graph {
+namespace artemis::graph {
 
 void NumberListAccumulator::process() {
 	if (!out_list.value.has_value())

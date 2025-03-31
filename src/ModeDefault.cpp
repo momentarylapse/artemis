@@ -5,8 +5,8 @@
 #include "ModeDefault.h"
 
 #include <Session.h>
+#include <lib/dataflow/Node.h>
 #include <graph/Graph.h>
-#include <graph/Node.h>
 #include <graph/renderer/Canvas.h>
 #include <graph/renderer/RendererNode.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
@@ -16,7 +16,9 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
-extern float _current_simulation_time_;
+namespace artemis::graph {
+	extern float _current_simulation_time_;
+}
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
@@ -41,7 +43,7 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	});
 	win->event("simulation-stop", [this] {
 		simulation_active = false;
-		_current_simulation_time_ = 0;
+		artemis::graph::_current_simulation_time_ = 0;
 		graph->reset_state();
 		update_menu();
 	});
@@ -52,14 +54,14 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 void ModeDefault::update_menu() {
 	auto win = session->win;
 	win->enable("simulation-start", !simulation_active);
-	win->enable("simulation-pause", simulation_active or _current_simulation_time_ > 0);
-	win->enable("simulation-stop", simulation_active or _current_simulation_time_ > 0);
+	win->enable("simulation-pause", simulation_active or artemis::graph::_current_simulation_time_ > 0);
+	win->enable("simulation-stop", simulation_active or artemis::graph::_current_simulation_time_ > 0);
 }
 
-graph::Canvas* get_canvas(graph::Graph* graph) {
+artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
 	for (auto n: graph->nodes)
-		if (n->flags & graph::NodeFlags::Canvas)
-			return static_cast<graph::Canvas*>(n);
+		if (n->flags & dataflow::NodeFlags::Canvas)
+			return static_cast<artemis::graph::Canvas*>(n);
 	return nullptr;
 }
 
@@ -73,8 +75,8 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 	}
 
 	for (auto n: graph->nodes)
-		if (n->flags & graph::NodeFlags::Renderer) {
-			auto r = static_cast<graph::RendererNode*>(n);
+		if (n->flags & dataflow::NodeFlags::Renderer) {
+			auto r = static_cast<artemis::graph::RendererNode*>(n);
 			if (r->active())
 				r->draw_win(params, win);
 		}
@@ -85,7 +87,7 @@ void ModeDefault::on_draw_post(Painter* p) {
 		c->draw_2d(p);
 
 	p->set_color(White);
-	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", _current_simulation_time_));
+	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", artemis::graph::_current_simulation_time_));
 }
 
 void ModeDefault::on_key_down(int key) {

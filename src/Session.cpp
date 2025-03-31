@@ -25,17 +25,14 @@
 #include <y/world/World.h>
 #include <y/graphics-impl.h>
 #include <y/renderer/target/XhuiRenderer.h>
-#include <graph/Graph.h>
+#include "graph/Graph.h"
 
 Session* _current_session_ = nullptr;
-
-float _current_simulation_time_ = 0;
-float _current_simulation_dt_ = 0;
 
 Session *create_session() {
 	auto s = new Session;
 	s->storage = new Storage(s);
-	s->graph = new graph::Graph(s);
+	s->graph = new artemis::graph::Graph(s);
 	//s->mode_world = new ModeWorld(s);
 	s->win = new ArtemisWindow(s);
 	s->win->renderer = new XhuiRenderer();

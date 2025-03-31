@@ -5,7 +5,7 @@
 #include "Gradient.h"
 #include <processing/field/Calculus.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void Gradient::process() {
 	if (auto f = in_field.value()) {

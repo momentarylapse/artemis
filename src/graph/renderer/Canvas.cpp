@@ -7,7 +7,7 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void Canvas::draw_win(const RenderParams& params, MultiViewWindow* win) {
 	session->drawing_helper->clear(params, background());

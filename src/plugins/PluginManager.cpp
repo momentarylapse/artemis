@@ -4,8 +4,8 @@
 
 #include "PluginManager.h"
 #include <data/mesh/PolygonMesh.h>
-#include <graph/Graph.h>
-#include <graph/Node.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
 #include <lib/kaba/kaba.h>
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
@@ -15,16 +15,18 @@
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
 #include <data/grid/RegularGrid.h>
+#include <graph/Graph.h>
 #include <graph/NodeFactory.h>
-#include <graph/Port.h>
 #include <graph/draw2d/Plotter.h>
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 #include <lib/os/msg.h>
 
 extern Session* _current_session_;
-extern float _current_simulation_time_;
-extern float _current_simulation_dt_;
+namespace artemis::graph {
+	extern float _current_simulation_time_;
+	extern float _current_simulation_dt_;
+}
 
 namespace kaba {
 	extern const Class* TypeVec3List;
@@ -56,14 +58,14 @@ Session* current_session() {
 	return _current_session_;
 }
 
-graph::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, const vec2& pos) {
+dataflow::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, const vec2& pos) {
 	auto n = graph::create_node(g->session, _class);
 	n->pos = pos;
 	g->add_node(n);
 	return n;
 }
 
-bool graph_connect(graph::Graph* g, graph::Node* source, int source_port, graph::Node* sink, int sink_port) {
+bool graph_connect(dataflow::Graph* g, dataflow::Node* source, int source_port, dataflow::Node* sink, int sink_port) {
 	try {
 		g->connect({source, source_port, sink, sink_port});
 		return true;
@@ -73,25 +75,25 @@ bool graph_connect(graph::Graph* g, graph::Node* source, int source_port, graph:
 	}
 }
 
-void node_init(graph::Node* n, const string& name) {
-	new(n) graph::Node(name);
+void node_init(dataflow::Node* n, const string& name) {
+	new(n) dataflow::Node(name);
 }
 
 template<class T>
-void port_init(T* port, graph::Node* node, const string& name, graph::PortFlags flags) {
+void port_init(T* port, dataflow::Node* node, const string& name, dataflow::PortFlags flags) {
 	new (port) T(node, name, flags);
 }
 
 template<class T>
 void link_ports(kaba::ExternalLinkData* ext, const string& name) {
-	ext->declare_class_size("InPort" + name, sizeof(graph::InPort<T>));
-	ext->link_class_func("InPort" + name + ".__init__", &port_init<graph::InPort<T>>);
-	ext->link_class_func("InPort" + name + ".value", &graph::InPort<T>::value);
-	ext->link_class_func("InPort" + name + ".mutated", &graph::InPort<T>::mutated);
+	ext->declare_class_size("InPort" + name, sizeof(dataflow::InPort<T>));
+	ext->link_class_func("InPort" + name + ".__init__", &port_init<dataflow::InPort<T>>);
+	ext->link_class_func("InPort" + name + ".value", &dataflow::InPort<T>::value);
+	ext->link_class_func("InPort" + name + ".mutated", &dataflow::InPort<T>::mutated);
 
-	ext->declare_class_size("OutPort" + name, sizeof(graph::OutPort<T>));
-	ext->link_class_func("OutPort" + name + ".__init__", &port_init<graph::OutPort<T>>);
-	ext->link_class_func("OutPort" + name + ".set", &graph::OutPort<T>::operator());
+	ext->declare_class_size("OutPort" + name, sizeof(dataflow::OutPort<T>));
+	ext->link_class_func("OutPort" + name + ".__init__", &port_init<dataflow::OutPort<T>>);
+	ext->link_class_func("OutPort" + name + ".set", &dataflow::OutPort<T>::operator());
 }
 
 template<class T>
@@ -134,8 +136,8 @@ void PluginManager::export_kaba() {
 	ext->link("rotation_fw", (void*)&processing::rotation_fw);
 	ext->link("rotation_bw", (void*)&processing::rotation_bw);
 	ext->link("laplace", (void*)&processing::laplace);
-	ext->link("simulation_time", &_current_simulation_time_);
-	ext->link("simulation_dt", &_current_simulation_dt_);
+	ext->link("simulation_time", &artemis::graph::_current_simulation_time_);
+	ext->link("simulation_dt", &artemis::graph::_current_simulation_dt_);
 
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
@@ -182,22 +184,22 @@ void PluginManager::export_kaba() {
 
 
 	{
-		graph::Node n("");
-		ext->declare_class_size("Node", sizeof(graph::Node));
-		ext->declare_class_element("Node.dirty", &graph::Node::dirty);
-		ext->declare_class_element("Node.flags", &graph::Node::flags);
+		dataflow::Node n("");
+		ext->declare_class_size("Node", sizeof(dataflow::Node));
+		ext->declare_class_element("Node.dirty", &dataflow::Node::dirty);
+		ext->declare_class_element("Node.flags", &dataflow::Node::flags);
 		ext->link_class_func("Node.__init__", &node_init);
-		ext->link_class_func("Node.set", &graph::Node::set);
-		ext->link_virtual("Node.__delete__", &GenericVDeleter<graph::Node>::__delete__, &n);
-		ext->link_virtual("Node.process", &graph::Node::process, &n);
-		ext->link_virtual("Node.create_panel", &graph::Node::create_panel, &n);
+		ext->link_class_func("Node.set", &dataflow::Node::set);
+		ext->link_virtual("Node.__delete__", &GenericVDeleter<dataflow::Node>::__delete__, &n);
+		ext->link_virtual("Node.process", &dataflow::Node::process, &n);
+		ext->link_virtual("Node.create_panel", &dataflow::Node::create_panel, &n);
 	}
 
 	link_ports<artemis::data::ScalarField>(ext, "ScalarField");
 	link_ports<artemis::data::VectorField>(ext, "VectorField");
 	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
 
-	ext->declare_class_size("Graph", sizeof(graph::Graph));
+	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
 

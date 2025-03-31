@@ -7,7 +7,7 @@
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
 
-namespace graph {
+namespace artemis::graph {
 
 VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {}
 

@@ -4,22 +4,23 @@
 
 #pragma once
 
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/field/ScalarField.h>
-#include <graph/Node.h>
-#include <graph/Port.h>
 #include <data/field/VectorField.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class Gradient : public Node {
+class Gradient : public dataflow::Node {
 public:
 	Gradient() : Node("Gradient") {}
 
 	void process() override;
 
-	InPort<artemis::data::ScalarField> in_field{this, "in"};
+	dataflow::InPort<artemis::data::ScalarField> in_field{this, "in"};
 
-	OutPort<artemis::data::VectorField> out{this, "out"};
+	dataflow::OutPort<artemis::data::VectorField> out{this, "out"};
 };
 
 } // graph

@@ -30,25 +30,25 @@
 #include "../plugins/PluginManager.h"
 #include "draw2d/ListPlot.h"
 
-namespace graph {
+namespace artemis::graph {
 
 struct NodeClassDescriptor {
 	string name;
-	base::set<NodeCategory> categories;
-	std::function<Node*(Session*)> f_create;
+	base::set<dataflow::NodeCategory> categories;
+	std::function<dataflow::Node*(Session*)> f_create;
 };
 
 static Array<NodeClassDescriptor> node_class_db;
 
-base::set<NodeCategory> category_set(const Array<NodeCategory>& categories) {
-	base::set<NodeCategory> r;
+base::set<dataflow::NodeCategory> category_set(const Array<dataflow::NodeCategory>& categories) {
+	base::set<dataflow::NodeCategory> r;
 	for (auto c: categories)
 		r.add(c);
 	return r;
 }
 
 template<class T>
-void register_node_class(const string& name, const Array<NodeCategory>& categories) {
+void register_node_class(const string& name, const Array<dataflow::NodeCategory>& categories) {
 	node_class_db.add({
 		name,
 		category_set(categories),
@@ -58,7 +58,7 @@ void register_node_class(const string& name, const Array<NodeCategory>& categori
 	});
 }
 template<class T>
-void register_node_class_p(const string& name, const Array<NodeCategory>& categories) {
+void register_node_class_p(const string& name, const Array<dataflow::NodeCategory>& categories) {
 	node_class_db.add({
 		name,
 		category_set(categories),
@@ -69,48 +69,48 @@ void register_node_class_p(const string& name, const Array<NodeCategory>& catego
 }
 
 void init_factory() {
-	register_node_class<RegularGrid>("RegularGrid", {NodeCategory::Grid});
+	register_node_class<RegularGrid>("RegularGrid", {dataflow::NodeCategory::Grid});
 
-	register_node_class<SphereMesh>("SphereMesh", {NodeCategory::Mesh});
-	register_node_class<TeapotMesh>("TeapotMesh", {NodeCategory::Mesh});
-	register_node_class<IsoSurface>("IsoSurface", {NodeCategory::Field, NodeCategory::Mesh});
+	register_node_class<SphereMesh>("SphereMesh", {dataflow::NodeCategory::Mesh});
+	register_node_class<TeapotMesh>("TeapotMesh", {dataflow::NodeCategory::Mesh});
+	register_node_class<IsoSurface>("IsoSurface", {dataflow::NodeCategory::Field, dataflow::NodeCategory::Mesh});
 
-	register_node_class<ScalarField>("ScalarField", {NodeCategory::Field});
-	register_node_class<VectorField>("VectorField", {NodeCategory::Field});
-	register_node_class<Gradient>("Gradient", {NodeCategory::Field});
-	register_node_class<Divergence>("Divergence", {NodeCategory::Field});
-	register_node_class<Rotation>("Rotation", {NodeCategory::Field});
-	register_node_class<Laplace>("Laplace", {NodeCategory::Field});
+	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});
+	register_node_class<VectorField>("VectorField", {dataflow::NodeCategory::Field});
+	register_node_class<Gradient>("Gradient", {dataflow::NodeCategory::Field});
+	register_node_class<Divergence>("Divergence", {dataflow::NodeCategory::Field});
+	register_node_class<Rotation>("Rotation", {dataflow::NodeCategory::Field});
+	register_node_class<Laplace>("Laplace", {dataflow::NodeCategory::Field});
 
-	register_node_class_p<Canvas>("Canvas", {NodeCategory::Renderer});
-	register_node_class_p<GridRenderer>("GridRenderer", {NodeCategory::Renderer});
-	register_node_class_p<MeshRenderer>("MeshRenderer", {NodeCategory::Renderer});
-	register_node_class_p<PointListRenderer>("PointListRenderer", {NodeCategory::Renderer});
-	register_node_class_p<VolumeRenderer>("VolumeRenderer", {NodeCategory::Renderer});
-	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {NodeCategory::Renderer});
-	register_node_class_p<DeformationRenderer>("DeformationRenderer", {NodeCategory::Renderer});
+	register_node_class_p<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<MeshRenderer>("MeshRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<VolumeRenderer>("VolumeRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<DeformationRenderer>("DeformationRenderer", {dataflow::NodeCategory::Renderer});
 
-	register_node_class<FunctionPlot>("FunctionPlot", {NodeCategory::Renderer});
-	register_node_class<ListPlot>("ListPlot", {NodeCategory::Renderer});
-	register_node_class_p<Plotter>("Plotter", {NodeCategory::Renderer});
+	register_node_class<FunctionPlot>("FunctionPlot", {dataflow::NodeCategory::Renderer});
+	register_node_class<ListPlot>("ListPlot", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<Plotter>("Plotter", {dataflow::NodeCategory::Renderer});
 
-	register_node_class<RandomNumber>("RandomNumber", {NodeCategory::Field});
-	register_node_class<NumberListAccumulator>("NumberListAccumulator", {NodeCategory::Field});
+	register_node_class<RandomNumber>("RandomNumber", {dataflow::NodeCategory::Field});
+	register_node_class<NumberListAccumulator>("NumberListAccumulator", {dataflow::NodeCategory::Field});
 
 
 	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {
 		node_class_db.add({
 			name,
-			{NodeCategory::Simulation}, // TODO
+			{dataflow::NodeCategory::Simulation}, // TODO
 			[name=name] (Session*) {
-				return (Node*)artemis::PluginManager::create_instance(name);
+				return (dataflow::Node*)artemis::PluginManager::create_instance(name);
 			}
 		});
 	}
 }
 
 
-Array<string> enumerate_nodes(NodeCategory category) {
+Array<string> enumerate_nodes(dataflow::NodeCategory category) {
 	base::set<string> _classes;
 	for (const auto& d: node_class_db)
 		if (d.categories.contains(category))
@@ -118,7 +118,7 @@ Array<string> enumerate_nodes(NodeCategory category) {
 	return _classes;
 }
 
-Node* create_node(Session* s, const string& name) {
+dataflow::Node* create_node(Session* s, const string& name) {
 	for (auto& d: node_class_db)
 		if (d.name == name)
 			return d.f_create(s);

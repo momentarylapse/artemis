@@ -2,8 +2,7 @@
 // Created by michi on 09.03.25.
 //
 
-#ifndef SETTING_H
-#define SETTING_H
+#pragma once
 
 #include "Node.h"
 #include <lib/base/base.h>
@@ -13,7 +12,7 @@ namespace kaba {
 	class Class;
 }
 
-namespace graph {
+namespace dataflow {
 
 class Node;
 
@@ -76,6 +75,5 @@ public:
 	}
 };
 
-} // graph
+} // dataflow
 
-#endif //SETTING_H

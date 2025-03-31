@@ -5,29 +5,29 @@
 #ifndef REGULARGRIDSOURCE_H
 #define REGULARGRIDSOURCE_H
 
-#include "../Node.h"
-#include <graph/Port.h>
-#include <graph/Setting.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
 #include <data/grid/RegularGrid.h>
 
-namespace graph {
+namespace artemis::graph {
 
-class RegularGrid : public ResourceNode {
+class RegularGrid : public dataflow::ResourceNode {
 public:
 	RegularGrid() : ResourceNode("RegularGrid") {}
 
 	void process() override;
 
-	Setting<int> nx{this, "nx", 8};
-	Setting<int> ny{this, "ny", 8};
-	Setting<int> nz{this, "nz", 1};
-	Setting<float> dx{this, "dx", 1.0f};
-	Setting<float> dy{this, "dy", 1.0f};
-	Setting<float> dz{this, "dz", 1.0f};
+	dataflow::Setting<int> nx{this, "nx", 8};
+	dataflow::Setting<int> ny{this, "ny", 8};
+	dataflow::Setting<int> nz{this, "nz", 1};
+	dataflow::Setting<float> dx{this, "dx", 1.0f};
+	dataflow::Setting<float> dy{this, "dy", 1.0f};
+	dataflow::Setting<float> dz{this, "dz", 1.0f};
 
-	OutPort<artemis::data::RegularGrid> out{this, "out"};
-	OutPort<Array<vec3>> out_vertices{this, "vertices"};
-	OutPort<Array<vec3>> out_cell_centers{this, "cell_centers"};
+	dataflow::OutPort<data::RegularGrid> out{this, "out"};
+	dataflow::OutPort<Array<vec3>> out_vertices{this, "vertices"};
+	dataflow::OutPort<Array<vec3>> out_cell_centers{this, "cell_centers"};
 };
 
 } // graph

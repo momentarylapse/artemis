@@ -5,7 +5,7 @@
 #include "Rotation.h"
 #include <processing/field/Calculus.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void Rotation::process() {
 	if (auto f = in_field.value()) {

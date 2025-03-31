@@ -6,16 +6,18 @@
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
 
-extern float _current_simulation_time_;
+namespace artemis::graph {
+	extern float _current_simulation_time_;
+}
 
-namespace graph {
+namespace artemis::graph {
 
 ScalarField::ScalarField() : ResourceNode("ScalarField") {
 	time_dependent.on_update = [this] {
 		if (time_dependent())
-			flags = NodeFlags::Resource | NodeFlags::TimeDependent;
+			flags = dataflow::NodeFlags::Resource | dataflow::NodeFlags::TimeDependent;
 		else
-			flags = NodeFlags::Resource;
+			flags = dataflow::NodeFlags::Resource;
 	};
 }
 

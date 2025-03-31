@@ -5,7 +5,7 @@
 #include "Divergence.h"
 #include <processing/field/Calculus.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void Divergence::process() {
 	if (auto f = in_field.value()) {

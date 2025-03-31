@@ -7,7 +7,7 @@
 #include <lib/image/color.h>
 #include <view/DrawingHelper.h>
 
-namespace graph {
+namespace artemis::graph {
 
 void VectorFieldRenderer::process() {
 	auto f = in_field.value();

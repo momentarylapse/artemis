@@ -5,12 +5,15 @@
 #ifndef AUTOCONNECT_H
 #define AUTOCONNECT_H
 
-namespace graph {
+namespace dataflow {
+	struct CableInfo;
+}
+
+namespace artemis::graph {
 
 class Graph;
-struct CableInfo;
 
-void auto_connect(Graph* g, const CableInfo& c);
+void auto_connect(Graph* g, const dataflow::CableInfo& c);
 
 } // graph
 
