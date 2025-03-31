@@ -241,6 +241,7 @@ add_executable(artemis
 	src/lib/dataflow/Port.cpp
 	src/lib/dataflow/ResourceNode.cpp
 	src/lib/dataflow/Setting.cpp
+	src/lib/dataflow/Type.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp

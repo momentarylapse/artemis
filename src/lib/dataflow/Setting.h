@@ -5,8 +5,8 @@
 #pragma once
 
 #include "Node.h"
+#include "Type.h"
 #include <lib/base/base.h>
-#include <plugins/PluginManager.h>
 
 namespace kaba {
 	class Class;
@@ -39,7 +39,7 @@ public:
 template<class T>
 class Setting : public SettingBase {
 public:
-	Setting(Node* owner, const string& name, const T& value, const string& options = "") : SettingBase(owner, name, artemis::get_class<T>(), options) {
+	Setting(Node* owner, const string& name, const T& value, const string& options = "") : SettingBase(owner, name, get_class<T>(), options) {
 		this->value = value;
 	}
 	const T& operator()() const {

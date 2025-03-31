@@ -5,10 +5,10 @@
 #pragma once
 
 #include "Node.h"
+#include "Type.h"
 #include <lib/base/base.h>
 #include <lib/base/optional.h>
 #include <lib/kaba/kaba.h>
-#include <plugins/PluginManager.h>
 
 namespace dataflow {
 
@@ -55,7 +55,7 @@ class OutPort;
 template<class T>
 class InPort : public InPortBase {
 public:
-	InPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : InPortBase(owner, name, artemis::get_class<T>(), flags) {}
+	InPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : InPortBase(owner, name, get_class<T>(), flags) {}
 	const T* value() const {
 		if (sources.num == 0)
 			return nullptr;
@@ -78,7 +78,7 @@ public:
 template<class T>
 class OutPort : public OutPortBase {
 public:
-	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, artemis::get_class<T>(), flags) {
+	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, get_class<T>(), flags) {
 		has_value = [this] {
 			return value.has_value();
 		};
