@@ -61,12 +61,5 @@ public:
 	Array<OutPortBase*> out_ports;
 };
 
-class ResourceNode : public Node {
-public:
-	explicit ResourceNode(const string& name) : Node(name) {
-		flags = NodeFlags::Resource;
-	}
-};
-
 } // dataflow
 

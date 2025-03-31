@@ -8,7 +8,7 @@
 namespace artemis::graph {
 
 void TeapotMesh::process() {
-	out_mesh(GeometryTeapot(v_0, radius(), samples()));
+	out(GeometryTeapot(v_0, radius(), samples()));
 }
 
 } // graph

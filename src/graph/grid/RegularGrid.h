@@ -5,14 +5,14 @@
 #ifndef REGULARGRIDSOURCE_H
 #define REGULARGRIDSOURCE_H
 
-#include <lib/dataflow/Node.h>
+#include <lib/dataflow/ResourceNode.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <data/grid/RegularGrid.h>
 
 namespace artemis::graph {
 
-class RegularGrid : public dataflow::ResourceNode {
+class RegularGrid : public dataflow::ResourceNode<data::RegularGrid> {
 public:
 	RegularGrid() : ResourceNode("RegularGrid") {}
 
@@ -25,7 +25,6 @@ public:
 	dataflow::Setting<float> dy{this, "dy", 1.0f};
 	dataflow::Setting<float> dz{this, "dz", 1.0f};
 
-	dataflow::OutPort<data::RegularGrid> out{this, "out"};
 	dataflow::OutPort<Array<vec3>> out_vertices{this, "vertices"};
 	dataflow::OutPort<Array<vec3>> out_cell_centers{this, "cell_centers"};
 };
