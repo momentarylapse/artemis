@@ -1,0 +1,119 @@
+use linalg.*
+use d1p1
+
+struct Grid
+	var NX = 4   # cells
+	var NY = 3
+	var NZ = 3
+	var DX = 0.1 # cell size
+	var DY = 0.1
+	var DZ = 0.1
+	var gx, gy, gz: d1p1.Grid
+	var nx, ny: i32
+	
+	func mut init(D: vec3, N: (i32,i32,i32))
+		NX = N[0]
+		NY = N[1]
+		NZ = N[2]
+		DX = D.x
+		DY = D.y
+		DZ = D.z
+		gx.N = NX
+		gx.D = DX
+		gy.N = NY
+		gy.D = DY
+		gz.N = NZ
+		gz.D = DZ
+		nx = gx.n()
+		ny = gy.n()
+	
+	func n() -> i32
+		#let (gx, gy) = components()
+		return gx.n() * gy.n() * gz.n()
+	
+#	func index(i: int, j: int) -> int
+#		return j*nx + i
+	
+#	func pos(i: int, j: int) -> vec2
+#		return [i*DX, j*DY]
+		
+	# M * u = <Op u, phi[.]>
+
+	# M = <phi[i], d/dx phi[j]>
+	func phi_dx_phi() -> SparseRowMatrix
+		let mx = gx.phi_dphi()
+		let my = gy.phi_phi()
+		let mz = gz.phi_phi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d/dy phi[j]>
+	func phi_dy_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_dphi()
+		let mz = gz.phi_phi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d/dz phi[j]>
+	func phi_dz_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_phi()
+		let mz = gz.phi_dphi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d²/dx² phi[j]>
+	func phi_dx_dx_phi() -> SparseRowMatrix
+		let mx = gx.phi_ddphi()
+		let my = gy.phi_phi()
+		let mz = gz.phi_phi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d²/dy² phi[j]>
+	func phi_dy_dy_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_ddphi()
+		let mz = gz.phi_phi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d²/dz² phi[j]>
+	func phi_dz_dz_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_phi()
+		let mz = gz.phi_ddphi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d²/dx/dy phi[j]>
+	func phi_dx_dy_phi() -> SparseRowMatrix
+		let mx = gx.phi_dphi()
+		let my = gy.phi_dphi()
+		let mz = gz.phi_phi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d²/dx/dz phi[j]>
+	func phi_dx_dz_phi() -> SparseRowMatrix
+		let mx = gx.phi_dphi()
+		let my = gy.phi_phi()
+		let mz = gz.phi_dphi()
+		return outer_product(outer_product(mx, my), mz)
+
+	# M = <phi[i], d²/dy/dz phi[j]>
+	func phi_dy_dz_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_dphi()
+		let mz = gz.phi_dphi()
+		return outer_product(outer_product(mx, my), mz)
+	
+	# <phi[i] phi[j], phi[k] phi[l]>
+	func phi_phi() -> SparseRowMatrix
+		let mx = gx.phi_phi()
+		let my = gy.phi_phi()
+		let mz = gz.phi_phi()
+		return outer_product(outer_product(mx, my), mz)
+
+func main()
+	var g: Grid
+	g.init((1,1,1), (4,4,2))
+	
+	print(g.phi_phi())
+	
+	print(g.phi_phi().to_matrix())
+	

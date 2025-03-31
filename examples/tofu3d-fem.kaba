@@ -1,0 +1,55 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var grid = g.add_node("RegularGrid", [100,50])
+	grid.set("nx", 8)
+	grid.set("ny", 6)
+	grid.set("nz", 2)
+
+	var ux = g.add_node("ScalarField", [200,200])
+	ux.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	var uy = g.add_node("ScalarField", [250,275])
+	uy.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	var uz = g.add_node("ScalarField", [300,350])
+	uz.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	var dt_ux = g.add_node("ScalarField", [400,200])
+	dt_ux.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	dt_ux.set("formula", "exp( - 0.5 * len(p - vec3(0,2,0))^2) *10000")
+	var dt_uy = g.add_node("ScalarField", [450,275])
+	dt_uy.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	var dt_uz = g.add_node("ScalarField", [500,350])
+	dt_uz.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+
+	var sim = g.add_node("Elastic3dFEM", [400,400])
+
+	var gr = g.add_node("GridRenderer", [100,500])
+	#gr.set("line-width", 2.0)
+	#gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var dr = g.add_node("DeformationRenderer", [300,500])
+	dr.set("scale", 10.0)
+	dr.set("radius", 0.2)
+
+	var canvas = g.add_node("Canvas", [200,650])
+
+	g.connect(grid, 0, ux, 0)
+	g.connect(grid, 0, uy, 0)
+	g.connect(grid, 0, uz, 0)
+	g.connect(grid, 0, dt_ux, 0)
+	g.connect(grid, 0, dt_uy, 0)
+	g.connect(grid, 0, dt_uz, 0)
+	g.connect(ux, 0, sim, 0)
+	g.connect(uy, 0, sim, 1)
+	g.connect(uz, 0, sim, 2)
+	g.connect(dt_ux, 0, sim, 3)
+	g.connect(dt_uy, 0, sim, 4)
+	g.connect(dt_uz, 0, sim, 5)
+	
+	g.connect(grid, 0, gr, 0)
+	g.connect(gr, 0, canvas, 0)
+	g.connect(sim, 0, dr, 0)
+	g.connect(dr, 0, canvas, 0)
+
+
