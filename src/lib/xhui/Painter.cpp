@@ -20,6 +20,8 @@ font::Face* pick_font(const string &font, float size, bool bold, bool italic) {
 		face = default_font_bold;
 	else
 		face = default_font_regular;
+	if (font == "monospace" and default_font_mono_regular)
+		face = default_font_mono_regular;
 	face->set_size(size * ui_scale);
 	return face;
 }

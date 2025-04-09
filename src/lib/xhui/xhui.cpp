@@ -32,6 +32,8 @@ namespace xhui {
 
 	font::Face* default_font_regular = nullptr;
 	font::Face* default_font_bold = nullptr;
+	font::Face* default_font_mono_regular = nullptr;
+	font::Face* default_font_mono_bold = nullptr;
 
 
 	Configuration config;
@@ -160,6 +162,14 @@ void init(const Array<string> &arg, const string& app_name) {
 	if (!default_font_regular)
 		msg_error("no font found...");
 
+	Array<string> font_names_mono = {"Courier New", "FreeMono"};
+	for (const string& name: font_names_mono) {
+		if (!default_font_mono_regular)
+			default_font_mono_regular = font::load_face(name, false, false);
+		if (!default_font_mono_bold)
+			default_font_mono_bold = font::load_face(name, true, false);
+	}
+	// TODO font library!
 
 	if (os::fs::exists(Application::directory | "config.txt"))
 		config.load(Application::directory | "config.txt");
@@ -322,6 +332,17 @@ void run() {
 		//usleep(8000);
 		os::sleep(0.008f);
 	};
+}
+
+namespace clipboard {
+	void copy(const string& text) {
+		glfwSetClipboardString(nullptr, text.c_str());
+	}
+	string paste() {
+		if (const char* text = glfwGetClipboardString(nullptr))
+			return text;
+		return "";
+	}
 }
 
 namespace event_id {

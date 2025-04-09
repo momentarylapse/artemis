@@ -76,6 +76,8 @@ public:
 		int key_char;
 	} state, state_prev;
 
+	void focus(const string& id);
+
 protected:
 	GLFWwindow *window;
 

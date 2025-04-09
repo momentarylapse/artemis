@@ -131,14 +131,14 @@ int key_decode(int key) {
 
 int mods_decode(int mods) {
 	int r = 0;
-	if (mods == GLFW_MOD_SHIFT)
-		r += xhui::KEY_SHIFT;
-	if (mods == GLFW_MOD_CONTROL)
-		r += xhui::KEY_CONTROL;
-	if (mods == GLFW_MOD_ALT)
-		r += xhui::KEY_ALT;
-	//if (mods == GLFW_MOD_SUPER)
-	//	r += xhui::KEY_SUPER;
+	if (mods & GLFW_MOD_SHIFT)
+		r += KEY_SHIFT;
+	if (mods & GLFW_MOD_CONTROL)
+		r += KEY_CONTROL;
+	if (mods & GLFW_MOD_ALT)
+		r += KEY_ALT;
+	if (mods & GLFW_MOD_SUPER)
+		r += KEY_SUPER;
 	return r;
 }
 
@@ -157,7 +157,7 @@ void Window::_key_callback(GLFWwindow *window, int key, int scancode, int action
 	}
 
 	k += mods_decode(mods);
-	//std::cout << "key " << k << "    " << key << " " << action << " " << mods << "\n";
+	//msg_write(format("key  %d  %d  %d  %d", k, key, action, mods));
 
 	w->state.key_code = k;
 	w->state.key_char = 0;
@@ -398,14 +398,14 @@ void Window::_on_draw() {
 		p->draw_rect(a);
 		p->softness = 0;
 
-		a = smaller_rect(a, R_shadow);
+		a = a.grow(-R_shadow);
 
 		rect header = rect(a.x1, a.x2, a.y1, a.y1 + Theme::_default.headerbar_height);
 
 		// window border
 		p->set_roundness(R+1);
 		p->set_color(Theme::_default.border);
-		p->draw_rect(smaller_rect(a, -1));
+		p->draw_rect(a.grow(1));
 
 		// main background
 		p->accumulate_alpha = false;
@@ -432,7 +432,7 @@ void Window::_on_draw() {
 		p->set_color(color(0.3f, 0, 0, 0));
 		p->draw_rect(a);
 		const vec2 m = a.center();
-		const vec2 size = vec2(dlg->width, dlg->height);
+		const vec2 size = vec2((float)dlg->width, (float)dlg->height);
 		dlg->negotiate_area({m - size/2, m + size/2});
 		dlg->_draw(p);
 	}
@@ -536,6 +536,14 @@ Control *Window::get_hover_control(const vec2 &p) {
 	}
 	return best;
 }
+
+void Window::focus(const string& id) {
+	if (auto c = get_control(id)) {
+		if (c->can_grab_focus)
+			focus_control = c;
+	}
+}
+
 
 
 bool Window::button(int index) const {
