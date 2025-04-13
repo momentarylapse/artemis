@@ -121,6 +121,12 @@ protected:
 
 	Context* context = nullptr;
 
+	struct EventKeyCode {
+		string id;
+		int key_code;
+	};
+	Array<EventKeyCode> event_key_codes;
+
 public:
 	struct Drag {
 		bool active = false;
@@ -134,6 +140,8 @@ public:
 	void start_drag(const string& title, const string& payload);
 
 	bool _destroy_requested = false;
+
+	void set_key_code(const string& id, int key_code);
 
 	shared_array<Dialog> dialogs;
 };

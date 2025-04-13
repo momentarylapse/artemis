@@ -1,4 +1,9 @@
 #include "Edit.h"
+
+#include <lib/base/algo.h>
+#include <lib/base/sort.h>
+#include <lib/os/time.h>
+
 #include "../Painter.h"
 #include "../Theme.h"
 #include "../draw/font.h"
@@ -6,6 +11,17 @@
 #include "../../os/msg.h"
 
 namespace xhui {
+
+
+//#define PERF_OUT
+
+
+FontFlags operator|(FontFlags a, FontFlags b) {
+	return (FontFlags)((int)a | (int)b);
+}
+bool operator&(FontFlags a, FontFlags b) {
+	return (int)a & (int)b;
+}
 
 int next_utf8_index(const string& text, int index) {
 	for (int i=index; i<min(index + 8, text.num); i++)
@@ -30,6 +46,9 @@ Edit::Edit(const string &_id, const string &t) : Control(_id) {
 
 	font_name = Theme::_default.font_name;
 	font_size = Theme::_default.font_size;
+
+	margin_x = Theme::_default.edit_margin_x;
+	margin_y = 8;
 
 	tab_size = 4;
 	face = nullptr;
@@ -81,6 +100,14 @@ void Edit::on_mouse_move(const vec2& m, const vec2& d) {
 	}
 }
 
+void Edit::on_mouse_wheel(const vec2& d) {
+	auto mm = cache.content_size - _area.size();
+	viewport_offset = vec2::max(vec2::min(viewport_offset - d * 10, mm), vec2::ZERO);
+	request_redraw();
+	emit_event(event_id::Scroll, false);
+}
+
+
 void Edit::on_key_down(int key) {
 	if (!enabled) {
 		request_redraw();
@@ -116,18 +143,35 @@ void Edit::on_key_down(int key) {
 	if (key_no_shift == KEY_DOWN and multiline)
 		jump_lines(1);
 
+
 #ifdef OS_MAC
-	if (key == KEY_C + KEY_SUPER)
+	int mod = KEY_SUPER;
 #else
-	if (key == KEY_C + KEY_CONTROL)
+	int mod = KEY_CONTROL;
 #endif
+
+	if (key == KEY_C + mod)
 		clipboard::copy(get_range(selection_start, cursor_pos));
-#ifdef OS_MAC
-	if (key == KEY_V + KEY_SUPER)
-#else
-	if (key == KEY_V + KEY_CONTROL)
-#endif
+	if (key == KEY_V + mod)
 		auto_insert(clipboard::paste());
+	if (key == KEY_X + mod) {
+		clipboard::copy(get_range(selection_start, cursor_pos));
+		delete_selection();
+	}
+	if (key == KEY_Z + mod and current_history_index > 0) {
+		auto& op = history[-- current_history_index];
+		string old = get_range(op.i0, op.i1);
+		_replace_range(op.i0, op.i1, op.t);
+		op.i1 = op.i0 + op.t.num;
+		op.t = old;
+	}
+	if (key == KEY_Y + mod and current_history_index < history.num) {
+		auto& op = history[current_history_index ++];
+		string old = get_range(op.i0, op.i1);
+		_replace_range(op.i0, op.i1, op.t);
+		op.i1 = op.i0 + op.t.num;
+		op.t = old;
+	}
 
 	if (key == KEY_BACKSPACE) {
 		if (cursor_pos != selection_start) {
@@ -162,12 +206,16 @@ void Edit::draw_active_marker(Painter* p) {
 }
 
 void Edit::draw_text(Painter* p) {
+#ifdef PERF_OUT
+	os::Timer timer;
+#endif
+
 	const auto clip0 = p->clip();
 	p->set_clip(_area);
 	p->set_font(font_name, font_size, false, false);
 	face = p->face;
 
-	text_x0 = _area.x1 + Theme::_default.edit_margin_x;
+	text_x0 = _area.x1 + margin_x - viewport_offset.x;
 
 	// update text dims
 	float inner_height = 0;
@@ -176,14 +224,18 @@ void Edit::draw_text(Painter* p) {
 		cache.line_y0.clear();
 		cache.line_height.clear();
 		cache.line_width.clear();
-		float y0 = _area.y1 + 8;
+		float y0 = _area.y1 + margin_y - viewport_offset.y;
+		cache.content_size = {0,0};
 		for (const string &l: lines) {
 			auto dim = face->get_text_dimensions(l);
 			inner_height = dim.inner_height() / ui_scale;
-			cache.line_height.add(dim.line_dy / ui_scale);
+			float dy = dim.line_dy / ui_scale * line_height_scale;
+			cache.line_height.add(dy);
 			cache.line_y0.add(y0);
 			cache.line_width.add(dim.dx / ui_scale);
-			y0 += dim.line_dy / ui_scale;
+			cache.content_size.x = max(cache.content_size.x, dim.dx / ui_scale);
+			y0 += dy;
+			cache.content_size.y += dy;
 		}
 		if (!multiline)
 			cache.line_y0[0] = _area.center().y - inner_height / 2;
@@ -208,30 +260,77 @@ void Edit::draw_text(Painter* p) {
 			const vec2 pos1 = index_to_xy(b);
 			p->draw_rect({pos0.x, pos1.x, pos0.y, pos0.y + cache.line_height[0]});
 		}
-
 	}
 
 
 	// text
-	p->set_color(Theme::_default.text_label);
+	color col0 = Theme::_default.text_label;
 	if (!enabled)
-		p->set_color(Theme::_default.text_disabled);
+		col0 = Theme::_default.text_disabled;
+	p->set_color(col0);
 	for (const auto& [line, l]: enumerate(cache.lines)) {
-		p->draw_str({text_x0, cache.line_y0[line]}, l);
+		if (cache.line_y0[line] + cache.line_height[line] < _area.y1)
+			continue;
+		if (cache.line_y0[line] > _area.y2)
+			continue;
+		if (markups.num > 0) {
+			int i0 = cache.line_first_index[line];
+			int i1 = i0 + l.num;
+			float x0 = text_x0;
+			for (const auto& m: markups) {
+				if (m.i1 >= i0 and m.i0 <= i1) {
+					if (m.i0 > i0) {
+						// before marker
+						p->set_font(font_name, font_size, false, false);
+						p->set_color(col0);
+						string t = text.sub(i0, m.i0);
+						p->draw_str({x0, cache.line_y0[line]}, t);
+						x0 += p->get_str_width(t);
+						i0 = m.i0;
+					}
+
+					{
+						// marker
+						p->set_color(m.col);
+						p->set_font(font_name, font_size, m.flags & FontFlags::Bold, m.flags & FontFlags::Italic);
+						string t = text.sub(i0, min(m.i1, i1));
+						p->draw_str({x0, cache.line_y0[line]}, t);
+						x0 += p->get_str_width(t);
+						i0 = min(m.i1, i1);
+					}
+				}
+			}
+
+			if (i0 < i1) {
+				// after markers
+				p->set_color(col0);
+				p->set_font(font_name, font_size, false, false);
+				string t = text.sub(i0, i1);
+				p->draw_str({x0, cache.line_y0[line]}, t);
+			}
+
+		} else {
+			p->draw_str({text_x0, cache.line_y0[line]}, l);
+		}
 	}
 
 	// cursor
 	if (has_focus() and enabled) {
 		const vec2 pos = index_to_xy(cursor_pos);
-		p->draw_line({pos.x, pos.y - 3}, {pos.x, pos.y + font_size + 3});
+		p->draw_line({pos.x, pos.y}, {pos.x, pos.y + cache.line_height[0]});
 	}
 	p->set_clip(clip0);
+
+#ifdef PERF_OUT
+	float t = timer.get();
+	msg_write(f2s(t * 1000, 2));
+#endif
 }
 
 string Edit::get_range(Index _i0, Index _i1) const {
 	auto i0 = min(_i0, _i1);
 	auto i1 = max(_i0, _i1);
-	return text.sub_ref(i0, i1);
+	return text.sub(i0, i1);
 }
 
 void Edit::delete_range(Index i0, Index i1) {
@@ -242,9 +341,15 @@ void Edit::delete_selection() {
 	delete_range(selection_start, cursor_pos);
 }
 
-void Edit::replace_range(Index _i0, Index _i1, const string& t) {
-	auto i0 = min(_i0, _i1);
-	auto i1 = max(_i0, _i1);
+// i0 <= i1
+void Edit::_replace_range(Index i0, Index i1, const string& t) {
+	clean_markup(i0, i1);
+	for (auto& m: markups)
+		if (m.i0 >= i1) {
+			m.i0 += (i0 - i1) + t.num;
+			m.i1 += (i0 - i1) + t.num;
+		}
+
 	text = text.sub_ref(0, i0) + t + text.sub_ref(i1);
 	cache.rebuild(text);
 	if (cursor_pos >= i1)
@@ -253,6 +358,22 @@ void Edit::replace_range(Index _i0, Index _i1, const string& t) {
 		set_cursor_pos(i0 + t.num);
 	on_edit();
 	emit_event(event_id::Changed, true);
+}
+
+void Edit::clear_history() {
+	history.clear();
+	current_history_index = 0;
+}
+
+
+void Edit::replace_range(Index _i0, Index _i1, const string& t) {
+	auto i0 = min(_i0, _i1);
+	auto i1 = max(_i0, _i1);
+	string old = get_range(i0, i1);
+	history.resize(current_history_index);
+	history.add({i0, i0 + t.num, old});
+	current_history_index ++;
+	_replace_range(i0, i1, t);
 }
 
 void Edit::auto_insert(const string& t) {
@@ -307,6 +428,8 @@ void Edit::_draw(Painter *p) {
 
 	// background
 	color bg = Theme::_default.background_button;
+	if (alt_background)
+		bg = Theme::_default.background;
 	p->set_color(bg);
 	p->set_roundness(Theme::_default.button_radius);
 	p->draw_rect(_area);
@@ -355,14 +478,58 @@ Edit::Index Edit::prior_index(Index index) const {
 	return prior_utf8_index(text, index);
 }
 
+void Edit::add_markup(const Markup& m) {
+	markups.add(m);
+	base::inplace_sort(markups, [] (const Markup& a, const Markup& b) {
+		return a.i0 <= b.i0;
+	});
+	request_redraw();
+}
+
+void Edit::clean_markup(Index i0, Index i1) {
+	// markup completely covered? -> remove
+	base::remove_if(markups, [i0, i1] (const Markup& m) {
+		return i0 <= m.i0 and i1 >= m.i1;
+	});
+	// shink?
+	for (auto& m: markups) {
+		if (m.i0 >= i0 and m.i0 <= i1)
+			m.i0 = i1;
+		if (m.i1 >= i0 and m.i1 <= i1)
+			m.i1 = i0;
+	}
+	// middle of markup?
+	Array<Markup> to_add;
+	for (auto& m: markups)
+		if (i0 > m.i0 and i1 < m.i1) {
+			to_add.add({i1, m.i1, m.flags, m.col});
+			m.i1 = i0;
+		}
+	for (const auto& m: to_add)
+		add_markup(m);
+	request_redraw();
+}
+
+
 
 void Edit::set_option(const string& key, const string& value) {
 	if (key == "focusframe") {
 		show_focus_frame = value._bool();
+		request_redraw();
 	} else if (key == "font") {
 		font_name = value;
+		request_redraw();
+	} else if (key == "monospace") {
+		font_name = "monospace";
+		request_redraw();
 	} else if (key == "fontsize") {
 		font_size = value._float();
+		request_redraw();
+	} else if (key == "lineheightscale") {
+		line_height_scale = value._float();
+		request_redraw();
+	} else if (key == "altbg") {
+		alt_background = true;
 	} else {
 		Control::set_option(key, value);
 	}

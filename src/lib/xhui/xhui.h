@@ -196,6 +196,7 @@ namespace event_id {
 	extern const string Select;
 	extern const string DragStart;
 	extern const string DragDrop;
+	extern const string Scroll;
 };
 
 struct XImage {

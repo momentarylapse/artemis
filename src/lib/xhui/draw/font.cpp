@@ -73,6 +73,7 @@ Face* load_face(const string& name, bool bold, bool italic) {
 	if (!try_load_font(format("/System/Library/Fonts/Supplemental/%s.ttf", namex)))
 	if (!try_load_font(format("/usr/share/fonts/noto/%s-%s.ttf", name, type)))
 	if (!try_load_font(format("/usr/share/fonts/open-sans/%s-%s.ttf", name, type)))
+	if (!try_load_font(format("/usr/share/fonts/Adwaita/%s-%s.ttf", name, type)))
 	if (!try_load_font(format("static/%s-%s.ttf", name, type))) {
 		delete face;
 		return nullptr;
