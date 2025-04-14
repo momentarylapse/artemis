@@ -395,6 +395,7 @@ add_executable(artemis
 	src/lib/xhui/controls/Image.cpp
 	src/lib/xhui/controls/Label.cpp
 	src/lib/xhui/controls/ListView.cpp
+	src/lib/xhui/controls/MenuBar.cpp
 	src/lib/xhui/controls/MultilineEdit.cpp
 	src/lib/xhui/controls/Overlay.cpp
 	src/lib/xhui/controls/RadioButton.cpp
@@ -528,7 +529,7 @@ add_executable(artemis
 target_include_directories(artemis PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(artemis PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(artemis PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(artemis PUBLIC ${COMPILE_DEFINITIONS} INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(artemis PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(artemis PUBLIC ${DEPS})
 target_include_directories(artemis PUBLIC src)
 target_include_directories(artemis PUBLIC src/y)
