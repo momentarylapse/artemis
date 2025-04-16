@@ -10,6 +10,7 @@
 #include "controls/ComboBox.h"
 #include "controls/DrawingArea.h"
 #include "controls/Edit.h"
+#include "controls/Expander.h"
 #include "controls/FileSelector.h"
 #include "controls/Grid.h"
 #include "controls/Group.h"
@@ -20,6 +21,8 @@
 #include "controls/MultilineEdit.h"
 #include "controls/Overlay.h"
 #include "controls/RadioButton.h"
+#include "controls/Separator.h"
+#include "controls/Slider.h"
 #include "controls/SpinButton.h"
 #include "controls/TabControl.h"
 #include "controls/ToggleButton.h"
@@ -286,6 +289,13 @@ void Panel::enable(const string& id, bool enabled) {
 			c->enable(enabled);
 }
 
+
+void Panel::expand(const string& id, bool expanded) {
+	for (auto& c: controls)
+		if (c->id == id)
+			c->expand(expanded);
+}
+
 void Panel::set_visible(const string& id, bool visible) {
 	for (auto& c: controls)
 		if (c->id == id)
@@ -342,6 +352,8 @@ void Panel::add_control(const string &type, const string &_title, int x, int y, 
 		add_child(new DrawingArea(id), x, y);
 	else if (type == "Edit")
 		add_child(new Edit(id, title), x, y);
+	else if (type == "Expander")
+		add_child(new Expander(id, title), x, y);
 	else if (type == "FileSelector")
 		add_child(new FileSelector(id), x, y);
 	else if (type == "Grid")
@@ -362,6 +374,10 @@ void Panel::add_control(const string &type, const string &_title, int x, int y, 
 		add_child(new Overlay(id), x, y);
 	else if (type == "RadioButton")
 		add_child(new RadioButton(id, title), x, y);
+	else if (type == "Separator")
+		add_child(new Separator(id), x, y);
+	else if (type == "Slider")
+		add_child(new Slider(id), x, y);
 	else if (type == "SpinButton")
 		add_child(new SpinButton(id, title._float()), x, y);
 	else if (type == "TabControl")
@@ -547,15 +563,17 @@ void Panel::from_resource(const string& id) {
 		msg_error("resource id not found: " + id);
 }
 
-void Panel::open_dialog(shared<Dialog> dialog) {
+base::future<void> Panel::open_dialog(shared<Dialog> dialog) {
 	dialog->owner = this;
 	if (auto w = get_window()) {
 		w->dialogs.add(dialog.get());
 	}
 	request_redraw();
+	return dialog->promise.get_future();
 }
 
 void Panel::close_dialog(Dialog* dialog) {
+	dialog->promise();
 	for (int i=0; i<controls.num; i++)
 		if (controls[i] == (Control*)dialog) {
 			controls.erase(i);

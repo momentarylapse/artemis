@@ -388,6 +388,7 @@ add_executable(artemis
 	src/lib/xhui/controls/Control.cpp
 	src/lib/xhui/controls/DrawingArea.cpp
 	src/lib/xhui/controls/Edit.cpp
+	src/lib/xhui/controls/Expander.cpp
 	src/lib/xhui/controls/FileSelector.cpp
 	src/lib/xhui/controls/Grid.cpp
 	src/lib/xhui/controls/Group.cpp
@@ -399,6 +400,8 @@ add_executable(artemis
 	src/lib/xhui/controls/MultilineEdit.cpp
 	src/lib/xhui/controls/Overlay.cpp
 	src/lib/xhui/controls/RadioButton.cpp
+	src/lib/xhui/controls/Separator.cpp
+	src/lib/xhui/controls/Slider.cpp
 	src/lib/xhui/controls/SpinButton.cpp
 	src/lib/xhui/controls/TabControl.cpp
 	src/lib/xhui/controls/ToggleButton.cpp
