@@ -1,4 +1,7 @@
 #include "Viewport.h"
+
+#include <lib/os/msg.h>
+
 #include "../Painter.h"
 #include "../Theme.h"
 
@@ -45,8 +48,11 @@ void Viewport::on_mouse_wheel(const vec2& d) {
 
 
 void Viewport::_draw(Painter *p) {
-	auto clip0 = p->clip();
 	if (child and child->visible) {
+		// hack :P
+		content_size = child->get_effective_min_size();
+
+		auto clip0 = p->clip();
 		p->set_clip(_area);
 		child->_draw(p);
 		p->set_clip(clip0);
