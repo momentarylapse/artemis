@@ -69,6 +69,7 @@ public:
 		return _area;
 	}
 
+	float ui_scale;
 	rect _area;
 	rect native_area;
 	rect native_area_window;
@@ -111,8 +112,8 @@ struct TextCache {
 	font::TextDimensions dimensions;
 };
 
-TextCache& get_text_cache(Context* context, const string& text, font::Face* face, float font_size);
+TextCache& get_text_cache(Context* context, const string& text, font::Face* face, float font_size, float ui_scale);
 void iterate_text_caches();
-font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face* face, float font_size);
+font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face* face, float font_size, float ui_scale);
 
 }

@@ -14,7 +14,7 @@ void Painter::set_color(const color &c) {
 	_color = c;
 }
 
-font::Face* pick_font(const string &font, float size, bool bold, bool italic) {
+font::Face* pick_font(const string &font, bool bold, bool italic) {
 	font::Face* face;
 	if (bold)
 		face = default_font_bold;
@@ -26,7 +26,6 @@ font::Face* pick_font(const string &font, float size, bool bold, bool italic) {
 		else if (default_font_mono_regular)
 			face = default_font_mono_regular;
 	}
-	face->set_size(size * ui_scale);
 	return face;
 }
 
@@ -35,7 +34,8 @@ void Painter::set_font(const string &font, float size, bool bold, bool italic) {
 		font_name = font;
 	if (font_size > 0)
 		font_size = size;
-	face = pick_font(font_name, font_size, bold, italic);
+	face = pick_font(font_name, bold, italic);
+	face->set_size(font_size * ui_scale);
 }
 
 void Painter::set_font_size(float size) {
@@ -44,7 +44,7 @@ void Painter::set_font_size(float size) {
 }
 
 vec2 Painter::get_str_size(const string &str) {
-	auto dim = get_cached_text_dimensions(str, face, font_size);
+	auto dim = get_cached_text_dimensions(str, face, font_size, ui_scale);
 	return {dim.bounding_width / ui_scale, dim.inner_height() / ui_scale};
 }
 
@@ -82,7 +82,7 @@ void Painter::draw_circle(const vec2& p, float radius) {
 
 Array<TextCache> text_caches;
 
-TextCache& get_text_cache(Context* context, const string& text, font::Face* face, float font_size) {
+TextCache& get_text_cache(Context* context, const string& text, font::Face* face, float font_size, float ui_scale) {
 	for (auto& tc: text_caches)
 		if (tc.text == text and tc.face == face and tc.font_size == font_size) {
 			tc.age = 0;
@@ -111,10 +111,13 @@ TextCache& get_text_cache(Context* context, const string& text, font::Face* face
 	tc->texture->write(im);
 	tc->texture->set_options("minfilter=nearest");
 
+	face->set_size(font_size * ui_scale);
 	tc->dimensions = face->get_text_dimensions(text);
 
+#if HAS_LIB_VULKAN
 	tc->dset->set_texture(0, tc->texture);
 	tc->dset->update();
+#endif
 	return *tc;
 }
 
@@ -138,7 +141,7 @@ void iterate_text_caches() {
 }
 
 
-font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face* face, float font_size) {
+font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face* face, float font_size, float ui_scale) {
 	// already in cache?
 	for (auto& tc: text_dimensions_caches)
 		if (tc.text == text and tc.face == face and tc.font_size == font_size) {
@@ -159,6 +162,7 @@ font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face*
 	tc->font_size = font_size;
 	tc->face = face;
 	tc->age = 0;
+	face->set_size(font_size * ui_scale);
 	tc->dimensions = face->get_text_dimensions(text);
 	return tc->dimensions;
 }

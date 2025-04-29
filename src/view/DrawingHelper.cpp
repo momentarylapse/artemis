@@ -17,6 +17,7 @@
 #include "../multiview/SingleData.h"
 
 
+static float ui_scale = 1.0f;
 
 
 Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
@@ -39,6 +40,8 @@ Material* create_material(ResourceManager* resource_manager, const color& albedo
 DrawingHelper::DrawingHelper(xhui::Context* ctx, ResourceManager* rm) {
 	context = ctx;
 	resource_manager = rm;
+
+	ui_scale = context->window->ui_scale;
 
 	/*light = new Light(White, -1, -1);
 	light->owner = new Entity;
@@ -113,9 +116,9 @@ void main() {
 	dset->set_texture(0, ctx->tex_white);
 	dset->update();
 
-	pipeline = new vulkan::GraphicsPipeline(shader, context->render_pass, 0, "triangles", context->vb);
+	pipeline = new vulkan::GraphicsPipeline(shader, context->render_pass, 0, PrimitiveTopology::TRIANGLES, context->vb);
 	//pipeline->set_z(false, false);
-	pipeline->set_culling(vulkan::CullMode::NONE);
+	pipeline->set_culling(CullMode::NONE);
 	pipeline->rebuild();
 #endif
 }
@@ -141,7 +144,7 @@ static void add_vb_line(Array<Vertex1>& vertices, const vec3& a, const vec3& b, 
 	vec2 ba_pixel = vec2((b.x - a.x) * w, (b.y - a.y) * h);
 	vec2 dir_pixel = ba_pixel.normalized();
 	vec2 o_pixel = dir_pixel.ortho();
-	vec3 r = vec3(o_pixel.x/ w, o_pixel.y/ h, 0) * (line_width / 2) * xhui::ui_scale;
+	vec3 r = vec3(o_pixel.x/ w, o_pixel.y/ h, 0) * (line_width / 2) * ui_scale;
 	vec3 a0 = a - r;
 	vec3 a1 = a + r;
 	vec3 b0 = b - r;
@@ -213,15 +216,9 @@ void DrawingHelper::clear(const RenderParams& params, const color& c) {
 }
 
 void DrawingHelper::draw_mesh(const RenderParams& params, RenderViewData& rvd, const mat4& matrix, VertexBuffer* vertex_buffer, Material* material, int pass_no, const string& vertex_module) {
-#ifdef USING_VULKAN
-	auto cb = context->current_command_buffer();
 	auto shader = rvd.get_shader(material, 0, vertex_module, "");
 	auto& rd = rvd.start(params, matrix, shader, *material, pass_no, PrimitiveTopology::TRIANGLES, vertex_buffer);
-	rd.apply(params);
-	cb->draw(vertex_buffer);
-#else
-	msg_error("TODO draw mesh");
-#endif
+	rd.draw_triangles(params, vertex_buffer);
 }
 
 void DrawingHelper::draw_boxed_str(Painter* p, const vec2& _pos, const string& str, int align) {
@@ -276,11 +273,12 @@ TextLayout TextLayout::from_format_string(const string& s) {
 	vec2 pos = vec2(0, 0);
 	TextLayout l;
 	auto add = [&] (const string& text, bool bold) {
-		auto face = xhui::pick_font(xhui::Theme::_default.font_name, font_size, bold, false);
+		auto face = xhui::pick_font(xhui::Theme::_default.font_name, bold, false);
+		face->set_size(font_size * ui_scale);
 		l.parts.add({text, font_size, base::None, bold, false, pos});
 
 		const auto dims = face->get_text_dimensions(text);
-		vec2 size = {dims.bounding_width / xhui::ui_scale, dims.inner_height() / xhui::ui_scale};
+		vec2 size = {dims.bounding_width / ui_scale, dims.inner_height() / ui_scale};
 		l.parts.back().box = {pos.x, pos.x + size.x, pos.y, pos.y + size.y};
 		pos += vec2(size.x, 0);
 	};

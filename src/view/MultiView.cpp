@@ -160,7 +160,7 @@ MultiView::~MultiView() = default;
 
 void MultiView::set_area(const rect& _area) {
 	area = _area;
-	area_native = {_area.p00() * xhui::ui_scale, _area.p11() * xhui::ui_scale};
+	area_native = {_area.p00() * session->win->ui_scale, _area.p11() * session->win->ui_scale};
 	window.area = area;
 	window.area_native = area_native;
 }
@@ -187,7 +187,7 @@ void MultiView::prepare(const RenderParams& params) {
 		default_light->owner->ang = view_port.ang;
 		lights = {default_light};
 		view_port.scene_view->lights = lights;
-		view_port.scene_view->shadow_index = -1;
+		view_port.scene_view->shadow_indices.clear();
 		//	if (l->allow_shadow)
 		//		scene_view.shadow_index = scene_view.lights.num;
 	}
