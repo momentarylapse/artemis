@@ -13,6 +13,7 @@
 #include <lib/xhui/dialogs/QuestionDialog.h>
 #include <lib/xhui/dialogs/ColorSelectionDialog.h>
 #include <data/Data.h>
+#include <lib/xhui/controls/DrawingArea.h>
 #include <renderer/base.h>
 #include <renderer/path/RenderPath.h>
 #include <sys/stat.h>
@@ -222,6 +223,15 @@ Dialog x x padding=0
 		engine.resource_manager = session->resource_manager;
 
 		session->promise_started(session);
+	});
+	event_xp(id, xhui::event_id::JustBeforeDraw, [this] (Painter* p) {
+		if (!session->cur_mode or !session->cur_mode->multi_view)
+			return;
+		if (auto da = static_cast<xhui::DrawingArea*>(get_control("area")))
+			da->for_painter_do(static_cast<xhui::Painter*>(p), [this] (Painter* p) {
+				session->cur_mode->multi_view->set_area(p->area());
+				renderer->prepare(p);
+			});
 	});
 	event_xp("area", xhui::event_id::Draw, [this] (Painter* p) {
 		if (!session->cur_mode or !session->cur_mode->multi_view)

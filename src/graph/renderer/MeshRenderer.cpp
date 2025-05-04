@@ -47,6 +47,14 @@ void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 	if (!vb)
 		return;
 
+	{
+		// FIXME workaround for mesh rendering bug...
+		Array<vec3> points;
+		points.add({0,0,0});
+		points.add({0,0,0});
+		session->drawing_helper->draw_lines(points, false);
+	}
+
 	session->drawing_helper->draw_mesh(params, win->rvd, mat4::ID, vb, material.get());
 }
 

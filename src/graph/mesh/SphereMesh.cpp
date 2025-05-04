@@ -8,7 +8,9 @@
 namespace artemis::graph {
 
 void SphereMesh::process() {
-	out(GeometrySphere(v_0, radius(), samples()));
+	GeometrySphere geo(v_0, radius(), samples());
+	geo.smoothen();
+	out(geo);
 }
 
 } // graph

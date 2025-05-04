@@ -192,6 +192,8 @@ void MultiView::prepare(const RenderParams& params) {
 		//		scene_view.shadow_index = scene_view.lights.num;
 	}
 
+	view_port.scene_view->choose_shadows();
+
 	session->cur_mode->on_prepare_scene(params);
 	//Renderer::prepare(params);
 }

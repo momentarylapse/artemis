@@ -175,6 +175,7 @@ Painter::Painter(Window *w) {
 	glfwMakeContextCurrent(w->window);
 	if (!_nix_inited)
 		init_nix();
+
 	Painter::set_color(Theme::_default.text);
 	Painter::set_font(Theme::_default.font_name /*"CAC Champagne"*/, Theme::_default.font_size, false, false);
 
@@ -192,6 +193,7 @@ Painter::Painter(Window *w) {
 	native_area_window = native_area;
 	_clip = _area;
 
+	window->handle_event_p(window->id, event_id::JustBeforeDraw, this);
 
 
 	nix::start_frame_glfw(_nix_context.get(), window->window);

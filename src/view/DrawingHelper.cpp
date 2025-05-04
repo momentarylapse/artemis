@@ -28,7 +28,7 @@ Material* create_material(ResourceManager* resource_manager, const color& albedo
 	material->emission = emission;
 	material->textures = {tex_white};
 	if (transparent) {
-		material->pass0.cull_mode = 0;
+		material->pass0.cull_mode = CullMode::NONE;
 		material->pass0.mode = TransparencyMode::FUNCTIONS;
 		material->pass0.source = Alpha::SOURCE_ALPHA;
 		material->pass0.destination = Alpha::SOURCE_INV_ALPHA;
@@ -216,7 +216,7 @@ void DrawingHelper::clear(const RenderParams& params, const color& c) {
 }
 
 void DrawingHelper::draw_mesh(const RenderParams& params, RenderViewData& rvd, const mat4& matrix, VertexBuffer* vertex_buffer, Material* material, int pass_no, const string& vertex_module) {
-	auto shader = rvd.get_shader(material, 0, vertex_module, "");
+	auto shader = rvd.get_shader(material, pass_no, vertex_module, "");
 	auto& rd = rvd.start(params, matrix, shader, *material, pass_no, PrimitiveTopology::TRIANGLES, vertex_buffer);
 	rd.draw_triangles(params, vertex_buffer);
 }

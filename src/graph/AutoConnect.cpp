@@ -40,7 +40,7 @@ void auto_connect(Graph* g, const dataflow::CableInfo& c) {
 	} else if (source->class_->name == "VectorField" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"VectorFieldRenderer"});
 	} else if (source->class_->name == "vec3[]" and sink->class_->name == "RenderData") {
-		connect_through(g, c, {"PointsRenderer"});
+		connect_through(g, c, {"PointListRenderer"});
 	} else if (source->class_->name == "PlotData" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"Plotter"});
 	} else if (source->class_->name == "f32[]" and sink->class_->name == "RenderData") {

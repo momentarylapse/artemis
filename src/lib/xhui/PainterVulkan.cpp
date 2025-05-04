@@ -67,6 +67,9 @@ Painter::Painter(Window *w) {
 	native_area = {0, (float)context->swap_chain->width, 0, (float)context->swap_chain->height};
 	native_area_window = native_area;
 	_clip = _area;
+
+	window->handle_event_p(window->id, event_id::JustBeforeDraw, this);
+
 	cb->set_viewport(native_area);
 	cb->begin_render_pass(context->render_pass, fb);
 	cb->set_scissor(native_area);

@@ -7,7 +7,7 @@ func main()
 	teapot.set("radius", 10.0)
 
 	var renderer = g.add_node("MeshRenderer", [300,300])
-	renderer.set("emission", dyn([1,0,0,1]))
+	#renderer.set("emission", dyn([1,0,0,1]))
 
 	var canvas = g.add_node("Canvas", [300,500])
 
