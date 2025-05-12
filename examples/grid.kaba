@@ -16,9 +16,14 @@ func main()
 	var d = g.add_node("PointListRenderer", [500,400])
 	d.set("radius", 0.2)
 	d.set("color", dyn([1,1,1,1]))
+	
+	var canvas = g.add_node("Canvas", [300, 600])
 
 	g.connect(a, 0, b, 0)
 	g.connect(a, 1, c, 0)
 	g.connect(a, 2, d, 0)
+	g.connect(b, 0, canvas, 0)
+	g.connect(c, 0, canvas, 0)
+	g.connect(d, 0, canvas, 0)
 
 
