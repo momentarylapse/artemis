@@ -7,13 +7,15 @@
 
 #include "Hover.h"
 #include <y/renderer/Renderer.h>
-#include <y/renderer/world/geometry/SceneView.h>
-#include <y/renderer/world/geometry/RenderViewData.h>
+#include <y/renderer/scene/SceneView.h>
+#include <y/renderer/scene/RenderViewData.h>
 #include <lib/math/Box.h>
 #include <lib/math/vec3.h>
 #include <lib/math/quaternion.h>
 #include <lib/pattern/Observable.h>
 #include <functional>
+
+#include "renderer/scene/SceneRenderer.h"
 
 class Camera;
 class Painter;
@@ -30,6 +32,7 @@ namespace multiview {
 class MultiViewWindow {
 public:
 	explicit MultiViewWindow(MultiView* mv);
+	vec3 view_pos() const;
 	vec3 project(const vec3& v) const;
 	vec3 unproject(const vec3& v, const vec3& zref) const;
 	vec3 direction() const;
@@ -49,7 +52,7 @@ public:
 	mat4 to_pixels;
 	mat4 view;
 	mat4 projection;
-	RenderViewData rvd;
+	owned<SceneRenderer> scene_renderer;
 };
 
 class MultiView : public obs::Node<Renderer> {

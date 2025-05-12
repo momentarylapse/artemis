@@ -17,7 +17,7 @@ void GridRenderer::process() {
 }
 
 
-void GridRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
+void GridRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	if (auto r = regular.value()) {
 		Array<vec3> points;
 		for (int i=0; i<=r->nx; i++)

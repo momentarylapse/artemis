@@ -1,10 +1,6 @@
 #include "ListView.h"
-
-#include <lib/os/msg.h>
-
 #include "Grid.h"
 #include "../Painter.h"
-#include "../draw/font.h"
 #include "../Theme.h"
 #include "../../base/iter.h"
 
@@ -43,10 +39,14 @@ ListView::ListView(const string &_id, const string &t) :
 void ListView::on_left_button_down(const vec2& m) {
 	owner->get_window()->start_pre_drag(this);
 	hover_row = get_hover(m);
-	if (selection_mode != SelectionMode::Single)
-		selected = {};
 	if (hover_row >= 0)
-		selected = {hover_row};
+		_update_selection({hover_row});
+	else if (selection_mode != SelectionMode::Single)
+		_update_selection({});
+}
+
+void ListView::_update_selection(const Array<int>& sel) {
+	selected = sel;
 
 	if (column_factories[0].f_select)
 		for (const auto& [i,r]: enumerate(cells))
@@ -61,7 +61,8 @@ void ListView::on_click_row(int row) {
 }
 
 void ListView::on_double_click_row(int row) {
-	emit_event(event_id::Activate, true);
+	if (!emit_event(event_id::Activate, true))
+		emit_event(event_id::ActivateDialogDefault, false);
 }
 
 void ListView::on_left_button_up(const vec2&) {
@@ -108,6 +109,21 @@ void ListView::on_mouse_move(const vec2& m, const vec2& d) {
 void ListView::on_mouse_wheel(const vec2& d) {
 	viewport.on_mouse_wheel(d);
 }
+
+void ListView::on_key_down(int key) {
+	if (key == KEY_RETURN) {
+		if (selected.num > 0)
+			if (!emit_event(event_id::Activate, true))
+				emit_event(event_id::ActivateDialogDefault, false);
+	} else if (key == KEY_DOWN) {
+		if (selected.num > 0)
+			_update_selection({min(selected[0] + 1, cells.num - 1)});
+	} else if (key == KEY_UP) {
+		if (selected.num > 0)
+			_update_selection({max(selected[0] - 1, 0)});
+	}
+}
+
 
 
 int ListView::get_hover(const vec2& m) const {

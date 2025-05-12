@@ -17,7 +17,7 @@ class ModeDefault : public Mode {
 public:
 	explicit ModeDefault(Session* session);
 
-	void on_draw_win(const RenderParams& params, MultiViewWindow* win) override;
+	void on_draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) override;
 	void on_draw_post(Painter*) override;
 	void on_key_down(int key) override;
 

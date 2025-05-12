@@ -3,10 +3,10 @@
 //
 
 #include "PointListRenderer.h"
-
 #include <Session.h>
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
+#include <y/renderer/base.h>
 
 namespace artemis::graph {
 
@@ -20,6 +20,8 @@ base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
 }
 
 PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRenderer") {
+	material = new Material(s->resource_manager);
+	material->textures.add(tex_white);
 }
 
 void PointListRenderer::process() {
@@ -30,9 +32,7 @@ void PointListRenderer::process() {
 }
 
 
-void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
-	if (!material)
-		material = new Material(session->resource_manager);
+void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	if (!vertex_buffer)
 		vertex_buffer = new VertexBuffer("3f,3f,2f");
 
@@ -50,7 +50,7 @@ void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* wi
 	if (auto points = in_points.value()) {
 		//session->drawing_helper->draw_data_points()
 		for (const auto& p: *points)
-			session->drawing_helper->draw_mesh(params, win->rvd, mat4::translation(p), vertex_buffer.get(), material.get());
+			session->drawing_helper->draw_mesh(params, rvd, mat4::translation(p), vertex_buffer.get(), material.get());
 	}
 }
 

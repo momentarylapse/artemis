@@ -7,6 +7,7 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 #include <y/graphics-impl.h>
+#include <y/renderer/base.h>
 
 namespace artemis::graph {
 
@@ -19,30 +20,31 @@ base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
 	return b;
 }
 
-	MeshRenderer::MeshRenderer(Session* s) : RendererNode(s, "MeshRenderer") {
-		material = new Material(s->resource_manager);
-	}
+MeshRenderer::MeshRenderer(Session* s) : RendererNode(s, "MeshRenderer") {
+	material = new Material(s->resource_manager);
+	material->textures.add(tex_white);
+}
 
-	MeshRenderer::~MeshRenderer() = default;
+MeshRenderer::~MeshRenderer() = default;
 
-	void MeshRenderer::process() {
-		auto mesh = in_mesh.value();
-		if (!mesh)
-			return;
+void MeshRenderer::process() {
+	auto mesh = in_mesh.value();
+	if (!mesh)
+		return;
 
-		if (!vertex_buffer)
-			vertex_buffer = new VertexBuffer("3f,3f,2f");
-		mesh->build(vertex_buffer.get());
+	if (!vertex_buffer)
+		vertex_buffer = new VertexBuffer("3f,3f,2f");
+	mesh->build(vertex_buffer.get());
 
-		material->roughness = roughness();
-		material->metal = metal();
-		material->albedo = albedo();
-		material->emission = emission();
+	material->roughness = roughness();
+	material->metal = metal();
+	material->albedo = albedo();
+	material->emission = emission();
 
-		out_draw({mesh_bounding_box(*mesh)});
-	}
+	out_draw({mesh_bounding_box(*mesh)});
+}
 
-void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
+void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	auto vb = vertex_buffer.get();
 	if (!vb)
 		return;
@@ -55,7 +57,7 @@ void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
 		session->drawing_helper->draw_lines(points, false);
 	}
 
-	session->drawing_helper->draw_mesh(params, win->rvd, mat4::ID, vb, material.get());
+	session->drawing_helper->draw_mesh(params, rvd, mat4::ID, vb, material.get());
 }
 
 

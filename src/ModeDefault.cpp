@@ -65,7 +65,7 @@ artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
 	return nullptr;
 }
 
-void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) {
+void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	if (auto c = get_canvas(graph)) {
 		if (c->background().a < 0)
 			c->background.set(xhui::Theme::_default.background_low);
@@ -78,7 +78,7 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win) 
 		if (n->flags & dataflow::NodeFlags::Renderer) {
 			auto r = static_cast<artemis::graph::RendererNode*>(n);
 			if (r->active())
-				r->draw_win(params, win);
+				r->draw_win(params, win, rvd);
 		}
 }
 

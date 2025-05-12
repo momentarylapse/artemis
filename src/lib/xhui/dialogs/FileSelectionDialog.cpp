@@ -23,7 +23,7 @@ namespace xhui {
  *			Button cancel
  *			Button ok
  */
-FileSelectionDialog::FileSelectionDialog(Panel* parent, const string& title, const Path& dir, const Array<string>& params) : Dialog(title, 800, 600, parent) {
+FileSelectionDialog::FileSelectionDialog(Panel* parent, const string& title, const Path& dir, const Array<string>& params) : Dialog(title, 800, 600, parent, DialogFlags::CloseByEscape | DialogFlags::CloseByClickOutside) {
 
 	saving = sa_contains(params, "save");
 
@@ -38,7 +38,7 @@ Dialog xxx ''
 		Grid ? ''
 			Label ? '' expandx
 			Button cancel 'Cancel' width=70
-			Button ok 'Ok' width=70 disabled
+			Button ok 'Save' width=70 disabled default
 )foodelim");
 	} else {
 		from_source(R"foodelim(
@@ -49,7 +49,7 @@ Dialog xxx ''
 		Grid ? ''
 			Label ? '' expandx
 			Button cancel 'Cancel' width=70
-			Button ok 'Ok' width=70 disabled
+			Button ok 'Open' width=70 disabled default
 )foodelim");
 	}
 

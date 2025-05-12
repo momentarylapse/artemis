@@ -17,7 +17,7 @@ void VectorFieldRenderer::process() {
 }
 
 
-void VectorFieldRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
+void VectorFieldRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	auto f = in_field.value();
 	if (!f)
 		return;

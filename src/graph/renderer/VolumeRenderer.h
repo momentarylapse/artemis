@@ -19,7 +19,7 @@ public:
 
 	void process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
+	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) override;
 
 	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 

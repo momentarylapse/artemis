@@ -11,6 +11,7 @@
 #include <lib/math/Box.h>
 #include <y/graphics-fwd.h>
 
+struct RenderViewData;
 class MultiViewWindow;
 struct RenderParams;
 class Session;
@@ -29,7 +30,7 @@ public:
 	explicit RendererNode(Session* s, const string& name);
 
 	// TODO send RenderData to Canvas instead!
-	virtual void draw_win(const RenderParams& params, MultiViewWindow* win) = 0;
+	virtual void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) = 0;
 
 	dataflow::Setting<bool> active{this, "active", true};
 

@@ -19,7 +19,7 @@ void VolumeRenderer::process() {
 }
 
 
-void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
+void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	auto f = in_field.value();
 	if (!f)
 		return;
@@ -35,7 +35,7 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) 
 			for (int j=0; j<f->grid.ny; j++)
 				for (int k=0; k<f->grid.nz; k++) {
 					float v = f->value32(i, j, k);
-					session->drawing_helper->draw_mesh(params, win->rvd,
+					session->drawing_helper->draw_mesh(params, rvd,
 						mat4::translation(f->grid.cell_center(i, j, k)) * mat4::scale(v, v, v),
 						vertex_buffer.get(),
 						session->drawing_helper->material_selection);
@@ -45,7 +45,7 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) 
 			for (int j=0; j<=f->grid.ny; j++)
 				for (int k=0; k<=f->grid.nz; k++) {
 					float v = f->value32(i, j, k);
-					session->drawing_helper->draw_mesh(params, win->rvd,
+					session->drawing_helper->draw_mesh(params, rvd,
 						mat4::translation(f->grid.vertex(i, j, k)) * mat4::scale(v, v, v),
 						vertex_buffer.get(),
 						session->drawing_helper->material_selection);

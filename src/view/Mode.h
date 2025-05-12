@@ -9,6 +9,7 @@
 #include <lib/math/vec2.h>
 #include <lib/pattern/Observable.h>
 
+struct RenderViewData;
 struct SceneView;
 class Renderer;
 struct RenderParams;
@@ -45,7 +46,8 @@ public:
 	virtual void on_left_button_up(const vec2&) {}
 	virtual void on_key_down(int key) {}
 	virtual void on_prepare_scene(const RenderParams& params) {}
-	virtual void on_draw_win(const RenderParams& params, MultiViewWindow* win) {}
+	virtual void on_draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {}
+	virtual void on_draw_shadow(const RenderParams& params, RenderViewData& rvd) {}
 	virtual void on_draw_post(Painter*) {}
 	virtual Mode* get_parent() { return nullptr; }
 

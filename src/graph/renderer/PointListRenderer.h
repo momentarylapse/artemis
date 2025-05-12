@@ -21,7 +21,7 @@ public:
 
 	void process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win) override;
+	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) override;
 
 	dataflow::Setting<float> radius{this, "radius", 0.2f, "range=0:99:0.1"};
 	dataflow::Setting<color> _color{this, "color", White};

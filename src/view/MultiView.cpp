@@ -18,9 +18,11 @@
 #include <y/y/Entity.h>
 #include <y/graphics-impl.h>
 
+#include "renderer/path/RenderPath.h"
+
 MultiViewWindow::MultiViewWindow(MultiView* _multi_view) {
 	multi_view = _multi_view;
-	rvd.scene_view = multi_view->view_port.scene_view.get();
+	scene_renderer = new SceneRenderer(RenderPathType::Forward, *multi_view->view_port.scene_view);
 }
 
 vec3 MultiViewWindow::project(const vec3& v) const {
@@ -107,20 +109,32 @@ mat3 MultiViewWindow::active_grid_frame() const {
 	return {right, up, dir};
 }
 
+vec3 MultiViewWindow::view_pos() const {
+	return multi_view->view_port.pos - local_ang * vec3::EZ * multi_view->view_port.radius;
+}
+
+
 mat3 MultiViewWindow::edit_frame() const {
 	return active_grid_frame();
 }
 
 void MultiViewWindow::draw(const RenderParams& params) {
-	rvd.scene_view->cam->update_matrices(params.desired_aspect_ratio);
-	rvd.set_projection_matrix(rvd.scene_view->cam->m_projection);
-	rvd.set_view_matrix(rvd.scene_view->cam->m_view);
-	rvd.update_lights();
+	projection = multi_view->view_port.cam->projection_matrix(area.width() / area.height());
 
-	rvd.begin_draw();
+	scene_renderer->set_view(params, view_pos(), local_ang, projection);
+	view = scene_renderer->rvd.ubo.v;
+	scene_renderer->prepare(params);
+
+	// 3d -> pixel
+	to_pixels = mat4::translation({area.x1, area.y1, 0})
+		* mat4::scale(area.width()/2, area.height()/2, 1)
+		* mat4::translation({1.0f, 1.0f, 0})
+		* projection * view;
+
+	scene_renderer->draw(params);
 	multi_view->session->drawing_helper->set_window(this);
-
-	multi_view->session->cur_mode->on_draw_win(params, this);
+	// TODO emitter...
+	multi_view->session->cur_mode->on_draw_win(params, this, scene_renderer->rvd);
 }
 
 
@@ -149,6 +163,7 @@ MultiView::MultiView(Session* s) : obs::Node<Renderer>("multiview"),
 	default_light->owner->ang = quaternion::ID;
 	default_light->enabled = true;
 	default_light->light.harshness = 0.5f;
+	default_light->allow_shadow = true;
 	lights.add(default_light);
 
 	view_port.out_changed >> create_sink([this] {
@@ -171,11 +186,8 @@ void MultiView::prepare(const RenderParams& params) {
 	view_port.cam->owner->pos = view_port.pos - view_port.cam->owner->ang * vec3::EZ * view_port.radius;
 	view_port.cam->min_depth = view_port.radius * 0.01f;
 	view_port.cam->max_depth = view_port.radius * 300;
-	view_port.cam->update_matrices(area.width() / area.height());
 
 	window.local_ang = view_port.ang;
-	window.view = view_port.cam->m_view;
-	window.projection = view_port.cam->m_projection;
 
 	// 3d -> pixel
 	window.to_pixels = mat4::translation({area.x1, area.y1, 0})
@@ -187,7 +199,6 @@ void MultiView::prepare(const RenderParams& params) {
 		default_light->owner->ang = view_port.ang;
 		lights = {default_light};
 		view_port.scene_view->lights = lights;
-		view_port.scene_view->shadow_indices.clear();
 		//	if (l->allow_shadow)
 		//		scene_view.shadow_index = scene_view.lights.num;
 	}

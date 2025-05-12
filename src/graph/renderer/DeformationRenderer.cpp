@@ -16,7 +16,7 @@ void DeformationRenderer::process() {
 }
 
 
-void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* win) {
+void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 
 	auto d = in_diff.value();
 	if (!d)
@@ -36,7 +36,7 @@ void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 			for (int j=0; j<d->grid.ny; j++)
 				for (int k=0; k<d->grid.nz; k++) {
 					vec3 pos = d->grid.cell_center(i, j, k) + d->value32(i, j, k) * s;
-					session->drawing_helper->draw_mesh(params, win->rvd,
+					session->drawing_helper->draw_mesh(params, rvd,
 						mat4::translation(pos) * mat4::scale(r, r, r),
 						vertex_buffer.get(),
 						session->drawing_helper->material_selection);
@@ -46,7 +46,7 @@ void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 			for (int j=0; j<=d->grid.ny; j++)
 				for (int k=0; k<=d->grid.nz; k++) {
 					vec3 pos = d->grid.vertex(i, j, k) + d->value32(i, j, k) * s;
-					session->drawing_helper->draw_mesh(params, win->rvd,
+					session->drawing_helper->draw_mesh(params, rvd,
 						mat4::translation(pos) * mat4::scale(r, r, r),
 						vertex_buffer.get(),
 						session->drawing_helper->material_selection);
