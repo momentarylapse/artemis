@@ -62,6 +62,15 @@ color any_to_color(const Any& a) {
 	return Black;
 }
 
+Any color_to_any(const color& c) {
+	Any r;
+	r.add(c.r);
+	r.add(c.g);
+	r.add(c.b);
+	r.add(c.a);
+	return r;
+}
+
 vec3 any_to_vec3(const Any& a) {
 	const auto list = any_to_float_list(a);
 	if (list.num >= 3)
@@ -69,11 +78,26 @@ vec3 any_to_vec3(const Any& a) {
 	return vec3::ZERO;
 }
 
+Any vec3_to_any(const vec3& v) {
+	Any r;
+	r.add(v.x);
+	r.add(v.y);
+	r.add(v.z);
+	return r;
+}
+
 vec2 any_to_vec2(const Any& a) {
 	const auto list = any_to_float_list(a);
 	if (list.num >= 2)
 		return {list[0], list[1]};
 	return vec2::ZERO;
+}
+
+Any vec2_to_any(const vec2& v) {
+	Any r;
+	r.add(v.x);
+	r.add(v.y);
+	return r;
 }
 
 void SettingBase::set_generic(const Any& value) {
@@ -92,6 +116,24 @@ void SettingBase::set_generic(const Any& value) {
 	} else if (class_ == kaba::TypeVec2) {
 		as<vec2>()->set(any_to_vec2(value));
 	}
+}
+
+Any SettingBase::get_generic() const {
+	if (class_ == kaba::TypeFloat32)
+		return (*as_const<float>())();
+	if (class_ == kaba::TypeInt32)
+		return (*as_const<int>())();
+	if (class_ == kaba::TypeString)
+		return (*as_const<string>())();
+	if (class_ == kaba::TypeBool)
+		return (*as_const<bool>())();
+	if (class_ == kaba::TypeColor)
+		return color_to_any((*as_const<color>())());
+	if (class_ == kaba::TypeVec3)
+		return vec3_to_any((*as_const<vec3>())());
+	if (class_ == kaba::TypeVec2)
+		return vec2_to_any((*as_const<vec2>())());
+	return {};
 }
 
 } // graph

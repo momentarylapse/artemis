@@ -70,7 +70,7 @@ Dialog x ''
 
 GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
 	session = s;
-	graph = s->graph.get();
+	graph = s->graph;
 
 	from_source(R"foodelim(
 Dialog x ''

@@ -11,6 +11,8 @@
 #include <lib/os/msg.h>
 #include <y/plugins/PluginManager.h>
 
+#include "storage/Storage.h"
+
 string AppVersion = "0.0.1";
 string AppName = "Artemis";
 
@@ -53,7 +55,9 @@ void start_session_load_file(Session* parent, const Path& filename) {
 		s->set_mode(new ModeDefault(s));
 
 		string ext = filename.extension();
-		if (ext == "kaba") {
+		if (ext == "artemis") {
+			s->storage->load(filename, s->data.get());
+		} else if (ext == "kaba") {
 			auto m = kaba::default_context->load_module(filename.absolute());
 			typedef void (*f_p)();
 			if (auto f = (f_p)m->match_function("main", "void", {})) {

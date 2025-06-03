@@ -48,6 +48,7 @@ public:
 	virtual xhui::Panel* create_panel();
 
 	void set(const string& key, const Any& value);
+	Any get(const string& key) const;
 
 	string name;
 	vec2 pos;

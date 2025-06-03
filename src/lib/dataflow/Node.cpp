@@ -5,6 +5,7 @@
 #include "Node.h"
 #include "Setting.h"
 #include <view/DefaultNodePanel.h>
+#include <lib/any/any.h>
 #include <lib/os/msg.h>
 
 #include "Port.h"
@@ -24,7 +25,7 @@ Node::Node(const string& name) {
 	pos = vec2(0, 0);
 }
 
-void Node::set(const string& key, const Any& value) {;
+void Node::set(const string& key, const Any& value) {
 	for (auto& s: settings)
 		if (s->name == key) {
 			s->set_generic(value);
@@ -33,6 +34,16 @@ void Node::set(const string& key, const Any& value) {;
 
 	msg_error(format("unknown setting '%s' of Node '%s'", key, name));
 }
+
+Any Node::get(const string& key) const {
+	for (auto& s: settings)
+		if (s->name == key)
+			return s->get_generic();
+
+	msg_error(format("unknown setting '%s' of Node '%s'", key, name));
+	return {};
+}
+
 
 bool Node::has_necessary_inputs() const {
 	for (auto p: in_ports)

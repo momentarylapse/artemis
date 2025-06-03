@@ -58,6 +58,7 @@ enum class MultiViewType {
 
 namespace artemis::graph {
 	class Graph;
+	class DataGraph;
 }
 
 
@@ -116,7 +117,8 @@ public:
 
 	base::promise<Session*> promise_started;
 
-	owned<artemis::graph::Graph> graph;
+	owned<artemis::graph::DataGraph> data;
+	artemis::graph::Graph* graph;
 };
 
 Session *create_session();

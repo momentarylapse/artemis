@@ -10,6 +10,7 @@
 
 namespace artemis::graph {
 	class Graph;
+	class DataGraph;
 }
 
 
@@ -19,8 +20,9 @@ public:
 
 	void on_draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) override;
 	void on_draw_post(Painter*) override;
-	void on_key_down(int key) override;
+	void on_command(const string& id) override;
 
+	artemis::graph::DataGraph* data;
 	artemis::graph::Graph* graph;
 
 	bool simulation_active = false;

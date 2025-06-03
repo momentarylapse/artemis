@@ -5,6 +5,7 @@
 #pragma once
 
 #include <lib/dataflow/Graph.h>
+#include <data/Data.h>
 
 namespace artemis::graph {
 
@@ -19,6 +20,15 @@ public:
 	void iterate_simulation(float dt);
 
 	Session* session;
+};
+
+
+class DataGraph : public Data {
+public:
+	explicit DataGraph(Session* session);
+	void reset() override;
+
+	Graph graph;
 };
 
 }

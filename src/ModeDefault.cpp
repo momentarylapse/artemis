@@ -16,6 +16,8 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 
+#include "storage/Storage.h"
+
 namespace artemis::graph {
 	extern float _current_simulation_time_;
 }
@@ -23,7 +25,8 @@ namespace artemis::graph {
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
 
-	graph = session->graph.get();
+	data = session->data.get();
+	graph = session->graph;
 
 	xhui::run_repeated(0.1f, [this] {
 		if (simulation_active)
@@ -90,9 +93,12 @@ void ModeDefault::on_draw_post(Painter* p) {
 	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", artemis::graph::_current_simulation_time_));
 }
 
-void ModeDefault::on_key_down(int key) {
-	if (key == xhui::KEY_S + xhui::KEY_CONTROL) {
-
+void ModeDefault::on_command(const string& id) {
+	if (id == "save") {
+		session->storage->auto_save(data);
+	}
+	if (id == "save-as") {
+		session->storage->save_as(data);
 	}
 }
 

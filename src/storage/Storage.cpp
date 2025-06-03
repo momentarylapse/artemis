@@ -6,16 +6,8 @@
  */
 
 #include "Storage.h"
-//#include "format/FormatFontX.h"
-//#include "format/FormatMaterial.h"
-//#include "format/FormatModel.h"
-//#include "format/FormatModelJson.h"
-//#include "format/FormatModel3ds.h"
-//#include "format/FormatModelPly.h"
+#include "format/FormatArtemis.h"
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
-
-//#include "format/FormatTerrain.h"
-//#include "format/FormatWorld.h"
 #include "../data/Data.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/os/msg.h"
@@ -29,14 +21,7 @@ Path Storage::CANONICAL_SUB_DIR[NUM_FDS];
 
 Storage::Storage(Session *_s) {
 	session = _s;
-//	formats.add(new FormatFontX(session));
-//	formats.add(new FormatMaterial(session));
-//	formats.add(new FormatModel(session));
-//	formats.add(new FormatModelJson(session));
-//	formats.add(new FormatModel3ds(session));
-//	formats.add(new FormatModelPly(session));
-//	formats.add(new FormatTerrain(session));
-//	formats.add(new FormatWorld(session));
+	formats.add(new FormatArtemis(session));
 
 	CANONICAL_SUB_DIR[FD_FONT] = "Fonts";
 	CANONICAL_SUB_DIR[FD_TERRAIN] = "Maps";
@@ -74,11 +59,8 @@ bool Storage::load(const Path &_filename, Data *data, bool deep) {
 	auto filename = _filename.absolute().canonical();
 	try {
 		int type = data_type(data);
-		msg_write(type);
 		string ext = filename.extension();
 		for (auto *f: formats) {
-			msg_write(f->extension);
-			msg_write(f->category);
 			if (f->category != type)
 				continue;
 			if (f->extension != ext)
@@ -200,11 +182,11 @@ void Storage::guess_root_directory(const Path &filename) {
 			return;
 		}
 
-	set_root_directory(filename.parent(), true);
+	set_root_directory(filename.parent());
 }
 
 
-void Storage::set_root_directory(const Path &_directory, bool compact_mode) {
+void Storage::set_root_directory(const Path &_directory) {
 	Path directory = _directory.absolute().canonical();
 	if (root_dir == directory)
 		return;
@@ -212,7 +194,7 @@ void Storage::set_root_directory(const Path &_directory, bool compact_mode) {
 	root_dir = directory;
 	msg_error("ROOT: " + str(root_dir));
 
-	compact_mode = !os::fs::exists(root_dir | "game.ini");
+	bool compact_mode = !os::fs::exists(root_dir | "game.ini");
 
 
 	for (int i=0; i<NUM_FDS; i++) {
@@ -240,6 +222,8 @@ Path Storage::get_root_dir(int kind) {
 }
 
 string Storage::fd_ext(int kind) {
+	if (kind == -1)
+		return "artemis";
 	if (kind == FD_MODEL)
 		return "model";
 	if (kind == FD_TEXTURE)
@@ -353,16 +337,9 @@ base::future<ComplexPath> Storage::file_dialog_x(const Array<int> &kind, int pre
 		promise(cp);
 	};
 
-#if 1
-	/*if (save)
-		xhui::file_dialog_save(session->win, title, last_dir[preferred], {"showfilter="+show_filter, "filter="+filter})
-			.then(on_select_base)
-			.on_fail([promise] () mutable { promise.fail(); });
-	else*/
-		xhui::FileSelectionDialog::ask(session->win, title, last_dir[preferred], {"showfilter="+show_filter, "filter="+filter})
-			.then(on_select_base)
-			.on_fail([promise] () mutable { promise.fail(); });
-#endif
+	xhui::FileSelectionDialog::ask(session->win, title, last_dir[preferred], {"showfilter="+show_filter, "filter="+filter, save ? "save" : "open"})
+		.then(on_select_base)
+		.on_fail([promise] () mutable { promise.fail(); });
 
 	return promise.get_future();
 }

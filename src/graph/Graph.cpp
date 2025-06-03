@@ -15,6 +15,7 @@ Graph::Graph(Session* s) {
 	session = s;
 }
 
+
 void Graph::iterate_simulation(float dt) {
 	_current_simulation_dt_ = dt;
 	_current_simulation_time_ += dt;
@@ -23,6 +24,13 @@ void Graph::iterate_simulation(float dt) {
 			n->process();
 			n->dirty = false;
 		}
+}
+
+DataGraph::DataGraph(Session* session) : Data(session, -1), graph(session) {
+}
+
+void DataGraph::reset() {
+	graph.clear();
 }
 
 } // graph

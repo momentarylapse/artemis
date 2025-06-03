@@ -32,7 +32,8 @@ Session* _current_session_ = nullptr;
 Session *create_session() {
 	auto s = new Session;
 	s->storage = new Storage(s);
-	s->graph = new artemis::graph::Graph(s);
+	s->data = new artemis::graph::DataGraph(s);
+	s->graph = &s->data->graph;
 	//s->mode_world = new ModeWorld(s);
 	s->win = new ArtemisWindow(s);
 	s->win->renderer = new XhuiRenderer();

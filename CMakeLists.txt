@@ -430,6 +430,7 @@ add_executable(artemis
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp
 	src/storage/format/Format.cpp
+	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
