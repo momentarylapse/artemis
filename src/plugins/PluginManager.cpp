@@ -3,7 +3,6 @@
 //
 
 #include "PluginManager.h"
-#include <data/mesh/PolygonMesh.h>
 #include <lib/dataflow/Node.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Type.h>
@@ -16,6 +15,8 @@
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
 #include <data/grid/RegularGrid.h>
+#include <data/mesh/PolygonMesh.h>
+#include <data/util/ColorMap.h>
 #include <graph/Graph.h>
 #include <graph/NodeFactory.h>
 #include <graph/draw2d/Plotter.h>
@@ -133,6 +134,10 @@ void PluginManager::export_kaba() {
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
 
+	ext->declare_class_size("ColorMap", sizeof(data::ColorMap));
+	ext->declare_class_element("ColorMap.colors", &data::ColorMap::colors);
+	ext->declare_class_element("ColorMap.values", &data::ColorMap::values);
+
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
 	ext->declare_class_element("ScalarField.v32", &data::ScalarField::v32);
@@ -211,9 +216,10 @@ void PluginManager::import_kaba() {
 
 	auto m = kaba::default_context->load_module("artemis/artemis.kaba");
 	import_component_class<PolygonMesh>(m, "Mesh");
-	import_component_class<artemis::data::RegularGrid>(m, "RegularGrid");
-	import_component_class<artemis::data::ScalarField>(m, "ScalarField");
-	import_component_class<artemis::data::VectorField>(m, "VectorField");
+	import_component_class<data::RegularGrid>(m, "RegularGrid");
+	import_component_class<data::ScalarField>(m, "ScalarField");
+	import_component_class<data::VectorField>(m, "VectorField");
+	import_component_class<data::ColorMap>(m, "ColorMap");
 	import_component_class<graph::PlotData>(m, "PlotData");
 	import_component_class<graph::RenderData>(m, "RenderData");
 	import_component_class<data::SamplingMode>(m, "SamplingMode");

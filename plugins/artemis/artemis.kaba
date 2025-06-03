@@ -42,6 +42,10 @@ struct PlotData
 
 struct RenderData
 
+struct ColorMap
+	var colors: color[]
+	var values: f32[]
+
 
 enum NodeFlags
 	NONE = 0

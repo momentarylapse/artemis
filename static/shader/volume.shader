@@ -1,6 +1,6 @@
 <Layout>
 	version = 420
-	pushsize = 0
+	pushsize = 128
 	input = [vec3,vec3,vec2]
 	topology = triangles
 </Layout>
@@ -50,6 +50,18 @@ void main() {
 layout(location=4) in vec3 in_pos0; // model space
 layout(binding=0) uniform sampler3D tex3d;
 
+#ifdef vulkan
+layout(push_constant) uniform User {
+	vec4 map_colors[4];
+	float map_values[4];
+	int map_count;
+};
+#else
+uniform vec4 map_colors[4];
+uniform float map_values[4];
+uniform int map_count;
+#endif
+
 void main() {
 	// Mesh
 	vec3 tmp1 = in_pos.xyz / in_pos.w;
@@ -64,11 +76,10 @@ void main() {
 	// scalar field value
 	float f = texture(tex3d, in_pos0).r;
 	
-	vec4 tmp9 = vec4(0,0,0,1);
-	if (f < 0)
-		tmp9 = mix(vec4(0,0,1,1), vec4(1,1,1,1), f+1);
-	else
-		tmp9 = mix(vec4(1,1,1,1), vec4(1,0,0,1), f);
+	vec4 tmp9 = map_colors[0];
+	for (int i=0; i<map_count-1; i++)
+		if (f >= map_values[i] && f <= map_values[i+1])
+			tmp9 = mix(map_colors[i], map_colors[i+1], (f - map_values[i]) / (map_values[i+1] - map_values[i]));
 	
 	// SurfaceOutput
 	surface_out(tmp2, tmp9, tmp7, tmp6, tmp5);

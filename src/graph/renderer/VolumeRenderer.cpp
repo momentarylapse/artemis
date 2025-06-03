@@ -47,8 +47,25 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, 
 		return;
 
 	if (true) {
-		mat4 m(f->grid.dx * (float)f->grid.nx, f->grid.dy * (float)f->grid.ny, f->grid.dz * (float)f->grid.nz);
-		session->drawing_helper->draw_mesh(params, rvd, m, vertex_buffer.get(), material.get());
+		mat4 matrix(f->grid.dx * (float)f->grid.nx, f->grid.dy * (float)f->grid.ny, f->grid.dz * (float)f->grid.nz);
+		//session->drawing_helper->draw_mesh(params, rvd, matrix, vertex_buffer.get(), material.get());
+
+
+		auto shader = rvd.get_shader(material.get(), 0, "default", "");
+		auto& rd = rvd.start(params, matrix, shader, *material, 0, PrimitiveTopology::TRIANGLES, vertex_buffer.get());
+
+		const auto cm = color_map();
+
+#ifdef USING_VULKAN
+		params.command_buffer->push_constant(0, sizeof(color)*cm.colors.num, &cm.colors[0]);
+		params.command_buffer->push_constant(64, sizeof(float)*cm.values.num, &cm.values[0]);
+		params.command_buffer->push_constant(80, 4, &cm.colors.num);
+#else
+		//shader->set_floats("pattern0", &t->texture_scale[0].x, 3);
+		//shader->set_floats("pattern1", &t->texture_scale[1].x, 3);
+		shader->set_int("map_count", 0);
+#endif
+		rd.draw_triangles(params, vertex_buffer.get());
 	} else {
 		GeometrySphere mesh(v_0, 1, 2);
 		mesh.build(vertex_buffer.get());

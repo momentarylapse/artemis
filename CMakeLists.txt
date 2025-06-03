@@ -205,6 +205,7 @@ add_executable(artemis
 	src/data/mesh/PolygonMesh.cpp
 	src/data/mesh/SkinGenerator.cpp
 	src/data/mesh/VertexStagingBuffer.cpp
+	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
 	src/graph/draw2d/FunctionPlot.cpp
 	src/graph/draw2d/ListPlot.cpp
