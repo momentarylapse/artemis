@@ -34,7 +34,7 @@ void VolumeRenderer::process() {
 		tex->writex(&f->v32.v[0], nx, ny, nz, "r:f32");
 	material->textures[0] = tex.get();
 
-	GeometryCube cube({0,0,0}, f->grid.dx * (float)f->grid.nx, f->grid.dy * (float)f->grid.ny, f->grid.dz * (float)f->grid.nz, 1, 1, 1);
+	GeometryCube cube({0,0,0}, vec3::EX, vec3::EY, vec3::EZ, 1, 1, 1);
 	cube.build(vertex_buffer.get());
 
 	out_draw(RenderData{f->grid.bounding_box()});
@@ -47,7 +47,8 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, 
 		return;
 
 	if (true) {
-		session->drawing_helper->draw_mesh(params, rvd, mat4::ID, vertex_buffer.get(), material.get());
+		mat4 m(f->grid.dx * (float)f->grid.nx, f->grid.dy * (float)f->grid.ny, f->grid.dz * (float)f->grid.nz);
+		session->drawing_helper->draw_mesh(params, rvd, m, vertex_buffer.get(), material.get());
 	} else {
 		GeometrySphere mesh(v_0, 1, 2);
 		mesh.build(vertex_buffer.get());
