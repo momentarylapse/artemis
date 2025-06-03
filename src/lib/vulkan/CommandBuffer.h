@@ -15,8 +15,8 @@
 #include "../base/base.h"
 #include "../base/optional.h"
 
-class rect;
-class color;
+struct rect;
+struct color;
 
 namespace vulkan{
 
@@ -45,6 +45,7 @@ namespace vulkan{
 		TRANSFER_DST_OPTIMAL = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		SHADER_READ_ONLY_OPTIMAL = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		PRESENT_SRC = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+		COLOR_ATTACHMENT = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	};
 
 	enum class PipelineBindPoint {
