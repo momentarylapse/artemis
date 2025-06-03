@@ -6,10 +6,10 @@
 #define VOLUMERENDERER_H
 
 #include <data/field/ScalarField.h>
-#include <data/grid/RegularGrid.h>
 #include <lib/dataflow/Port.h>
-
 #include "RendererNode.h"
+
+class Material;
 
 namespace artemis::graph {
 
@@ -24,6 +24,8 @@ public:
 	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 
 	owned<VertexBuffer> vertex_buffer;
+	owned<VolumeTexture> tex;
+	owned<Material> material;
 };
 
 } // graph
