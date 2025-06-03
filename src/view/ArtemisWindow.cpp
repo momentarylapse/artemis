@@ -183,7 +183,7 @@ Dialog x x padding=0
 
 	embed("main-grid", 0, 0, new GraphEditor(session));
 
-#if OS_MAC
+#ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;
 #else
 	int mod = xhui::KEY_CONTROL;
