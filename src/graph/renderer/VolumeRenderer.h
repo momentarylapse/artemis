@@ -20,7 +20,7 @@ public:
 
 	void process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) override;
+	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 
 	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 	dataflow::Setting<bool> solid{this, "solid", false};

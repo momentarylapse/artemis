@@ -19,7 +19,7 @@ public:
 		flags = dataflow::NodeFlags::Canvas;
 	}
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win);
+	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 	void draw_2d(Painter* p);
 
 	dataflow::Setting<color> background{this, "background", color(-1,-1,-1,-1)};

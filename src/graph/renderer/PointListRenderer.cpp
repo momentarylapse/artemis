@@ -25,9 +25,14 @@ PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRen
 }
 
 void PointListRenderer::process() {
+	if (!active())
+		return;
+
 	if (auto points = in_points.value()) {
 		// TODO
-		out_draw(RenderData{point_list_bounding_box(*points)});
+		out_draw(RenderData{active(), point_list_bounding_box(*points), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+			draw_win(params, win, rvd);
+		}});
 	}
 }
 

@@ -15,7 +15,7 @@ public:
 
 	void process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) override;
+	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 
 	dataflow::Setting<float> scale{this, "scale", 1.0f};
 	dataflow::Setting<float> radius{this, "radius", 0.1f};

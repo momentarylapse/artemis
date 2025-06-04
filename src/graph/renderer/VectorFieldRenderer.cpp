@@ -13,7 +13,10 @@ void VectorFieldRenderer::process() {
 	auto f = in_field.value();
 	if (!f)
 		return;
-	out_draw(RenderData{f->grid.bounding_box()});
+
+	out_draw(RenderData{active(), f->grid.bounding_box(), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+		draw_win(params, win, rvd);
+	}});
 }
 
 

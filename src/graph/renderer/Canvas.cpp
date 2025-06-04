@@ -9,7 +9,7 @@
 
 namespace artemis::graph {
 
-void Canvas::draw_win(const RenderParams& params, MultiViewWindow* win) {
+void Canvas::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 	session->drawing_helper->clear(params, background());
 
 	if (!camera_defined) {
@@ -28,11 +28,19 @@ void Canvas::draw_win(const RenderParams& params, MultiViewWindow* win) {
 			camera_defined = true;
 		}
 	}
+
+	for (auto d: in_draw.values())
+		if (d->f_draw_3d and d->active)
+			d->f_draw_3d(params, win, rvd);
+
+	for (auto d: in_draw.values())
+		if (d->f_draw_3d_transparent and d->active)
+			d->f_draw_3d_transparent(params, win, rvd);
 }
 
 void Canvas::draw_2d(Painter* p) {
 	for (auto& d: in_draw.values()) {
-		if (d->f_draw_2d)
+		if (d->f_draw_2d and d->active)
 			d->f_draw_2d(p);
 	}
 }

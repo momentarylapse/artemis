@@ -21,9 +21,6 @@ VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
 
 	material_solid = new Material(s->resource_manager);
 	material_solid->pass0.shader_path = "volume-surface.shader";
-	material_solid->pass0.mode = TransparencyMode::FUNCTIONS;
-	material_solid->pass0.source = Alpha::SOURCE_ALPHA;
-	material_solid->pass0.destination = Alpha::SOURCE_INV_ALPHA;
 	material_solid->textures.add(tex_white);
 }
 
@@ -48,7 +45,9 @@ void VolumeRenderer::process() {
 	GeometryCube cube({0,0,0}, vec3::EX, vec3::EY, vec3::EZ, 1, 1, 1);
 	cube.build(vertex_buffer.get());
 
-	out_draw(RenderData{f->grid.bounding_box()});
+	out_draw(RenderData{active(), f->grid.bounding_box(), nullptr, [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+		draw_win(params, win, rvd);
+	}});
 }
 
 

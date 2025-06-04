@@ -72,17 +72,10 @@ void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win, 
 	if (auto c = get_canvas(graph)) {
 		if (c->background().a < 0)
 			c->background.set(xhui::Theme::_default.background_low);
-		c->draw_win(params, win);
+		c->draw_win(params, win, rvd);
 	} else {
 		session->drawing_helper->clear(params, Red);//xhui::Theme::_default.background_low);
 	}
-
-	for (auto n: graph->nodes)
-		if (n->flags & dataflow::NodeFlags::Renderer) {
-			auto r = static_cast<artemis::graph::RendererNode*>(n);
-			if (r->active())
-				r->draw_win(params, win, rvd);
-		}
 }
 
 void ModeDefault::on_draw_post(Painter* p) {

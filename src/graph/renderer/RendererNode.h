@@ -21,7 +21,10 @@ namespace artemis::graph {
 
 struct RenderData {
 	// TODO
+	bool active;
 	base::optional<Box> bounding_box;
+	std::function<void(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd)> f_draw_3d;
+	std::function<void(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd)> f_draw_3d_transparent;
 	std::function<void(Painter*)> f_draw_2d;
 };
 
@@ -30,7 +33,7 @@ public:
 	explicit RendererNode(Session* s, const string& name);
 
 	// TODO send RenderData to Canvas instead!
-	virtual void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) = 0;
+	//virtual void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) = 0;
 
 	dataflow::Setting<bool> active{this, "active", true};
 

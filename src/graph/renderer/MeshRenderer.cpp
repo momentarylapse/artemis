@@ -41,7 +41,9 @@ void MeshRenderer::process() {
 	material->albedo = albedo();
 	material->emission = emission();
 
-	out_draw({mesh_bounding_box(*mesh)});
+	out_draw({active(), mesh_bounding_box(*mesh), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+		draw_win(params, win, rvd);
+	}});
 }
 
 void MeshRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
