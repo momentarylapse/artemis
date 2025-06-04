@@ -14,6 +14,9 @@ namespace artemis::graph {
 VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
 	material = new Material(s->resource_manager);
 	material->pass0.shader_path = "volume.shader";
+	material->pass0.mode = TransparencyMode::FUNCTIONS;
+	material->pass0.source = Alpha::SOURCE_ALPHA;
+	material->pass0.destination = Alpha::SOURCE_INV_ALPHA;
 	material->textures.add(tex_white);
 }
 

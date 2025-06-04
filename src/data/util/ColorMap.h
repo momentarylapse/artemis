@@ -19,6 +19,7 @@ struct ColorMap {
 	color get(float f) const;
 
 	static const ColorMap _default;
+	static const ColorMap _default_transparent;
 };
 
 }
