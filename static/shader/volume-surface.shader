@@ -41,28 +41,12 @@ void main() {
 	float tmp6 = material.metal;
 	vec4 tmp7 = material.emission;
 	
-	vec3 cam_pos0 = (inverse(matrix.view * matrix.model) * vec4(0,0,0,1)).xyz;
 	vec3 p0 = (inverse(matrix.view * matrix.model) * vec4(tmp1,1)).xyz;
-	vec3 dir0 = normalize(p0 - cam_pos0);
 	
-	vec4 acc = vec4(0,0,0,0);
-	
-	float dt = 0.03;
-	for (int i=0; i<30; i++) {
-		// scalar field value
-		float f = texture(tex3d, p0).r;
-		vec4 c = color_map(f);
-		acc.xyz += (1-acc.a) * c.xyz * c.a * dt * 5;
-		acc.a += (1-acc.a) * c.a * dt * 5;
-		
-	
-		p0 += dir0 * dt;
-		if (p0.x<0 || p0.y<0 || p0.z<0 || p0.x>1 || p0.y>1 || p0.z>1 || acc.a>0.95)
-			break;
-	}
+	float f = texture(tex3d, p0).r;
+	vec4 c = color_map(f);
 	
 	// SurfaceOutput
-	//surface_out(tmp2, tmp9, tmp7, tmp6, tmp5);
-	out_color = acc;
+	surface_out(tmp2, c, tmp7, tmp6, tmp5);
 }
 </FragmentShader>

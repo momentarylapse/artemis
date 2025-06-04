@@ -18,6 +18,13 @@ VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
 	material->pass0.source = Alpha::SOURCE_ALPHA;
 	material->pass0.destination = Alpha::SOURCE_INV_ALPHA;
 	material->textures.add(tex_white);
+
+	material_solid = new Material(s->resource_manager);
+	material_solid->pass0.shader_path = "volume-surface.shader";
+	material_solid->pass0.mode = TransparencyMode::FUNCTIONS;
+	material_solid->pass0.source = Alpha::SOURCE_ALPHA;
+	material_solid->pass0.destination = Alpha::SOURCE_INV_ALPHA;
+	material_solid->textures.add(tex_white);
 }
 
 void VolumeRenderer::process() {
@@ -36,6 +43,7 @@ void VolumeRenderer::process() {
 	if (f->type == data::ScalarType::Float32)
 		tex->writex(&f->v32.v[0], nx, ny, nz, "r:f32");
 	material->textures[0] = tex.get();
+	material_solid->textures[0] = tex.get();
 
 	GeometryCube cube({0,0,0}, vec3::EX, vec3::EY, vec3::EZ, 1, 1, 1);
 	cube.build(vertex_buffer.get());
@@ -50,14 +58,22 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, 
 		return;
 
 	if (true) {
+		auto _material = material.get();
+		if (solid())
+			_material = material_solid.get();
+
 		mat4 matrix(f->grid.dx * (float)f->grid.nx, f->grid.dy * (float)f->grid.ny, f->grid.dz * (float)f->grid.nz);
 		//session->drawing_helper->draw_mesh(params, rvd, matrix, vertex_buffer.get(), material.get());
 
 
-		auto shader = rvd.get_shader(material.get(), 0, "default", "");
-		auto& rd = rvd.start(params, matrix, shader, *material, 0, PrimitiveTopology::TRIANGLES, vertex_buffer.get());
+		auto shader = rvd.get_shader(_material, 0, "default", "");
+		auto& rd = rvd.start(params, matrix, shader, *_material, 0, PrimitiveTopology::TRIANGLES, vertex_buffer.get());
 
-		const auto cm = color_map();
+		auto cm = color_map();
+
+		if (solid())
+			for (auto& c: cm.colors)
+				c.a = 1;
 
 #ifdef USING_VULKAN
 		params.command_buffer->push_constant(0, sizeof(color)*cm.colors.num, &cm.colors[0]);
