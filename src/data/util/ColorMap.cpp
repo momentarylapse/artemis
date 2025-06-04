@@ -32,5 +32,15 @@ color ColorMap::get(float f) const {
 	return Black;
 }
 
+void ColorMap::sort() {
+	for (int i=0; i<values.num; i++)
+		for (int j=i+1; j<values.num; j++)
+			if (values[i] > values[j]) {
+				std::swap(values[i], values[j]);
+				std::swap(colors[i], colors[j]);
+			}
+}
+
+
 }
 

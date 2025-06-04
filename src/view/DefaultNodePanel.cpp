@@ -14,6 +14,8 @@
 #include "dialog/ColorMapDialog.h"
 
 
+void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
+
 DefaultNodePanel::DefaultNodePanel(dataflow::Node* n) : xhui::Panel("node-panel") {
 	node = n;
 	from_source(R"foodelim(
@@ -98,15 +100,7 @@ Dialog x ''
 			set_options(id, "expandx");
 			event_xp(id, xhui::event_id::Draw, [this, id, ss] (Painter* p) {
 				const auto cm = (*ss)();
-				const rect area = p->area();
-				const int N = 100;
-				for (int k=0; k<N; k++) {
-					float t0 = (float)k / (float)N;
-					float t1 = (float)(k+1) / (float)N;
-					float t = cm.min() + (cm.max() - cm.min()) * t0;
-					p->set_color(cm.get(t));
-					p->draw_rect(rect(area.x1 + area.width() * t0, area.x1 + area.width() * t1, area.y1, area.y2));
-				}
+				draw_color_map_background(p, cm, cm.min(), cm.max(), p->area());
 			});
 			event_x(id, xhui::event_id::LeftButtonUp, [this, ss] {
 				ColorMapDialog::ask(this, (*ss)()).then([ss] (const artemis::data::ColorMap& cm) {

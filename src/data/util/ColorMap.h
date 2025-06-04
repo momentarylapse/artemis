@@ -17,6 +17,7 @@ struct ColorMap {
 	float min() const;
 	float max() const;
 	color get(float f) const;
+	void sort();
 
 	static const ColorMap _default;
 	static const ColorMap _default_transparent;

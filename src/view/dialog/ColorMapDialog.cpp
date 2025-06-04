@@ -6,6 +6,29 @@
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/dialogs/ColorSelectionDialog.h>
 
+void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area) {
+	auto clip = p->clip();
+	p->set_clip(area);
+
+	const float d = area.height() > 50 ? 20 : 12;
+	for (int i=0; i<=area.width()/d; i++)
+		for (int j=0; j<=area.height()/d; j++) {
+			p->set_color(((i+j) % 2) == 0 ? Black : White);
+			p->draw_rect({area.p00() + vec2((float)i*d, (float)j*d), area.p00() + vec2((float)(i+1)*d, (float)(j+1)*d)});
+		}
+
+	const int N = 200;
+	for (int k=0; k<N; k++) {
+		float t0 = (float)k / (float)N;
+		float t1 = (float)(k+1) / (float)N;
+		float t = value_min + (value_max - value_min) * t0;
+		p->set_color(color_map.get(t));
+		p->draw_rect(rect(area.x1 + area.width() * t0, area.x1 + area.width() * t1, area.y1, area.y2));
+	}
+
+	p->set_clip(clip);
+}
+
 ColorMapDialog::ColorMapDialog(xhui::Panel* parent, const artemis::data::ColorMap& _color_map) : Dialog("Question", 400, 300, parent, xhui::DialogFlags::CloseByEscape) {
 	from_source(R"foodelim(
 Dialog color-map-dialog 'Color map'
@@ -23,15 +46,17 @@ Dialog color-map-dialog 'Color map'
 		on_draw(p);
 	});
 	event_x("area", xhui::event_id::MouseMove, [this] {
-		const vec2 m = get_window()->mouse_position();
-		on_mouse_move(m, m - mouse_position_last);
-		mouse_position_last = m;
+		auto w = get_window();
+		on_mouse_move(w->state.m, w->state.m - w->state_prev.m);
 	});
 	event_x("area", xhui::event_id::LeftButtonDown, [this] {
 		on_left_button_down(get_window()->mouse_position());
 	});
 	event_x("area", xhui::event_id::LeftButtonUp, [this] {
 		on_left_button_up(get_window()->mouse_position());
+	});
+	event_x("area", xhui::event_id::KeyDown, [this] {
+		on_key_down(get_window()->state.key_code);
 	});
 	event("ok", [this] {
 		answer = color_map;
@@ -49,27 +74,8 @@ ColorMapDialog::~ColorMapDialog() = default;
 
 
 void ColorMapDialog::on_draw(Painter* p) {
-	auto clip = p->clip();
 	area = p->area();
-	p->set_clip(area);
-
-	const float d = 20;
-	for (int i=0; i<=area.width()/d; i++)
-		for (int j=0; j<=area.height()/d; j++) {
-			p->set_color(((i+j) % 2) == 0 ? Black : White);
-			p->draw_rect({area.p00() + vec2((float)i*d, (float)j*d), area.p00() + vec2((float)(i+1)*d, (float)(j+1)*d)});
-		}
-
-	const int N = 200;
-	for (int k=0; k<N; k++) {
-		float t0 = (float)k / (float)N;
-		float t1 = (float)(k+1) / (float)N;
-		float t = value_min + (value_max - value_min) * t0;
-		p->set_color(color_map.get(t));
-		p->draw_rect(rect(area.x1 + area.width() * t0, area.x1 + area.width() * t1, area.y1, area.y2));
-	}
-
-	p->set_clip(clip);
+	draw_color_map_background(p, color_map, value_min, value_max, area);
 
 	for (int i=0; i<color_map.colors.num; i++) {
 		if (hover and *hover == i)
@@ -114,15 +120,36 @@ void ColorMapDialog::on_left_button_down(const vec2& m) {
 }
 
 void ColorMapDialog::on_left_button_up(const vec2& m) {
+	if (selected) {
+		if (mouse_moved_since_click < 10) {
+			xhui::ColorSelectionDialog::ask(this, "Color", color_map.colors[*selected].with_alpha(1), {}).then([this] (const color& c) {
+				color_map.colors[*selected] = c.with_alpha(color_map.colors[*selected].a);
+				request_redraw();
+			});
+		}
+	} else {
+		if (mouse_moved_since_click < 10) {
+			color_map.colors.add(White.with_alpha(clamp(1 - (m.y - area.y1) / area.height(), 0.0f, 1.0f)));
+			color_map.values.add(value_min + (m.x - area.x1) / area.width() * (value_max - value_min));
+		}
+	}
+	color_map.sort();
 	value_min = color_map.min();
 	value_max = color_map.max();
-	if (mouse_moved_since_click < 10 and selected) {
-		xhui::ColorSelectionDialog::ask(this, "Color", color_map.colors[*selected].with_alpha(1), {}).then([this] (const color& c) {
-			color_map.colors[*selected] = c.with_alpha(color_map.colors[*selected].a);
-			request_redraw();
-		});
-	}
 	request_redraw();
+}
+
+void ColorMapDialog::on_key_down(int key) {
+	if (key == xhui::KEY_DELETE or key == xhui::KEY_BACKSPACE) {
+		if (selected and get_window()->button(0)) {
+			color_map.colors.erase(*selected);
+			color_map.values.erase(*selected);
+			hover = base::None;
+			selected = base::None;
+			mouse_moved_since_click = 999; // hack to prevent new color...
+			request_redraw();
+		}
+	}
 }
 
 
