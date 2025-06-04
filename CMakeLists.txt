@@ -433,6 +433,7 @@ add_executable(artemis
 	src/storage/format/Format.cpp
 	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp
+	src/view/dialog/ColorMapDialog.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
 	src/view/DefaultNodePanel.cpp

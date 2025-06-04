@@ -14,6 +14,8 @@ struct ColorMap {
 	Array<color> colors;
 	Array<float> values;
 
+	float min() const;
+	float max() const;
 	color get(float f) const;
 
 	static const ColorMap _default;

@@ -3,11 +3,15 @@
 //
 
 #include "DefaultNodePanel.h"
+#include <data/util/ColorMap.h>
 #include <lib/dataflow/Node.h>
 #include <lib/dataflow/Setting.h>
 #include <lib/base/iter.h>
 #include <lib/kaba/syntax/Class.h>
 #include <lib/os/msg.h>
+#include <lib/xhui/xhui.h>
+
+#include "dialog/ColorMapDialog.h"
 
 
 DefaultNodePanel::DefaultNodePanel(dataflow::Node* n) : xhui::Panel("node-panel") {
@@ -87,6 +91,27 @@ Dialog x ''
 			set_color(id, (*ss)());
 			event(id, [this, id, ss] {
 				ss->set(get_color(id));
+			});
+		} else if (s->class_->name == "ColorMap") {
+			auto ss = node->settings[i]->as<artemis::data::ColorMap>();
+			add_control("DrawingArea", "", 1, i, id);
+			set_options(id, "expandx");
+			event_xp(id, xhui::event_id::Draw, [this, id, ss] (Painter* p) {
+				const auto cm = (*ss)();
+				const rect area = p->area();
+				const int N = 100;
+				for (int k=0; k<N; k++) {
+					float t0 = (float)k / (float)N;
+					float t1 = (float)(k+1) / (float)N;
+					float t = cm.min() + (cm.max() - cm.min()) * t0;
+					p->set_color(cm.get(t));
+					p->draw_rect(rect(area.x1 + area.width() * t0, area.x1 + area.width() * t1, area.y1, area.y2));
+				}
+			});
+			event_x(id, xhui::event_id::LeftButtonUp, [this, ss] {
+				ColorMapDialog::ask(this, (*ss)()).then([ss] (const artemis::data::ColorMap& cm) {
+					ss->set(cm);
+				});
 			});
 		} else {
 			add_control("Label", format("(%s)", s->class_->name), 1, i, "");
