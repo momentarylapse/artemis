@@ -1,0 +1,15 @@
+DEST=~/.kaba/modules/artemis
+
+if [ ! -d $DEST ]
+then
+	mkdir $DEST
+fi
+
+
+cp build/libmoduleartemis.* $DEST
+
+# TODO replace by REAL api!!!!!!
+cp fake-api/artemis.kaba $DEST
+
+
+

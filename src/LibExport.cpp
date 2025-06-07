@@ -16,14 +16,6 @@
 string AppVersion = "0.0.1";
 string AppName = "Artemis";
 
-void* app = nullptr;
-
-namespace hui {
-	string get_language_s(const string& lang) {
-		return "";
-	}
-}
-
 base::future<Session*> emit_empty_session(Session* parent);
 
 void start_session_empty(Session* parent) {
@@ -50,33 +42,27 @@ void start_session_empty(Session* parent) {
 	});
 }
 
-void start_session_load_file(Session* parent, const Path& filename) {
-	emit_empty_session(parent).then([filename] (Session* s) {
-		s->set_mode(new ModeDefault(s));
 
-		string ext = filename.extension();
-		if (ext == "artemis") {
-			s->storage->load(filename, s->data.get());
-		} else if (ext == "kaba") {
-			auto m = kaba::default_context->load_module(filename.absolute());
-			typedef void (*f_p)();
-			if (auto f = (f_p)m->match_function("main", "void", {})) {
-				f();
-			} else {
-				s->set_message(format("script %s does not contain 'func main()'", filename));
-			}
-		} else {
-			s->set_message(format("unknown file extension: %s", filename));
-		}
-	});
+class KabaExporter {
+public:
+	virtual ~KabaExporter() = default;
+	virtual void declare_class_size(const string& name, int size) = 0;
+	virtual void declare_enum(const string& name, int value) = 0;
+	virtual void declare_class_element(const string& name, int offset) = 0;
+	virtual void link(const string& name, void* p) = 0;
+	virtual void link_virtual(const string& name, void* p, void* instance) = 0;
+};
+
+
+Session* export_create_session() {
+	return create_session();
 }
-
-int xhui_main(const Array<string>& args) {
+Session* export_start() {
 	try {
-		xhui::init(args, "artemis");
+		xhui::init({}, "artemis");
 	} catch (Exception &e) {
 		msg_error(e.message());
-		return 1;
+		return nullptr;
 	}
 
 	kaba::init();
@@ -88,18 +74,27 @@ int xhui_main(const Array<string>& args) {
 
 	auto s = create_session();
 	artemis::graph::init_factory();
-	if (args.num >= 2) {
-		start_session_load_file(s, args[1]);
-	} else {
-		start_session_empty(s);
-	}
-
+	start_session_empty(s);
+	return s;
+}
+void export_run() {
 	try {
 		xhui::run();
 	} catch (Exception& e) {
 		msg_error(e.message());
 	}
+}
+
+int xhui_main(const Array<string>& args) {
 	return 0;
 }
 
+extern "C" {
+	__attribute__ ((visibility ("default")))
+	void export_symbols(KabaExporter* e) {
+		e->link("create_session", (void*)&create_session);
+		e->link("start", (void*)&export_start);
+		e->link("run", (void*)&export_run);
+	}
+}
 
