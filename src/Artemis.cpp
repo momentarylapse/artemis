@@ -71,6 +71,34 @@ void start_session_load_file(Session* parent, const Path& filename) {
 	});
 }
 
+Session* export_start() {
+	try {
+		xhui::init({}, "artemis");
+	} catch (Exception &e) {
+		msg_error(e.message());
+		return nullptr;
+	}
+
+	kaba::init();
+	try {
+		artemis::PluginManager::init();
+	} catch (Exception &e) {
+		msg_error(e.message());
+	}
+
+	auto s = create_session();
+	artemis::graph::init_factory();
+	start_session_empty(s);
+	return s;
+}
+void export_run() {
+	try {
+		xhui::run();
+	} catch (Exception& e) {
+		msg_error(e.message());
+	}
+}
+
 int xhui_main(const Array<string>& args) {
 	try {
 		xhui::init(args, "artemis");

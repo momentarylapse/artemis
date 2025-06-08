@@ -115,3 +115,8 @@ func extern rotation_bw(f: VectorField) -> VectorField
 func extern laplace(f: ScalarField) -> ScalarField
 
 
+
+
+func extern create_session() -> Session*
+func extern start() -> Session*
+func extern run()

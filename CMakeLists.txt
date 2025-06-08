@@ -1067,6 +1067,7 @@ add_library(moduleartemis SHARED
 	src/y/y/System.cpp
 	src/y/y/SystemManager.cpp
 	src/y/Config.cpp
+	src/Artemis.cpp
 	src/LibExport.cpp
 	src/ModeDefault.cpp
 	src/Session.cpp)

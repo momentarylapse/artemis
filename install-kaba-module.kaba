@@ -8,8 +8,7 @@ fi
 
 cp build/libmoduleartemis.* $DEST
 
-# TODO replace by REAL api!!!!!!
-cp fake-api/artemis.kaba $DEST
+cp plugins/artemis/artemis.kaba $DEST
 
 
 

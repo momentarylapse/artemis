@@ -11,6 +11,7 @@
 class Path;
 namespace kaba {
 	class Class;
+	class Exporter;
 }
 
 namespace artemis {
@@ -18,7 +19,7 @@ namespace artemis {
 class PluginManager {
 public:
 	static void init();
-	static void export_kaba();
+	static void export_kaba(kaba::Exporter* e);
 	static void import_kaba();
 	static void find_plugins();
 

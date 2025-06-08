@@ -26,6 +26,9 @@
 
 extern Session* _current_session_;
 
+Session* export_start();
+void export_run();
+
 namespace artemis {
 
 base::map<string, Path> PluginManager::plugin_classes;
@@ -41,7 +44,8 @@ Path PluginManager::directory() {
 
 void PluginManager::init() {
 	kaba::config.directory = directory();
-	export_kaba();
+	kaba::Exporter exporter(kaba::default_context, nullptr);
+	export_kaba(&exporter);
 	import_kaba();
 	find_plugins();
 }
@@ -77,7 +81,7 @@ void port_init(T* port, dataflow::Node* node, const string& name, dataflow::Port
 }
 
 template<class T>
-void link_ports(kaba::ExternalLinkData* ext, const string& name) {
+void link_ports(kaba::Exporter* ext, const string& name) {
 	ext->declare_class_size("InPort" + name, sizeof(dataflow::InPort<T>));
 	ext->link_class_func("InPort" + name + ".__init__", &port_init<dataflow::InPort<T>>);
 	ext->link_class_func("InPort" + name + ".value", &dataflow::InPort<T>::value);
@@ -101,6 +105,11 @@ data::ScalarType type2type(const kaba::Class* type) {
 		return data::ScalarType::Float32;
 	if (type == kaba::TypeFloat64)
 		return data::ScalarType::Float64;
+	// in case type comes from an external kaba context...
+	if (type->name == "f32")
+		return data::ScalarType::Float32;
+	if (type->name == "f64")
+		return data::ScalarType::Float64;
 	return data::ScalarType::None;
 }
 
@@ -117,10 +126,12 @@ void generic_assign(T& a, const T& b) {
 	a = b;
 }
 
-void PluginManager::export_kaba() {
-	auto ext = kaba::default_context->external.get();
+void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	ext->link("current_session", (void*)&current_session);
+	ext->link("create_session", (void*)&create_session);
+	ext->link("start", (void*)&export_start);
+	ext->link("run", (void*)&export_run);
 	ext->link("create_scalar_field", (void*)&create_scalar_field);
 	ext->link("create_vector_field", (void*)&create_vector_field);
 	ext->link("gradient", (void*)&processing::gradient);
