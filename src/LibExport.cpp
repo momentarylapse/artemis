@@ -7,6 +7,7 @@
 #include "Session.h"
 #include <view/ArtemisWindow.h>
 #include <plugins/PluginManager.h>
+#include <lib/xhui/Application.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
 #include <y/plugins/PluginManager.h>

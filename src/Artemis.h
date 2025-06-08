@@ -8,7 +8,7 @@
 #ifndef ARTEMIS_H_
 #define ARTEMIS_H_
 
-#include "lib/xhui/xhui.h"
+#include "lib/xhui/Application.h"
 
 class PluginManager;
 

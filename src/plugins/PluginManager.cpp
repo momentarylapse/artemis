@@ -10,7 +10,7 @@
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
 #include <lib/os/filesystem.h>
-#include <lib/xhui/xhui.h>
+#include <lib/xhui/Application.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
