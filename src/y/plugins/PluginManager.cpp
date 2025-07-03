@@ -7,6 +7,7 @@
 
 #include "PluginManager.h"
 #include "../lib/kaba/kaba.h"
+#include "../lib/kaba/lib/extern.h"
 #include "../audio/SoundSource.h"
 #include "../audio/AudioBuffer.h"
 #include "../audio/AudioStream.h"
@@ -261,6 +262,14 @@ void imagetexture_init(DepthBuffer *t, int w, int h, const string &format) {
 #endif
 }
 
+void storagetexture_init(DepthBuffer *t, int nx, int ny, int nz, const string &format) {
+#ifdef USING_VULKAN
+	new(t) vulkan::StorageTexture(nx, ny, nz, format);
+#else
+	new(t) VolumeTexture(nx, ny, format);
+#endif
+}
+
 void volumetexture_init(VolumeTexture *t, int nx, int ny, int nz, const string &format) {
 	new(t) VolumeTexture(nx, ny, nz, format);
 }
@@ -343,11 +352,12 @@ audio::AudioStream* __create_audio_stream(Callable<Array<float>(int)>& f, float 
 }
 
 void PluginManager::init() {
-	export_kaba();
+	kaba::Exporter exporter(kaba::default_context, nullptr);
+	export_kaba(&exporter);
 	import_kaba();
 }
 
-void export_ecs(kaba::ExternalLinkData* ext) {
+void export_ecs(kaba::Exporter* ext) {
 	BaseClass entity(BaseClass::Type::NONE);
 	ext->declare_class_size("BaseClass", sizeof(BaseClass));
 	//	ext->link_class_func("BaseClass.__init__", &Entity::__init__);
@@ -407,7 +417,7 @@ void export_ecs(kaba::ExternalLinkData* ext) {
 	ext->link("__get_controller", (void*)&SystemManager::get);
 }
 
-void export_world(kaba::ExternalLinkData* ext) {
+void export_world(kaba::Exporter* ext) {
 	ext->declare_enum("PhysicsMode.NONE", PhysicsMode::NONE);
 	ext->declare_enum("PhysicsMode.SIMPLE", PhysicsMode::SIMPLE);
 	ext->declare_enum("PhysicsMode.FULL_EXTERNAL", PhysicsMode::FULL_EXTERNAL);
@@ -648,7 +658,7 @@ void export_world(kaba::ExternalLinkData* ext) {
 	ext->link("attach_light_cone", (void*)&attach_light_cone);
 }
 
-void export_gfx(kaba::ExternalLinkData* ext) {
+void export_gfx(kaba::Exporter* ext) {
 	ext->declare_enum("PrimitiveTopology.TRIANGLES", PrimitiveTopology::TRIANGLES);
 	ext->declare_enum("PrimitiveTopology.TRIANGLE_FAN", PrimitiveTopology::TRIANGLE_FAN);
 	ext->declare_enum("PrimitiveTopology.LINES", PrimitiveTopology::LINES);
@@ -698,6 +708,8 @@ void export_gfx(kaba::ExternalLinkData* ext) {
 
 	ext->link_class_func("ImageTexture.__init__", &imagetexture_init);
 
+	ext->link_class_func("StorageTexture.__init__", &storagetexture_init);
+
 	ext->link_class_func("VolumeTexture.__init__", &volumetexture_init);
 
 	ext->link_class_func("Shader.set_float", &shader_set_float);
@@ -710,7 +722,7 @@ void export_gfx(kaba::ExternalLinkData* ext) {
 	ext->link("load_texture", (void*)&__load_texture);
 }
 
-void export_fx(kaba::ExternalLinkData* ext) {
+void export_fx(kaba::Exporter* ext) {
 	ext->declare_class_size("Particle", sizeof(Particle));
 	ext->declare_class_element("Particle.pos", &Particle::pos);
 	ext->declare_class_element("Particle.vel", &Particle::vel);
@@ -777,7 +789,7 @@ void export_fx(kaba::ExternalLinkData* ext) {
 	}
 }
 
-void export_ui(kaba::ExternalLinkData* ext) {
+void export_ui(kaba::Exporter* ext) {
 #ifdef HAS_INPUT
 	ext->declare_enum("VRDeviceRole.NONE", input::VRDeviceRole::None);
 	ext->declare_enum("VRDeviceRole.CONTROLLER_RIGHT", input::VRDeviceRole::ControllerRight);
@@ -896,7 +908,7 @@ void export_ui(kaba::ExternalLinkData* ext) {
 	ext->link("toplevel", &gui::toplevel);
 }
 
-void export_sound(kaba::ExternalLinkData* ext) {
+void export_sound(kaba::Exporter* ext) {
 	ext->declare_class_size("SoundSource", sizeof(audio::SoundSource));
 	ext->declare_class_element("SoundSource.loop", &audio::SoundSource::loop);
 	ext->declare_class_element("SoundSource.suicidal", &audio::SoundSource::suicidal);
@@ -924,7 +936,7 @@ void export_sound(kaba::ExternalLinkData* ext) {
 	ext->link("emit_sound_stream", (void*)&audio::emit_sound_stream);
 }
 
-void export_net(kaba::ExternalLinkData* ext) {
+void export_net(kaba::Exporter* ext) {
 	ext->declare_class_size("NetworkManager", sizeof(NetworkManager));
 	ext->declare_class_element("NewtorkManager.cur_con", &NetworkManager::cur_con);
 	ext->link_class_func("NetworkManager.connect_to_host", &NetworkManager::connect_to_host);
@@ -941,7 +953,7 @@ void export_net(kaba::ExternalLinkData* ext) {
 	ext->link("network", &network_manager);
 }
 
-void export_engine(kaba::ExternalLinkData* ext) {
+void export_engine(kaba::Exporter* ext) {
 
 	ext->declare_class_size("PerformanceMonitor.Channel", sizeof(PerformanceChannel));
 	ext->declare_class_element("PerformanceMonitor.Channel.name", &PerformanceChannel::name);
@@ -1038,7 +1050,7 @@ void export_engine(kaba::ExternalLinkData* ext) {
 	ext->link("rt_vtrace", (void*)&vtrace);
 }
 
-void export_renderer(kaba::ExternalLinkData* ext) {
+void export_renderer(kaba::Exporter* ext) {
 	ext->declare_class_size("Renderer", sizeof(Renderer));
 
 	{
@@ -1089,9 +1101,17 @@ void export_renderer(kaba::ExternalLinkData* ext) {
 	ext->link_class_func("PostProcessor.process", &PostProcessor::process);
 	ext->link_class_func("PostProcessor.add_stage", &PostProcessor::add_stage);
 
+	ext->declare_class_size("RayTracingData", sizeof(RayTracingData));
+	ext->declare_class_element("RayTracingData.buffer_meshes", &RayTracingData::buffer_meshes);
+	ext->declare_class_element("RayTracingData.num_meshes", &RayTracingData::num_meshes);
+
 	ext->declare_class_size("SceneView", sizeof(SceneView));
 	ext->declare_class_element("SceneView.surfel_buffer", &SceneView::surfel_buffer);
 	ext->declare_class_element("SceneView.num_surfels", &SceneView::num_surfels);
+	ext->declare_class_element("SceneView.probe_cells", &SceneView::probe_cells);
+	ext->declare_class_element("SceneView.probe_min", &SceneView::probe_min);
+	ext->declare_class_element("SceneView.probe_max", &SceneView::probe_max);
+	ext->declare_class_element("SceneView.ray_tracing_data", &SceneView::ray_tracing_data);
 
 	ext->declare_class_size("RenderPath", sizeof(RenderPath));
 	ext->declare_class_element("RenderPath.hdr_resolver", &RenderPath::hdr_resolver);
@@ -1121,9 +1141,7 @@ void export_renderer(kaba::ExternalLinkData* ext) {
 	ext->declare_class_element("LightMeter.brightness", &LightMeter::brightness);
 }
 
-void PluginManager::export_kaba() {
-	auto ext = kaba::default_context->external.get();
-
+void PluginManager::export_kaba(kaba::Exporter* ext) {
 	export_gfx(ext);
 	export_ecs(ext);
 	export_world(ext);
