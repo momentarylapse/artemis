@@ -1,7 +1,7 @@
 use artemis.*
-use helper.linalg.*
-use helper.d3.*
-use helper.material.*
+use linalg.*
+use fem.d3.*
+use fem.material.*
 
 class Elastic3dFEM extends Node
 	var in_ux: InPortScalarField

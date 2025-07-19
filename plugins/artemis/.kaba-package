@@ -1,0 +1,5 @@
+version 0.1
+require linalg
+require fem
+build xmake ../../ moduleartemis
+

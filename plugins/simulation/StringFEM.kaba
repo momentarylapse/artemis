@@ -1,7 +1,7 @@
 use artemis.*
-use helper.linalg.*
-use helper.d1p1.*
-use helper.material.*
+use linalg.*
+use fem.d1p1.*
+use fem.material.*
 
 class StringFEM extends Node
 	var in_ux: InPortScalarField
