@@ -44,8 +44,7 @@ Path PluginManager::directory() {
 
 void PluginManager::init() {
 	kaba::config.directory = directory();
-	kaba::Exporter exporter(kaba::default_context, nullptr);
-	export_kaba(&exporter);
+	kaba::default_context->register_package_init("artemis", directory() | "artemis", &export_kaba);
 	import_kaba();
 	find_plugins();
 }

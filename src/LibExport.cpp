@@ -1,4 +1,4 @@
-#include "KabaExporter.h"
+#include "lib/kabaexport/KabaExporter.h"
 #include <plugins/PluginManager.h>
 
 extern "C" {
