@@ -521,6 +521,7 @@ add_executable(artemis
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
 	src/lib/pattern/Observable.cpp
+	src/lib/profiler/Profiler.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -618,7 +619,6 @@ add_executable(artemis
 	src/y/gui/Text.cpp
 	src/y/helper/DeletionQueue.cpp
 	src/y/helper/ErrorHandler.cpp
-	src/y/helper/PerformanceMonitor.cpp
 	src/y/helper/ResourceManager.cpp
 	src/y/helper/Scheduler.cpp
 	src/y/net/NetworkManager.cpp
@@ -890,6 +890,7 @@ add_library(moduleartemis SHARED
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
 	src/lib/pattern/Observable.cpp
+	src/lib/profiler/Profiler.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -987,7 +988,6 @@ add_library(moduleartemis SHARED
 	src/y/gui/Text.cpp
 	src/y/helper/DeletionQueue.cpp
 	src/y/helper/ErrorHandler.cpp
-	src/y/helper/PerformanceMonitor.cpp
 	src/y/helper/ResourceManager.cpp
 	src/y/helper/Scheduler.cpp
 	src/y/net/NetworkManager.cpp
