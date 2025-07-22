@@ -10,6 +10,11 @@ class MaxwellFDTD extends Node
 		in_me.__init__(self, "me", PortFlags.OPTIONAL)
 		in_mb.__init__(self, "mb", PortFlags.OPTIONAL)
 		flags = NodeFlags.TIME_DEPENDENT
+		c1 = profiler.create_channel("a", channel)
+		c2 = profiler.create_channel("b", channel)
+		c3 = profiler.create_channel("c", channel)
+		c4 = profiler.create_channel("d", channel)
+		c5 = profiler.create_channel("e", channel)
 	
 	func override on_process()
 		let N = 5
@@ -17,26 +22,36 @@ class MaxwellFDTD extends Node
 		for E in in_e.value()
 			for B in in_b.value()
 				for step in 0:N
+					profiler.begin(c1)
 				
 					# E -> B
 					for mb in in_mb.value()
 						B += mb.componentwise_product(rotation_fw(E) * dt)
 					else
 						B += rotation_fw(E) * dt
+					profiler.end(c1)
+					profiler.begin(c2)
 					dampen_y(B)
 					dampen_z(B)
+					profiler.end(c2)
 					
 					# B -> E
+					profiler.begin(c3)
 					for me in in_me.value()
 						E -= me.componentwise_product(rotation_bw(B) * dt)
 					else
 						E -= rotation_bw(B) * dt
+					profiler.end(c3)
+					profiler.begin(c4)
 					dampen_y(E)
 					dampen_z(E)
+					profiler.end(c4)
 					
 					# source current?
+					profiler.begin(c5)
 					for j in in_j.value()
 						E -= j * dt
+					profiler.end(c5)
 				in_e.mutated()
 				in_b.mutated()
 	
@@ -64,3 +79,4 @@ class MaxwellFDTD extends Node
 	var in_j: InPortVectorField
 	var in_me: InPortVectorField
 	var in_mb: InPortVectorField
+	var c1, c2, c3, c4, c5: i32

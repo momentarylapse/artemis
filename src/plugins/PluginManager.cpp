@@ -10,6 +10,8 @@
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
 #include <lib/os/filesystem.h>
+#include <lib/os/msg.h>
+#include <lib/profiler/Profiler.h>
 #include <lib/xhui/Application.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
@@ -22,7 +24,6 @@
 #include <graph/draw2d/Plotter.h>
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
-#include <lib/os/msg.h>
 
 extern Session* _current_session_;
 
@@ -127,17 +128,20 @@ void generic_assign(T& a, const T& b) {
 
 void PluginManager::export_kaba(kaba::Exporter* ext) {
 
-	ext->link("current_session", (void*)&current_session);
-	ext->link("create_session", (void*)&create_session);
-	ext->link("start", (void*)&export_start);
-	ext->link("run", (void*)&export_run);
-	ext->link("create_scalar_field", (void*)&create_scalar_field);
-	ext->link("create_vector_field", (void*)&create_vector_field);
-	ext->link("gradient", (void*)&processing::gradient);
-	ext->link("divergence", (void*)&processing::divergence);
-	ext->link("rotation_fw", (void*)&processing::rotation_fw);
-	ext->link("rotation_bw", (void*)&processing::rotation_bw);
-	ext->link("laplace", (void*)&processing::laplace);
+	ext->link_func("current_session", &current_session);
+	ext->link_func("create_session", &create_session);
+	ext->link_func("start", &export_start);
+	ext->link_func("run", &export_run);
+	ext->link_func("create_scalar_field", &create_scalar_field);
+	ext->link_func("create_vector_field", &create_vector_field);
+	ext->link_func("gradient", &processing::gradient);
+	ext->link_func("divergence", &processing::divergence);
+	ext->link_func("rotation_fw", &processing::rotation_fw);
+	ext->link_func("rotation_bw", &processing::rotation_bw);
+	ext->link_func("laplace", &processing::laplace);
+	ext->link_func("profiler.create_channel", &profiler::create_channel);
+	ext->link_func("profiler.begin", &profiler::begin);
+	ext->link_func("profiler.end", &profiler::end);
 	ext->link("simulation_time", &artemis::graph::_current_simulation_time_);
 	ext->link("simulation_dt", &artemis::graph::_current_simulation_dt_);
 
@@ -192,6 +196,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	{
 		dataflow::Node n("");
 		ext->declare_class_size("Node", sizeof(dataflow::Node));
+		ext->declare_class_element("Node.name", &dataflow::Node::name);
+		ext->declare_class_element("Node.channel", &dataflow::Node::channel);
 		ext->declare_class_element("Node.dirty", &dataflow::Node::dirty);
 		ext->declare_class_element("Node.flags", &dataflow::Node::flags);
 		ext->link_class_func("Node.__init__", &node_init);

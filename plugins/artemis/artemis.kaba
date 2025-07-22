@@ -60,6 +60,8 @@ class Node
 	func extern virtual mut on_process()
 	func extern virtual mut create_panel() -> void*
 	func extern mut set(key: string, value: any)
+	var name: string
+	var channel: i32
 	var flags: NodeFlags
 	var dirty: bool
 
@@ -116,6 +118,10 @@ func extern rotation_bw(f: VectorField) -> VectorField
 func extern laplace(f: ScalarField) -> ScalarField
 
 
+namespace profiler
+	func extern static create_channel(name: string, parent: i32) -> i32
+	func extern static begin(channel: i32)
+	func extern static end(channel: i32)
 
 
 func extern create_session() -> Session*
