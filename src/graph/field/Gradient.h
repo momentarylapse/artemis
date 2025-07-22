@@ -16,7 +16,7 @@ class Gradient : public dataflow::Node {
 public:
 	Gradient() : Node("Gradient") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::InPort<artemis::data::ScalarField> in_field{this, "in"};
 

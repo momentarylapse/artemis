@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void Laplace::process() {
+void Laplace::on_process() {
 	if (auto f = in_field.value()) {
 		out(artemis::processing::laplace(*f));
 	}

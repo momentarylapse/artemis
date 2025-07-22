@@ -16,7 +16,7 @@ public:
 		flags = dataflow::NodeFlags::TimeDependent;
 	}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::OutPort<float> out_number{this, "number"};
 };

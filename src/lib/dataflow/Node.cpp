@@ -4,11 +4,11 @@
 
 #include "Node.h"
 #include "Setting.h"
+#include "Port.h"
 #include <view/DefaultNodePanel.h>
 #include <lib/any/any.h>
 #include <lib/os/msg.h>
-
-#include "Port.h"
+#include <lib/profiler/Profiler.h>
 
 namespace dataflow {
 
@@ -23,6 +23,17 @@ bool operator&(NodeFlags a, NodeFlags b) {
 Node::Node(const string& name) {
 	this->name = name;
 	pos = vec2(0, 0);
+	channel = profiler::create_channel(name);
+}
+
+Node::~Node() {
+	profiler::delete_channel(channel);
+}
+
+void Node::process() {
+	profiler::begin(channel);
+	on_process();
+	profiler::end(channel);
 }
 
 void Node::set(const string& key, const Any& value) {

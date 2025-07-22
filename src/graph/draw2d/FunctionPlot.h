@@ -16,7 +16,7 @@ class FunctionPlot : public dataflow::Node {
 public:
 	explicit FunctionPlot() : Node("FunctionPlot") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<string> formula{this, "formula", "x^2"};
 	dataflow::Setting<float> line_width{this, "line-width", 2.0f};

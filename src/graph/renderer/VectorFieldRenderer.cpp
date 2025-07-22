@@ -9,7 +9,7 @@
 
 namespace artemis::graph {
 
-void VectorFieldRenderer::process() {
+void VectorFieldRenderer::on_process() {
 	auto f = in_field.value();
 	if (!f)
 		return;

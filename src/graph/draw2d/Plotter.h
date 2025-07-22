@@ -24,7 +24,7 @@ class Plotter : public RendererNode {
 public:
 	explicit Plotter(Session* s) : RendererNode(s, "Plotter") {}
 
-	void process() override;
+	void on_process() override;
 
 	void draw_2d(Painter* p);
 

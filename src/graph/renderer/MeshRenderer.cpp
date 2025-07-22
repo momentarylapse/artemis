@@ -27,7 +27,7 @@ MeshRenderer::MeshRenderer(Session* s) : RendererNode(s, "MeshRenderer") {
 
 MeshRenderer::~MeshRenderer() = default;
 
-void MeshRenderer::process() {
+void MeshRenderer::on_process() {
 	auto mesh = in_mesh.value();
 	if (!mesh)
 		return;

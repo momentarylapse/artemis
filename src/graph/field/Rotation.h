@@ -15,7 +15,7 @@ class Rotation : public dataflow::Node {
 public:
 	Rotation() : Node("Rotation") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<bool> backwards{this, "backwards", false};
 

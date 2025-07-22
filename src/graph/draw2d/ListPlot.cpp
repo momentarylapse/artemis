@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void ListPlot::process() {
+void ListPlot::on_process() {
 	Array<vec2> points;
 	for (const auto& [i, y]: enumerate(*in_list.value()))
 		points.add(vec2((float)i * 0.1f, y));

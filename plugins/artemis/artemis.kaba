@@ -56,7 +56,8 @@ enum NodeFlags
 class Node
 	func extern __init__(name: string)
 	func extern virtual __delete__()
-	func extern virtual mut process()
+	func extern mut process()
+	func extern virtual mut on_process()
 	func extern virtual mut create_panel() -> void*
 	func extern mut set(key: string, value: any)
 	var flags: NodeFlags

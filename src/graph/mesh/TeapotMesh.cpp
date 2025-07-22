@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void TeapotMesh::process() {
+void TeapotMesh::on_process() {
 	GeometryTeapot geo(v_0, radius(), samples());
 	geo.smoothen();
 	out(geo);

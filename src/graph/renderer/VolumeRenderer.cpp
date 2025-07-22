@@ -24,7 +24,7 @@ VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
 	material_solid->textures.add(tex_white);
 }
 
-void VolumeRenderer::process() {
+void VolumeRenderer::on_process() {
 	auto f = in_field.value();
 	if (!f)
 		return;

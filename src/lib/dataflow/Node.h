@@ -41,9 +41,10 @@ bool operator&(NodeFlags a, NodeFlags b);
 class Node : public obs::Node<VirtualBase> {
 public:
 	explicit Node(const string& name);
-	~Node() override = default;
+	~Node() override;
 
-	virtual void process() {}
+	virtual void on_process() {}
+	void process();
 
 	virtual xhui::Panel* create_panel();
 
@@ -52,6 +53,7 @@ public:
 
 	string name;
 	vec2 pos;
+	int channel;
 	bool dirty = true;
 	NodeFlags flags = NodeFlags::None;
 

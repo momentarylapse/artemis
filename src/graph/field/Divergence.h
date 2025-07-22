@@ -16,7 +16,7 @@ class Divergence : public dataflow::Node {
 public:
 	Divergence() : Node("Divergence") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::InPort<artemis::data::VectorField> in_field{this, "in"};
 

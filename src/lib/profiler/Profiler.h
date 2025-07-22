@@ -13,6 +13,7 @@
 namespace profiler {
 	struct Channel {
 		string name;
+		bool used = false;
 		int parent = -1;
 		std::chrono::high_resolution_clock::time_point prev;
 		float dt = 0, average = 0;
@@ -36,6 +37,9 @@ namespace profiler {
 	};
 
 	int create_channel(const string &name, int parent = -1);
+	void delete_channel(int channel);
+	void set_parent(int channel, int parent);
+	void set_name(int channel, const string &name);
 	string get_name(int channel);
 
 	void begin(int channel);

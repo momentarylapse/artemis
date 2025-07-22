@@ -17,7 +17,7 @@ class VectorField : public dataflow::ResourceNode<data::VectorField> {
 public:
 	VectorField();
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<string> formula{this, "formula", "[0,0,0]"};
 	dataflow::SettingFromSet<data::ScalarType> type{this, "type", data::ScalarType::Float32,

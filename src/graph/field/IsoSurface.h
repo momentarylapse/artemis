@@ -16,7 +16,7 @@ class IsoSurface : public dataflow::Node {
 public:
 	IsoSurface() : Node("IsoSurface") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<float> iso_value{this, "iso-value", 0.0f};
 

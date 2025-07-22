@@ -11,7 +11,7 @@ class MaxwellFDTD extends Node
 		in_mb.__init__(self, "mb", PortFlags.OPTIONAL)
 		flags = NodeFlags.TIME_DEPENDENT
 	
-	func override process()
+	func override on_process()
 		let N = 5
 		let dt = simulation_dt / N * 2
 		for E in in_e.value()

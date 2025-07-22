@@ -21,7 +21,7 @@ VectorField::VectorField() : ResourceNode("VectorField") {
 	};
 }
 
-void VectorField::process() {
+void VectorField::on_process() {
 	if (auto g = in_grid.value()) {
 
 		if (formula() != cached_formula or !f_p) {

@@ -6,7 +6,7 @@
 
 namespace artemis::graph {
 
-void NumberListAccumulator::process() {
+void NumberListAccumulator::on_process() {
 	if (!out_list.value.has_value())
 		out_list.value = Array<float>{};
 

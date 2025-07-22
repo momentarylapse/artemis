@@ -19,7 +19,7 @@ class PointListRenderer : public RendererNode {
 public:
 	explicit PointListRenderer(Session* s);
 
-	void process() override;
+	void on_process() override;
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 

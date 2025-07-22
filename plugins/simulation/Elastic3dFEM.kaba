@@ -128,7 +128,7 @@ class Elastic3dFEM extends Node
 		uz += dt_uz * dt
 		#print(dux|>log)
 	
-	func override process()
+	func override on_process()
 		# assume f32
 		# assume PER_VERTEX
 		for ux in in_ux.value()

@@ -6,7 +6,7 @@
 
 namespace artemis::graph {
 
-void RandomNumber::process() {
+void RandomNumber::on_process() {
 	out_number(randf(1.0f));
 }
 

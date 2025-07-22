@@ -24,7 +24,7 @@ PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRen
 	material->textures.add(tex_white);
 }
 
-void PointListRenderer::process() {
+void PointListRenderer::on_process() {
 	if (!active())
 		return;
 

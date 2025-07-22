@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void FunctionPlot::process() {
+void FunctionPlot::on_process() {
 	if (formula() != cached_formula or !f_p) {
 		cached_formula = formula();
 		ctx = kaba::Context::create();

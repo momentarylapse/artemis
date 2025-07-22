@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void SphereMesh::process() {
+void SphereMesh::on_process() {
 	GeometrySphere geo(v_0, radius(), samples());
 	geo.smoothen();
 	out(geo);

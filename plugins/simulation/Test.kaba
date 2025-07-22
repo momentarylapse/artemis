@@ -7,7 +7,7 @@ class Test extends Node
 		#out_y.__init__(self, "y")
 		flags = NodeFlags.TIME_DEPENDENT
 	
-	func override process()
+	func override on_process()
 		for f in in_x.value()
 			for i in 0:f.grid.nx
 				for j in 0:f.grid.ny

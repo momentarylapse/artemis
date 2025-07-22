@@ -6,7 +6,7 @@
 
 namespace artemis::graph {
 
-void RegularGrid::process() {
+void RegularGrid::on_process() {
 	out(data::RegularGrid(nx(), ny(), nz(),
 		vec3::EX * dx(),
 		vec3::EY * dy(),

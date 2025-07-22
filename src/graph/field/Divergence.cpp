@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void Divergence::process() {
+void Divergence::on_process() {
 	if (auto f = in_field.value()) {
 		out(artemis::processing::divergence(*f));
 	}

@@ -16,7 +16,7 @@ class TeapotMesh : public dataflow::ResourceNode<PolygonMesh> {
 public:
 	TeapotMesh() : ResourceNode("TeapotMesh") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<float> radius{this, "radius", 1.0f};
 	dataflow::Setting<int> samples{this, "samples", 8};

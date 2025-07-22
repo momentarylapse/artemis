@@ -10,7 +10,7 @@
 
 namespace artemis::graph {
 
-void GridRenderer::process() {
+void GridRenderer::on_process() {
 	if (auto r = regular.value()) {
 		out_draw(RenderData{active(), r->bounding_box(), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
 			draw_win(params, win, rvd);

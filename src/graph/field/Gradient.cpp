@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-void Gradient::process() {
+void Gradient::on_process() {
 	if (auto f = in_field.value()) {
 		out(artemis::processing::gradient(*f));
 	}

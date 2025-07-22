@@ -15,7 +15,7 @@ class ListPlot : public dataflow::Node {
 public:
 	explicit ListPlot() : Node("ListPlot") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<float> line_width{this, "line-width", 2.0f};
 	dataflow::Setting<color> _color{this, "color", Red};

@@ -17,7 +17,7 @@ class GridRenderer : public RendererNode {
 public:
 	explicit GridRenderer(Session* s) : RendererNode(s, "GridRenderer") {}
 
-	void process() override;
+	void on_process() override;
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 

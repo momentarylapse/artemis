@@ -6,6 +6,7 @@
  */
 
 #include "Profiler.h"
+#include "../base/iter.h"
 
 namespace profiler {
 	int frames = -1;
@@ -32,8 +33,27 @@ namespace profiler {
 	}
 
 	int create_channel(const string &name, int parent) {
-		channels.add({name, parent});
+		for (auto&& [i, c]: enumerate(channels))
+			if (!c.used) {
+				c.used = true;
+				c.name = name;
+				c.parent = parent;
+				return i;
+			}
+		channels.add({name, true, parent});
 		return channels.num - 1;
+	}
+
+	void delete_channel(int channel) {
+		channels[channel].used = false;
+	}
+
+	void set_parent(int channel, int parent) {
+		channels[channel].parent = parent;
+	}
+
+	void set_name(int channel, const string& name) {
+		channels[channel].name = name;
 	}
 
 	string get_name(int channel) {

@@ -196,8 +196,9 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 		ext->declare_class_element("Node.flags", &dataflow::Node::flags);
 		ext->link_class_func("Node.__init__", &node_init);
 		ext->link_class_func("Node.set", &dataflow::Node::set);
+		ext->link_class_func("Node.process", &dataflow::Node::process);
 		ext->link_virtual("Node.__delete__", &GenericVDeleter<dataflow::Node>::__delete__, &n);
-		ext->link_virtual("Node.process", &dataflow::Node::process, &n);
+		ext->link_virtual("Node.on_process", &dataflow::Node::on_process, &n);
 		ext->link_virtual("Node.create_panel", &dataflow::Node::create_panel, &n);
 	}
 

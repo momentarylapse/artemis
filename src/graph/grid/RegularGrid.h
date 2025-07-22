@@ -16,7 +16,7 @@ class RegularGrid : public dataflow::ResourceNode<data::RegularGrid> {
 public:
 	RegularGrid() : ResourceNode("RegularGrid") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<int> nx{this, "nx", 8};
 	dataflow::Setting<int> ny{this, "ny", 8};

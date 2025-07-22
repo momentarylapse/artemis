@@ -7,10 +7,13 @@
 #include "Node.h"
 #include <lib/base/algo.h>
 #include <lib/os/msg.h>
+#include <lib/profiler/Profiler.h>
 
 namespace dataflow {
 
-Graph::Graph() = default;
+Graph::Graph() {
+	channel = profiler::create_channel("graph");
+}
 
 void Graph::clear() {
 	auto _nodes = nodes;
@@ -20,6 +23,7 @@ void Graph::clear() {
 
 void Graph::add_node(dataflow::Node* node) {
 	nodes.add(node);
+	profiler::set_parent(node->channel, channel);
 	out_changed();
 }
 
@@ -72,6 +76,8 @@ Array<CableInfo> Graph::cables() const {
 
 
 bool Graph::iterate() {
+	profiler::begin(channel);
+
 	// TODO DAG
 	bool updated_any = false;
 	for (auto n: nodes)
@@ -80,6 +86,8 @@ bool Graph::iterate() {
 			n->dirty = false;
 			updated_any = true;
 		}
+
+	profiler::end(channel);
 	return updated_any;
 }
 

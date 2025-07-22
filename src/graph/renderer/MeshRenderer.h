@@ -18,7 +18,7 @@ public:
 	explicit MeshRenderer(Session* s);
 	~MeshRenderer() override;
 
-	void process() override;
+	void on_process() override;
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 

@@ -15,7 +15,7 @@ class NumberListAccumulator : public dataflow::Node {
 public:
 	NumberListAccumulator() : Node("NumberListAccumulator") {}
 
-	void process() override;
+	void on_process() override;
 
 	dataflow::Setting<int> capacity{this, "capacity", 1000};
 

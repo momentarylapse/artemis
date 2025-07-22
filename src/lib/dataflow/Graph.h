@@ -26,6 +26,7 @@ class Graph : public obs::Node<VirtualBase> {
 public:
 	Graph();
 
+	int channel;
 	Array<dataflow::Node*> nodes;
 
 	void clear();

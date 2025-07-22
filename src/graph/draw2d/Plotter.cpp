@@ -11,7 +11,7 @@
 
 namespace artemis::graph {
 
-void Plotter::process() {
+void Plotter::on_process() {
 	RenderData d;
 	d.f_draw_2d = [this] (Painter* p) {
 		draw_2d(p);
