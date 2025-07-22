@@ -3,6 +3,7 @@
 //
 
 #include "VectorField.h"
+#include <processing/helper/GlobalThreadPool.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
 
@@ -54,16 +55,14 @@ func f(p: vec3, t: f32) -> vec3
 
 			switch (sampling_mode()) {
 			case data::SamplingMode::PerCell:
-				for (int i=0; i<g->nx; i++)
-					for (int j=0; j<g->ny; j++)
-						for (int k=0; k<g->nz; k++)
-							s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, _current_simulation_time_)));
+				processing::pool::run({0,0,0}, {g->nx, g->ny, g->nz}, [&s, f] (int i, int j, int k) {
+					s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, _current_simulation_time_)));
+				}, 200);
 				break;
 			case data::SamplingMode::PerVertex:
-				for (int i=0; i<=g->nx; i++)
-					for (int j=0; j<=g->ny; j++)
-						for (int k=0; k<=g->nz; k++)
-							s.set(i, j, k, dvec3(f({(float)i, (float)j, (float)k}, _current_simulation_time_)));
+				processing::pool::run({0,0,0}, {g->nx+1, g->ny+1, g->nz+1}, [&s, f] (int i, int j, int k) {
+					s.set(i, j, k, dvec3(f({(float)i, (float)j, (float)k}, _current_simulation_time_)));
+				}, 200);
 			}
 			out(s);
 		}

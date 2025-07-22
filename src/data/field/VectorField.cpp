@@ -3,6 +3,8 @@
 //
 
 #include "VectorField.h"
+//#include <processing/field/Calculus.h>
+#include <processing/helper/GlobalThreadPool.h>
 
 namespace artemis::data {
 
@@ -50,20 +52,29 @@ void VectorField::set32(int i, int j, int k, const vec3& vv) {
 
 template<class T>
 void list_add(T& a, const T& b) {
-	for (int i=0; i<a.num; i++)
+	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
+	}, 1000);
+//	for (int i=0; i<a.num; i++)
+//		a[i] += b[i];
 }
 
 template<class T>
 void list_sub(T& a, const T& b) {
-	for (int i=0; i<a.num; i++)
+	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
+	}, 1000);
+//	for (int i=0; i<a.num; i++)
+//		a[i] -= b[i];
 }
 
 template<class T>
 void list_mul_single(T& a, float s) {
-	for (int i=0; i<a.num; i++)
+	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
+	}, 1000);
+//	for (int i=0; i<a.num; i++)
+//		a[i] *= s;
 }
 
 void VectorField::operator+=(const VectorField& o) {
