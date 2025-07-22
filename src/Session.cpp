@@ -15,10 +15,11 @@
 #include "view/Mode.h"
 #include "data/Data.h"
 #include "storage/format/Format.h"
-#include "storage/Storage.h"
-#include "lib/xhui/config.h"
-#include "lib/image/image.h"
-#include "lib/os/msg.h"
+#include <processing/helper/GlobalThreadPool.h>
+#include <storage/Storage.h>
+#include <lib/xhui/config.h>
+#include <lib/image/image.h>
+#include <lib/os/msg.h>
 #include <y/EngineData.h>
 #include <y/helper/ResourceManager.h>
 #include <y/world/Camera.h>
@@ -38,6 +39,7 @@ Session *create_session() {
 	s->win = new ArtemisWindow(s);
 	s->win->renderer = new XhuiRenderer();
 	_current_session_ = s;
+	artemis::processing::pool::init();
 	return s;
 }
 

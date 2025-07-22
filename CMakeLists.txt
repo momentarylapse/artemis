@@ -403,6 +403,7 @@ add_executable(artemis
 	src/lib/dataflow/ResourceNode.cpp
 	src/lib/dataflow/Setting.cpp
 	src/lib/dataflow/Type.cpp
+	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
@@ -525,6 +526,7 @@ add_executable(artemis
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
+	src/lib/threads/ThreadPool.cpp
 	src/lib/vulkan/AccelerationStructure.cpp
 	src/lib/vulkan/Buffer.cpp
 	src/lib/vulkan/CommandBuffer.cpp
@@ -591,6 +593,7 @@ add_executable(artemis
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp
+	src/processing/helper/GlobalThreadPool.cpp
 	src/storage/format/Format.cpp
 	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp
@@ -772,6 +775,7 @@ add_library(moduleartemis SHARED
 	src/lib/dataflow/ResourceNode.cpp
 	src/lib/dataflow/Setting.cpp
 	src/lib/dataflow/Type.cpp
+	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
@@ -894,6 +898,7 @@ add_library(moduleartemis SHARED
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
+	src/lib/threads/ThreadPool.cpp
 	src/lib/vulkan/AccelerationStructure.cpp
 	src/lib/vulkan/Buffer.cpp
 	src/lib/vulkan/CommandBuffer.cpp
@@ -960,6 +965,7 @@ add_library(moduleartemis SHARED
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp
+	src/processing/helper/GlobalThreadPool.cpp
 	src/storage/format/Format.cpp
 	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp

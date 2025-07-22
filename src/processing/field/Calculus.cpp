@@ -5,6 +5,9 @@
 #include "Calculus.h"
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
+#include "../helper/GlobalThreadPool.h"
+#include <lib/os/time.h>
+#include "lib/os/msg.h"
 
 namespace artemis::processing {
 
@@ -43,16 +46,18 @@ data::ScalarField divergence(const data::VectorField& v) {
 data::VectorField rotation_fw(const data::VectorField& v) {
 	data::VectorField rot(v.grid, v.type, v.sampling_mode);
 
+
+	os::Timer timer;
+
 	// volume
-	for (int i=0; i<v.grid.nx-1; i++)
-		for (int j=0; j<v.grid.ny-1; j++)
-			for (int k=0; k<v.grid.nz-1; k++) {
-				dvec3 v0 = v.value(i, j, k);
-				dvec3 vx = v.value(i+1, j, k);
-				dvec3 vy = v.value(i, j+1, k);
-				dvec3 vz = v.value(i, j, k+1);
-				rot.set(i, j, k, dvec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
-			}
+	pool::run({0,0,0}, {v.grid.nx-1, v.grid.ny-1, v.grid.nz-1}, [&v, &rot] (int i, int j, int k) {
+		dvec3 v0 = v.value(i, j, k);
+		dvec3 vx = v.value(i+1, j, k);
+		dvec3 vy = v.value(i, j+1, k);
+		dvec3 vz = v.value(i, j, k+1);
+		rot.set(i, j, k, dvec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
+	}, 200);
+	float t0 = timer.peek();
 	// face x/y
 	{
 		int k = v.grid.nz-1;
@@ -117,21 +122,22 @@ data::VectorField rotation_fw(const data::VectorField& v) {
 		}
 	}
 
+	float t1 = timer.get();
+	msg_write(f2s(t0 * 1000, 3) + "   " + f2s(t1 * 1000, 3));
+
 	return rot;
 }
 
 data::VectorField rotation_bw(const data::VectorField& v) {
 	data::VectorField rot(v.grid, v.type, v.sampling_mode);
 
-	for (int i=1; i<v.grid.nx; i++)
-		for (int j=1; j<v.grid.ny; j++)
-			for (int k=1; k<v.grid.nz; k++) {
-				dvec3 v0 = v.value(i, j, k);
-				dvec3 vnx = v.value(i-1, j, k);
-				dvec3 vny = v.value(i, j-1, k);
-				dvec3 vnz = v.value(i, j, k-1);
-				rot.set(i, j, k, dvec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
-			}
+	pool::run({1,1,1}, {v.grid.nx, v.grid.ny, v.grid.nz}, [&v, &rot] (int i, int j, int k) {
+		dvec3 v0 = v.value(i, j, k);
+		dvec3 vnx = v.value(i-1, j, k);
+		dvec3 vny = v.value(i, j-1, k);
+		dvec3 vnz = v.value(i, j, k-1);
+		rot.set(i, j, k, dvec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
+	}, 200);
 	// face x/y
 	{
 		int k = 0;

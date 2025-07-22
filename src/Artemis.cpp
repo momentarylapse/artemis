@@ -3,7 +3,6 @@
 #include <lib/dataflow/Node.h>
 #include <graph/NodeFactory.h>
 #include <graph/Graph.h>
-#include <storage/format/Format.h>
 #include "Session.h"
 #include <view/ArtemisWindow.h>
 #include <plugins/PluginManager.h>
