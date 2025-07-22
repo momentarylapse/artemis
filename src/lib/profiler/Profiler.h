@@ -15,9 +15,6 @@ namespace profiler {
 		string name;
 		bool used = false;
 		int parent = -1;
-		std::chrono::high_resolution_clock::time_point prev;
-		float dt = 0, average = 0;
-		int count = 0;
 	};
 
 	struct TimingData {
@@ -30,6 +27,13 @@ namespace profiler {
 		Array<TimingData> gpu;
 		float total_time;
 	};
+
+	struct ChannelStats {
+		int channel = -1;
+		float total = 0, average = 0;
+		int count = 0;
+	};
+	Array<ChannelStats> digest_report(const FrameTimingData& td);
 
 	class Profiler {
 	public:

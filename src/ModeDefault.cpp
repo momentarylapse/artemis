@@ -12,15 +12,12 @@
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
+#include <lib/base/iter.h>
+#include <lib/profiler/Profiler.h>
 #include <view/ArtemisWindow.h>
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
-
 #include "storage/Storage.h"
-
-namespace artemis::graph {
-	extern float _current_simulation_time_;
-}
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
@@ -33,6 +30,10 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 			graph->iterate_simulation(0.1f);
 		if (graph->iterate())
 			session->win->request_redraw();
+	});
+	xhui::run_repeated(2.0f, [this] {
+		profiler::next_frame();
+		session->win->request_redraw();
 	});
 
 	auto win = session->win;
@@ -84,6 +85,12 @@ void ModeDefault::on_draw_post(Painter* p) {
 
 	p->set_color(White);
 	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", artemis::graph::_current_simulation_time_));
+
+	if (show_profiling) {
+		auto report = profiler::digest_report(profiler::previous_frame_timing);
+		for (const auto& [i, c]: enumerate(report))
+			p->draw_str(p->area().p00() + vec2(20, 20 + 20 * (float)i), format("%s  %.2f  %.2f  %.d", profiler::get_name(c.channel), c.average * 1000, c.total * 1000, c.count));
+	}
 }
 
 void ModeDefault::on_command(const string& id) {
@@ -93,6 +100,11 @@ void ModeDefault::on_command(const string& id) {
 	if (id == "save-as") {
 		session->storage->save_as(data);
 	}
+}
+
+void ModeDefault::on_key_down(int key) {
+	if (key == xhui::KEY_CONTROL | key == xhui::KEY_T)
+		show_profiling = !show_profiling;
 }
 
 
