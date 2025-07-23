@@ -9,10 +9,10 @@
 #include <lib/kaba/kaba.h>
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
+#include <lib/os/app.h>
 #include <lib/os/filesystem.h>
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
-#include <lib/xhui/Application.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
@@ -36,10 +36,10 @@ base::map<string, Path> PluginManager::plugin_classes;
 
 
 Path PluginManager::directory() {
-	if (xhui::Application::installed)
-		return xhui::Application::directory_static | "plugins";
+	if (os::app::installed)
+		return os::app::directory_static | "plugins";
 	else
-		return xhui::Application::directory_static.parent() | "plugins";
+		return os::app::directory_static.parent() | "plugins";
 }
 
 

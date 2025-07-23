@@ -501,6 +501,7 @@ add_executable(artemis
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
+	src/lib/nix/_kaba_export.cpp
 	src/lib/nix/nix.cpp
 	src/lib/nix/nix_buffer.cpp
 	src/lib/nix/nix_draw.cpp
@@ -510,6 +511,7 @@ add_executable(artemis
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
 	src/lib/os/date.cpp
@@ -705,7 +707,7 @@ add_executable(artemis
 target_include_directories(artemis PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(artemis PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(artemis PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(artemis PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(artemis PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(artemis PUBLIC ${DEPS})
 target_include_directories(artemis PUBLIC src)
 target_include_directories(artemis PUBLIC src/y)
@@ -873,6 +875,7 @@ add_library(moduleartemis SHARED
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
+	src/lib/nix/_kaba_export.cpp
 	src/lib/nix/nix.cpp
 	src/lib/nix/nix_buffer.cpp
 	src/lib/nix/nix_draw.cpp
@@ -882,6 +885,7 @@ add_library(moduleartemis SHARED
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
 	src/lib/os/date.cpp
@@ -1078,7 +1082,7 @@ add_library(moduleartemis SHARED
 target_include_directories(moduleartemis PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(moduleartemis PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(moduleartemis PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(moduleartemis PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(moduleartemis PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(moduleartemis PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(moduleartemis PUBLIC -fvisibility=hidden)

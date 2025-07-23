@@ -98,35 +98,36 @@ void export_run() {
 	}
 }
 
-int xhui_main(const Array<string>& args) {
-	try {
-		xhui::init(args, "artemis");
-	} catch (Exception &e) {
-		msg_error(e.message());
-		return 1;
-	}
+namespace os::app {
+	int main(const Array<string>& args) {
+		try {
+			xhui::init(args, "artemis");
+		} catch (Exception &e) {
+			msg_error(e.message());
+			return 1;
+		}
 
-	kaba::init();
-	try {
-		artemis::PluginManager::init();
-	} catch (Exception &e) {
-		msg_error(e.message());
-	}
+		kaba::init();
+		try {
+			artemis::PluginManager::init();
+		} catch (Exception &e) {
+			msg_error(e.message());
+		}
 
-	auto s = create_session();
-	artemis::graph::init_factory();
-	if (args.num >= 2) {
-		start_session_load_file(s, args[1]);
-	} else {
-		start_session_empty(s);
-	}
+		auto s = create_session();
+		artemis::graph::init_factory();
+		if (args.num >= 2) {
+			start_session_load_file(s, args[1]);
+		} else {
+			start_session_empty(s);
+		}
 
-	try {
-		xhui::run();
-	} catch (Exception& e) {
-		msg_error(e.message());
+		try {
+			xhui::run();
+		} catch (Exception& e) {
+			msg_error(e.message());
+		}
+		return 0;
 	}
-	return 0;
 }
-
 
