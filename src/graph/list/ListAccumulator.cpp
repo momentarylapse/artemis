@@ -2,11 +2,11 @@
 // Created by Michael Ankele on 2025-03-18.
 //
 
-#include "NumberListAccumulator.h"
+#include "ListAccumulator.h"
 
 namespace artemis::graph {
 
-void NumberListAccumulator::on_process() {
+void ListAccumulator::on_process() {
 	if (!out_list.value.has_value())
 		out_list.value = Array<double>{};
 

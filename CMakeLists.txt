@@ -378,6 +378,9 @@ add_executable(artemis
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
 	src/graph/grid/RegularGrid.cpp
+	src/graph/list/List.cpp
+	src/graph/list/ListAccumulator.cpp
+	src/graph/list/ListToVectors.cpp
 	src/graph/mesh/SphereMesh.cpp
 	src/graph/mesh/TeapotMesh.cpp
 	src/graph/renderer/Canvas.cpp
@@ -388,9 +391,6 @@ add_executable(artemis
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
-	src/graph/value/ListToVectors.cpp
-	src/graph/value/NumberList.cpp
-	src/graph/value/NumberListAccumulator.cpp
 	src/graph/value/RandomNumber.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp
@@ -754,6 +754,9 @@ add_library(moduleartemis SHARED
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
 	src/graph/grid/RegularGrid.cpp
+	src/graph/list/List.cpp
+	src/graph/list/ListAccumulator.cpp
+	src/graph/list/ListToVectors.cpp
 	src/graph/mesh/SphereMesh.cpp
 	src/graph/mesh/TeapotMesh.cpp
 	src/graph/renderer/Canvas.cpp
@@ -764,9 +767,6 @@ add_library(moduleartemis SHARED
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
-	src/graph/value/ListToVectors.cpp
-	src/graph/value/NumberList.cpp
-	src/graph/value/NumberListAccumulator.cpp
 	src/graph/value/RandomNumber.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp

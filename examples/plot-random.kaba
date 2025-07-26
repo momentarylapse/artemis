@@ -4,7 +4,7 @@ func main()
 	var g = weak(current_session().graph)
 
 	var rn = g.add_node("RandomNumber", [300, 100])
-	var acc = g.add_node("NumberListAccumulator", [300, 250])
+	var acc = g.add_node("ListAccumulator", [300, 250])
 	acc.set("capacity", 80)
 	var lp = g.add_node("ListPlot", [300, 400])
 	lp.set("x-scale", 0.1)

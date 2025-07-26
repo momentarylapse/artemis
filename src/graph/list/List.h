@@ -9,9 +9,9 @@
 
 namespace artemis::graph {
 
-class NumberList : public dataflow::ResourceNode<Array<double>> {
+class List : public dataflow::ResourceNode<Array<double>> {
 public:
-	NumberList();
+	List() : ResourceNode("List") {}
 
 	void on_process() override;
 

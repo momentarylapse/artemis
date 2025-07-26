@@ -3,7 +3,7 @@ use plugins.artemis.*
 func main()
 	var g = weak(current_session().graph)
 
-	var list = g.add_node("NumberList", [300, 250])
+	var list = g.add_node("List", [300, 250])
 	list.set("list", dyn([1.0, 2.0, 5.0, 0.0]))
 	var lp = g.add_node("ListPlot", [300, 400])
 	
