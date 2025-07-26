@@ -30,8 +30,8 @@ void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* 
 	GeometrySphere mesh(v_0, 1, 2);
 	mesh.build(vertex_buffer.get());
 
-	float s = scale();
-	float r = radius();
+	float s = (float)scale();
+	float r = (float)radius();
 
 	if (d->sampling_mode == artemis::data::SamplingMode::PerCell) {
 		for (int i=0; i<d->grid.nx; i++)

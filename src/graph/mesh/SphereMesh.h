@@ -18,7 +18,7 @@ public:
 
 	void on_process() override;
 
-	dataflow::Setting<float> radius{this, "radius", 1.0f};
+	dataflow::Setting<double> radius{this, "radius", 1.0};
 	dataflow::Setting<int> samples{this, "samples", 8};
 };
 

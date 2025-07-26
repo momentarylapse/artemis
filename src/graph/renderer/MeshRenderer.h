@@ -24,8 +24,8 @@ public:
 
 	dataflow::InPort<PolygonMesh> in_mesh{this, "mesh"};
 
-	dataflow::Setting<float> roughness{this, "roughness", 0.7f};
-	dataflow::Setting<float> metal{this, "metal", 0.05f};
+	dataflow::Setting<double> roughness{this, "roughness", 0.7};
+	dataflow::Setting<double> metal{this, "metal", 0.05};
 	dataflow::Setting<color> albedo{this, "albedo", White};
 	dataflow::Setting<color> emission{this, "emission", Black};
 

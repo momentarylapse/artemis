@@ -45,7 +45,7 @@ void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* wi
 	if (in_mesh.value()) {
 		in_mesh.value()->build(vertex_buffer.get());
 	} else {
-		GeometrySphere mesh(v_0, radius(), 4);
+		GeometrySphere mesh(v_0, (float)radius(), 4);
 		mesh.build(vertex_buffer.get());
 	}
 

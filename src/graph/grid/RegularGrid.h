@@ -21,9 +21,9 @@ public:
 	dataflow::Setting<int> nx{this, "nx", 8};
 	dataflow::Setting<int> ny{this, "ny", 8};
 	dataflow::Setting<int> nz{this, "nz", 1};
-	dataflow::Setting<float> dx{this, "dx", 1.0f};
-	dataflow::Setting<float> dy{this, "dy", 1.0f};
-	dataflow::Setting<float> dz{this, "dz", 1.0f};
+	dataflow::Setting<double> dx{this, "dx", 1.0};
+	dataflow::Setting<double> dy{this, "dy", 1.0};
+	dataflow::Setting<double> dz{this, "dz", 1.0};
 
 	dataflow::OutPort<Array<vec3>> out_vertices{this, "vertices"};
 	dataflow::OutPort<Array<vec3>> out_cell_centers{this, "cell_centers"};

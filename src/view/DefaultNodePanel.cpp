@@ -31,17 +31,17 @@ Dialog x ''
 		set_target("settings-grid");
 		add_control("Label", s->name, 0, i, "");
 		string id = format("setting-%d", i);
-		if (s->class_ == kaba::TypeFloat32) {
-			auto ss = node->settings[i]->as<float>();
+		if (s->class_ == kaba::TypeFloat64) {
+			auto ss = node->settings[i]->as<double>();
 			add_control("SpinButton", "", 1, i, id);
 			set_options(id, "expandx");
 			if (s->options.find("range=") == 0)
 				set_options(id, s->options);
 			else
 				set_options(id, "range=::0.001");
-			set_float(id, (*ss)());
+			set_float(id, (float)(*ss)());
 			event(id, [this, id, ss] {
-				ss->set(get_float(id));
+				ss->set((double)get_float(id));
 			});
 		} else if (s->class_ == kaba::TypeInt32) {
 			auto ss = node->settings[i]->as<int>();

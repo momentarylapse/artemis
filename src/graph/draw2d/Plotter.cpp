@@ -43,8 +43,8 @@ void Plotter::draw_2d(Painter* p) {
 	float y_min = -5;
 	float y_max = 15;
 
-	float x_scale = area.width() / (x_max() - x_min());
-	float x_offset = area.x1 - x_min() * x_scale;
+	float x_scale = area.width() / (float)(x_max() - x_min());
+	float x_offset = area.x1 - (float)x_min() * x_scale;
 
 	float y_scale = - area.height() / (y_max - y_min);
 	float y_offset = area.y1 - y_max * y_scale;
@@ -55,16 +55,16 @@ void Plotter::draw_2d(Painter* p) {
 
 	p->set_color(color::interpolate(xhui::Theme::_default.text_disabled, xhui::Theme::_default.background_low, 0.75f));
 	p->set_line_width(1);
-	for (float x: ticks(x_min(), x_max(), x_scale))
+	for (float x: ticks((float)x_min(), (float)x_max(), x_scale))
 		p->draw_line(project({x, y_min}), project({x, y_max}));
 	for (float y: ticks(y_min, y_max, -y_scale))
-		p->draw_line(project({x_min(), y}), project({x_max(), y}));
+		p->draw_line(project({(float)x_min(), y}), project({(float)x_max(), y}));
 
 	for (const auto d: in_plot.values()) {
 		Array<vec2> points;
 
 		if (d->f) {
-			Array<float> xs = lin_spacing(x_min(), x_max(), 200), ys;
+			Array<float> xs = lin_spacing((float)x_min(), (float)x_max(), 200), ys;
 			for (float x: xs) {
 				float y = (*d->f)(x);
 				ys.add(y);
@@ -78,7 +78,7 @@ void Plotter::draw_2d(Painter* p) {
 		}
 
 		p->set_color(d->_color);
-		p->set_line_width(d->line_width);
+		p->set_line_width((float)d->line_width);
 		p->draw_lines(points);
 	}
 }

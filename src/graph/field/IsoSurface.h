@@ -18,7 +18,7 @@ public:
 
 	void on_process() override;
 
-	dataflow::Setting<float> iso_value{this, "iso-value", 0.0f};
+	dataflow::Setting<double> iso_value{this, "iso-value", 0.0};
 
 	dataflow::InPort<artemis::data::ScalarField> in_field{this, "in"};
 	dataflow::OutPort<PolygonMesh> out_mesh{this, "mesh"};

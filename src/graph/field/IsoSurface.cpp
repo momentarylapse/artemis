@@ -9,7 +9,7 @@ namespace artemis::graph {
 
 void IsoSurface::on_process() {
 	if (auto f = in_field.value()) {
-		out_mesh(artemis::processing::iso_surface(*f, iso_value()));
+		out_mesh(artemis::processing::iso_surface(*f, (float)iso_value()));
 	}
 }
 

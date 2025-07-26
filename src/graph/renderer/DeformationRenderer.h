@@ -17,8 +17,8 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 
-	dataflow::Setting<float> scale{this, "scale", 1.0f};
-	dataflow::Setting<float> radius{this, "radius", 0.1f};
+	dataflow::Setting<double> scale{this, "scale", 1.0};
+	dataflow::Setting<double> radius{this, "radius", 0.1};
 
 	dataflow::InPort<artemis::data::VectorField> in_diff{this, "diff"};
 	dataflow::InPort<artemis::data::ScalarField> in_scalar{this, "scalar", dataflow::PortFlags::Optional};

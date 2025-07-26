@@ -36,8 +36,8 @@ void MeshRenderer::on_process() {
 		vertex_buffer = new VertexBuffer("3f,3f,2f");
 	mesh->build(vertex_buffer.get());
 
-	material->roughness = roughness();
-	material->metal = metal();
+	material->roughness = (float)roughness();
+	material->metal = (float)metal();
 	material->albedo = albedo();
 	material->emission = emission();
 

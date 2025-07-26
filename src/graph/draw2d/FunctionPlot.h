@@ -19,7 +19,7 @@ public:
 	void on_process() override;
 
 	dataflow::Setting<string> formula{this, "formula", "x^2"};
-	dataflow::Setting<float> line_width{this, "line-width", 2.0f};
+	dataflow::Setting<double> line_width{this, "line-width", 2.0};
 	dataflow::Setting<color> _color{this, "color", Red};
 
 	dataflow::OutPort<PlotData> out_plot{this, "plot"};

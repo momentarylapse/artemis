@@ -21,7 +21,7 @@ public:
 
 	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 
-	dataflow::Setting<float> line_width{this, "line-width", 1.0f, "range=0:99:0.1"};
+	dataflow::Setting<double> line_width{this, "line-width", 1.0, "range=0:99:0.1"};
 	dataflow::Setting<color> _color{this, "color", Gray};
 
 	dataflow::InPort<data::RegularGrid> regular{this, "regular"};

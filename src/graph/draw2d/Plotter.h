@@ -13,7 +13,7 @@ namespace artemis::graph {
 typedef float (*scalar_function_1d)(float); // double..?
 
 struct PlotData {
-	float line_width;
+	double line_width;
 	color _color;
 	scalar_function_1d f;
 	Array<vec2> points;
@@ -29,8 +29,8 @@ public:
 
 
 	dataflow::Setting<bool> auto_zoom{this, "auto-zoom", true};
-	dataflow::Setting<float> x_min{this, "x-min", -10};
-	dataflow::Setting<float> x_max{this, "x-max", 10};
+	dataflow::Setting<double> x_min{this, "x-min", -10};
+	dataflow::Setting<double> x_max{this, "x-max", 10};
 
 	dataflow::InPort<PlotData> in_plot{this, "plot", dataflow::PortFlags::Multi};
 };

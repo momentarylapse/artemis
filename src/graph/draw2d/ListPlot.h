@@ -17,9 +17,9 @@ public:
 
 	void on_process() override;
 
-	dataflow::Setting<float> line_width{this, "line-width", 2.0f};
+	dataflow::Setting<double> line_width{this, "line-width", 2.0};
 	dataflow::Setting<color> _color{this, "color", Red};
-	dataflow::Setting<float> x_scale{this, "x-scale", 1.0f};
+	dataflow::Setting<double> x_scale{this, "x-scale", 1.0};
 
 	dataflow::InPort<Array<double>> in_list{this, "list"};
 	dataflow::OutPort<PlotData> out_plot{this, "plot"};
