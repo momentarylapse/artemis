@@ -101,6 +101,31 @@ class OutPortList
 	func extern __init__(node: Node, name: string, flags: PortFlags)
 	func extern set(x: f64[])
 
+class SettingFloat
+	func extern __init__(node: Node, name: string, value: f64, options: string = "")
+	func extern call() -> f64&
+	func extern mut set(value: f64)
+
+class SettingInt
+	func extern __init__(node: Node, name: string, value: i32, options: string = "")
+	func extern call() -> i32&
+	func extern mut set(value: i32)
+
+class SettingBool
+	func extern __init__(node: Node, name: string, value: bool, options: string = "")
+	func extern call() -> bool&
+	func extern mut set(value: bool)
+
+class SettingString
+	func extern __init__(node: Node, name: string, value: string, options: string = "")
+	func extern call() -> string&
+	func extern mut set(value: string)
+
+class SettingColor
+	func extern __init__(node: Node, name: string, value: color, options: string = "")
+	func extern call() -> color&
+	func extern mut set(value: color)
+
 class Graph
 	func extern add_node(name: string, pos: vec2) -> Node&
 	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)

@@ -13,6 +13,7 @@ func main()
 	vel.set("list", dyn([0,1,0, 0,0,0]))
 	
 	var sim = g.add_node("OrbitRK", [500, 400])
+	sim.set("g", 250)
 	
 	var l2v = g.add_node("ListToVectors", [300, 400])
 	

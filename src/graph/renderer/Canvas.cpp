@@ -24,7 +24,7 @@ void Canvas::draw_win(const RenderParams& params, MultiViewWindow* win, RenderVi
 		}
 		if (bounding_box) {
 			win->multi_view->view_port.pos = bounding_box->center();
-			win->multi_view->view_port.radius = bounding_box->size().length() * 1.2f;
+			win->multi_view->view_port.radius = bounding_box->size().length() * 1.5f;
 			camera_defined = true;
 		}
 	}

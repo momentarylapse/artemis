@@ -7,6 +7,7 @@
 #include "Node.h"
 #include "Type.h"
 #include <lib/base/base.h>
+#include <lib/base/xparam.h>
 
 namespace kaba {
 	class Class;
@@ -51,7 +52,7 @@ public:
 	const T& operator()() const {
 		return this->value;
 	}
-	void set(const T& value) {
+	void set(const typename base::xparam<T>::t value) {
 		this->value = value;
 		owner->dirty = true;
 		if (on_update)

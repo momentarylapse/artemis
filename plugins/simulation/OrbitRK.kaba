@@ -112,8 +112,8 @@ class OrbitRK extends Node
 	var in_pos: InPortList
 	var in_vel: InPortList
 	
+	var G: SettingFloat
 	
-	var G = 250.0
 	var state: SimulationState
 	
 	
@@ -122,11 +122,12 @@ class OrbitRK extends Node
 		in_mass.__init__(self, "mass", PortFlags.NONE)
 		in_pos.__init__(self, "pos", PortFlags.MUTABLE)
 		in_vel.__init__(self, "vel", PortFlags.MUTABLE)
+		G.__init__(self, "g", 100.0)
 		flags = NodeFlags.TIME_DEPENDENT
 		
 	func mut state_in(mass: f64[], pos: f64[], vel: f64[])
 		let n = min(min(len(mass), len(pos)/3), len(vel)/3)
-		state.G = G
+		state.G = G()
 		state.num_actives = n
 		state.num_passives = 0
 		state.m_grav = mass

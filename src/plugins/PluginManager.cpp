@@ -25,6 +25,8 @@
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 
+#include "lib/xhui/Application.h"
+
 extern Session* _current_session_;
 
 Session* export_start();
@@ -81,6 +83,11 @@ void port_init(T* port, dataflow::Node* node, const string& name, dataflow::Port
 }
 
 template<class T>
+void setting_init(T* setting, dataflow::Node* node, const string& name, typename base::xparam<T>::t value, const string& options) {
+	new (setting) dataflow::Setting<T>(node, name, value, options);
+}
+
+template<class T>
 void link_ports(kaba::Exporter* ext, const string& name) {
 	ext->declare_class_size("InPort" + name, sizeof(dataflow::InPort<T>));
 	ext->link_class_func("InPort" + name + ".__init__", &port_init<dataflow::InPort<T>>);
@@ -90,6 +97,14 @@ void link_ports(kaba::Exporter* ext, const string& name) {
 	ext->declare_class_size("OutPort" + name, sizeof(dataflow::OutPort<T>));
 	ext->link_class_func("OutPort" + name + ".__init__", &port_init<dataflow::OutPort<T>>);
 	ext->link_class_func("OutPort" + name + ".set", &dataflow::OutPort<T>::operator());
+}
+
+template<class T>
+void link_setting(kaba::Exporter* ext, const string& name) {
+	ext->declare_class_size("Setting" + name, sizeof(dataflow::Setting<T>));
+	ext->link_class_func("Setting" + name + ".__init__", &setting_init<T>);
+	ext->link_class_func("Setting" + name + "." + kaba::Identifier::func::Call, &dataflow::Setting<T>::operator());
+	ext->link_class_func("Setting" + name + ".set", &dataflow::Setting<T>::set);
 }
 
 template<class T>
@@ -212,6 +227,12 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<artemis::data::VectorField>(ext, "VectorField");
 	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
 	link_ports<Array<double>>(ext, "List");
+
+	link_setting<double>(ext, "Float");
+	link_setting<int>(ext, "Int");
+	link_setting<bool>(ext, "Bool");
+	link_setting<string>(ext, "String");
+	link_setting<color>(ext, "Color");
 
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
