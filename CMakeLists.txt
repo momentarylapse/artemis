@@ -388,6 +388,7 @@ add_executable(artemis
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
+	src/graph/value/ListToVectors.cpp
 	src/graph/value/NumberList.cpp
 	src/graph/value/NumberListAccumulator.cpp
 	src/graph/value/RandomNumber.cpp
@@ -763,6 +764,7 @@ add_library(moduleartemis SHARED
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
+	src/graph/value/ListToVectors.cpp
 	src/graph/value/NumberList.cpp
 	src/graph/value/NumberListAccumulator.cpp
 	src/graph/value/RandomNumber.cpp

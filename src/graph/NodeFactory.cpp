@@ -25,6 +25,7 @@
 #include "renderer/VolumeRenderer.h"
 #include "draw2d/Plotter.h"
 #include "draw2d/FunctionPlot.h"
+#include "value/ListToVectors.h"
 #include "value/NumberList.h"
 #include "value/NumberListAccumulator.h"
 #include "value/RandomNumber.h"
@@ -98,6 +99,7 @@ void init_factory() {
 	register_node_class<RandomNumber>("RandomNumber", {dataflow::NodeCategory::Field});
 	register_node_class<NumberList>("NumberList", {dataflow::NodeCategory::Field});
 	register_node_class<NumberListAccumulator>("NumberListAccumulator", {dataflow::NodeCategory::Field});
+	register_node_class<ListToVectors>("ListToVectors", {dataflow::NodeCategory::Field});
 
 
 	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {
