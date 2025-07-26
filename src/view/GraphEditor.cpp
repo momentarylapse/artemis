@@ -226,10 +226,23 @@ void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 	p->draw_rect(node_area(n));
 
 	p->set_color(White);
-	float w = p->get_str_width(n->name);
-	p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), n->name);
-	if (n->dirty)
-		p->draw_str(n->pos + vec2(NODE_WIDTH / 2, 35), "X");
+	p->set_font("", xhui::Theme::_default.font_size, true, false);
+	{
+		const string name = n->name.explode(":").back();
+		const float w = p->get_str_width(name);
+		p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), name);
+		if (n->dirty)
+			p->draw_str(n->pos + vec2(NODE_WIDTH / 2, 35), "X");
+	}
+	p->set_font("", xhui::Theme::_default.font_size, false, false);
+
+	if (n->name.find(":") >= 0) {
+		p->set_color(White.with_alpha(0.7f));
+		const string class_name = n->name.explode(":")[0];
+		const float w = p->get_str_width(class_name);
+		p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 20), class_name);
+	}
+
 
 	for (int i=0; i<n->in_ports.num; i++) {
 		p->set_color(Gray);

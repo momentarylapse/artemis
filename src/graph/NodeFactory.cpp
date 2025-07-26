@@ -37,7 +37,7 @@ namespace artemis::graph {
 struct NodeClassDescriptor {
 	string name;
 	base::set<dataflow::NodeCategory> categories;
-	std::function<dataflow::Node*(Session*)> f_create;
+	std::function<dataflow::Node*(Session*,const string&)> f_create;
 };
 
 static Array<NodeClassDescriptor> node_class_db;
@@ -50,22 +50,26 @@ base::set<dataflow::NodeCategory> category_set(const Array<dataflow::NodeCategor
 }
 
 template<class T>
-void register_node_class(const string& name, const Array<dataflow::NodeCategory>& categories) {
+void register_node_class(const string& class_name, const Array<dataflow::NodeCategory>& categories) {
 	node_class_db.add({
-		name,
+		class_name,
 		category_set(categories),
-		[] (Session*) {
-			return new T();
+		[] (Session*, const string& name) {
+			auto node = new T();
+			node->name = name;
+			return node;
 		}
 	});
 }
 template<class T>
-void register_node_class_p(const string& name, const Array<dataflow::NodeCategory>& categories) {
+void register_node_class_p(const string& class_name, const Array<dataflow::NodeCategory>& categories) {
 	node_class_db.add({
-		name,
+		class_name,
 		category_set(categories),
-		[] (Session* s) {
-			return new T(s);
+		[] (Session* s, const string& name) {
+			auto node = new T(s);
+			node->name = name;
+			return node;
 		}
 	});
 }
@@ -102,12 +106,14 @@ void init_factory() {
 	register_node_class<ListToVectors>("ListToVectors", {dataflow::NodeCategory::Field});
 
 
-	for (const auto& [name, filename] : artemis::PluginManager::plugin_classes) {
+	for (const auto& [class_name, filename] : artemis::PluginManager::plugin_classes) {
 		node_class_db.add({
-			name,
+			class_name,
 			{dataflow::NodeCategory::Simulation}, // TODO
-			[name=name] (Session*) {
-				return (dataflow::Node*)artemis::PluginManager::create_instance(name);
+			[class_name=class_name] (Session*, const string& name) {
+				auto n = (dataflow::Node*)artemis::PluginManager::create_instance(class_name);
+				n->name = name;
+				return n;
 			}
 		});
 	}
@@ -123,10 +129,11 @@ Array<string> enumerate_nodes(dataflow::NodeCategory category) {
 }
 
 dataflow::Node* create_node(Session* s, const string& name) {
+	const string class_name = name.explode(":")[0];
 	for (auto& d: node_class_db)
-		if (d.name == name)
-			return d.f_create(s);
-	msg_error(format("unknown node: %s", name));
+		if (d.name == class_name)
+			return d.f_create(s, name);
+	msg_error(format("unknown node class: %s", class_name));
 	return nullptr;
 }
 

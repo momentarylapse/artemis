@@ -3,13 +3,13 @@ use plugins.artemis.*
 func main()
 	var g = weak(current_session().graph)
 
-	var mass = g.add_node("List", [100, 250])
+	var mass = g.add_node("List:Mass", [100, 250])
 	mass.set("list", dyn([1.0, 10.0]))
 	
-	var pos = g.add_node("List", [300, 250])
+	var pos = g.add_node("List:Position", [300, 250])
 	pos.set("list", dyn([-100,0,0, 0,0,0]))
 	
-	var vel = g.add_node("List", [500, 250])
+	var vel = g.add_node("List:Velocity", [500, 250])
 	vel.set("list", dyn([0,1,0, 0,0,0]))
 	
 	var sim = g.add_node("OrbitRK", [500, 400])
