@@ -11,7 +11,9 @@
 
 namespace kaba {
 	extern const Class* TypeVec3List;
+	extern const Class* TypeIntList;
 	extern const Class* TypeFloatList;
+	extern const Class* TypeFloat64List;
 }
 
 
@@ -23,7 +25,9 @@ void link_basic_types() {
 	type_map.set(&typeid(float), kaba::TypeFloat32);
 	type_map.set(&typeid(Array<float>), kaba::TypeFloatList);
 	type_map.set(&typeid(double), kaba::TypeFloat64);
+	type_map.set(&typeid(Array<double>), kaba::TypeFloat64List);
 	type_map.set(&typeid(int), kaba::TypeInt32);
+	type_map.set(&typeid(Array<int>), kaba::TypeIntList);
 	type_map.set(&typeid(int64), kaba::TypeInt64);
 	type_map.set(&typeid(bool), kaba::TypeBool);
 	type_map.set(&typeid(string), kaba::TypeString);
@@ -34,6 +38,15 @@ void link_basic_types() {
 	//type_map.set(&typeid(mat4), kaba::TypeMatrix4);
 	//type_map.set(&typeid(box), kaba::TypeBox);
 	type_map.set(&typeid(color), kaba::TypeColor);
+}
+
+
+const kaba::Class* _get_class(const std::type_info* t) {
+	try {
+		return type_map[t];
+	} catch (Exception& e) {
+		throw Exception(format("type not registered: %s", t->name()));
+	}
 }
 
 } // dataflow

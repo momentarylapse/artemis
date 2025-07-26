@@ -8,14 +8,16 @@ namespace artemis::graph {
 
 void NumberListAccumulator::on_process() {
 	if (!out_list.value.has_value())
-		out_list.value = Array<float>{};
+		out_list.value = Array<double>{};
 
-	out_list.value->add(*in_number.value());
-	if (capacity() > 0)
-		while (out_list.value->num > capacity())
-			out_list.value->erase(0);
+	if (in_number.has_value()) {
+		out_list.value->add(*in_number.value());
+		if (capacity() > 0)
+			while (out_list.value->num > capacity())
+				out_list.value->erase(0);
 
-	out_list.mutated();
+		out_list.mutated();
+	}
 }
 
 

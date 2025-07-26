@@ -18,7 +18,7 @@ public:
 
 	void on_process() override;
 
-	dataflow::OutPort<float> out_number{this, "number"};
+	dataflow::OutPort<double> out_number{this, "number"};
 };
 
 } // graph

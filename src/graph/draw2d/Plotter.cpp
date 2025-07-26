@@ -30,8 +30,8 @@ Array<float> lin_spacing(float x_min, float x_max, int N) {
 
 Array<float> ticks(float x_min, float x_max, float scale) {
 	Array<float> xs;
-	float dx = pow(10.0f, round(log10(40 / scale)));
-	x_min = floor(x_min / dx) * dx;
+	float dx = powf(10.0f, roundf(log10f(40 / scale)));
+	x_min = floorf(x_min / dx) * dx;
 	for (float x = x_min; x < x_max; x+=dx)
 		xs.add(x);
 	return xs;

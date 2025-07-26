@@ -7,7 +7,7 @@
 namespace artemis::graph {
 
 void RandomNumber::on_process() {
-	out_number(randf(1.0f));
+	out_number((double)randf(1.0f));
 }
 
 } // graph

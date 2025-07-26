@@ -19,8 +19,8 @@ public:
 
 	dataflow::Setting<int> capacity{this, "capacity", 1000};
 
-	dataflow::InPort<float> in_number{this, "number"};
-	dataflow::OutPort<Array<float>> out_list{this, "list"};
+	dataflow::InPort<double> in_number{this, "number"};
+	dataflow::OutPort<Array<double>> out_list{this, "list"};
 };
 
 } // graph

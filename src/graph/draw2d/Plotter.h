@@ -7,11 +7,10 @@
 #include "../renderer/RendererNode.h"
 #include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
-#include <lib/kaba/kaba.h>
 
 namespace artemis::graph {
 
-typedef float (*scalar_function_1d)(float);
+typedef float (*scalar_function_1d)(float); // double..?
 
 struct PlotData {
 	float line_width;

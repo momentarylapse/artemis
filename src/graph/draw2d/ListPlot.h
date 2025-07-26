@@ -20,7 +20,7 @@ public:
 	dataflow::Setting<float> line_width{this, "line-width", 2.0f};
 	dataflow::Setting<color> _color{this, "color", Red};
 
-	dataflow::InPort<Array<float>> in_list{this, "list"};
+	dataflow::InPort<Array<double>> in_list{this, "list"};
 	dataflow::OutPort<PlotData> out_plot{this, "plot"};
 };
 

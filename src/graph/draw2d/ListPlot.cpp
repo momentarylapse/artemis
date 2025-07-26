@@ -9,8 +9,10 @@ namespace artemis::graph {
 
 void ListPlot::on_process() {
 	Array<vec2> points;
-	for (const auto& [i, y]: enumerate(*in_list.value()))
-		points.add(vec2((float)i * 0.1f, y));
-	out_plot({line_width(), _color(), nullptr, points});
+	if (in_list.has_value()) {
+		for (const auto& [i, y]: enumerate(*in_list.value()))
+			points.add(vec2((float)i * 0.1f, (float)y));
+		out_plot({line_width(), _color(), nullptr, points});
+	}
 }
 } // graph

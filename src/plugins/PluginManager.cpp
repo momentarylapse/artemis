@@ -66,7 +66,7 @@ bool graph_connect(dataflow::Graph* g, dataflow::Node* source, int source_port, 
 		g->connect({source, source_port, sink, sink_port});
 		return true;
 	} catch (Exception& e) {
-		msg_error(e.message());
+		msg_error("connect failed: " + e.message());
 		return false;
 	}
 }

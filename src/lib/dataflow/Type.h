@@ -18,10 +18,11 @@ namespace dataflow {
 extern base::map<const std::type_info*, const kaba::Class*> type_map;
 
 void link_basic_types();
+const kaba::Class* _get_class(const std::type_info* t);
 
 template<class T>
 const kaba::Class* get_class() {
-	return type_map[&typeid(T)];
+	return _get_class(&typeid(T));
 }
 
 } // dataflow
