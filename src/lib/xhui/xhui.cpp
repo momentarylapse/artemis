@@ -64,7 +64,7 @@ void init(const Array<string> &arg, const string& app_name) {
 
 	font::init();
 
-	Array<string> font_names = {"OpenSans", "Helvetica", "NotoSans"};
+	Array<string> font_names = {"FreeSans", "Cantarell", "OpenSans", "Helvetica", "NotoSans"};
 
 	for (const string& name: font_names) {
 		if (!default_font_regular)
