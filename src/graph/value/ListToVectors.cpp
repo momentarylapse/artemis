@@ -8,8 +8,7 @@
 namespace artemis::graph {
 
 	void ListToVectors::on_process() {
-		if (!out_vectors.value.has_value())
-			out_vectors.value = Array<vec3>{};
+		out_vectors.value = Array<vec3>{};
 
 		if (first() < 0)
 			return;

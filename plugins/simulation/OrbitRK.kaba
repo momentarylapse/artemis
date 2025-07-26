@@ -1,0 +1,160 @@
+use artemis.*
+
+
+func vec3_len(v: f64[]) -> f64
+	return (v[0]^2 + v[1]^2 + v[2]^2)^0.5
+
+func vec3_len_sqr(v: f64[]) -> f64
+	return v[0]^2 + v[1]^2 + v[2]^2
+
+
+
+class SimulationState
+	var G: f64
+	var x: f64[]
+	var m_inert: f64[]
+	var m_grav: f64[]
+	var num_actives, num_passives: i32
+	
+	# time derivative of the current state
+	func derivative(x: f64[]) -> f64[]
+		var f: f64[]
+		f.resize(len(x))
+		for i in 0:num_actives
+			# dpos = vel
+			f[6*i:6*i+3] = x[6*i+3:6*i+6]
+			
+			# dvel = acceleration
+			for j in i+1:num_actives
+				
+				var d = x[i*6:i*6+3] - x[j*6:j*6+3]
+				let r = vec3_len(d)
+				d /= r
+				f[6*i+3:6*i+6] -= d * m_grav[j] * G / r^2
+				f[6*j+3:6*j+6] += d * m_grav[i] * G / r^2
+		for di in 0:num_passives
+			let i = num_actives + di
+			# dpos = vel
+			f[6*i:6*i+3] = x[6*i+3:6*i+6]
+			
+			# dvel = acceleration
+			for j in 0:num_actives
+				
+				var d = x[i*6:i*6+3] - x[j*6:j*6+3]
+				let r = vec3_len(d)
+				d /= r
+				f[6*i+3:6*i+6] -= d * m_grav[j] * G / r^2
+		return f
+	
+	func energy_kinetic(x: f64[]) -> f64
+		var E: f64 = 0
+		for i in 0:num_actives
+			E += vec3_len_sqr(x[6*i+3:6*i+6]) * m_inert[i] / 2
+		return E
+	
+	func energy_potential(x: f64[]) -> f64
+		var E: f64 = 0
+		for i in 0:num_actives
+			for j in i+1:num_actives
+				let d = x[i*6:i*6+3] - x[j*6:j*6+3]
+				let r = vec3_len(d)
+				E -= m_grav[i]*m_grav[j]*G/r
+		return E
+	
+	func energy(x: f64[]) -> f64
+		return energy_kinetic(x) + energy_potential(x)
+		
+	func integrate_euler(x: f64[], dt: f64) -> f64[]
+		let dx = derivative(x)
+		return x + dx * dt
+	
+	# use 4th order Runge Kutta to simulate a step
+	func integrate_rk(x: f64[], dt: f64) -> f64[]
+		let k1 = derivative(x)
+		let k2 = derivative(x + k1 * dt/2)
+		let k3 = derivative(x + k2 * dt/2)
+		let k4 = derivative(x + k3 * dt)
+		return x + (k1 + k2*2 + k3*2 + k4)/6 * dt
+		
+	func integrate_rk_multi(x0: f64[], dt: f64, n: int) -> f64[]
+		var x = x0
+		for i in 0:n
+			x = integrate_rk(x, dt/n)
+		return x
+	
+	func error(x1: f64[], x2: f64[]) -> float
+		return float(sum_sqr(x2-x1) / sum_sqr(x1))
+		var e1 = energy(x1)
+		var e2 = energy(x2)
+		return abs(float((e1 - e2) / e1))
+	
+	func integrate_rk_adaptive(x: f64[], dt: f64) -> f64[]
+		var x1 = integrate_rk(x, dt)
+		var n = 4
+		var x2: f64[]
+		while n < 1024*1024
+			x2 = integrate_rk_multi(x, dt, n)
+			if error(x1,x2) < 0.0000000001
+#				print("E{{n}}   {{error(x1,x2)}}")
+				return x2
+			x1 = x2
+			n = n * 4
+		print("E{{n}}...   {{error(x1,x2)}}")
+		return x2
+		
+	func mut iterate(dt: f64)	
+		#x = integrate_euler(x, dt)
+		x = integrate_rk_adaptive(x, dt)
+
+
+class OrbitRK extends Node
+	var in_mass: InPortList
+	var in_pos: InPortList
+	var in_vel: InPortList
+	
+	
+	var G = 250.0
+	var state: SimulationState
+	
+	
+	func __init__()
+		super.__init__("OrbitRK")
+		in_mass.__init__(self, "mass", PortFlags.NONE)
+		in_pos.__init__(self, "pos", PortFlags.MUTABLE)
+		in_vel.__init__(self, "vel", PortFlags.MUTABLE)
+		flags = NodeFlags.TIME_DEPENDENT
+		
+	func mut state_in(mass: f64[], pos: f64[], vel: f64[])
+		let n = min(min(len(mass), len(pos)/3), len(vel)/3)
+		state.G = G
+		state.num_actives = n
+		state.num_passives = 0
+		state.m_grav = mass
+		state.m_inert = mass
+		state.x.resize(n * 6)
+		for i in 0:n
+			for k in 0:3
+				state.x[i*6 + k] = pos[i*3 + k]
+				state.x[i*6 + 3 + k] = vel[i*3 + k]
+		
+	func mut state_out(out pos: f64[], out vel: f64[])
+		let n = state.num_actives
+		for i in 0:n
+			for k in 0:3
+				pos[i*3 + k] = state.x[i*6 + k]
+				vel[i*3 + k] = state.x[i*6 + 3 + k]
+		
+	
+	func override on_process()
+		for mass in in_mass.value()
+			for pos in in_pos.value()
+				for vel in in_vel.value()
+					state_in(mass, pos, vel)
+		
+					state.iterate(simulation_dt)
+		
+					state_out(pos, vel)
+					in_pos.mutated()
+					in_vel.mutated()
+	
+		

@@ -1,0 +1,31 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var mass = g.add_node("NumberList", [100, 250])
+	mass.set("list", dyn([1.0, 10.0]))
+	
+	var pos = g.add_node("NumberList", [300, 250])
+	pos.set("list", dyn([-100,0,0, 0,0,0]))
+	
+	var vel = g.add_node("NumberList", [500, 250])
+	vel.set("list", dyn([0,1,0, 0,0,0]))
+	
+	var sim = g.add_node("OrbitRK", [500, 400])
+	
+	var l2v = g.add_node("ListToVectors", [300, 400])
+	
+	var plr = g.add_node("PointListRenderer", [300, 550])
+	
+	var canvas = g.add_node("Canvas", [300, 700])
+	
+	g.connect(mass, 0, sim, 0)
+	g.connect(pos, 0, sim, 1)
+	g.connect(vel, 0, sim, 2)
+	
+	g.connect(pos, 0, l2v, 0)
+	g.connect(l2v, 0, plr, 0)
+	g.connect(plr, 0, canvas, 0)
+
+

@@ -93,6 +93,14 @@ class InPortRegularGrid
 	func extern value() -> RegularGrid*
 	func extern mutated()
 
+class InPortList
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern value() -> f64[]*
+	func extern mutated()
+class OutPortList
+	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern set(x: f64[])
+
 class Graph
 	func extern add_node(name: string, pos: vec2) -> Node&
 	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)

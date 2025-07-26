@@ -211,6 +211,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<artemis::data::ScalarField>(ext, "ScalarField");
 	link_ports<artemis::data::VectorField>(ext, "VectorField");
 	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
+	link_ports<Array<double>>(ext, "List");
 
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
