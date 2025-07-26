@@ -3,17 +3,18 @@ use plugins.artemis.*
 func main()
 	var g = weak(current_session().graph)
 
-	var list = g.add_node("NumberList", [300, 250])
-	list.set("list", dyn([1.0, 2.0, 5.0, 0.0]))
+	var rn = g.add_node("RandomNumber", [300, 100])
+	var acc = g.add_node("NumberListAccumulator", [300, 250])
+	acc.set("capacity", 80)
 	var lp = g.add_node("ListPlot", [300, 400])
+	lp.set("x-scale", 0.1)
 	
 	var plotter = g.add_node("Plotter", [300, 550])
-	plotter.set("x-min", 0)
-	plotter.set("x-max", 5)
 	
 	var canvas = g.add_node("Canvas", [300, 700])
 	
-	g.connect(list, 0, lp, 0)
+	g.connect(rn, 0, acc, 0)
+	g.connect(acc, 0, lp, 0)
 	g.connect(lp, 0, plotter, 0)
 	g.connect(plotter, 0, canvas, 0)
 

@@ -10,6 +10,12 @@
 #include <lib/math/vec3.h>
 #include <lib/os/msg.h>
 
+namespace kaba {
+	extern const Class *TypeIntList;
+	extern const Class* TypeFloatList;
+	extern const Class* TypeFloat64List;
+}
+
 namespace dataflow {
 
 SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _class_, const string& _options) {
@@ -44,16 +50,25 @@ bool any_to_bool(const Any& a) {
 	return false;
 }
 
-Array<float> any_to_float_list(const Any& a) {
-	Array<float> r;
+template <typename T>
+Array<T> any_to_float_list(const Any& a) {
+	Array<T> r;
 	if (a.is_list())
 		for (int i=0; i<a.as_list().num; i++)
-			r.add(any_to_float(a.as_list()[i]));
+			r.add((T)any_to_float(a.as_list()[i]));
+	return r;
+}
+
+template <typename T>
+Any float_list_to_any(const Array<T>& a) {
+	Any r = Any::EmptyList;
+	for (T x: a)
+		r.add((float)x);
 	return r;
 }
 
 color any_to_color(const Any& a) {
-	const auto list = any_to_float_list(a);
+	const auto list = any_to_float_list<float>(a);
 	// rgb-a  :P
 	if (list.num >= 4)
 		return color(list[3], list[0], list[1], list[2]);
@@ -72,7 +87,7 @@ Any color_to_any(const color& c) {
 }
 
 vec3 any_to_vec3(const Any& a) {
-	const auto list = any_to_float_list(a);
+	const auto list = any_to_float_list<float>(a);
 	if (list.num >= 3)
 		return {list[0], list[1], list[2]};
 	return vec3::ZERO;
@@ -87,7 +102,7 @@ Any vec3_to_any(const vec3& v) {
 }
 
 vec2 any_to_vec2(const Any& a) {
-	const auto list = any_to_float_list(a);
+	const auto list = any_to_float_list<float>(a);
 	if (list.num >= 2)
 		return {list[0], list[1]};
 	return vec2::ZERO;
@@ -103,6 +118,10 @@ Any vec2_to_any(const vec2& v) {
 void SettingBase::set_generic(const Any& value) {
 	if (class_ == kaba::TypeFloat32) {
 		as<float>()->set(any_to_float(value));
+	} else if (class_ == kaba::TypeFloat64) {
+		as<double>()->set((double)any_to_float(value));
+	} else if (class_ == kaba::TypeFloat64List) {
+		as<Array<double>>()->set(any_to_float_list<double>(value));
 	} else if (class_ == kaba::TypeInt32) {
 		as<int>()->set(any_to_int(value));
 	} else if (class_ == kaba::TypeString) {
@@ -121,6 +140,12 @@ void SettingBase::set_generic(const Any& value) {
 Any SettingBase::get_generic() const {
 	if (class_ == kaba::TypeFloat32)
 		return (*as_const<float>())();
+	if (class_ == kaba::TypeFloatList)
+		return float_list_to_any<float>((*as_const<Array<float>>())());
+	if (class_ == kaba::TypeFloat64)
+		return (float)(*as_const<double>())();
+	if (class_ == kaba::TypeFloat64List)
+		return float_list_to_any<double>((*as_const<Array<double>>())());
 	if (class_ == kaba::TypeInt32)
 		return (*as_const<int>())();
 	if (class_ == kaba::TypeString)
