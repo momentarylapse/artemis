@@ -24,6 +24,8 @@ public:
 	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
 
 	dataflow::Setting<double> radius{this, "radius", 0.2, "range=0:99:0.1"};
+	dataflow::Setting<int> trail_length{this, "trail-length", 0, "range=0:"};
+	dataflow::Setting<double> line_width{this, "line-width", 1, "range=0:99:0.1"};
 	dataflow::Setting<color> _color{this, "color", White};
 
 	dataflow::InPort<Array<vec3>> in_points{this, "points"};
@@ -31,6 +33,8 @@ public:
 
 	owned<VertexBuffer> vertex_buffer;
 	owned<Material> material;
+
+	Array<Array<vec3>> trails;
 };
 
 } // graph

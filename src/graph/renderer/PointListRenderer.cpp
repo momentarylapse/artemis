@@ -8,6 +8,8 @@
 #include <view/DrawingHelper.h>
 #include <y/renderer/base.h>
 
+#include "lib/base/iter.h"
+
 namespace artemis::graph {
 
 base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
@@ -25,6 +27,17 @@ PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRen
 }
 
 void PointListRenderer::on_process() {
+	if (trail_length() > 0) {
+		trails.resize(in_points.value()->num);
+		for (const auto& [i, v]: enumerate(*in_points.value())) {
+			trails[i].add(v);
+			while (trails[i].num > trail_length())
+				trails[i].erase(0);
+		}
+	} else {
+		trails.clear();
+	}
+
 	if (!active())
 		return;
 
@@ -56,6 +69,14 @@ void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* wi
 		//session->drawing_helper->draw_data_points()
 		for (const auto& p: *points)
 			session->drawing_helper->draw_mesh(params, rvd, mat4::translation(p), vertex_buffer.get(), material.get());
+	}
+
+	if (trail_length() > 0) {
+		for (const auto& points: trails) {
+			session->drawing_helper->set_color(_color());
+			session->drawing_helper->set_line_width((float)line_width());
+			session->drawing_helper->draw_lines(points, true);
+		}
 	}
 }
 
