@@ -1,18 +1,18 @@
 
 # ===  vector functions  ===
 
-func vec_zero(n: int) -> float[]
-	var v: float[]
+func vec_zero(n: i32) -> f32[]
+	var v: f32[]
 	v.resize(n)
 	return v
 
-func vec_basis(n: int, k: int) -> float[]
-	var v: float[]
+func vec_basis(n: i32, k: i32) -> f32[]
+	var v: f32[]
 	v.resize(n)
 	v[k] = 1
 	return v
 
-func dot(a: float[], b: float[]) -> float
+func dot(a: f32[], b: f32[]) -> f32
 	if len(a) != len(b)
 		return 0
 	var r = 0.0
@@ -24,33 +24,33 @@ func dot(a: float[], b: float[]) -> float
 # ===  matrix functions  ===
 
 struct Matrix
-	var e: float[]
+	var e: f32[]
 	var m = 0 # rows
 	var n = 0 # cols
 	func __init__()
-	func __init__(el: float[][])
+	func __init__(el: f32[][])
 		m = len(el) # rows
 		n = len(el[0]) # columns
 		e.resize(m*n)
 		for i in 0:m
 			for j in 0:n
 				e[i*n + j] = el[i][j]
-	func mut clear(_m: int, _n: int)
+	func mut clear(_m: i32, _n: i32)
 		m = _m
 		n = _n
 		e.clear()
 		e.resize(m*n)
-	func selfref get(i: int, j: int) -> float&
+	func selfref get(i: i32, j: i32) -> f32&
 		return &e[i * n + j]
 	func __str__() -> string
 		var s: string[]
 		for i in 0:m
 			s.add(str(e[i*n:(i+1)*n]))
 		return "[" + s.join(",\n ") + "]"
-	func mut _diagonalize(out b: float[])
+	func mut _diagonalize(out b: f32[])
 		for i in 0:m
 			var f = *get(i,i)
-			if f == 0
+			if abs(f) < 0.0000001
 				f = 0.0000001
 			#print f
 			for j in i:n
@@ -63,12 +63,12 @@ struct Matrix
 					e[ii * n + j] -= e[i * n + j] * g
 				b[ii] -= b[i] * g
 
-func zeros(m: int, n: int) -> Matrix
+func zeros(m: i32, n: i32) -> Matrix
 	var M: Matrix
 	M.clear(m, n)
 	return M
 
-func eye(n: int) -> Matrix
+func eye(n: i32) -> Matrix
 	var M: Matrix
 	M.clear(n, n)
 	for i in 0:n
@@ -83,11 +83,11 @@ func transpose(M: Matrix) -> Matrix
 			r.get(i,j) = M.get(j,i)
 	return r
 
-func solve(A: Matrix, b: float[]) -> float[]
+func solve(A: Matrix, b: f32[]) -> f32[]
 	if A.m != A.n or len(b) != A.m
 		raise(new Exception("size mismatch"))
 	var mm = A
-	var x: float[]
+	var x: f32[]
 	x.resize(A.m)
 	var bb = b
 	mm._diagonalize(bb)
@@ -106,10 +106,10 @@ func solve(A: Matrix, b: float[]) -> float[]
 	return x
 
 
-func mul(M: Matrix, x: float[]) -> float[]
+func mul(M: Matrix, x: f32[]) -> f32[]
 	if M.n != len(x)
 		raise(new Exception("size mismatch"))
-	var y: float[]
+	var y: f32[]
 	y.resize(M.m)
 	for i in 0:M.m
 		for j=>v in x
@@ -178,7 +178,7 @@ func qr_decomposition(A: Matrix) -> (Matrix,Matrix)
 struct SparseRowMatrix
 	var m = 0
 	var n = 0
-	var rows: (int,float)[][]
+	var rows: (i32,f32)[][]
 	func __init__()
 	func __init__(M: Matrix)
 		clear(M.m, M.n)
@@ -188,13 +188,13 @@ struct SparseRowMatrix
 				if v != 0
 					set(i, j, v)
 
-	func mut clear(_m: int, _n: int)
+	func mut clear(_m: i32, _n: i32)
 		m = _m
 		n = _n
 		rows.clear()
 		rows.resize(m)
 
-	func mut set(i: int, j: int, v: float)
+	func mut set(i: i32, j: i32, v: f32)
 		for mut x in rows[j]
 			if x[0] == i
 				x[1] = v
@@ -202,7 +202,7 @@ struct SparseRowMatrix
 		if v != 0
 			rows[j].add([i, v])
 
-	func get(i: int, j: int) -> float
+	func get(i: i32, j: i32) -> f32
 		for x in rows[j]
 			if x[0] == i
 				return x[1]
@@ -223,10 +223,10 @@ struct SparseRowMatrix
 		return "[" + s.join(",\n ") + "]"
 
 
-func mul(M: SparseRowMatrix, x: float[]) -> float[]
+func mul(M: SparseRowMatrix, x: f32[]) -> f32[]
 	if M.n != len(x)
 		raise(new Exception("size mismatch"))
-	var y: float[]
+	var y: f32[]
 	y.resize(M.m)
 	for i in 0:M.m
 		for el in M.rows[i]
