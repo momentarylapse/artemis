@@ -9,7 +9,7 @@
 
 namespace artemis::graph {
 
-void Canvas::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+void Canvas::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 	session->drawing_helper->clear(params, background());
 
 	if (!camera_defined) {

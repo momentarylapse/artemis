@@ -10,7 +10,7 @@
 #include "VertexStagingBuffer.h"
 #include "SkinGenerator.h"
 #include <view/MultiView.h>
-#include <y/graphics-impl.h>
+#include <lib/ygraphics/graphics-impl.h>
 #include <y/world/Model.h>
 #include <lib/base/iter.h>
 #include <lib/math/mat4.h>
@@ -259,7 +259,7 @@ void PolygonMesh::get_bounding_box(vec3 &min, vec3 &max)
 	}
 }
 
-void PolygonMesh::build(VertexBuffer *vb) const {
+void PolygonMesh::build(ygfx::VertexBuffer *vb) const {
 	VertexStagingBuffer vbs;
 #ifdef USING_VULKAN
 	int num_textures = 1;

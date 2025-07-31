@@ -3,9 +3,9 @@
 //
 
 #include "DrawingHelper.h"
-#include <y/graphics-impl.h>
+#include <lib/ygraphics/graphics-impl.h>
 #include <y/helper/ResourceManager.h>
-#include <y/renderer/base.h>
+#include <lib/yrenderer/base.h>
 #include <lib/math/mat4.h>
 #include <lib/math/vec2.h>
 #include <lib/os/msg.h>
@@ -20,18 +20,18 @@
 static float ui_scale = 1.0f;
 
 
-Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
+yrenderer::Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
 	auto material = resource_manager->load_material("");
 	material->albedo = albedo;
 	material->roughness = roughness;
 	material->metal = metal;
 	material->emission = emission;
-	material->textures = {tex_white};
+	material->textures = {resource_manager->ctx->tex_white};
 	if (transparent) {
-		material->pass0.cull_mode = CullMode::NONE;
-		material->pass0.mode = TransparencyMode::FUNCTIONS;
-		material->pass0.source = Alpha::SOURCE_ALPHA;
-		material->pass0.destination = Alpha::SOURCE_INV_ALPHA;
+		material->pass0.cull_mode = ygfx::CullMode::NONE;
+		material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
+		material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
+		material->pass0.destination = ygfx::Alpha::SOURCE_INV_ALPHA;
 		material->pass0.z_buffer = false;
 	}
 	return material;
@@ -116,9 +116,9 @@ void main() {
 	dset->set_texture(0, ctx->tex_white);
 	dset->update();
 
-	pipeline = new vulkan::GraphicsPipeline(shader, context->render_pass, 0, PrimitiveTopology::TRIANGLES, context->vb);
+	pipeline = new vulkan::GraphicsPipeline(shader, context->render_pass, 0, ygfx::PrimitiveTopology::TRIANGLES, context->vb);
 	//pipeline->set_z(false, false);
-	pipeline->set_culling(CullMode::NONE);
+	pipeline->set_culling(ygfx::CullMode::NONE);
 	pipeline->rebuild();
 #endif
 }
@@ -138,7 +138,7 @@ void DrawingHelper::set_line_width(float width) {
 
 
 
-static void add_vb_line(Array<Vertex1>& vertices, const vec3& a, const vec3& b, MultiViewWindow* win, float line_width) {
+static void add_vb_line(Array<ygfx::Vertex1>& vertices, const vec3& a, const vec3& b, MultiViewWindow* win, float line_width) {
 	float w = win->area.width();
 	float h = win->area.height();
 	vec2 ba_pixel = vec2((b.x - a.x) * w, (b.y - a.y) * h);
@@ -160,7 +160,7 @@ static void add_vb_line(Array<Vertex1>& vertices, const vec3& a, const vec3& b, 
 void DrawingHelper::draw_lines(const Array<vec3>& points, bool contiguous) {
 #ifdef USING_VULKAN
 	auto vb = context->get_line_vb();
-	Array<Vertex1> vertices;
+	Array<ygfx::Vertex1> vertices;
 	mat4 m = window->projection * window->view;
 	if (contiguous) {
 		for (int i=0; i<points.num-1; i++)
@@ -206,7 +206,7 @@ void DrawingHelper::draw_circle(const vec3& center, const vec3& axis, float r) {
 }
 
 
-void DrawingHelper::clear(const RenderParams& params, const color& c) {
+void DrawingHelper::clear(const yrenderer::RenderParams& params, const color& c) {
 #ifdef USING_VULKAN
 	auto cb = params.command_buffer;
 	cb->clear(params.area, {c}, 1.0);
@@ -215,9 +215,9 @@ void DrawingHelper::clear(const RenderParams& params, const color& c) {
 #endif
 }
 
-void DrawingHelper::draw_mesh(const RenderParams& params, RenderViewData& rvd, const mat4& matrix, VertexBuffer* vertex_buffer, Material* material, int pass_no, const string& vertex_module) {
+void DrawingHelper::draw_mesh(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd, const mat4& matrix, ygfx::VertexBuffer* vertex_buffer, yrenderer::Material* material, int pass_no, const string& vertex_module) {
 	auto shader = rvd.get_shader(material, pass_no, vertex_module, "");
-	auto& rd = rvd.start(params, matrix, shader, *material, pass_no, PrimitiveTopology::TRIANGLES, vertex_buffer);
+	auto& rd = rvd.start(params, matrix, shader, *material, pass_no, ygfx::PrimitiveTopology::TRIANGLES, vertex_buffer);
 	rd.draw_triangles(params, vertex_buffer);
 }
 

@@ -7,7 +7,7 @@
 
 
 #include <helper/ResourceManager.h>
-#include <y/graphics-fwd.h>
+#include <lib/ygraphics/graphics-fwd.h>
 #include <lib/image/color.h>
 #include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
@@ -15,11 +15,13 @@
 #include <lib/xhui/Context.h>
 #include "MultiView.h"
 
-struct RenderViewData;
-struct RenderParams;
+namespace yrenderer {
+	struct RenderViewData;
+	struct RenderParams;
+	class Material;
+}
 class ResourceManager;
 class MultiViewWindow;
-class Material;
 class Painter;
 
 struct TextLayout {
@@ -47,12 +49,12 @@ public:
 	void set_line_width(float width);
 	float _line_width;
 
-	void clear(const RenderParams& params, const color& c);
+	void clear(const yrenderer::RenderParams& params, const color& c);
 
 	void draw_lines(const Array<vec3>& points, bool contiguous = true);
 	void draw_circle(const vec3& center, const vec3& axis, float r);
 
-	void draw_mesh(const RenderParams& params, RenderViewData& rvd, const mat4& matrix, VertexBuffer* vb, Material* material, int pass_no = 0, const string& vertex_module = "default");
+	void draw_mesh(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd, const mat4& matrix, ygfx::VertexBuffer* vb, yrenderer::Material* material, int pass_no = 0, const string& vertex_module = "default");
 
 	static void draw_boxed_str(Painter* p, const vec2& pos, const string& str, int align = -1);
 
@@ -68,15 +70,15 @@ public:
 	MultiViewWindow* window;
 	void set_window(MultiViewWindow* win);
 
-	Shader* shader = nullptr;
+	ygfx::Shader* shader = nullptr;
 #ifdef USING_VULKAN
 	vulkan::GraphicsPipeline* pipeline = nullptr;
 	vulkan::DescriptorSet* dset = nullptr;
 #endif
 
-	Material* material_hover;
-	Material* material_selection;
-	Material* material_creation;
+	yrenderer::Material* material_hover;
+	yrenderer::Material* material_selection;
+	yrenderer::Material* material_creation;
 };
 
 

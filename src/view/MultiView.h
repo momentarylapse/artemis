@@ -6,16 +6,15 @@
 #define MULTIVIEW_H
 
 #include "Hover.h"
-#include <y/renderer/Renderer.h>
-#include <y/renderer/scene/SceneView.h>
-#include <y/renderer/scene/RenderViewData.h>
+#include <lib/yrenderer/Renderer.h>
+#include <lib/yrenderer/scene/SceneView.h>
+#include <lib/yrenderer/scene/RenderViewData.h>
 #include <lib/math/Box.h>
 #include <lib/math/vec3.h>
 #include <lib/math/quaternion.h>
 #include <lib/pattern/Observable.h>
 #include <functional>
-
-#include "renderer/scene/SceneRenderer.h"
+#include <lib/yrenderer/scene/SceneRenderer.h>
 
 class Camera;
 class Painter;
@@ -43,7 +42,7 @@ public:
 	vec3 active_grid_direction() const;
 	mat3 active_grid_frame() const;
 	mat3 edit_frame() const;
-	void draw(const RenderParams& params);
+	void draw(const yrenderer::RenderParams& params);
 
 	MultiView* multi_view;
 	rect area;
@@ -52,19 +51,26 @@ public:
 	mat4 to_pixels;
 	mat4 view;
 	mat4 projection;
-	owned<SceneRenderer> scene_renderer;
+	owned<yrenderer::SceneRenderer> scene_renderer;
 };
 
-class MultiView : public obs::Node<Renderer> {
+class MultiViewRenderer : public yrenderer::Renderer {
+public:
+	explicit MultiViewRenderer(yrenderer::Context* ctx, MultiView* mv);
+
+	void prepare(const yrenderer::RenderParams& params) override;
+	void draw(const yrenderer::RenderParams& params) override;
+
+	MultiView* multi_view;
+};
+
+class MultiView : public obs::Node<VirtualBase> {
 public:
 	explicit MultiView(Session* session);
 	~MultiView() override;
 
 	obs::source out_selection_changed{this, "selection-changed"};
 	obs::sink in_data_changed;
-
-	void prepare(const RenderParams& params) override;
-	void draw(const RenderParams& params) override;
 
 	void on_draw(Painter* p);
 	void on_left_button_down(const vec2& m);
@@ -80,7 +86,7 @@ public:
 		quaternion ang;
 		float radius;
 		Camera* cam;
-		owned<SceneView> scene_view;
+		owned<yrenderer::SceneView> scene_view;
 		MultiView* multi_view;
 
 		void move(const vec3& drel);
@@ -92,7 +98,7 @@ public:
 	Array<Light*> lights;
 	Light* default_light;
 
-	MultiViewWindow window;
+	owned<MultiViewWindow> window;
 	MultiViewWindow* active_window;
 	MultiViewWindow* hover_window;
 
@@ -116,6 +122,7 @@ public:
 	void set_area(const rect& area);
 	Session* session;
 
+	owned<MultiViewRenderer> renderer;
 
 	void set_allow_select(bool allow);
 	void set_allow_action(bool allow);

@@ -16,13 +16,13 @@
 #include <y/world/Camera.h>
 #include <y/world/Light.h>
 #include <y/y/Entity.h>
-#include <y/graphics-impl.h>
+#include <lib/ygraphics/graphics-impl.h>
 
 #include "renderer/path/RenderPath.h"
 
 MultiViewWindow::MultiViewWindow(MultiView* _multi_view) {
 	multi_view = _multi_view;
-	scene_renderer = new SceneRenderer(RenderPathType::Forward, *multi_view->view_port.scene_view);
+	scene_renderer = new yrenderer::SceneRenderer(multi_view->session->ctx, yrenderer::RenderPathType::Forward, *multi_view->view_port.scene_view);
 }
 
 vec3 MultiViewWindow::project(const vec3& v) const {
@@ -118,7 +118,7 @@ mat3 MultiViewWindow::edit_frame() const {
 	return active_grid_frame();
 }
 
-void MultiViewWindow::draw(const RenderParams& params) {
+void MultiViewWindow::draw(const yrenderer::RenderParams& params) {
 	projection = multi_view->view_port.cam->projection_matrix(area.width() / area.height());
 
 	scene_renderer->set_view(params, view_pos(), local_ang, projection);
@@ -138,23 +138,65 @@ void MultiViewWindow::draw(const RenderParams& params) {
 }
 
 
+MultiViewRenderer::MultiViewRenderer(yrenderer::Context *ctx, MultiView *mv) : Renderer(ctx, "multiview") {
+	multi_view = mv;
+}
 
 
+void MultiViewRenderer::prepare(const yrenderer::RenderParams& params) {
+	auto& view_port = multi_view->view_port;
+	const auto& area = multi_view->area;
+	auto& window = multi_view->window;
 
-MultiView::MultiView(Session* s) : obs::Node<Renderer>("multiview"),
+	view_port.cam->owner->ang = view_port.ang;
+	view_port.cam->owner->pos = view_port.pos - view_port.cam->owner->ang * vec3::EZ * view_port.radius;
+	view_port.cam->min_depth = view_port.radius * 0.01f;
+	view_port.cam->max_depth = view_port.radius * 300;
+
+	window->local_ang = view_port.ang;
+
+	// 3d -> pixel
+	window->to_pixels = mat4::translation({area.x1, area.y1, 0})
+		* mat4::scale(area.width()/2, area.height()/2, 1)
+		* mat4::translation({1.0f, 1.0f, 0})
+		* window->projection * window->view;
+
+	{
+		multi_view->default_light->owner->ang = view_port.ang;
+		multi_view->lights = {multi_view->default_light};
+		view_port.scene_view->lights = multi_view->lights;
+		//	if (l->allow_shadow)
+		//		scene_view.shadow_index = scene_view.lights.num;
+	}
+
+	view_port.scene_view->choose_shadows();
+
+	multi_view->session->cur_mode->on_prepare_scene(params);
+	//Renderer::prepare(params);
+}
+
+void MultiViewRenderer::draw(const yrenderer::RenderParams& params) {
+	//	scene_view.choose_lights();
+	//engine.physical_aspect_ratio = pp->native_area.width() / pp->native_area.height();
+
+	multi_view->window->draw(params);
+}
+
+
+MultiView::MultiView(Session* s) :
 		in_data_changed(this, [this] {
 			if (!action_controller->in_use()) {
 				update_selection_box();
 				hover = base::None;
 			}
 		}),
-		view_port(this),
-		window(this)
+		view_port(this)
 {
 	session = s;
-	resource_manager = session->resource_manager;
-	active_window = &window;
-	hover_window = &window;
+	window = new MultiViewWindow(this);
+	renderer = new MultiViewRenderer(session->ctx, this);
+	active_window = window.get();
+	hover_window = window.get();
 	action_controller = new ActionController(this);
 
 
@@ -176,45 +218,10 @@ MultiView::~MultiView() = default;
 void MultiView::set_area(const rect& _area) {
 	area = _area;
 	area_native = {_area.p00() * session->win->ui_scale, _area.p11() * session->win->ui_scale};
-	window.area = area;
-	window.area_native = area_native;
+	window->area = area;
+	window->area_native = area_native;
 }
 
-
-void MultiView::prepare(const RenderParams& params) {
-	view_port.cam->owner->ang = view_port.ang;
-	view_port.cam->owner->pos = view_port.pos - view_port.cam->owner->ang * vec3::EZ * view_port.radius;
-	view_port.cam->min_depth = view_port.radius * 0.01f;
-	view_port.cam->max_depth = view_port.radius * 300;
-
-	window.local_ang = view_port.ang;
-
-	// 3d -> pixel
-	window.to_pixels = mat4::translation({area.x1, area.y1, 0})
-		* mat4::scale(area.width()/2, area.height()/2, 1)
-		* mat4::translation({1.0f, 1.0f, 0})
-		* window.projection * window.view;
-
-	{
-		default_light->owner->ang = view_port.ang;
-		lights = {default_light};
-		view_port.scene_view->lights = lights;
-		//	if (l->allow_shadow)
-		//		scene_view.shadow_index = scene_view.lights.num;
-	}
-
-	view_port.scene_view->choose_shadows();
-
-	session->cur_mode->on_prepare_scene(params);
-	//Renderer::prepare(params);
-}
-
-void MultiView::draw(const RenderParams& params) {
-	//	scene_view.choose_lights();
-	//engine.physical_aspect_ratio = pp->native_area.width() / pp->native_area.height();
-
-	window.draw(params);
-}
 
 
 void MultiView::on_mouse_move(const vec2& m, const vec2& d) {
@@ -495,7 +502,7 @@ void MultiView::draw_mouse_pos(Painter* p) {
 }
 
 vec3 MultiView::cursor_pos_3d(const vec2& m) const {
-	return window.unproject(vec3(m, 0), view_port.pos);
+	return window->unproject(vec3(m, 0), view_port.pos);
 }
 
 void MultiView::set_allow_action(bool allow) {
@@ -517,7 +524,7 @@ MultiView::ViewPort::ViewPort(MultiView* _multi_view) {
 	cam->owner = new Entity;
 	//cam->owner->ang = quaternion::rotation({1, 0, 0}, 0.33f);
 	//cam->owner->pos = {1000,1000,-800};
-	scene_view = new SceneView;
+	scene_view = new yrenderer::SceneView;
 	scene_view->cam = cam;
 }
 

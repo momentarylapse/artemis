@@ -19,15 +19,15 @@
 #include <data/mesh/GeometryCylinder.h>
 #include <data/mesh/GeometryTorus.h>
 #include <data/mesh/GeometryCube.h>
-#include <y/graphics-impl.h>
-#include <y/renderer/scene/RenderViewData.h>
+#include <lib/ygraphics/graphics-impl.h>
+#include <lib/yrenderer/scene/RenderViewData.h>
 #include <lib/base/iter.h>
 #include <lib/math/plane.h>
 #include <lib/os/msg.h>
 
 #define MVGetSingleData(d, index)	((SingleData*) ((char*)(d).data->data + (d).data->element_size* index))
 
-Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false);
+yrenderer::Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false);
 
 ActionController::Manipulator::Manipulator(MultiView* multi_view) {
 	geo_mat = mat4::ID;
@@ -59,18 +59,18 @@ ActionController::Manipulator::Manipulator(MultiView* multi_view) {
 	geo_show.add(new GeometryCylinder( vec3::EZ*r0,  vec3::EZ*r1, r, 1, 8));
 
 	for (auto g: geo_show){
-		auto *vb = new VertexBuffer("3f,3f,2f");
+		auto *vb = new ygfx::VertexBuffer("3f,3f,2f");
 		g->build(vb);
 		buf.add(vb);
 	}
 
 	for (int i=0; i<geo.num; i++) {
-		auto m = create_material(multi_view->resource_manager, Black, 0.9f, 0, geo_config[i].col);
+		auto m = create_material(multi_view->renderer->resource_manager, Black, 0.9f, 0, geo_config[i].col);
 		m->pass0.z_buffer = false;
 		m->pass0.z_test = false;
 		materials.add(m);
 	}
-	material_hover = create_material(multi_view->resource_manager, Black, 0.9f, 0, White);
+	material_hover = create_material(multi_view->renderer->resource_manager, Black, 0.9f, 0, White);
 	material_hover->pass0.z_buffer = false;
 	material_hover->pass0.z_test = false;
 }
@@ -365,7 +365,7 @@ bool ActionController::geo_allow(int i, MultiViewWindow* win, const mat4& geo_ma
 }
 
 // in 2d mode!
-void ActionController::draw(const RenderParams& params, RenderViewData& rvd) {
+void ActionController::draw(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd) {
 	//if (!multi_view->allow_mouse_actions)
 	//	return;
 	if (!visible)
@@ -379,7 +379,7 @@ void ActionController::draw(const RenderParams& params, RenderViewData& rvd) {
 		if (multi_view->hover and multi_view->hover->type == MultiViewType::ACTION_MANAGER and multi_view->hover->index == (int)geo_config[i].constraint)
 			m = manipulator.material_hover.get();
 		auto shader = rvd.get_shader(m, 0, "default", "");
-		auto& rd = rvd.start(params, manipulator.geo_mat, shader, *m, 0, PrimitiveTopology::TRIANGLES, vb);
+		auto& rd = rvd.start(params, manipulator.geo_mat, shader, *m, 0, ygfx::PrimitiveTopology::TRIANGLES, vb);
 		rd.draw_triangles(params, vb);
 	}
 

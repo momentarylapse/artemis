@@ -7,20 +7,26 @@
 
 #include "GuiRendererGL.h"
 #ifdef USING_OPENGL
-#include "../base.h"
-#include <graphics-impl.h>
+#include <lib/yrenderer/base.h>
+#include <lib/ygraphics/graphics-impl.h>
 #include <lib/os/msg.h>
 #include "../../gui/gui.h"
 #include "../../gui/Picture.h"
 #include <lib/profiler/Profiler.h>
+#include <lib/yrenderer/ShaderManager.h>
 #include "../../helper/ResourceManager.h"
 #include <y/EngineData.h>
 
 
-void apply_shader_data(Shader *s, const Any &shader_data);
+using namespace yrenderer;
+using namespace ygfx;
 
-GuiRendererGL::GuiRendererGL() : Renderer("gui") {
-	shader = resource_manager->load_shader("forward/2d.shader");
+namespace yrenderer {
+	void apply_shader_data(Shader *s, const Any &shader_data);
+}
+
+GuiRendererGL::GuiRendererGL(yrenderer::Context* ctx) : Renderer(ctx, "gui") {
+	shader = resource_manager->shader_manager->load_shader("forward/2d.shader");
 
 	vb = new VertexBuffer("3f,3f,2f");
 	vb->create_quad(rect::ID);
@@ -32,7 +38,7 @@ void GuiRendererGL::draw(const RenderParams& params) {
 
 void GuiRendererGL::draw_gui(const RenderParams& params, FrameBuffer *source) {
 	profiler::begin(channel);
-	gpu_timestamp_begin(params, channel);
+	ctx->gpu_timestamp_begin(params, channel);
 	gui::update();
 
 	//nix::set_projection_ortho_relative();
@@ -73,7 +79,7 @@ void GuiRendererGL::draw_gui(const RenderParams& params, FrameBuffer *source) {
 
 	nix::disable_alpha();
 
-	gpu_timestamp_end(params, channel);
+	ctx->gpu_timestamp_end(params, channel);
 	profiler::end(channel);
 }
 

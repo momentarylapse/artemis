@@ -69,7 +69,7 @@ artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
 	return nullptr;
 }
 
-void ModeDefault::on_draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+void ModeDefault::on_draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 	if (auto c = get_canvas(graph)) {
 		if (c->background().a < 0)
 			c->background.set(xhui::Theme::_default.background_low);

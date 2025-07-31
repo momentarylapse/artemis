@@ -7,21 +7,21 @@
 #include <data/mesh/GeometrySphere.h>
 #include <data/mesh/GeometryCube.h>
 #include <view/DrawingHelper.h>
-#include <y/renderer/base.h>
+#include <lib/yrenderer/base.h>
 
 namespace artemis::graph {
 
 VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
-	material = new Material(s->resource_manager);
+	material = new yrenderer::Material(s->resource_manager);
 	material->pass0.shader_path = "volume.shader";
-	material->pass0.mode = TransparencyMode::FUNCTIONS;
-	material->pass0.source = Alpha::SOURCE_ALPHA;
-	material->pass0.destination = Alpha::SOURCE_INV_ALPHA;
-	material->textures.add(tex_white);
+	material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
+	material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
+	material->pass0.destination = ygfx::Alpha::SOURCE_INV_ALPHA;
+	material->textures.add(s->ctx->tex_white);
 
-	material_solid = new Material(s->resource_manager);
+	material_solid = new yrenderer::Material(s->resource_manager);
 	material_solid->pass0.shader_path = "volume-surface.shader";
-	material_solid->textures.add(tex_white);
+	material_solid->textures.add(s->ctx->tex_white);
 }
 
 void VolumeRenderer::on_process() {
@@ -30,12 +30,12 @@ void VolumeRenderer::on_process() {
 		return;
 
 	if (!vertex_buffer)
-		vertex_buffer = new VertexBuffer("3f,3f,2f");
+		vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 	int nx = f->sampling_mode == data::SamplingMode::PerCell ? f->grid.nx : f->grid.nx + 1;
 	int ny = f->sampling_mode == data::SamplingMode::PerCell ? f->grid.ny : f->grid.ny + 1;
 	int nz = f->sampling_mode == data::SamplingMode::PerCell ? f->grid.nz : f->grid.nz + 1;
 	if (!tex)
-		tex = new VolumeTexture(nx, ny, nz, "r:f32");
+		tex = new ygfx::VolumeTexture(nx, ny, nz, "r:f32");
 	tex->set_options("wrap=clamp,magfilter=nearest");
 	if (f->type == data::ScalarType::Float32)
 		tex->writex(&f->v32.v[0], nx, ny, nz, "r:f32");
@@ -45,13 +45,13 @@ void VolumeRenderer::on_process() {
 	GeometryCube cube({0,0,0}, vec3::EX, vec3::EY, vec3::EZ, 1, 1, 1);
 	cube.build(vertex_buffer.get());
 
-	out_draw(RenderData{active(), f->grid.bounding_box(), nullptr, [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+	out_draw(RenderData{active(), f->grid.bounding_box(), nullptr, [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 		draw_win(params, win, rvd);
 	}});
 }
 
 
-void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 	auto f = in_field.value();
 	if (!f)
 		return;
@@ -66,7 +66,7 @@ void VolumeRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, 
 
 
 		auto shader = rvd.get_shader(_material, 0, "default", "");
-		auto& rd = rvd.start(params, matrix, shader, *_material, 0, PrimitiveTopology::TRIANGLES, vertex_buffer.get());
+		auto& rd = rvd.start(params, matrix, shader, *_material, 0, ygfx::PrimitiveTopology::TRIANGLES, vertex_buffer.get());
 
 		auto cm = color_map();
 

@@ -14,7 +14,7 @@
 #include <lib/xhui/dialogs/ColorSelectionDialog.h>
 #include <data/Data.h>
 #include <lib/xhui/controls/DrawingArea.h>
-#include <renderer/base.h>
+#include <lib/yrenderer/base.h>
 #include <renderer/path/RenderPath.h>
 #include <sys/stat.h>
 #include <y/EngineData.h>
@@ -26,8 +26,9 @@
 #include "lib/os/msg.h"
 #include "lib/xhui/Theme.h"
 #include "lib/xhui/draw/font.h"
-#include "y/renderer/Renderer.h"
-#include "y/renderer/target/XhuiRenderer.h"
+#include <lib/yrenderer/ShaderManager.h>
+#include <lib/yrenderer/Renderer.h>
+#include <lib/yrenderer/target/XhuiRenderer.h>
 #include "y/helper/ResourceManager.h"
 #include "storage/Storage.h"
 #include "Session.h"
@@ -38,7 +39,7 @@ extern string AppName;
 
 Session* session;
 
-rect dynamicly_scaled_area(FrameBuffer*) { return {}; }
+rect dynamicly_scaled_area(ygfx::FrameBuffer*) { return {}; }
 rect dynamicly_scaled_source() { return {}; }
 void ExternalModelCleanup(Model *m) {}
 
@@ -124,6 +125,16 @@ public:
 };
 #endif
 
+
+namespace yrenderer {
+	rect dynamicly_scaled_area(ygfx::FrameBuffer *fb) {
+		return rect(0, fb->width, 0, fb->height);
+	}
+
+	rect dynamicly_scaled_source() {
+		return rect::ID;
+	}
+}
 
 
 ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppName, 1024, 768),
@@ -216,28 +227,22 @@ Dialog x x padding=0
 
 	event_xp("area", xhui::event_id::Initialize, [this] (Painter* p) {
 		auto pp = (xhui::Painter*)p;
-#ifdef USING_VULKAN
-		vulkan::default_device = pp->context->device;
-		api_init_external(pp->context->instance, pp->context->device);
-#else
-		xhui::init_nix();
-		//api_init()
-#endif
-		session->resource_manager = new ResourceManager({});
-		session->resource_manager->default_shader = "default.shader";
-#ifdef USING_OPENGL
+		session->ctx = yrenderer::api_init_xhui(pp);
+		session->resource_manager = new ResourceManager(session->ctx, "", "", "");
+		session->resource_manager->shader_manager->default_shader = "default.shader";
+/*#ifdef USING_OPENGL
 		session->resource_manager->ctx = xhui::_nix_context.get();
-#endif
+#endif*/
 		session->drawing_helper = new DrawingHelper(pp->context, session->resource_manager);
 		try {
-			session->resource_manager->load_shader_module("module-basic-data.shader");
-			session->resource_manager->load_shader_module("module-basic-interface.shader");
-			session->resource_manager->load_shader_module("module-vertex-default.shader");
-			session->resource_manager->load_shader_module("module-vertex-animated.shader");
-			session->resource_manager->load_shader_module("module-light-sources-default.shader");
-			session->resource_manager->load_shader_module("module-shadows-pcf.shader");
-			session->resource_manager->load_shader_module("module-lighting-pbr.shader");
-			session->resource_manager->load_shader_module("forward/module-surface.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-basic-data.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-basic-interface.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-vertex-default.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-vertex-animated.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-light-sources-default.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-shadows-pcf.shader");
+			session->resource_manager->shader_manager->load_shader_module("module-lighting-pbr.shader");
+			session->resource_manager->shader_manager->load_shader_module("forward/module-surface.shader");
 		} catch(Exception& e) {
 			msg_error(e.message());
 		}
@@ -245,6 +250,8 @@ Dialog x x padding=0
 		engine.file_errors_are_critical = false;
 		engine.ignore_missing_files = true;
 		engine.resource_manager = session->resource_manager;
+
+		session->win->renderer = new yrenderer::XhuiRenderer(session->ctx);
 
 		session->promise_started(session);
 	});

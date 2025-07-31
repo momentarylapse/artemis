@@ -22,6 +22,7 @@
 #include "../gui/Text.h"
 #include "../helper/DeletionQueue.h"
 #include "../helper/ResourceManager.h"
+#include <lib/yrenderer/ShaderManager.h>
 #include "../helper/Scheduler.h"
 #if __has_include("../input/InputManager.h")
 #include "../input/InputManager.h"
@@ -32,30 +33,30 @@
 #define HAS_INPUT
 #endif
 #include "../net/NetworkManager.h"
-#include "../renderer/base.h"
-#include "../renderer/Renderer.h"
+#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/Renderer.h>
 #include "../renderer/helper/RendererFactory.h"
-#include "../renderer/helper/CubeMapSource.h"
-#include "../renderer/helper/ComputeTask.h"
+#include <lib/yrenderer/helper/CubeMapSource.h>
+#include <lib/yrenderer/helper/ComputeTask.h>
 #include "../renderer/helper/LightMeter.h"
 #include "../renderer/path/RenderPath.h"
-#include "../renderer/post/HDRResolver.h"
+#include <lib/yrenderer/post/HDRResolver.h>
 #include "../renderer/world/WorldRendererForward.h"
 #include "../renderer/world/WorldRendererDeferred.h"
 #ifdef USING_OPENGL
 #include "../renderer/gui/GuiRendererGL.h"
 #include "../renderer/post/PostProcessorGL.h"
-#include "../renderer/target/WindowRendererGL.h"
+#include <lib/yrenderer/target/WindowRendererGL.h>
 #endif
 #ifdef USING_VULKAN
 #include "../renderer/gui/GuiRendererVulkan.h"
 #include "../renderer/post/PostProcessorVulkan.h"
-#include "../renderer/target/WindowRendererVulkan.h"
+#include <lib/yrenderer/target/WindowRendererVulkan.h>
 #endif
 #include <renderer/helper/Raytracing.h>
-#include <renderer/scene/pass/ShadowRenderer.h>
-#include "../renderer/regions/RegionRenderer.h"
-#include "../renderer/scene/SceneView.h"
+#include <lib/yrenderer/scene/pass/ShadowRenderer.h>
+#include <lib/yrenderer/regions/RegionRenderer.h>
+#include <lib/yrenderer/scene/SceneView.h>
 #include "../y/EngineData.h"
 #include "../y/Component.h"
 #include "../y/ComponentManager.h"
@@ -75,11 +76,14 @@
 #include "../world/components/UserMesh.h"
 #include "../world/components/MultiInstance.h"
 #include "../meta.h"
-#include "../graphics-impl.h"
+#include <lib/ygraphics/graphics-impl.h>
 #include "../lib/kaba/dynamic/exception.h"
 #include "../lib/os/msg.h"
 #include "../lib/image/image.h"
 
+
+using namespace yrenderer;
+using namespace ygfx;
 
 /*void global_delete(BaseClass *e) {
 	//msg_error("global delete... " + p2s(e));
@@ -195,7 +199,7 @@ void storagebuffer_init(ShaderStorageBuffer* buf, int size) {
 	new(buf) ShaderStorageBuffer(size);
 }
 
-void computetask_init(ComputeTask* task, const string& name, const shared<Shader>& shader, const Array<int>& n) {
+void computetask_init(ComputeTask* task, yrenderer::Context* ctx, const string& name, const shared<Shader>& shader, const Array<int>& n) {
 	int nx = 1;
 	int ny = 1;
 	int nz = 1;
@@ -205,7 +209,7 @@ void computetask_init(ComputeTask* task, const string& name, const shared<Shader
 		ny = n[1];
 	if (n.num >= 3)
 		nz = n[2];
-	new(task) ComputeTask(name, shader, nx, ny, nz);
+	new(task) ComputeTask(ctx, name, shader, nx, ny, nz);
 }
 
 void texture_init(Texture *t, int w, int h, const string &format) {
@@ -296,7 +300,7 @@ void screenshot(Image& im) {
 #ifdef USING_VULKAN
 	msg_error("unimplemented:  screenshot()");
 #else
-	engine.context->default_framebuffer->read(im);
+	engine.context->context->default_framebuffer->read(im);
 #endif
 }
 
@@ -306,18 +310,18 @@ xfer<Model> __load_model(const Path& filename) {
 }
 
 shared<Shader> __load_shader(const Path& filename) {
-	return engine.resource_manager->load_shader(filename);
+	return engine.resource_manager->shader_manager->load_shader(filename);
 }
 
 xfer<Shader> __create_shader(const string& source) {
-	return engine.resource_manager->create_shader(source);
+	return engine.resource_manager->shader_manager->create_shader(source);
 }
 
 shared<Texture> __load_texture(const Path& filename) {
 	return engine.resource_manager->load_texture(filename);
 }
 
-xfer<Material> __load_material(const Path& filename) {
+xfer<yrenderer::Material> __load_material(const Path& filename) {
 	return engine.resource_manager->load_material(filename);
 }
 
@@ -335,12 +339,12 @@ Array<Texture*> render_path_get_shadow_map(RenderPath &r) {
 
 //shared_array<Texture> render_path_get_gbuffer(RenderPath &r) {
 Array<Texture*> render_path_get_gbuffer(RenderPath &r) {
-	if (r.type == RenderPathType::Deferred)
+	if (r.type == yrenderer::RenderPathType::Deferred)
 		return weak(reinterpret_cast<WorldRendererDeferred*>(r.world_renderer)->gbuffer_textures);
 	return {};
 }
 
-shared_array<Texture> hdr_resolver_get_tex_bloom(HDRResolver &r) {
+shared_array<Texture> hdr_resolver_get_tex_bloom(yrenderer::HDRResolver &r) {
 //Array<Texture*> hdr_resolver_get_tex_bloom(HDRResolver &r) {
 	msg_write("get bloom...");
 	return {r.bloom_levels[0].tex_out.get(), r.bloom_levels[1].tex_out.get(), r.bloom_levels[2].tex_out.get(), r.bloom_levels[3].tex_out.get()};
@@ -715,11 +719,11 @@ void export_gfx(kaba::Exporter* ext) {
 	ext->link_class_func("Shader.set_float", &shader_set_float);
 	ext->link_class_func("Shader.set_floats", &shader_set_floats);
 
-	ext->link("tex_white", &tex_white);
+	ext->link_func("load_shader", &__load_shader);
+	ext->link_func("create_shader", &__create_shader);
+	ext->link_func("load_texture", &__load_texture);
 
-	ext->link("load_shader", (void*)&__load_shader);
-	ext->link("create_shader", (void*)&__create_shader);
-	ext->link("load_texture", (void*)&__load_texture);
+	ext->link("tex_white", &engine.context->tex_white);
 }
 
 void export_fx(kaba::Exporter* ext) {
@@ -978,13 +982,16 @@ void export_engine(kaba::Exporter* ext) {
 
 
 	// unused
-	ext->declare_class_size("ResourceManager", sizeof(ResourceManager));
+/*	ext->declare_class_size("ResourceManager", sizeof(ResourceManager));
 	ext->link_class_func("ResourceManager.load_shader", &ResourceManager::load_shader);
 	ext->link_class_func("ResourceManager.create_shader", &ResourceManager::create_shader);
 	ext->link_class_func("ResourceManager.load_texture", &ResourceManager::load_texture);
 	ext->link_class_func("ResourceManager.load_material", &ResourceManager::load_material);
-	ext->link_class_func("ResourceManager.load_model", &ResourceManager::load_model);
+	ext->link_class_func("ResourceManager.load_model", &ResourceManager::load_model);*/
 
+	ext->declare_class_size("Context", sizeof(yrenderer::Context));
+	ext->declare_class_element("Context.ctx", &yrenderer::Context::context);
+	ext->declare_class_element("Context.tex_white", &yrenderer::Context::tex_white);
 
 	ext->declare_class_size("EngineData", sizeof(EngineData));
 	ext->declare_class_element("EngineData.app_name", &EngineData::app_name);
@@ -1053,7 +1060,7 @@ void export_renderer(kaba::Exporter* ext) {
 	ext->declare_class_size("Renderer", sizeof(Renderer));
 
 	{
-		ComputeTask ct("", nullptr, 0, 0, 0);
+		ComputeTask ct(nullptr, "", nullptr, 0, 0, 0);
 		ext->declare_class_size("RenderTask", sizeof(RenderTask));
 		ext->declare_class_element("RenderTask.active", &RenderTask::active);
 		//ext->link_virtual("RenderTask.prepare", &RenderTask::prepare, &ct);

@@ -24,8 +24,8 @@
 #include <y/helper/ResourceManager.h>
 #include <y/world/Camera.h>
 #include <y/world/World.h>
-#include <y/graphics-impl.h>
-#include <y/renderer/target/XhuiRenderer.h>
+#include <lib/ygraphics/graphics-impl.h>
+#include <lib/yrenderer/target/XhuiRenderer.h>
 #include "graph/Graph.h"
 
 Session* _current_session_ = nullptr;
@@ -37,7 +37,6 @@ Session *create_session() {
 	s->graph = &s->data->graph;
 	//s->mode_world = new ModeWorld(s);
 	s->win = new ArtemisWindow(s);
-	s->win->renderer = new XhuiRenderer();
 	_current_session_ = s;
 	artemis::processing::pool::init();
 	return s;
@@ -116,18 +115,18 @@ Session::~Session() {
 	app->end();
 }
 
-
-void Session::create_initial_resources(Context *_ctx) {
+#ifdef ksdjfhskjdfhkjsdhfj
+void Session::create_initial_resources(yrenderer::Context *_ctx) {
 
 	ctx = _ctx;
 
 	// initialize engine
-	resource_manager = new ResourceManager(ctx);
+	resource_manager = new ResourceManager(ctx, "", "", "");
 ///	drawing_helper = new DrawingHelper(ctx, resource_manager, app->directory_static);
 
 	engine.ignore_missing_files = true;
 	engine.set_context(ctx, resource_manager);
-	resource_manager->load_shader("module-vertex-default.shader");
+	resource_manager->shader_manager->load_shader("module-vertex-default.shader");
 	//ResourceManager::default_shader
 
 	CameraInit();
@@ -184,6 +183,7 @@ void Session::create_initial_resources(Context *_ctx) {
 
 	promise_started(this);
 }
+#endif
 
 // do we change roots?
 //  -> data loss?
@@ -271,7 +271,7 @@ void Session::set_mode_now(Mode *m) {
 #endif
 
 	cur_mode = m;
-	win->renderer->add_child(cur_mode->multi_view);
+	win->renderer->add_child(cur_mode->multi_view->renderer.get());
 
 	cur_mode->on_enter();
 
@@ -369,7 +369,7 @@ base::future<void> Session::allow_termination() {
 	return promise.get_future();
 }
 
-string Session::get_tex_image(Texture *tex) {
+string Session::get_tex_image(ygfx::Texture *tex) {
 #if 0
 	if (icon_image.contains(tex))
 		return icon_image[tex];

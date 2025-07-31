@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../../scene/MeshEmitter.h"
-#include <graphics-fwd.h>
-#include <world/Material.h>
+#include <lib/yrenderer/scene/MeshEmitter.h>
+#include <lib/ygraphics/graphics-fwd.h>
+#include <lib/yrenderer/Material.h>
 #include "lib/math/vec3.h"
 
 
@@ -23,18 +23,18 @@ struct VertexPoint {
 };
 
 
-class WorldParticlesEmitter : public MeshEmitter {
+class WorldParticlesEmitter : public yrenderer::MeshEmitter {
 public:
-	WorldParticlesEmitter();
-	void emit_transparent(const RenderParams& params, RenderViewData& rvd) override;
+	explicit WorldParticlesEmitter(yrenderer::Context* ctx);
+	void emit_transparent(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd) override;
 
 //	shared<Shader> shader_fx;
 //	shared<Shader> shader_fx_points;
-	owned<VertexBuffer> vb_fx;
-	owned<VertexBuffer> vb_fx_points;
+	owned<ygfx::VertexBuffer> vb_fx;
+	owned<ygfx::VertexBuffer> vb_fx_points;
 
-	Material fx_material;
+	yrenderer::Material fx_material;
 
-	owned_array<VertexBuffer> fx_vertex_buffers;
+	owned_array<ygfx::VertexBuffer> fx_vertex_buffers;
 };
 

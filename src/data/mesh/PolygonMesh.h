@@ -13,8 +13,8 @@
 #include <lib/base/base.h>
 #include <lib/math/vec3.h>
 #include <lib/math/vec4.h>
-#include <y/graphics-fwd.h>
-#include <y/world/Material.h>
+#include <lib/ygraphics/graphics-fwd.h>
+#include <lib/yrenderer/Material.h>
 
 class MultiViewWindow;
 class VertexStagingBuffer;
@@ -69,7 +69,7 @@ struct PolygonMesh {
 	void get_bounding_box(vec3 &min, vec3 &max);
 	bool is_mouse_over(MultiViewWindow* win, const mat4 &matrix, const vec2& m, vec3 &tp, int& index, bool any_hit);
 
-	void build(VertexBuffer *vb) const;
+	void build(ygfx::VertexBuffer *vb) const;
 
 	Array<MeshVertex> vertices;
 	Array<Polygon> polygons;

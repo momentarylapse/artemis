@@ -9,7 +9,7 @@
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <data/mesh/PolygonMesh.h>
-#include <y/graphics-fwd.h>
+#include <lib/ygraphics/graphics-fwd.h>
 
 namespace artemis::graph {
 
@@ -20,7 +20,7 @@ public:
 
 	void on_process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
+	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
 
 	dataflow::InPort<PolygonMesh> in_mesh{this, "mesh"};
 
@@ -29,8 +29,8 @@ public:
 	dataflow::Setting<color> albedo{this, "albedo", White};
 	dataflow::Setting<color> emission{this, "emission", Black};
 
-	owned<VertexBuffer> vertex_buffer;
-	owned<Material> material;
+	owned<ygfx::VertexBuffer> vertex_buffer;
+	owned<yrenderer::Material> material;
 };
 
 } // graph

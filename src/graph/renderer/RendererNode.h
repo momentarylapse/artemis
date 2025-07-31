@@ -9,11 +9,13 @@
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <lib/math/Box.h>
-#include <y/graphics-fwd.h>
+#include <lib/ygraphics/graphics-fwd.h>
 
-struct RenderViewData;
+namespace yrenderer {
+	struct RenderViewData;
+	struct RenderParams;
+}
 class MultiViewWindow;
-struct RenderParams;
 class Session;
 class Painter;
 
@@ -23,8 +25,8 @@ struct RenderData {
 	// TODO
 	bool active;
 	base::optional<Box> bounding_box;
-	std::function<void(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd)> f_draw_3d;
-	std::function<void(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd)> f_draw_3d_transparent;
+	std::function<void(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd)> f_draw_3d;
+	std::function<void(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd)> f_draw_3d_transparent;
 	std::function<void(Painter*)> f_draw_2d;
 };
 

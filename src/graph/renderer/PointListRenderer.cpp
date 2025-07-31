@@ -6,7 +6,7 @@
 #include <Session.h>
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
-#include <y/renderer/base.h>
+#include <lib/yrenderer/base.h>
 
 #include "lib/base/iter.h"
 
@@ -22,8 +22,8 @@ base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
 }
 
 PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRenderer") {
-	material = new Material(s->resource_manager);
-	material->textures.add(tex_white);
+	material = new yrenderer::Material(s->resource_manager);
+	material->textures.add(s->ctx->tex_white);
 }
 
 void PointListRenderer::on_process() {
@@ -43,16 +43,16 @@ void PointListRenderer::on_process() {
 
 	if (auto points = in_points.value()) {
 		// TODO
-		out_draw(RenderData{active(), point_list_bounding_box(*points), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+		out_draw(RenderData{active(), point_list_bounding_box(*points), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 			draw_win(params, win, rvd);
 		}});
 	}
 }
 
 
-void PointListRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+void PointListRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 	if (!vertex_buffer)
-		vertex_buffer = new VertexBuffer("3f,3f,2f");
+		vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 
 	// mesh -> vb
 	if (in_mesh.value()) {

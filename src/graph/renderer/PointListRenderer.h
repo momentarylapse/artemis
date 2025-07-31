@@ -11,7 +11,9 @@
 #include <data/mesh/PolygonMesh.h>
 #include <lib/image/color.h>
 
-class Material;
+namespace yrenderer {
+	class Material;
+}
 
 namespace artemis::graph {
 
@@ -21,7 +23,7 @@ public:
 
 	void on_process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
+	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
 
 	dataflow::Setting<double> radius{this, "radius", 0.2, "range=0:99:0.1"};
 	dataflow::Setting<int> trail_length{this, "trail-length", 0, "range=0:"};
@@ -31,8 +33,8 @@ public:
 	dataflow::InPort<Array<vec3>> in_points{this, "points"};
 	dataflow::InPort<PolygonMesh> in_mesh{this, "mesh", dataflow::PortFlags::Optional};
 
-	owned<VertexBuffer> vertex_buffer;
-	owned<Material> material;
+	owned<ygfx::VertexBuffer> vertex_buffer;
+	owned<yrenderer::Material> material;
 
 	Array<Array<vec3>> trails;
 };

@@ -4,17 +4,20 @@
 
 #include "LightMeter.h"
 #include <world/Camera.h>
-#include "../../graphics-impl.h"
-#include "../base.h"
+#include <lib/ygraphics/graphics-impl.h>
+#include <lib/yrenderer/base.h>
 #include <lib/profiler/Profiler.h>
 #include "../../helper/ResourceManager.h"
+#include <lib/yrenderer/ShaderManager.h>
 
 
 constexpr int NBINS = 256;
 constexpr int NSAMPLES = 2560;
 
-LightMeter::LightMeter(ResourceManager* resource_manager, Texture* tex)
-	: ComputeTask("expo", resource_manager->load_shader("compute/brightness.shader"), NSAMPLES, 1, 1)
+using namespace ygfx;
+
+LightMeter::LightMeter(yrenderer::Context* ctx, Texture* tex)
+	: ComputeTask(ctx, "expo", ctx->resource_manager->shader_manager->load_shader("compute/brightness.shader"), NSAMPLES, 1, 1)
 {
 	ch_prepare = profiler::create_channel("expo.p", channel);
 	params = new UniformBuffer(8);
@@ -30,7 +33,7 @@ void LightMeter::read() {
 	profiler::begin(ch_prepare);
 
 	// TODO barriers...
-	gpu_flush();
+	ctx->gpu_flush();
 	if (histogram.num == NBINS) {
 #ifdef USING_VULKAN
 		void* p = buf->map();

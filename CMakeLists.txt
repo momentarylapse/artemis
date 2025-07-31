@@ -590,6 +590,40 @@ add_executable(artemis
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
+	src/lib/yrenderer/helper/Bindable.cpp
+	src/lib/yrenderer/helper/ComputeTask.cpp
+	src/lib/yrenderer/helper/CubeMapSource.cpp
+	src/lib/yrenderer/helper/jitter.cpp
+	src/lib/yrenderer/helper/Pipeline.cpp
+	src/lib/yrenderer/helper/PipelineManager.cpp
+	src/lib/yrenderer/post/HDRResolver.cpp
+	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
+	src/lib/yrenderer/regions/RegionRenderer.cpp
+	src/lib/yrenderer/regions/RegionRendererGL.cpp
+	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
+	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/MeshEmitter.cpp
+	src/lib/yrenderer/scene/RenderViewData.cpp
+	src/lib/yrenderer/scene/SceneRenderer.cpp
+	src/lib/yrenderer/scene/SceneView.cpp
+	src/lib/yrenderer/target/HeadlessRendererVulkan.cpp
+	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
+	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
+	src/lib/yrenderer/target/TargetRenderer.cpp
+	src/lib/yrenderer/target/TextureRendererGL.cpp
+	src/lib/yrenderer/target/TextureRendererVulkan.cpp
+	src/lib/yrenderer/target/WindowRendererGL.cpp
+	src/lib/yrenderer/target/WindowRendererVulkan.cpp
+	src/lib/yrenderer/target/XhuiRenderer.cpp
+	src/lib/yrenderer/base-gl.cpp
+	src/lib/yrenderer/base-vulkan.cpp
+	src/lib/yrenderer/base.cpp
+	src/lib/yrenderer/Material.cpp
+	src/lib/yrenderer/Renderer.cpp
+	src/lib/yrenderer/ShaderManager.cpp
+	src/lib/yrenderer/TextureManager.cpp
 	src/multiview/SingleData.cpp
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
@@ -629,40 +663,13 @@ add_executable(artemis
 	src/y/plugins/PluginManager.cpp
 	src/y/renderer/gui/GuiRendererGL.cpp
 	src/y/renderer/gui/GuiRendererVulkan.cpp
-	src/y/renderer/helper/Bindable.cpp
-	src/y/renderer/helper/ComputeTask.cpp
-	src/y/renderer/helper/CubeMapSource.cpp
-	src/y/renderer/helper/jitter.cpp
 	src/y/renderer/helper/LightMeter.cpp
-	src/y/renderer/helper/Pipeline.cpp
-	src/y/renderer/helper/PipelineManager.cpp
 	src/y/renderer/helper/Raytracing.cpp
 	src/y/renderer/helper/RendererFactory.cpp
 	src/y/renderer/path/RenderPath.cpp
-	src/y/renderer/post/HDRResolver.cpp
-	src/y/renderer/post/MultisampleResolver.cpp
 	src/y/renderer/post/PostProcessor.cpp
 	src/y/renderer/post/PostProcessorGL.cpp
 	src/y/renderer/post/PostProcessorVulkan.cpp
-	src/y/renderer/post/ThroughShaderRenderer.cpp
-	src/y/renderer/regions/RegionRenderer.cpp
-	src/y/renderer/regions/RegionRendererGL.cpp
-	src/y/renderer/regions/RegionRendererVulkan.cpp
-	src/y/renderer/scene/mesh/CubeEmitter.cpp
-	src/y/renderer/scene/pass/ShadowRenderer.cpp
-	src/y/renderer/scene/MeshEmitter.cpp
-	src/y/renderer/scene/RenderViewData.cpp
-	src/y/renderer/scene/SceneRenderer.cpp
-	src/y/renderer/scene/SceneView.cpp
-	src/y/renderer/target/HeadlessRendererVulkan.cpp
-	src/y/renderer/target/HuiWindowRendererGL.cpp
-	src/y/renderer/target/HuiWindowRendererVulkan.cpp
-	src/y/renderer/target/TargetRenderer.cpp
-	src/y/renderer/target/TextureRendererGL.cpp
-	src/y/renderer/target/TextureRendererVulkan.cpp
-	src/y/renderer/target/WindowRendererGL.cpp
-	src/y/renderer/target/WindowRendererVulkan.cpp
-	src/y/renderer/target/XhuiRenderer.cpp
 	src/y/renderer/world/emitter/WorldInstancedEmitter.cpp
 	src/y/renderer/world/emitter/WorldModelsEmitter.cpp
 	src/y/renderer/world/emitter/WorldParticlesEmitter.cpp
@@ -673,10 +680,6 @@ add_executable(artemis
 	src/y/renderer/world/WorldRendererDeferred.cpp
 	src/y/renderer/world/WorldRendererForward.cpp
 	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
-	src/y/renderer/base-gl.cpp
-	src/y/renderer/base-vulkan.cpp
-	src/y/renderer/base.cpp
-	src/y/renderer/Renderer.cpp
 	src/y/world/components/Animator.cpp
 	src/y/world/components/Collider.cpp
 	src/y/world/components/MultiInstance.cpp
@@ -687,7 +690,6 @@ add_executable(artemis
 	src/y/world/LevelData.cpp
 	src/y/world/Light.cpp
 	src/y/world/Link.cpp
-	src/y/world/Material.cpp
 	src/y/world/Model.cpp
 	src/y/world/ModelManager.cpp
 	src/y/world/Terrain.cpp
@@ -963,6 +965,40 @@ add_library(moduleartemis SHARED
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
+	src/lib/yrenderer/helper/Bindable.cpp
+	src/lib/yrenderer/helper/ComputeTask.cpp
+	src/lib/yrenderer/helper/CubeMapSource.cpp
+	src/lib/yrenderer/helper/jitter.cpp
+	src/lib/yrenderer/helper/Pipeline.cpp
+	src/lib/yrenderer/helper/PipelineManager.cpp
+	src/lib/yrenderer/post/HDRResolver.cpp
+	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
+	src/lib/yrenderer/regions/RegionRenderer.cpp
+	src/lib/yrenderer/regions/RegionRendererGL.cpp
+	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
+	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/MeshEmitter.cpp
+	src/lib/yrenderer/scene/RenderViewData.cpp
+	src/lib/yrenderer/scene/SceneRenderer.cpp
+	src/lib/yrenderer/scene/SceneView.cpp
+	src/lib/yrenderer/target/HeadlessRendererVulkan.cpp
+	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
+	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
+	src/lib/yrenderer/target/TargetRenderer.cpp
+	src/lib/yrenderer/target/TextureRendererGL.cpp
+	src/lib/yrenderer/target/TextureRendererVulkan.cpp
+	src/lib/yrenderer/target/WindowRendererGL.cpp
+	src/lib/yrenderer/target/WindowRendererVulkan.cpp
+	src/lib/yrenderer/target/XhuiRenderer.cpp
+	src/lib/yrenderer/base-gl.cpp
+	src/lib/yrenderer/base-vulkan.cpp
+	src/lib/yrenderer/base.cpp
+	src/lib/yrenderer/Material.cpp
+	src/lib/yrenderer/Renderer.cpp
+	src/lib/yrenderer/ShaderManager.cpp
+	src/lib/yrenderer/TextureManager.cpp
 	src/multiview/SingleData.cpp
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
@@ -1002,40 +1038,13 @@ add_library(moduleartemis SHARED
 	src/y/plugins/PluginManager.cpp
 	src/y/renderer/gui/GuiRendererGL.cpp
 	src/y/renderer/gui/GuiRendererVulkan.cpp
-	src/y/renderer/helper/Bindable.cpp
-	src/y/renderer/helper/ComputeTask.cpp
-	src/y/renderer/helper/CubeMapSource.cpp
-	src/y/renderer/helper/jitter.cpp
 	src/y/renderer/helper/LightMeter.cpp
-	src/y/renderer/helper/Pipeline.cpp
-	src/y/renderer/helper/PipelineManager.cpp
 	src/y/renderer/helper/Raytracing.cpp
 	src/y/renderer/helper/RendererFactory.cpp
 	src/y/renderer/path/RenderPath.cpp
-	src/y/renderer/post/HDRResolver.cpp
-	src/y/renderer/post/MultisampleResolver.cpp
 	src/y/renderer/post/PostProcessor.cpp
 	src/y/renderer/post/PostProcessorGL.cpp
 	src/y/renderer/post/PostProcessorVulkan.cpp
-	src/y/renderer/post/ThroughShaderRenderer.cpp
-	src/y/renderer/regions/RegionRenderer.cpp
-	src/y/renderer/regions/RegionRendererGL.cpp
-	src/y/renderer/regions/RegionRendererVulkan.cpp
-	src/y/renderer/scene/mesh/CubeEmitter.cpp
-	src/y/renderer/scene/pass/ShadowRenderer.cpp
-	src/y/renderer/scene/MeshEmitter.cpp
-	src/y/renderer/scene/RenderViewData.cpp
-	src/y/renderer/scene/SceneRenderer.cpp
-	src/y/renderer/scene/SceneView.cpp
-	src/y/renderer/target/HeadlessRendererVulkan.cpp
-	src/y/renderer/target/HuiWindowRendererGL.cpp
-	src/y/renderer/target/HuiWindowRendererVulkan.cpp
-	src/y/renderer/target/TargetRenderer.cpp
-	src/y/renderer/target/TextureRendererGL.cpp
-	src/y/renderer/target/TextureRendererVulkan.cpp
-	src/y/renderer/target/WindowRendererGL.cpp
-	src/y/renderer/target/WindowRendererVulkan.cpp
-	src/y/renderer/target/XhuiRenderer.cpp
 	src/y/renderer/world/emitter/WorldInstancedEmitter.cpp
 	src/y/renderer/world/emitter/WorldModelsEmitter.cpp
 	src/y/renderer/world/emitter/WorldParticlesEmitter.cpp
@@ -1046,10 +1055,6 @@ add_library(moduleartemis SHARED
 	src/y/renderer/world/WorldRendererDeferred.cpp
 	src/y/renderer/world/WorldRendererForward.cpp
 	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
-	src/y/renderer/base-gl.cpp
-	src/y/renderer/base-vulkan.cpp
-	src/y/renderer/base.cpp
-	src/y/renderer/Renderer.cpp
 	src/y/world/components/Animator.cpp
 	src/y/world/components/Collider.cpp
 	src/y/world/components/MultiInstance.cpp
@@ -1060,7 +1065,6 @@ add_library(moduleartemis SHARED
 	src/y/world/LevelData.cpp
 	src/y/world/Light.cpp
 	src/y/world/Link.cpp
-	src/y/world/Material.cpp
 	src/y/world/Model.cpp
 	src/y/world/ModelManager.cpp
 	src/y/world/Terrain.cpp

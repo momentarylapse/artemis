@@ -12,20 +12,20 @@ void DeformationRenderer::on_process() {
 	if (!d)
 		return;
 
-	out_draw(RenderData{active(), d->grid.bounding_box(), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+	out_draw(RenderData{active(), d->grid.bounding_box(), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 		draw_win(params, win, rvd);
 	}});
 }
 
 
-void DeformationRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+void DeformationRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 
 	auto d = in_diff.value();
 	if (!d)
 		return;
 
 	if (!vertex_buffer)
-		vertex_buffer = new VertexBuffer("3f,3f,2f");
+		vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 
 	GeometrySphere mesh(v_0, 1, 2);
 	mesh.build(vertex_buffer.get());

@@ -5,20 +5,19 @@
 #ifndef LIGHTMETER_H
 #define LIGHTMETER_H
 
-#include "../Renderer.h"
-#include "../helper/ComputeTask.h"
+#include <lib/yrenderer/Renderer.h>
+#include <lib/yrenderer/helper/ComputeTask.h>
 
-class ComputeTask;
 class Camera;
 
-class LightMeter : public ComputeTask {
+class LightMeter : public yrenderer::ComputeTask {
 public:
-	LightMeter(ResourceManager* resource_manager, Texture* tex);
-	UniformBuffer* params;
-	ShaderStorageBuffer* buf;
+	LightMeter(yrenderer::Context* ctx, ygfx::Texture* tex);
+	ygfx::UniformBuffer* params;
+	ygfx::ShaderStorageBuffer* buf;
 	Array<int> histogram;
 	float brightness;
-	Texture* texture;
+	ygfx::Texture* texture;
 	void read();
 	void setup();
 	void adjust_camera(Camera* cam);

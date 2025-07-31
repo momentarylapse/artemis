@@ -10,7 +10,9 @@
 #include <lib/dataflow/Port.h>
 #include "RendererNode.h"
 
-class Material;
+namespace yrenderer {
+	class Material;
+}
 
 namespace artemis::graph {
 
@@ -20,16 +22,16 @@ public:
 
 	void on_process() override;
 
-	void draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd);
+	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
 
 	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 	dataflow::Setting<bool> solid{this, "solid", false};
 	dataflow::Setting<data::ColorMap> color_map{this, "color_map", data::ColorMap::_default_transparent};
 
-	owned<VertexBuffer> vertex_buffer;
-	owned<VolumeTexture> tex;
-	owned<Material> material;
-	owned<Material> material_solid;
+	owned<ygfx::VertexBuffer> vertex_buffer;
+	owned<ygfx::VolumeTexture> tex;
+	owned<yrenderer::Material> material;
+	owned<yrenderer::Material> material_solid;
 };
 
 } // graph

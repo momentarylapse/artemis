@@ -3,16 +3,18 @@
 //
 
 #include "WorldSkyboxEmitter.h"
-#include "../../scene/RenderViewData.h"
-#include "../../scene/SceneView.h"
-#include "../../base.h"
+#include <lib/yrenderer/scene/RenderViewData.h>
+#include <lib/yrenderer/scene/SceneView.h>
+#include <lib/yrenderer/base.h>
 #include <lib/profiler/Profiler.h>
 #include <world/World.h>
 #include <world/Model.h>
 #include <world/Camera.h>
-#include <graphics-impl.h>
+#include <lib/ygraphics/graphics-impl.h>
 
-WorldSkyboxEmitter::WorldSkyboxEmitter() : MeshEmitter("sky") {
+using namespace yrenderer;
+
+WorldSkyboxEmitter::WorldSkyboxEmitter(Context* ctx) : MeshEmitter(ctx, "sky") {
 }
 
 void WorldSkyboxEmitter::emit(const RenderParams& params, RenderViewData& rvd, bool shadow_pass) {
@@ -20,7 +22,7 @@ void WorldSkyboxEmitter::emit(const RenderParams& params, RenderViewData& rvd, b
 		return;
 
 	profiler::begin(channel);
-	gpu_timestamp_begin(params, channel);
+	ctx->gpu_timestamp_begin(params, channel);
 
 	rvd.clear(params, {world.background}, 1.0f);
 
@@ -54,7 +56,7 @@ void WorldSkyboxEmitter::emit(const RenderParams& params, RenderViewData& rvd, b
 		for (int i=0; i<sb->material.num; i++) {
 			auto vb = sb->mesh[0]->sub[i].vertex_buffer;
 			auto shader = rvd.get_shader(sb->material[i], 0, "default", "");
-			auto& rd = rvd.start(params, sb->_matrix * mat4::scale(10,10,10), shader, *sb->material[i], 0, PrimitiveTopology::TRIANGLES, vb);
+			auto& rd = rvd.start(params, sb->_matrix * mat4::scale(10,10,10), shader, *sb->material[i], 0, ygfx::PrimitiveTopology::TRIANGLES, vb);
 
 			rd.draw_triangles(params, vb);
 		}
@@ -69,7 +71,7 @@ void WorldSkyboxEmitter::emit(const RenderParams& params, RenderViewData& rvd, b
 	nix::set_cull(nix::CullMode::BACK);
 #endif
 #endif
-	gpu_timestamp_end(params, channel);
+	ctx->gpu_timestamp_end(params, channel);
 	profiler::end(channel);
 }
 

@@ -14,7 +14,7 @@
 #include "../lib/math/mat4.h"
 #include "../lib/math/vec3.h"
 #include "../lib/pattern/Observable.h"
-#include <y/graphics-fwd.h>
+#include <lib/ygraphics/graphics-fwd.h>
 
 struct PolygonMesh;
 class ActionMultiView;
@@ -22,9 +22,11 @@ class Data;
 class Painter;
 class MultiView;
 class MultiViewWindow;
-class Material;
-struct RenderParams;
-struct RenderViewData;
+namespace yrenderer {
+	class Material;
+	struct RenderParams;
+	struct RenderViewData;
+}
 
 enum class MouseActionMode {
 	SELECT,
@@ -80,9 +82,9 @@ public:
 		float scale;
 		owned_array<PolygonMesh> geo_show;
 		owned_array<PolygonMesh> geo;
-		owned_array<VertexBuffer> buf;
-		owned_array<Material> materials;
-		owned<Material> material_hover;
+		owned_array<ygfx::VertexBuffer> buf;
+		owned_array<yrenderer::Material> materials;
+		owned<yrenderer::Material> material_hover;
 		mat4 geo_mat;
 	} manipulator;
 	vec3 m0;
@@ -96,7 +98,7 @@ public:
 	Data* data;
 	//void reset();
 	//void draw(Window *win);
-	void draw(const RenderParams& params, RenderViewData& rvd);
+	void draw(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd);
 	void draw_post(Painter* p);
 	void show(bool show);
 

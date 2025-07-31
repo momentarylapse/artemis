@@ -12,14 +12,14 @@ namespace artemis::graph {
 
 void GridRenderer::on_process() {
 	if (auto r = regular.value()) {
-		out_draw(RenderData{active(), r->bounding_box(), [this] (const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+		out_draw(RenderData{active(), r->bounding_box(), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 			draw_win(params, win, rvd);
 		}});
 	}
 }
 
 
-void GridRenderer::draw_win(const RenderParams& params, MultiViewWindow* win, RenderViewData& rvd) {
+void GridRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 	if (auto r = regular.value()) {
 		Array<vec3> points;
 		for (int i=0; i<=r->nx; i++)
