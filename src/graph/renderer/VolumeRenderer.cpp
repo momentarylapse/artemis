@@ -12,14 +12,14 @@
 namespace artemis::graph {
 
 VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
-	material = new yrenderer::Material(s->resource_manager);
+	material = new yrenderer::Material(s->ctx);
 	material->pass0.shader_path = "volume.shader";
 	material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
 	material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
 	material->pass0.destination = ygfx::Alpha::SOURCE_INV_ALPHA;
 	material->textures.add(s->ctx->tex_white);
 
-	material_solid = new yrenderer::Material(s->resource_manager);
+	material_solid = new yrenderer::Material(s->ctx);
 	material_solid->pass0.shader_path = "volume-surface.shader";
 	material_solid->textures.add(s->ctx->tex_white);
 }

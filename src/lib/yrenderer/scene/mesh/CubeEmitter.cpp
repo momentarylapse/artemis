@@ -5,17 +5,18 @@
 #include "CubeEmitter.h"
 #include <lib/yrenderer/base.h>
 #include <lib/yrenderer/scene/RenderViewData.h>
-#include <y/EngineData.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/math/Box.h>
 
 namespace yrenderer {
 
 CubeEmitter::CubeEmitter(Context* ctx) : MeshEmitter(ctx, "cube") {
-	vb = new ygfx::VertexBuffer("3f,3f,2f");
-	set_cube(Box::ID_SYM);
-	material = new Material(engine.resource_manager);
-	material->textures.add(ctx->tex_white);
+	if (ctx) {
+		vb = new ygfx::VertexBuffer("3f,3f,2f");
+		set_cube(Box::ID_SYM);
+		material = new Material(ctx);
+		material->textures.add(ctx->tex_white);
+	}
 }
 
 void CubeEmitter::set_cube(const Box& box) {

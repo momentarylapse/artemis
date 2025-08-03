@@ -9,16 +9,16 @@
 #include <lib/yrenderer/base.h>
 #include "../path/RenderPath.h"
 #include "../world/WorldRenderer.h"
+#include <lib/yrenderer/helper/CubeMapSource.h>
 #include <lib/yrenderer/post/ThroughShaderRenderer.h>
 #include <lib/yrenderer/regions/RegionRenderer.h>
+#include <lib/yrenderer/target/WindowRenderer.h>
 #ifdef USING_VULKAN
 	#include "../gui/GuiRendererVulkan.h"
 	#include "../post/PostProcessorVulkan.h"
-	#include <lib/yrenderer/target/WindowRendererVulkan.h>
 #else
 	#include "../gui/GuiRendererGL.h"
 	#include "../post/PostProcessorGL.h"
-	#include <lib/yrenderer/target/WindowRendererGL.h>
 #endif
 #include <y/EngineData.h>
 #include <lib/os/msg.h>
@@ -57,11 +57,7 @@ void print_render_chain() {
 
 WindowRenderer *create_window_renderer(yrenderer::Context* ctx, GLFWwindow* window) {
 #ifdef HAS_LIB_GLFW
-#ifdef USING_VULKAN
-	return WindowRendererVulkan::create(ctx, window);
-#else
-	return new WindowRendererGL(ctx, window);
-#endif
+	return new WindowRenderer(ctx, window);
 #else
 	return nullptr;
 #endif
@@ -110,6 +106,9 @@ void create_and_attach_render_path(yrenderer::Context* ctx, Camera *cam) {
 
 
 void create_base_renderer(yrenderer::Context* ctx, GLFWwindow* window) {
+	yrenderer::cubemap_default_resolution = config.get_int("cubemap.resolution", 256);
+	yrenderer::cubemap_default_rate = config.get_int("cubemap.update_rate", 9);
+
 	try {
 		engine.window_renderer = create_window_renderer(ctx, window);
 		engine.region_renderer = create_region_renderer(ctx);

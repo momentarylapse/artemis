@@ -21,7 +21,7 @@ base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
 }
 
 MeshRenderer::MeshRenderer(Session* s) : RendererNode(s, "MeshRenderer") {
-	material = new yrenderer::Material(s->resource_manager);
+	material = new yrenderer::Material(s->ctx);
 	material->textures.add(s->ctx->tex_white);
 }
 

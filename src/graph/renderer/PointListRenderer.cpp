@@ -22,7 +22,7 @@ base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
 }
 
 PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRenderer") {
-	material = new yrenderer::Material(s->resource_manager);
+	material = new yrenderer::Material(s->ctx);
 	material->textures.add(s->ctx->tex_white);
 }
 

@@ -229,11 +229,14 @@ Dialog x x padding=0
 		auto pp = (xhui::Painter*)p;
 		session->ctx = yrenderer::api_init_xhui(pp);
 		session->resource_manager = new ResourceManager(session->ctx, "", "", "");
+		session->ctx->material_manager = session->resource_manager->material_manager;
+		session->ctx->shader_manager = session->resource_manager->shader_manager;
+		session->ctx->texture_manager = session->resource_manager->texture_manager;
 		session->resource_manager->shader_manager->default_shader = "default.shader";
 /*#ifdef USING_OPENGL
 		session->resource_manager->ctx = xhui::_nix_context.get();
 #endif*/
-		session->drawing_helper = new DrawingHelper(pp->context, session->resource_manager);
+		session->drawing_helper = new DrawingHelper(pp->context, session->ctx);
 		try {
 			session->resource_manager->shader_manager->load_shader_module("module-basic-data.shader");
 			session->resource_manager->shader_manager->load_shader_module("module-basic-interface.shader");

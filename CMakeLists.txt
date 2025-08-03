@@ -594,6 +594,7 @@ add_executable(artemis
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
 	src/lib/yrenderer/helper/jitter.cpp
+	src/lib/yrenderer/helper/LightMeter.cpp
 	src/lib/yrenderer/helper/Pipeline.cpp
 	src/lib/yrenderer/helper/PipelineManager.cpp
 	src/lib/yrenderer/post/HDRResolver.cpp
@@ -604,6 +605,8 @@ add_executable(artemis
 	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
 	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
 	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/CameraParams.cpp
+	src/lib/yrenderer/scene/Light.cpp
 	src/lib/yrenderer/scene/MeshEmitter.cpp
 	src/lib/yrenderer/scene/RenderViewData.cpp
 	src/lib/yrenderer/scene/SceneRenderer.cpp
@@ -617,6 +620,7 @@ add_executable(artemis
 	src/lib/yrenderer/target/WindowRendererGL.cpp
 	src/lib/yrenderer/target/WindowRendererVulkan.cpp
 	src/lib/yrenderer/target/XhuiRenderer.cpp
+	src/lib/yrenderer/_kaba_export.cpp
 	src/lib/yrenderer/base-gl.cpp
 	src/lib/yrenderer/base-vulkan.cpp
 	src/lib/yrenderer/base.cpp
@@ -663,7 +667,6 @@ add_executable(artemis
 	src/y/plugins/PluginManager.cpp
 	src/y/renderer/gui/GuiRendererGL.cpp
 	src/y/renderer/gui/GuiRendererVulkan.cpp
-	src/y/renderer/helper/LightMeter.cpp
 	src/y/renderer/helper/Raytracing.cpp
 	src/y/renderer/helper/RendererFactory.cpp
 	src/y/renderer/path/RenderPath.cpp
@@ -682,6 +685,7 @@ add_executable(artemis
 	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
 	src/y/world/components/Animator.cpp
 	src/y/world/components/Collider.cpp
+	src/y/world/components/CubeMapSource.cpp
 	src/y/world/components/MultiInstance.cpp
 	src/y/world/components/Skeleton.cpp
 	src/y/world/components/SolidBody.cpp
@@ -969,6 +973,7 @@ add_library(moduleartemis SHARED
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
 	src/lib/yrenderer/helper/jitter.cpp
+	src/lib/yrenderer/helper/LightMeter.cpp
 	src/lib/yrenderer/helper/Pipeline.cpp
 	src/lib/yrenderer/helper/PipelineManager.cpp
 	src/lib/yrenderer/post/HDRResolver.cpp
@@ -979,6 +984,8 @@ add_library(moduleartemis SHARED
 	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
 	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
 	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/CameraParams.cpp
+	src/lib/yrenderer/scene/Light.cpp
 	src/lib/yrenderer/scene/MeshEmitter.cpp
 	src/lib/yrenderer/scene/RenderViewData.cpp
 	src/lib/yrenderer/scene/SceneRenderer.cpp
@@ -992,6 +999,7 @@ add_library(moduleartemis SHARED
 	src/lib/yrenderer/target/WindowRendererGL.cpp
 	src/lib/yrenderer/target/WindowRendererVulkan.cpp
 	src/lib/yrenderer/target/XhuiRenderer.cpp
+	src/lib/yrenderer/_kaba_export.cpp
 	src/lib/yrenderer/base-gl.cpp
 	src/lib/yrenderer/base-vulkan.cpp
 	src/lib/yrenderer/base.cpp
@@ -1038,7 +1046,6 @@ add_library(moduleartemis SHARED
 	src/y/plugins/PluginManager.cpp
 	src/y/renderer/gui/GuiRendererGL.cpp
 	src/y/renderer/gui/GuiRendererVulkan.cpp
-	src/y/renderer/helper/LightMeter.cpp
 	src/y/renderer/helper/Raytracing.cpp
 	src/y/renderer/helper/RendererFactory.cpp
 	src/y/renderer/path/RenderPath.cpp
@@ -1057,6 +1064,7 @@ add_library(moduleartemis SHARED
 	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
 	src/y/world/components/Animator.cpp
 	src/y/world/components/Collider.cpp
+	src/y/world/components/CubeMapSource.cpp
 	src/y/world/components/MultiInstance.cpp
 	src/y/world/components/Skeleton.cpp
 	src/y/world/components/SolidBody.cpp

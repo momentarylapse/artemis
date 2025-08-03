@@ -119,9 +119,10 @@ mat3 MultiViewWindow::edit_frame() const {
 }
 
 void MultiViewWindow::draw(const yrenderer::RenderParams& params) {
-	projection = multi_view->view_port.cam->projection_matrix(area.width() / area.height());
+	projection = multi_view->view_port.cam.projection_matrix(area.width() / area.height());
 
-	scene_renderer->set_view(params, view_pos(), local_ang, projection);
+	scene_renderer->scene_view.main_camera_params = multi_view->view_port.cam;
+	scene_renderer->set_view(params, multi_view->view_port.cam, &projection);
 	view = scene_renderer->rvd.ubo.v;
 	scene_renderer->prepare(params);
 
@@ -148,10 +149,11 @@ void MultiViewRenderer::prepare(const yrenderer::RenderParams& params) {
 	const auto& area = multi_view->area;
 	auto& window = multi_view->window;
 
-	view_port.cam->owner->ang = view_port.ang;
-	view_port.cam->owner->pos = view_port.pos - view_port.cam->owner->ang * vec3::EZ * view_port.radius;
-	view_port.cam->min_depth = view_port.radius * 0.01f;
-	view_port.cam->max_depth = view_port.radius * 300;
+	view_port.cam.fov = pi / 4;
+	view_port.cam.ang = view_port.ang;
+	view_port.cam.pos = view_port.pos - view_port.cam.ang * vec3::EZ * view_port.radius;
+	view_port.cam.min_depth = view_port.radius * 0.01f;
+	view_port.cam.max_depth = view_port.radius * 300;
 
 	window->local_ang = view_port.ang;
 
@@ -162,7 +164,7 @@ void MultiViewRenderer::prepare(const yrenderer::RenderParams& params) {
 		* window->projection * window->view;
 
 	{
-		multi_view->default_light->owner->ang = view_port.ang;
+		multi_view->default_light->_ang = view_port.ang;
 		multi_view->lights = {multi_view->default_light};
 		view_port.scene_view->lights = multi_view->lights;
 		//	if (l->allow_shadow)
@@ -200,9 +202,8 @@ MultiView::MultiView(Session* s) :
 	action_controller = new ActionController(this);
 
 
-	default_light = new Light(White, -1, -1);
-	default_light->owner = new Entity;
-	default_light->owner->ang = quaternion::ID;
+	default_light = new yrenderer::Light;
+	default_light->init(White, -1, -1);
 	default_light->enabled = true;
 	default_light->light.harshness = 0.5f;
 	default_light->allow_shadow = true;
@@ -520,12 +521,7 @@ MultiView::ViewPort::ViewPort(MultiView* _multi_view) {
 	pos = v_0;
 	ang = quaternion::ID;
 	radius = 100;
-	cam = new Camera();
-	cam->owner = new Entity;
-	//cam->owner->ang = quaternion::rotation({1, 0, 0}, 0.33f);
-	//cam->owner->pos = {1000,1000,-800};
 	scene_view = new yrenderer::SceneView;
-	scene_view->cam = cam;
 }
 
 void MultiView::ViewPort::move(const vec3& drel) {

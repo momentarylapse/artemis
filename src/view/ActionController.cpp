@@ -25,9 +25,11 @@
 #include <lib/math/plane.h>
 #include <lib/os/msg.h>
 
+#include "lib/yrenderer/base.h"
+
 #define MVGetSingleData(d, index)	((SingleData*) ((char*)(d).data->data + (d).data->element_size* index))
 
-yrenderer::Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false);
+yrenderer::Material* create_material(yrenderer::Context* ctx, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false);
 
 ActionController::Manipulator::Manipulator(MultiView* multi_view) {
 	geo_mat = mat4::ID;
@@ -65,12 +67,12 @@ ActionController::Manipulator::Manipulator(MultiView* multi_view) {
 	}
 
 	for (int i=0; i<geo.num; i++) {
-		auto m = create_material(multi_view->renderer->resource_manager, Black, 0.9f, 0, geo_config[i].col);
+		auto m = create_material(multi_view->renderer->ctx, Black, 0.9f, 0, geo_config[i].col);
 		m->pass0.z_buffer = false;
 		m->pass0.z_test = false;
 		materials.add(m);
 	}
-	material_hover = create_material(multi_view->renderer->resource_manager, Black, 0.9f, 0, White);
+	material_hover = create_material(multi_view->renderer->ctx, Black, 0.9f, 0, White);
 	material_hover->pass0.z_buffer = false;
 	material_hover->pass0.z_test = false;
 }

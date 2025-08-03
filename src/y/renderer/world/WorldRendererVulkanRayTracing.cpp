@@ -16,6 +16,7 @@
 #include <lib/profiler/Profiler.h>
 #include "../../helper/ResourceManager.h"
 #include <lib/yrenderer/ShaderManager.h>
+#include <lib/yrenderer/scene/CameraParams.h>
 #include "../../world/Camera.h"
 #include "../../world/World.h"
 #include "../../y/EngineData.h"
@@ -24,8 +25,8 @@
 
 using namespace yrenderer;
 
-WorldRendererVulkanRayTracing::WorldRendererVulkanRayTracing(Context* ctx, SceneView& scene_view, int w, int h) :
-		WorldRenderer(ctx, "rt", scene_view),
+WorldRendererVulkanRayTracing::WorldRendererVulkanRayTracing(Context* ctx, Camera* cam, SceneView& scene_view, int w, int h) :
+		WorldRenderer(ctx, "rt", cam, scene_view),
 		rvd(ctx)
 {
 	device = ctx->device;
@@ -59,9 +60,9 @@ WorldRendererVulkanRayTracing::WorldRendererVulkanRayTracing(Context* ctx, Scene
 		rtx.dset->set_uniform_buffer(4, rvd.ubo_light.get());
 		rtx.dset->set_uniform_buffer(5, scene_view.ray_tracing_data->buffer_meshes.get());
 
-		auto shader_gen = resource_manager->shader_manager->load_shader("vulkan/gen.shader");
-		auto shader1 = resource_manager->shader_manager->load_shader("vulkan/group1.shader");
-		auto shader2 = resource_manager->shader_manager->load_shader("vulkan/group2.shader");
+		auto shader_gen = shader_manager->load_shader("vulkan/gen.shader");
+		auto shader1 = shader_manager->load_shader("vulkan/group1.shader");
+		auto shader2 = shader_manager->load_shader("vulkan/group2.shader");
 		rtx.pipeline = new vulkan::RayPipeline("[[acceleration-structure,image,buffer,buffer,buffer,buffer]]", {shader_gen.get(), shader1.get(), shader2.get()}, 2);
 		rtx.pipeline->create_sbt();
 
@@ -71,7 +72,7 @@ WorldRendererVulkanRayTracing::WorldRendererVulkanRayTracing(Context* ctx, Scene
 
 		compute.pool = new vulkan::DescriptorPool("image:1,storage-buffer:1,buffer:8,sampler:1", 1);
 
-		auto shader = resource_manager->shader_manager->load_shader("compute/pathtracing.shader");
+		auto shader = shader_manager->load_shader("compute/pathtracing.shader");
 		compute.pipeline = new vulkan::ComputePipeline(shader.get());
 		compute.dset = compute.pool->create_set("image,buffer,buffer");
 		compute.dset->set_storage_image(0, offscreen_image);
@@ -83,7 +84,7 @@ WorldRendererVulkanRayTracing::WorldRendererVulkanRayTracing(Context* ctx, Scene
 	pc.t_rand = 0;
 
 
-	auto shader_out = resource_manager->shader_manager->load_shader("vulkan/passthrough.shader");
+	auto shader_out = shader_manager->load_shader("vulkan/passthrough.shader");
 	out_renderer = new ThroughShaderRenderer(ctx, "out", shader_out);
 	out_renderer->bind_texture(0, offscreen_image);
 }
@@ -92,13 +93,13 @@ void WorldRendererVulkanRayTracing::prepare(const RenderParams& params) {
 	profiler::begin(ch_prepare);
 	ctx->gpu_timestamp_begin(params, ch_prepare);
 
-	rvd.set_view(params, scene_view.cam);
+	rvd.set_view(params, cam->params());
 	rvd.update_light_ubo();
 
 	int w = width * engine.resolution_scale_x;
 	int h = height * engine.resolution_scale_y;
 
-	pc.iview = scene_view.cam->view_matrix().inverse();
+	pc.iview = cam->view_matrix().inverse();
 	pc.background = world.background;
 	pc.num_lights = scene_view.lights.num;
 	pc.t_rand += loop(pc.t_rand + 0.01f, 0.0f, 10.678f);

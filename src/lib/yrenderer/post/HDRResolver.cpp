@@ -10,13 +10,11 @@
 #include <lib/yrenderer/base.h>
 #include <lib/yrenderer/target/TextureRenderer.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include <Config.h>
-#include <helper/ResourceManager.h>
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/profiler/Profiler.h>
 #include <lib/math/vec2.h>
+#include <lib/math/mat4.h>
 #include <lib/os/msg.h>
-#include <world/Camera.h>
 
 Any mat4_to_any(const mat4& m);
 Any vec2_to_any(const vec2& v);
@@ -30,8 +28,7 @@ static int BLUR_SCALE = 4;
 static int BLOOM_LEVEL_SCALE = 4;
 
 
-HDRResolver::HDRResolver(Context* ctx, Camera *_cam, const shared<ygfx::Texture>& tex, const shared<ygfx::DepthBuffer>& depth_buffer) : Renderer(ctx, "hdr") {
-	cam = _cam;
+HDRResolver::HDRResolver(Context* ctx, const shared<ygfx::Texture>& tex, const shared<ygfx::DepthBuffer>& depth_buffer) : Renderer(ctx, "hdr") {
 	tex_main = tex;
 	_depth_buffer = depth_buffer;
 
@@ -39,7 +36,7 @@ HDRResolver::HDRResolver(Context* ctx, Camera *_cam, const shared<ygfx::Texture>
 	int height = tex->height;
 
 
-	auto shader_blur = resource_manager->shader_manager->load_shader("forward/blur.shader");
+	auto shader_blur = shader_manager->load_shader("forward/blur.shader");
 	int bloomw = width, bloomh = height;
 	auto bloom_input = tex;
 	float r = 3;
@@ -72,7 +69,7 @@ HDRResolver::HDRResolver(Context* ctx, Camera *_cam, const shared<ygfx::Texture>
 		threshold = 0;
 	}
 
-	auto shader_out = resource_manager->shader_manager->load_shader("forward/hdr.shader");
+	auto shader_out = shader_manager->load_shader("forward/hdr.shader");
 	out_renderer = new ThroughShaderRenderer(ctx, "out", shader_out);
 	out_renderer->bind_textures(0, {tex.get(), bloom_levels[0].tex_out.get(), bloom_levels[1].tex_out.get(), bloom_levels[2].tex_out.get(), bloom_levels[3].tex_out.get()});
 	children.add(out_renderer.get());
@@ -107,8 +104,8 @@ void HDRResolver::prepare(const RenderParams& params) {
 
 	auto& data = out_renderer->bindings.shader_data;
 	data.dict_set("project:128", mat4_to_any(mat4::ID));
-	data.dict_set("exposure:192", cam->exposure);
-	data.dict_set("bloom_factor:196", cam->bloom_factor);
+	data.dict_set("exposure:192", exposure);
+	data.dict_set("bloom_factor:196", bloom_factor);
 #ifdef USING_VULKAN
 	data.dict_set("gamma:200", 2.2f);
 #endif

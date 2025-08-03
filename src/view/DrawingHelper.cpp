@@ -4,7 +4,7 @@
 
 #include "DrawingHelper.h"
 #include <lib/ygraphics/graphics-impl.h>
-#include <y/helper/ResourceManager.h>
+#include <lib/yrenderer/Material.h>
 #include <lib/yrenderer/base.h>
 #include <lib/math/mat4.h>
 #include <lib/math/vec2.h>
@@ -20,13 +20,13 @@
 static float ui_scale = 1.0f;
 
 
-yrenderer::Material* create_material(ResourceManager* resource_manager, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
-	auto material = resource_manager->load_material("");
+yrenderer::Material* create_material(yrenderer::Context* ctx, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
+	auto material = ctx->material_manager->load("");
 	material->albedo = albedo;
 	material->roughness = roughness;
 	material->metal = metal;
 	material->emission = emission;
-	material->textures = {resource_manager->ctx->tex_white};
+	material->textures = {ctx->tex_white};
 	if (transparent) {
 		material->pass0.cull_mode = ygfx::CullMode::NONE;
 		material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
@@ -37,11 +37,11 @@ yrenderer::Material* create_material(ResourceManager* resource_manager, const co
 	return material;
 }
 
-DrawingHelper::DrawingHelper(xhui::Context* ctx, ResourceManager* rm) {
-	context = ctx;
-	resource_manager = rm;
+DrawingHelper::DrawingHelper(xhui::Context* _ctx1, yrenderer::Context* _ctx2) {
+	xhui_ctx = _ctx1;
+	ctx = _ctx2;
 
-	ui_scale = context->window->ui_scale;
+	ui_scale = xhui_ctx->window->ui_scale;
 
 	/*light = new Light(White, -1, -1);
 	light->owner = new Entity;
@@ -49,9 +49,9 @@ DrawingHelper::DrawingHelper(xhui::Context* ctx, ResourceManager* rm) {
 	light->light.harshness = 0.5f;*/
 
 	try {
-		material_hover = create_material(resource_manager, {0.3f, 0,0,0}, 0.9f, 0, White, true);
-		material_selection = create_material(resource_manager, {0.3f, 0,0,0}, 0.9f, 0, Red, true);
-		material_creation = create_material(resource_manager, {0.3f, 0,0.5f,0}, 0.9f, 0, color(1,0,0.5f,0), true);
+		material_hover = create_material(ctx, {0.3f, 0,0,0}, 0.9f, 0, White, true);
+		material_selection = create_material(ctx, {0.3f, 0,0,0}, 0.9f, 0, Red, true);
+		material_creation = create_material(ctx, {0.3f, 0,0.5f,0}, 0.9f, 0, color(1,0,0.5f,0), true);
 	} catch(Exception& e) {
 		msg_error(e.message());
 	}
@@ -116,7 +116,7 @@ void main() {
 	dset->set_texture(0, ctx->tex_white);
 	dset->update();
 
-	pipeline = new vulkan::GraphicsPipeline(shader, context->render_pass, 0, ygfx::PrimitiveTopology::TRIANGLES, context->vb);
+	pipeline = new vulkan::GraphicsPipeline(shader, xhui_ctx->render_pass, 0, ygfx::PrimitiveTopology::TRIANGLES, xhui_ctx->vb);
 	//pipeline->set_z(false, false);
 	pipeline->set_culling(ygfx::CullMode::NONE);
 	pipeline->rebuild();
@@ -159,7 +159,7 @@ static void add_vb_line(Array<ygfx::Vertex1>& vertices, const vec3& a, const vec
 
 void DrawingHelper::draw_lines(const Array<vec3>& points, bool contiguous) {
 #ifdef USING_VULKAN
-	auto vb = context->get_line_vb();
+	auto vb = xhui_ctx->get_line_vb();
 	Array<ygfx::Vertex1> vertices;
 	mat4 m = window->projection * window->view;
 	if (contiguous) {
@@ -185,7 +185,7 @@ void DrawingHelper::draw_lines(const Array<vec3>& points, bool contiguous) {
 	params.radius = 0;//line_width;
 	params.softness = 0;//softness;
 
-	auto cb = context->current_command_buffer();
+	auto cb = xhui_ctx->current_command_buffer();
 	cb->bind_pipeline(pipeline);
 	cb->push_constant(0, sizeof(params), &params);
 	cb->bind_descriptor_set(0, dset);

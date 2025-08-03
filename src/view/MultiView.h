@@ -16,7 +16,6 @@
 #include <functional>
 #include <lib/yrenderer/scene/SceneRenderer.h>
 
-class Camera;
 class Painter;
 class Session;
 class ActionMultiView;
@@ -85,7 +84,7 @@ public:
 		vec3 pos;
 		quaternion ang;
 		float radius;
-		Camera* cam;
+		yrenderer::CameraParams cam;
 		owned<yrenderer::SceneView> scene_view;
 		MultiView* multi_view;
 
@@ -95,8 +94,8 @@ public:
 		void suggest_for_box(const Box& box);
 	} view_port;
 
-	Array<Light*> lights;
-	Light* default_light;
+	Array<yrenderer::Light*> lights;
+	yrenderer::Light* default_light;
 
 	owned<MultiViewWindow> window;
 	MultiViewWindow* active_window;

@@ -12,7 +12,7 @@
 class Camera;
 class PostProcessor;
 class WorldRenderer;
-class LightMeter;
+class XTerrainVBUpdater;
 
 namespace yrenderer {
 	class CubeMapRenderer;
@@ -24,6 +24,7 @@ namespace yrenderer {
 	class ShadowRenderer;
 	struct RenderViewData;
 	class CubeMapSource;
+	class LightMeter;
 	enum class RenderPathType;
 }
 
@@ -47,7 +48,7 @@ public:
 	PostProcessor* post_processor = nullptr;
 	yrenderer::TextureRenderer* texture_renderer = nullptr;
 	yrenderer::MultisampleResolver* multisample_resolver = nullptr;
-	LightMeter* light_meter = nullptr;
+	yrenderer::LightMeter* light_meter = nullptr;
 
 	Renderer* main_renderer = nullptr;
 
@@ -62,7 +63,6 @@ public:
 	//virtual void render_into_texture(FrameBuffer *fb, Camera *cam, RenderViewData &rvd) {};
 	void render_into_cubemap(yrenderer::CubeMapSource& source);
 
-	void prepare_basics();
 	void render_cubemaps(const yrenderer::RenderParams& params);
 	void prepare_instanced_matrices();
 
@@ -75,6 +75,6 @@ public:
 	Array<XTerrainVBUpdater*> updater;
 };
 
-WorldRenderer* create_world_renderer(yrenderer::Context* ctx, yrenderer::SceneView& scene_view, yrenderer::RenderPathType type);
+WorldRenderer* create_world_renderer(yrenderer::Context* ctx, Camera* cam, yrenderer::SceneView& scene_view, yrenderer::RenderPathType type);
 
 #endif //RENDERPATH_H

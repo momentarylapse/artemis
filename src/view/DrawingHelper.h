@@ -16,11 +16,11 @@
 #include "MultiView.h"
 
 namespace yrenderer {
+	class Context;
 	struct RenderViewData;
 	struct RenderParams;
 	class Material;
 }
-class ResourceManager;
 class MultiViewWindow;
 class Painter;
 
@@ -42,7 +42,7 @@ struct TextLayout {
 
 class DrawingHelper {
 public:
-	explicit DrawingHelper(xhui::Context* ctx, ResourceManager* rm);
+	explicit DrawingHelper(xhui::Context* ctx1, yrenderer::Context* ctx2);
 	void set_color(const color& color);
 	color _color;
 
@@ -65,8 +65,8 @@ public:
 	static void draw_text_layout(Painter* p, const vec2& pos, const TextLayout& l);
 	static void draw_text_layout_with_box(Painter* p, const vec2& pos, const TextLayout& l);
 
-	xhui::Context* context;
-	ResourceManager* resource_manager;
+	xhui::Context* xhui_ctx;
+	yrenderer::Context* ctx;
 	MultiViewWindow* window;
 	void set_window(MultiViewWindow* win);
 
