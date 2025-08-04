@@ -14,7 +14,7 @@
 #include <lib/xhui/dialogs/ColorSelectionDialog.h>
 #include <data/Data.h>
 #include <lib/xhui/controls/DrawingArea.h>
-#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/Context.h>
 #include <renderer/path/RenderPath.h>
 #include <sys/stat.h>
 #include <y/EngineData.h>

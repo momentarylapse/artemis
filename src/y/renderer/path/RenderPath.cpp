@@ -3,7 +3,7 @@
 //
 
 #include "RenderPath.h"
-#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/Context.h>
 #include "../world/WorldRenderer.h"
 #include <lib/yrenderer/scene/pass/ShadowRenderer.h>
 #include <lib/yrenderer/post/MultisampleResolver.h>
@@ -49,10 +49,6 @@ using LightMeter = yrenderer::LightMeter;
 using RenderPathType = yrenderer::RenderPathType;
 
 
-HDRResolver* create_hdr_resolver(Context* ctx, ygfx::Texture* tex, ygfx::DepthBuffer* depth) {
-	return new HDRResolver(ctx, tex, depth);
-}
-
 WorldRenderer* create_world_renderer(Context* ctx, Camera* cam, SceneView& scene_view, RenderPathType type) {
 #ifdef USING_VULKAN
 	if (type == RenderPathType::PathTracing)
@@ -73,22 +69,22 @@ RenderPath::RenderPath(Context* ctx, RenderPathType _type, Camera* _cam) : Rende
 	global_shadow_box_size = shadow_box_size;
 
 	shader_manager->default_shader = "default.shader";
-	shader_manager->load_shader_module("module-basic-interface.shader");
-	shader_manager->load_shader_module("module-basic-data.shader");
+	ctx->load_shader_module("module-basic-interface.shader");
+	ctx->load_shader_module("module-basic-data.shader");
 	const string light_sources = config.get_str("renderer.light_sources", "default");
-	shader_manager->load_shader_module(format("module-light-sources-%s.shader", light_sources));
+	ctx->load_shader_module(format("module-light-sources-%s.shader", light_sources));
 	const string shadows_method = config.get_str("shadow.quality", "pcf-hardening");
-	shader_manager->load_shader_module(format("module-shadows-%s.shader", shadows_method));
+	ctx->load_shader_module(format("module-shadows-%s.shader", shadows_method));
 	const string lighting_method = config.get_str("renderer.lighting", "pbr");
-	shader_manager->load_shader_module(format("module-lighting-%s.shader", lighting_method));
-	shader_manager->load_shader_module("module-vertex-default.shader");
-	shader_manager->load_shader_module("module-vertex-animated.shader");
-	shader_manager->load_shader_module("module-vertex-instanced.shader");
-	shader_manager->load_shader_module("module-vertex-lines.shader");
-	shader_manager->load_shader_module("module-vertex-points.shader");
-	shader_manager->load_shader_module("module-vertex-fx.shader");
-	shader_manager->load_shader_module("module-geometry-lines.shader");
-	shader_manager->load_shader_module("module-geometry-points.shader");
+	ctx->load_shader_module(format("module-lighting-%s.shader", lighting_method));
+	ctx->load_shader_module("module-vertex-default.shader");
+	ctx->load_shader_module("module-vertex-animated.shader");
+	ctx->load_shader_module("module-vertex-instanced.shader");
+	ctx->load_shader_module("module-vertex-lines.shader");
+	ctx->load_shader_module("module-vertex-points.shader");
+	ctx->load_shader_module("module-vertex-fx.shader");
+	ctx->load_shader_module("module-geometry-lines.shader");
+	ctx->load_shader_module("module-geometry-points.shader");
 
 
 	if (type != RenderPathType::PathTracing) {
@@ -180,7 +176,7 @@ void RenderPath::create_post_processing(Renderer* source) {
 	hdr_tex->set_options("magfilter=" + config.resolution_scale_filter);
 	auto hdr_depth = new ygfx::DepthBuffer(engine.width, engine.height, "d:f32");
 
-	hdr_resolver = create_hdr_resolver(ctx, hdr_tex, hdr_depth);
+	hdr_resolver = new HDRResolver(ctx, hdr_tex, hdr_depth, true);
 
 #ifdef USING_VULKAN
 	config.antialiasing_method = AntialiasingMethod::NONE;

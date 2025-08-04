@@ -25,7 +25,7 @@
 #include <lib/math/plane.h>
 #include <lib/os/msg.h>
 
-#include "lib/yrenderer/base.h"
+#include "lib/yrenderer/Context.h"
 
 #define MVGetSingleData(d, index)	((SingleData*) ((char*)(d).data->data + (d).data->element_size* index))
 

@@ -7,7 +7,7 @@
 #include <data/mesh/GeometrySphere.h>
 #include <data/mesh/GeometryCube.h>
 #include <view/DrawingHelper.h>
-#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/Context.h>
 
 namespace artemis::graph {
 

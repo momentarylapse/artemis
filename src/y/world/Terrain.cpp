@@ -10,6 +10,7 @@
 #include "Terrain.h"
 #include <lib/yrenderer/Material.h>
 #include <lib/yrenderer/TextureManager.h>
+#include <lib/yrenderer/Context.h>
 #include "World.h"
 #include "../y/EngineData.h"
 #include <lib/ygraphics/graphics-impl.h>
@@ -18,8 +19,6 @@
 #include <lib/os/file.h>
 #include <lib/os/msg.h>
 #include <lib/os/time.h>
-
-#include "lib/yrenderer/base.h"
 
 const kaba::Class *Terrain::_class = nullptr;
 
@@ -84,7 +83,7 @@ bool Terrain::load(yrenderer::Context* ctx, const Path &_filename_, bool deep) {
 			// Material
 			material_file = f->read_str();
 			if (deep) {
-				material = ctx->material_manager->load(material_file);
+				material = ctx->load_material(material_file);
 
 				while (num_textures > material->textures.num)
 					material->textures.add(ctx->texture_manager->load_texture(""));

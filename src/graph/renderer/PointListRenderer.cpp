@@ -6,7 +6,7 @@
 #include <Session.h>
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
-#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/Context.h>
 
 #include "lib/base/iter.h"
 

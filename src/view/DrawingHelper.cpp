@@ -4,8 +4,8 @@
 
 #include "DrawingHelper.h"
 #include <lib/ygraphics/graphics-impl.h>
-#include <lib/yrenderer/Material.h>
-#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/MaterialManager.h>
+#include <lib/yrenderer/Context.h>
 #include <lib/math/mat4.h>
 #include <lib/math/vec2.h>
 #include <lib/os/msg.h>

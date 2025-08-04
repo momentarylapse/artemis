@@ -7,7 +7,7 @@
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include <lib/yrenderer/base.h>
+#include <lib/yrenderer/Context.h>
 
 namespace artemis::graph {
 
