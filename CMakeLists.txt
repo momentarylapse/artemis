@@ -528,6 +528,7 @@ add_executable(artemis
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
 	src/lib/threads/ThreadPool.cpp
+	src/lib/vulkan/_kaba_export.cpp
 	src/lib/vulkan/AccelerationStructure.cpp
 	src/lib/vulkan/Buffer.cpp
 	src/lib/vulkan/CommandBuffer.cpp
@@ -576,6 +577,7 @@ add_executable(artemis
 	src/lib/xhui/dialogs/MenuPopup.cpp
 	src/lib/xhui/dialogs/QuestionDialog.cpp
 	src/lib/xhui/draw/font.cpp
+	src/lib/xhui/_kaba_export.cpp
 	src/lib/xhui/Application.cpp
 	src/lib/xhui/ContextGL.cpp
 	src/lib/xhui/ContextVulkan.cpp
@@ -908,6 +910,7 @@ add_library(moduleartemis SHARED
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
 	src/lib/threads/ThreadPool.cpp
+	src/lib/vulkan/_kaba_export.cpp
 	src/lib/vulkan/AccelerationStructure.cpp
 	src/lib/vulkan/Buffer.cpp
 	src/lib/vulkan/CommandBuffer.cpp
@@ -956,6 +959,7 @@ add_library(moduleartemis SHARED
 	src/lib/xhui/dialogs/MenuPopup.cpp
 	src/lib/xhui/dialogs/QuestionDialog.cpp
 	src/lib/xhui/draw/font.cpp
+	src/lib/xhui/_kaba_export.cpp
 	src/lib/xhui/Application.cpp
 	src/lib/xhui/ContextGL.cpp
 	src/lib/xhui/ContextVulkan.cpp

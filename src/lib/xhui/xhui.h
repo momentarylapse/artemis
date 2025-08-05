@@ -42,7 +42,8 @@ enum class Flags {
 	SILENT = 2,
 	NO_ERROR_HANDLER = 4,
 	UNIQUE = 16,
-	OWN_DECORATION = 64
+	OWN_DECORATION = 64,
+	FAKE = 128
 };
 Flags operator|(Flags a, Flags b);
 int operator&(Flags a, Flags b);
