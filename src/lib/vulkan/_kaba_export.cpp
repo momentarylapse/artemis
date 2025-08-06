@@ -1,6 +1,7 @@
 #include "vulkan.h"
 #include "../kabaexport/KabaExporter.h"
 
+#ifdef HAS_LIB_VULKAN
 
 #define vul_p(p)		p
 
@@ -272,5 +273,13 @@ void export_package_vulkan(kaba::Exporter* e) {
 	e->link_class_func("Instance.create_glfw_surface", &VulkanInstance::_create_glfw_surface);
 	e->link_class_func("create_headless_surface", &VulkanInstance::_create_headless_surface);
 }
+
+
+#else
+
+void export_package_vulkan(kaba::Exporter* e) {
+}
+
+#endif
 
 

@@ -16,16 +16,16 @@
 #include <lib/xhui/controls/DrawingArea.h>
 #include <lib/yrenderer/Context.h>
 #include <renderer/path/RenderPath.h>
-#include <sys/stat.h>
+#include <lib/ygraphics/graphics-impl.h>
 #include <y/EngineData.h>
 
 #include "ActionController.h"
 #include "DrawingHelper.h"
 #include "GraphEditor.h"
 #include "MultiView.h"
-#include "lib/os/msg.h"
-#include "lib/xhui/Theme.h"
-#include "lib/xhui/draw/font.h"
+#include <lib/os/msg.h>
+#include <lib/xhui/Theme.h>
+#include <lib/xhui/draw/font.h>
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/yrenderer/Renderer.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>

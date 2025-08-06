@@ -7,6 +7,7 @@
 #include <data/mesh/GeometrySphere.h>
 #include <data/mesh/GeometryCube.h>
 #include <view/DrawingHelper.h>
+#include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/Context.h>
 
 namespace artemis::graph {
@@ -37,8 +38,12 @@ void VolumeRenderer::on_process() {
 	if (!tex)
 		tex = new ygfx::VolumeTexture(nx, ny, nz, "r:f32");
 	tex->set_options("wrap=clamp,magfilter=nearest");
+#ifdef USING_VULKAN
 	if (f->type == data::ScalarType::Float32)
 		tex->writex(&f->v32.v[0], nx, ny, nz, "r:f32");
+#else
+#warning "UNIMPLEMENTED: VolumeRenderer for OpenGL"
+#endif
 	material->textures[0] = tex.get();
 	material_solid->textures[0] = tex.get();
 

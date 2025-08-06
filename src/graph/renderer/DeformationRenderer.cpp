@@ -2,6 +2,7 @@
 #include <Session.h>
 #include <data/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
+#include <lib/ygraphics/graphics-impl.h>
 
 namespace artemis::graph {
 

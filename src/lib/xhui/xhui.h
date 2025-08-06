@@ -4,17 +4,7 @@
 #include "Painter.h"
 #include "../os/path.h"
 #include "../base/map.h"
-
-#if HAS_LIB_VULKAN
-namespace vulkan {
-	class Texture;
-}
-#endif
-#if HAS_LIB_GL
-namespace nix {
-	class Texture;
-}
-#endif
+#include <lib/ygraphics/graphics-fwd.h>
 
 namespace font {
 	struct Face;
@@ -26,12 +16,6 @@ namespace xhui {
 
 void init(const Array<string> &arg, const string& app_name);
 void run();
-
-#if HAS_LIB_VULKAN
-	using Texture = vulkan::Texture;
-#else
-	using Texture = nix::Texture;
-#endif
 
 extern float global_ui_scale;
 
@@ -206,14 +190,14 @@ struct XImage {
 	string uid;
 	Path filename;
 	owned<::Image> image;
-	shared<Texture> texture;
+	shared<ygfx::Texture> texture;
 	vec2 size() const;
 };
 
 XImage* load_image(const string& name);
 string create_image(const ::Image& im);
 void set_image(const string& uid, const ::Image& im);
-string texture_to_image(const shared<Texture>& texture);
+string texture_to_image(const shared<ygfx::Texture>& texture);
 void delete_image(const string& name);
 void prepare_image(XImage* image);
 

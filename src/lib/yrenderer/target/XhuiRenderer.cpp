@@ -6,6 +6,7 @@
 #if __has_include(<lib/xhui/Painter.h>)
 #include <lib/xhui/Painter.h>
 #include <lib/xhui/Context.h>
+#include <lib/ygraphics/graphics-impl.h>
 
 namespace yrenderer {
 
