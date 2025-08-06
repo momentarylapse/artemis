@@ -264,14 +264,14 @@ Dialog x x padding=0
 		if (auto da = static_cast<xhui::DrawingArea*>(get_control("area")))
 			da->for_painter_do(static_cast<xhui::Painter*>(p), [this] (Painter* p) {
 				session->cur_mode->multi_view->set_area(p->area());
-				renderer->prepare(p);
+				renderer->before_draw(p);
 			});
 	});
 	event_xp("area", xhui::event_id::Draw, [this] (Painter* p) {
 		if (!session->cur_mode or !session->cur_mode->multi_view)
 			return;
 		session->cur_mode->multi_view->set_area(p->area());
-		renderer->render(p);
+		renderer->draw(p);
 		session->cur_mode->multi_view->on_draw(p);
 		session->cur_mode->on_draw_post(p);
 		p->set_color(White);

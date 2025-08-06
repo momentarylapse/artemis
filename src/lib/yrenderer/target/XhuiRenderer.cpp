@@ -25,7 +25,7 @@ RenderParams XhuiRenderer::extract_params(Painter* p) {
 	return params;
 }
 
-void XhuiRenderer::prepare(Painter* p) {
+void XhuiRenderer::before_draw(Painter* p) {
 	const auto params = extract_params(p);
 
 	for (auto c: children)
@@ -53,12 +53,23 @@ void XhuiRenderer::render(const RenderParams& params) {
 #endif
 }
 
-void XhuiRenderer::render(Painter* p) {
+void XhuiRenderer::draw(Painter* p) {
 	const auto params = extract_params(p);
 
 	render(params);
 }
 
 }
+#else
+
+namespace yrenderer {
+	RenderParams XhuiRenderer::extract_params(Painter*) {
+		return {};
+	}
+	void XhuiRenderer::before_draw(Painter*) {}
+	void XhuiRenderer::render(const RenderParams&) {}
+	void XhuiRenderer::draw(Painter*) {}
+}
+
 
 #endif

@@ -227,6 +227,7 @@ void export_package_xhui(kaba::Exporter* e) {
 			e->link_class_func("Window.get_mouse", &xhui::Window::get_mouse);
 			e->link_class_func("Window.get_key", &xhui::Window::get_key);*/
 		//	e->link_virtual("Window.on_close_request", &xhui::Window::on_close_request, &win);
+		e->link_class_func("Window.redraw", &xhui::Window::redraw);
 	}
 
 

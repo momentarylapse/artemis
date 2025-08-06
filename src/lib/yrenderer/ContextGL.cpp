@@ -21,7 +21,7 @@ extern owned<nix::Context> _nix_context;
 
 namespace yrenderer {
 
-Context* api_init(GLFWwindow* window) {
+Context* api_init_glfw(GLFWwindow* window) {
 	auto ctx = new Context();
 	nix::allow_separate_vertex_arrays = true;
 	nix::default_shader_bindings = false;
