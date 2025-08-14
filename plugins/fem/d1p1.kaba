@@ -14,7 +14,7 @@ struct Grid
 		return mul(M, u)
 	
 	# <phi[i], phi[j]>
-	func phi_phi() -> SparseRowMatrix
+	func phi_phi() -> SparseMatrix
 		var m: Ret
 		m.clear(n(), n())
 		let A = D / 6
@@ -31,7 +31,7 @@ struct Grid
 
 	# M = <phi[i], d/dx phi[j]>
 	# M * u = <phi, d/dx u>
-	func phi_dphi() -> SparseRowMatrix
+	func phi_dphi() -> SparseMatrix
 		var m: Ret
 		m.clear(n(), n())
 		# diagonal
@@ -45,7 +45,7 @@ struct Grid
 
 	# M = <phi[i], d²/dx²phi[j]>
 	# M * u = <phi, d²/dx² u>
-	func phi_ddphi() -> SparseRowMatrix
+	func phi_ddphi() -> SparseMatrix
 		var m: Ret
 		m.clear(n(), n())
 		let A = 1.0/D

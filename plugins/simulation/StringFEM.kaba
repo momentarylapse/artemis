@@ -19,9 +19,9 @@ class StringFEM extends Node
 	var mat: Material
 #	var tension: f32 # [N]
 	var radius: f32 # [m]
-	var phi_dx_phi: SparseRowMatrix
-	var phi_dx_dx_phi: SparseRowMatrix
-	var phi_phi: SparseRowMatrix
+	var phi_dx_phi: SparseMatrix
+	var phi_dx_dx_phi: SparseMatrix
+	var phi_phi: SparseMatrix
 	var phi_phi_inv: Matrix
 	
 	

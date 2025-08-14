@@ -1,4 +1,5 @@
 use artemis.*
+use linalg.*
 
 class MaxwellFDTD extends Node
 	func __init__()
@@ -17,6 +18,17 @@ class MaxwellFDTD extends Node
 		c5 = profiler.create_channel("e", channel)
 	
 	func override on_process()
+	
+		var MM = Matrix(2,2)
+		print(MM.rows)
+		print(MM.cols)
+		MM.get(0,0) = 3
+		MM.get(1,1) = 5
+		print(mul(MM, [1,2]))
+		print(solve(MM, [1,2]))
+	
+	
+	
 		let N = 5
 		let dt = simulation_dt / N * 2
 		for E in in_e.value()

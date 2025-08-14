@@ -14,12 +14,12 @@ class Elastic2dFEM extends Node
 	
 	var grid: Grid
 	var mat: Material
-	var phi_dx_phi: SparseRowMatrix
-	var phi_dy_phi: SparseRowMatrix
-	var phi_dx_dx_phi: SparseRowMatrix
-	var phi_dx_dy_phi: SparseRowMatrix
-	var phi_dy_dy_phi: SparseRowMatrix
-	var phi_phi: SparseRowMatrix
+	var phi_dx_phi: SparseMatrix
+	var phi_dy_phi: SparseMatrix
+	var phi_dx_dx_phi: SparseMatrix
+	var phi_dx_dy_phi: SparseMatrix
+	var phi_dy_dy_phi: SparseMatrix
+	var phi_phi: SparseMatrix
 	var phi_phi_inv: Matrix
 	var thickness: f32
 	

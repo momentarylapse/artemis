@@ -8,6 +8,7 @@
 #include <plugins/PluginManager.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
+#include <lib/linalg/Matrix.h>
 #include <y/plugins/PluginManager.h>
 
 #include "storage/Storage.h"
@@ -106,6 +107,23 @@ namespace os::app {
 			msg_error(e.message());
 			return 1;
 		}
+
+#if 0
+		linalg::Matrix<float> M(3, 2);
+		M(0,0) = 2;
+		M(1, 1) = 3;
+		auto x = linalg::mul(M, Array<float>({1, 2}));
+		msg_write(str(x));
+		auto yy = linalg::solve(M, x);
+		msg_write(str(yy));
+
+		/*arma::Mat<float> M;
+		arma::Col<float> v;
+		arma::Col<float> xx;
+		auto x = M * v;
+		auto y = arma::solve(xx, M, x);*/
+		return 0;
+#endif
 
 		kaba::init();
 		try {

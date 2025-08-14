@@ -175,164 +175,10 @@ list(APPEND DEPS Freetype::Freetype)
 list(APPEND COMPILE_DEFINITIONS HAS_LIB_FREETYPE2=1)
 
 
-# lib: zlib (mandatory)
-find_package(ZLIB REQUIRED)
-list(APPEND DEPS ZLIB::ZLIB)
-list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
-
-
-# lib: vulkan or gl (mandatory)
-set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
-pkg_check_modules(VULKAN vulkan)
-if(VULKAN_FOUND)
-	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
-endif()
-find_package(OpenGL)
-if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
-	list(APPEND VULKAN_OR_GL_FOUND "gl")
-endif()
-if(VULKAN_OR_GL_FOUND)
-	if(NOT ${VULKAN_OR_GL} IN_LIST VULKAN_OR_GL_FOUND)
-		list(GET VULKAN_OR_GL_FOUND 0 X)
-		set(VULKAN_OR_GL ${X} CACHE STRING "choose" FORCE)
-		message(WARNING "Choice for VULKAN_OR_GL invalid, using ${VULKAN_OR_GL} instead")
-	endif()
-else()
-	message(SEND_ERROR "Neither vulkan or gl found") #  or/nor..
-	set(VULKAN_OR_GL "")
-endif()
-if(VULKAN_OR_GL STREQUAL "vulkan")
-	list(APPEND INCLUDE_DIRECTORIES ${VULKAN_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${VULKAN_LIBRARY_DIRS})
-	list(APPEND DEPS ${VULKAN_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${VULKAN_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
-endif()
-if(VULKAN_OR_GL STREQUAL "gl")
-	list(APPEND DEPS OpenGL::OpenGL)
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
-endif()
-
-
-# lib: glew (optional)
-set(LIB_GLEW_ENABLED true CACHE BOOL "Use glew library?")
-pkg_check_modules(GLEW glew)
-if(GLEW_FOUND)
-else()
-	set(LIB_GLEW_ENABLED false CACHE BOOL "glew library not found" FORCE)
-endif()
-if(${LIB_GLEW_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${GLEW_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${GLEW_LIBRARY_DIRS})
-	list(APPEND DEPS ${GLEW_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${GLEW_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLEW=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLEW=0)
-endif()
-
-
-# lib: glfw (optional)
-set(LIB_GLFW_ENABLED true CACHE BOOL "Use glfw library?")
-find_package(glfw3)
-if(glfw3_FOUND)
-else()
-	set(LIB_GLFW_ENABLED false CACHE BOOL "glfw library not found" FORCE)
-endif()
-if(${LIB_GLFW_ENABLED})
-	list(APPEND DEPS glfw)
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=0)
-endif()
-
-
-# lib: shaderc (optional)
-set(LIB_SHADERC_ENABLED true CACHE BOOL "Use shaderc library?")
-pkg_check_modules(SHADERC shaderc)
-if(SHADERC_FOUND)
-else()
-	set(LIB_SHADERC_ENABLED false CACHE BOOL "shaderc library not found" FORCE)
-endif()
-if(${LIB_SHADERC_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${SHADERC_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${SHADERC_LIBRARY_DIRS})
-	list(APPEND DEPS ${SHADERC_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${SHADERC_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=0)
-endif()
-
-
-# lib: spirv (optional)
-set(LIB_SPIRV_ENABLED true CACHE BOOL "Use spirv library?")
-pkg_check_modules(SPIRV spirv)
-if(SPIRV_FOUND)
-else()
-	set(LIB_SPIRV_ENABLED false CACHE BOOL "spirv library not found" FORCE)
-endif()
-if(${LIB_SPIRV_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${SPIRV_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${SPIRV_LIBRARY_DIRS})
-	list(APPEND DEPS ${SPIRV_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${SPIRV_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SPIRV=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SPIRV=0)
-endif()
-
-
-# lib: unwind (optional)
-set(LIB_UNWIND_ENABLED true CACHE BOOL "Use unwind library?")
-pkg_check_modules(LIBUNWIND libunwind)
-if(LIBUNWIND_FOUND)
-else()
-	set(LIB_UNWIND_ENABLED false CACHE BOOL "unwind library not found" FORCE)
-endif()
-if(${LIB_UNWIND_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${LIBUNWIND_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${LIBUNWIND_LIBRARY_DIRS})
-	list(APPEND DEPS ${LIBUNWIND_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${LIBUNWIND_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_UNWIND=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_UNWIND=0)
-endif()
-
-
-# lib: dl (optional)
-if(WIN32)
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_DL=0)
-else()
-	list(APPEND DEPS ${CMAKE_DL_LIBS})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_DL=1)
-endif()
-
-
-
-# lib: xlib (optional)
-set(LIB_XLIB_ENABLED true CACHE BOOL "Use xlib library?")
-pkg_check_modules(X11 x11)
-if(X11_FOUND)
-else()
-	set(LIB_XLIB_ENABLED false CACHE BOOL "xlib library not found" FORCE)
-endif()
-if(${LIB_XLIB_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${X11_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${X11_LIBRARY_DIRS})
-	list(APPEND DEPS ${X11_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${X11_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_XLIB=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_XLIB=0)
-endif()
-
-
-# lib: freetype2 (mandatory)
-find_package(Freetype REQUIRED)
-list(APPEND DEPS Freetype::Freetype)
-list(APPEND COMPILE_DEFINITIONS HAS_LIB_FREETYPE2=1)
+# lib: armadillo (mandatory)
+find_package(Armadillo REQUIRED)
+list(APPEND DEPS ${ARMADILLO_LIBRARIES})
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_ARMADILLO=1)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -484,6 +330,8 @@ add_executable(artemis
 	src/lib/kaba/Interpreter.cpp
 	src/lib/kaba/kaba.cpp
 	src/lib/kaba/Module.cpp
+	src/lib/linalg/_kaba_export.cpp
+	src/lib/linalg/Matrix.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
@@ -869,6 +717,8 @@ add_library(moduleartemis SHARED
 	src/lib/kaba/Interpreter.cpp
 	src/lib/kaba/kaba.cpp
 	src/lib/kaba/Module.cpp
+	src/lib/linalg/_kaba_export.cpp
+	src/lib/linalg/Matrix.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
