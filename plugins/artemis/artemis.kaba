@@ -43,7 +43,7 @@ struct PlotData
 struct RenderData
 
 struct ColorMap
-	var colors: color[]
+	var colors: Color[]
 	var values: f32[]
 
 
@@ -59,7 +59,7 @@ class Node
 	func extern mut process()
 	func extern virtual mut on_process()
 	func extern virtual mut create_panel() -> void*
-	func extern mut set(key: string, value: any)
+	func extern mut set(key: string, value: Any)
 	var name: string
 	var channel: i32
 	var flags: NodeFlags
@@ -122,9 +122,9 @@ class SettingString
 	func extern mut set(value: string)
 
 class SettingColor
-	func extern __init__(node: Node, name: string, value: color, options: string = "")
-	func extern call() -> color&
-	func extern mut set(value: color)
+	func extern __init__(node: Node, name: string, value: Color, options: string = "")
+	func extern call() -> Color&
+	func extern mut set(value: Color)
 
 class Graph
 	func extern add_node(name: string, pos: vec2) -> Node&

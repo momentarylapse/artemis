@@ -523,6 +523,7 @@ add_executable(artemis
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
 	src/lib/pattern/Observable.cpp
+	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
@@ -601,12 +602,19 @@ add_executable(artemis
 	src/lib/yrenderer/helper/PipelineManager.cpp
 	src/lib/yrenderer/post/HDRResolver.cpp
 	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/PostProcessor.cpp
+	src/lib/yrenderer/post/PostProcessorGL.cpp
+	src/lib/yrenderer/post/PostProcessorVulkan.cpp
 	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
 	src/lib/yrenderer/regions/RegionRenderer.cpp
 	src/lib/yrenderer/regions/RegionRendererGL.cpp
 	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
 	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/CubeMapRenderer.cpp
 	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/path/RenderPath.cpp
+	src/lib/yrenderer/scene/path/RenderPathDeferred.cpp
+	src/lib/yrenderer/scene/path/RenderPathForward.cpp
 	src/lib/yrenderer/scene/CameraParams.cpp
 	src/lib/yrenderer/scene/Light.cpp
 	src/lib/yrenderer/scene/MeshEmitter.cpp
@@ -672,20 +680,14 @@ add_executable(artemis
 	src/y/renderer/gui/GuiRendererVulkan.cpp
 	src/y/renderer/helper/Raytracing.cpp
 	src/y/renderer/helper/RendererFactory.cpp
-	src/y/renderer/path/RenderPath.cpp
-	src/y/renderer/post/PostProcessor.cpp
-	src/y/renderer/post/PostProcessorGL.cpp
-	src/y/renderer/post/PostProcessorVulkan.cpp
 	src/y/renderer/world/emitter/WorldInstancedEmitter.cpp
 	src/y/renderer/world/emitter/WorldModelsEmitter.cpp
 	src/y/renderer/world/emitter/WorldParticlesEmitter.cpp
 	src/y/renderer/world/emitter/WorldSkyboxEmitter.cpp
 	src/y/renderer/world/emitter/WorldTerrainsEmitter.cpp
 	src/y/renderer/world/emitter/WorldUserMeshesEmitter.cpp
-	src/y/renderer/world/WorldRenderer.cpp
-	src/y/renderer/world/WorldRendererDeferred.cpp
-	src/y/renderer/world/WorldRendererForward.cpp
 	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
+	src/y/renderer/FullCameraRenderer.cpp
 	src/y/world/components/Animator.cpp
 	src/y/world/components/Collider.cpp
 	src/y/world/components/CubeMapSource.cpp
@@ -905,6 +907,7 @@ add_library(moduleartemis SHARED
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
 	src/lib/pattern/Observable.cpp
+	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
@@ -983,12 +986,19 @@ add_library(moduleartemis SHARED
 	src/lib/yrenderer/helper/PipelineManager.cpp
 	src/lib/yrenderer/post/HDRResolver.cpp
 	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/PostProcessor.cpp
+	src/lib/yrenderer/post/PostProcessorGL.cpp
+	src/lib/yrenderer/post/PostProcessorVulkan.cpp
 	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
 	src/lib/yrenderer/regions/RegionRenderer.cpp
 	src/lib/yrenderer/regions/RegionRendererGL.cpp
 	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
 	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/CubeMapRenderer.cpp
 	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/path/RenderPath.cpp
+	src/lib/yrenderer/scene/path/RenderPathDeferred.cpp
+	src/lib/yrenderer/scene/path/RenderPathForward.cpp
 	src/lib/yrenderer/scene/CameraParams.cpp
 	src/lib/yrenderer/scene/Light.cpp
 	src/lib/yrenderer/scene/MeshEmitter.cpp
@@ -1054,20 +1064,14 @@ add_library(moduleartemis SHARED
 	src/y/renderer/gui/GuiRendererVulkan.cpp
 	src/y/renderer/helper/Raytracing.cpp
 	src/y/renderer/helper/RendererFactory.cpp
-	src/y/renderer/path/RenderPath.cpp
-	src/y/renderer/post/PostProcessor.cpp
-	src/y/renderer/post/PostProcessorGL.cpp
-	src/y/renderer/post/PostProcessorVulkan.cpp
 	src/y/renderer/world/emitter/WorldInstancedEmitter.cpp
 	src/y/renderer/world/emitter/WorldModelsEmitter.cpp
 	src/y/renderer/world/emitter/WorldParticlesEmitter.cpp
 	src/y/renderer/world/emitter/WorldSkyboxEmitter.cpp
 	src/y/renderer/world/emitter/WorldTerrainsEmitter.cpp
 	src/y/renderer/world/emitter/WorldUserMeshesEmitter.cpp
-	src/y/renderer/world/WorldRenderer.cpp
-	src/y/renderer/world/WorldRendererDeferred.cpp
-	src/y/renderer/world/WorldRendererForward.cpp
 	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
+	src/y/renderer/FullCameraRenderer.cpp
 	src/y/world/components/Animator.cpp
 	src/y/world/components/Collider.cpp
 	src/y/world/components/CubeMapSource.cpp

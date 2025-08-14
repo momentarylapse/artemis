@@ -11,8 +11,8 @@
 #include <lib/os/msg.h>
 
 namespace kaba {
-	extern const Class *TypeIntList;
-	extern const Class* TypeFloatList;
+	extern const Class *TypeIntL32ist;
+	extern const Class* TypeFloat32List;
 	extern const Class* TypeFloat64List;
 }
 
@@ -63,7 +63,7 @@ template <typename T>
 Any float_list_to_any(const Array<T>& a) {
 	Any r = Any::EmptyList;
 	for (T x: a)
-		r.add((float)x);
+		r.add(Any(x));
 	return r;
 }
 
@@ -79,10 +79,10 @@ color any_to_color(const Any& a) {
 
 Any color_to_any(const color& c) {
 	Any r;
-	r.add(c.r);
-	r.add(c.g);
-	r.add(c.b);
-	r.add(c.a);
+	r.add(Any(c.r));
+	r.add(Any(c.g));
+	r.add(Any(c.b));
+	r.add(Any(c.a));
 	return r;
 }
 
@@ -95,9 +95,9 @@ vec3 any_to_vec3(const Any& a) {
 
 Any vec3_to_any(const vec3& v) {
 	Any r;
-	r.add(v.x);
-	r.add(v.y);
-	r.add(v.z);
+	r.add(Any(v.x));
+	r.add(Any(v.y));
+	r.add(Any(v.z));
 	return r;
 }
 
@@ -110,8 +110,8 @@ vec2 any_to_vec2(const Any& a) {
 
 Any vec2_to_any(const vec2& v) {
 	Any r;
-	r.add(v.x);
-	r.add(v.y);
+	r.add(Any(v.x));
+	r.add(Any(v.y));
 	return r;
 }
 
@@ -139,19 +139,19 @@ void SettingBase::set_generic(const Any& value) {
 
 Any SettingBase::get_generic() const {
 	if (class_ == kaba::TypeFloat32)
-		return (*as_const<float>())();
-	if (class_ == kaba::TypeFloatList)
+		return Any((*as_const<float>())());
+	if (class_ == kaba::TypeFloat32List)
 		return float_list_to_any<float>((*as_const<Array<float>>())());
 	if (class_ == kaba::TypeFloat64)
-		return (float)(*as_const<double>())();
+		return Any((*as_const<double>())());
 	if (class_ == kaba::TypeFloat64List)
 		return float_list_to_any<double>((*as_const<Array<double>>())());
 	if (class_ == kaba::TypeInt32)
-		return (*as_const<int>())();
+		return Any((*as_const<int>())());
 	if (class_ == kaba::TypeString)
-		return (*as_const<string>())();
+		return Any((*as_const<string>())());
 	if (class_ == kaba::TypeBool)
-		return (*as_const<bool>())();
+		return Any((*as_const<bool>())());
 	if (class_ == kaba::TypeColor)
 		return color_to_any((*as_const<color>())());
 	if (class_ == kaba::TypeVec3)

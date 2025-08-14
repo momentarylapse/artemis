@@ -15,7 +15,6 @@
 #include <data/Data.h>
 #include <lib/xhui/controls/DrawingArea.h>
 #include <lib/yrenderer/Context.h>
-#include <renderer/path/RenderPath.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <y/EngineData.h>
 

@@ -27,24 +27,25 @@ static float resolution_scale_y = 1.0f;
 static int BLUR_SCALE = 4;
 static int BLOOM_LEVEL_SCALE = 4;
 
+string HDRResolver::magfilter = "nearest";
 
-HDRResolver::HDRResolver(Context* ctx, const shared<ygfx::Texture>& tex, const shared<ygfx::DepthBuffer>& depth_buffer, bool manual_mode) : Renderer(ctx, "hdr") {
-	tex_main = tex;
-	_depth_buffer = depth_buffer;
+HDRResolver::HDRResolver(Context* ctx, int width, int height, bool manual_mode) : Renderer(ctx, "hdr") {
 
-	int width = tex->width;
-	int height = tex->height;
+	texture = new ygfx::Texture(width, height, "rgba:f16");
+	texture->set_options("wrap=clamp,minfilter=nearest");
+	texture->set_options("magfilter=" + magfilter);
+	depth_buffer = new ygfx::DepthBuffer(width, height, "d:f32");
 
 
 	auto shader_blur = shader_manager->load_shader("forward/blur.shader");
 	int bloomw = width, bloomh = height;
-	auto bloom_input = tex;
+	auto bloom_input = texture;
 	float r = 3;
 	float threshold = 1.0f;
 	for (int i=0; i<MAX_BLOOM_LEVELS; i++) {
 		auto& bl = bloom_levels[i];
-		bloomw /= BLOOM_LEVEL_SCALE;
-		bloomh /= BLOOM_LEVEL_SCALE;
+		bloomw = max(bloomw / BLOOM_LEVEL_SCALE, 4);
+		bloomh = max(bloomh / BLOOM_LEVEL_SCALE, 4);
 		bl.tex_temp = new ygfx::Texture(bloomw, bloomh, "rgba:f16");
 		auto depth0 = new ygfx::DepthBuffer(bloomw, bloomh, "d:f32");
 		bl.tex_out = new ygfx::Texture(bloomw, bloomh, "rgba:f16");
@@ -54,13 +55,13 @@ HDRResolver::HDRResolver(Context* ctx, const shared<ygfx::Texture>& tex, const s
 		bl.tsr[0] = new ThroughShaderRenderer(ctx, "blur", shader_blur);
 		bl.tsr[0]->bind_texture(0, bloom_input.get());
 		bl.tsr[0]->bindings.shader_data.dict_set("axis:0", vec2_to_any(vec2::EX));
-		bl.tsr[0]->bindings.shader_data.dict_set("radius:8", r * (float)BLOOM_LEVEL_SCALE);
-		bl.tsr[0]->bindings.shader_data.dict_set("threshold:12", threshold);
+		bl.tsr[0]->bindings.shader_data.dict_set("radius:8", Any(r * (float)BLOOM_LEVEL_SCALE));
+		bl.tsr[0]->bindings.shader_data.dict_set("threshold:12", Any(threshold));
 		bl.tsr[1] = new ThroughShaderRenderer(ctx, "blur", shader_blur);
 		bl.tsr[1]->bind_texture(0, bl.tex_temp.get());
 		bl.tsr[1]->bindings.shader_data.dict_set("axis:0", vec2_to_any(vec2::EY));
-		bl.tsr[1]->bindings.shader_data.dict_set("radius:8", r);
-		bl.tsr[1]->bindings.shader_data.dict_set("threshold:12", 0.0f);
+		bl.tsr[1]->bindings.shader_data.dict_set("radius:8", Any(r));
+		bl.tsr[1]->bindings.shader_data.dict_set("threshold:12", Any(0.0f));
 		bl.renderer[0] = new TextureRenderer(ctx, "blur", {bl.tex_temp, depth0});
 		bl.renderer[0]->add_child(bl.tsr[0].get());
 		bl.renderer[1] = new TextureRenderer(ctx, "blur", {bl.tex_out, depth1});
@@ -71,11 +72,11 @@ HDRResolver::HDRResolver(Context* ctx, const shared<ygfx::Texture>& tex, const s
 
 	auto shader_out = shader_manager->load_shader("forward/hdr.shader");
 	out_renderer = new ThroughShaderRenderer(ctx, "out", shader_out);
-	out_renderer->bind_textures(0, {tex.get(), bloom_levels[0].tex_out.get(), bloom_levels[1].tex_out.get(), bloom_levels[2].tex_out.get(), bloom_levels[3].tex_out.get()});
+	out_renderer->bind_textures(0, {texture.get(), bloom_levels[0].tex_out.get(), bloom_levels[1].tex_out.get(), bloom_levels[2].tex_out.get(), bloom_levels[3].tex_out.get()});
 
 	if (!manual_mode) {
 		auto ddd = (ygfx::Texture*)depth_buffer.get();
-		texture_renderer = new TextureRenderer(ctx, "tex", {tex, ddd});
+		texture_renderer = new TextureRenderer(ctx, "tex", {texture, ddd});
 	}
 }
 
@@ -115,13 +116,13 @@ void HDRResolver::prepare(const RenderParams& params) {
 
 	auto& data = out_renderer->bindings.shader_data;
 	data.dict_set("project:128", mat4_to_any(mat4::ID));
-	data.dict_set("exposure:192", exposure);
-	data.dict_set("bloom_factor:196", bloom_factor);
+	data.dict_set("exposure:192", Any(exposure));
+	data.dict_set("bloom_factor:196", Any(bloom_factor));
 #ifdef USING_VULKAN
-	data.dict_set("gamma:200", 2.2f);
+	data.dict_set("gamma:200", Any(2.2f));
 #endif
-	data.dict_set("scale_x:204", resolution_scale_x);
-	data.dict_set("scale_y:208", resolution_scale_y);
+	data.dict_set("scale_x:204", Any(resolution_scale_x));
+	data.dict_set("scale_y:208", Any(resolution_scale_y));
 
 	ctx->gpu_timestamp_end(params, ch_prepare);
 	profiler::end(ch_prepare);

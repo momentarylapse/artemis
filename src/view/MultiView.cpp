@@ -18,8 +18,6 @@
 #include <y/y/Entity.h>
 #include <lib/ygraphics/graphics-impl.h>
 
-#include "renderer/path/RenderPath.h"
-
 MultiViewWindow::MultiViewWindow(MultiView* _multi_view) {
 	multi_view = _multi_view;
 	scene_renderer = new yrenderer::SceneRenderer(multi_view->session->ctx, yrenderer::RenderPathType::Forward, *multi_view->view_port.scene_view);

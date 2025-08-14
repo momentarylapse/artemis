@@ -11,8 +11,8 @@
 
 namespace kaba {
 	extern const Class* TypeVec3List;
-	extern const Class* TypeIntList;
-	extern const Class* TypeFloatList;
+	extern const Class* TypeInt32List;
+	extern const Class* TypeFloat32List;
 	extern const Class* TypeFloat64List;
 }
 
@@ -23,11 +23,11 @@ base::map<const std::type_info*, const kaba::Class*> type_map;
 
 void link_basic_types() {
 	type_map.set(&typeid(float), kaba::TypeFloat32);
-	type_map.set(&typeid(Array<float>), kaba::TypeFloatList);
+	type_map.set(&typeid(Array<float>), kaba::TypeFloat32List);
 	type_map.set(&typeid(double), kaba::TypeFloat64);
 	type_map.set(&typeid(Array<double>), kaba::TypeFloat64List);
 	type_map.set(&typeid(int), kaba::TypeInt32);
-	type_map.set(&typeid(Array<int>), kaba::TypeIntList);
+	type_map.set(&typeid(Array<int>), kaba::TypeInt32List);
 	type_map.set(&typeid(int64), kaba::TypeInt64);
 	type_map.set(&typeid(bool), kaba::TypeBool);
 	type_map.set(&typeid(string), kaba::TypeString);
