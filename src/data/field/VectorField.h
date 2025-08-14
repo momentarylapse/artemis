@@ -65,8 +65,8 @@ struct VectorField {
 	ScalarType type;
 	RegularGrid grid;
 	SamplingMode sampling_mode;
-	SampledData<vec3, float> v32;
-	SampledData<dvec3, double> v64;
+	SampledData<float> v32;
+	SampledData<double> v64;
 
 	dvec3 value(int i, int j, int k) const;
 	void set(int i, int j, int k, const dvec3& v);

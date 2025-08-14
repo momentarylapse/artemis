@@ -11,26 +11,26 @@ ScalarField::ScalarField(const RegularGrid& g, ScalarType t, SamplingMode s) {
 	type = t;
 	sampling_mode = s;
 	if (type == ScalarType::Float32)
-		v32.init(grid, sampling_mode);
+		v32.init(grid, 1, sampling_mode);
 	else if (type == ScalarType::Float64)
-		v64.init(grid, sampling_mode);
+		v64.init(grid, 1, sampling_mode);
 }
 
 ScalarField::ScalarField() : ScalarField(RegularGrid(), ScalarType::None, SamplingMode::PerCell) {}
 
 double ScalarField::value(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
-		return (double)v32.at(grid, sampling_mode, i, j, k);
+		return (double)*v32.at(grid, sampling_mode, i, j, k);
 	if (type == ScalarType::Float64)
-		return v64.at(grid, sampling_mode, i, j, k);
+		return *v64.at(grid, sampling_mode, i, j, k);
 	return 0.0;
 }
 
 void ScalarField::set(int i, int j, int k, double f) {
 	if (type == ScalarType::Float32)
-		v32.at(grid, sampling_mode, i, j, k) = (float)f;
+		*v32.at(grid, sampling_mode, i, j, k) = (float)f;
 	else if (type == ScalarType::Float64)
-		v64.at(grid, sampling_mode, i, j, k) = f;
+		*v64.at(grid, sampling_mode, i, j, k) = f;
 }
 
 float ScalarField::value32(int i, int j, int k) const {

@@ -23,28 +23,43 @@ enum class SamplingMode {
 	PerVertex
 };
 
-template<class T, class S>
+template<class S>
 struct SampledData {
-	using ItemType = T;
 	using ScalarType = S;
-	Array<T> v;
-	void init(const RegularGrid& grid, SamplingMode mode) {
+	Array<S> v;
+	int components;
+	void init(const RegularGrid& grid, int _components, SamplingMode mode) {
+		components = _components;
 		if (mode == SamplingMode::PerCell)
-			v.resize(grid.cell_count());
+			v.resize(components * grid.cell_count());
 		else if (mode == SamplingMode::PerVertex)
-			v.resize(grid.vertex_count());
+			v.resize(components * grid.vertex_count());
 	}
-	T& at(const RegularGrid& grid, SamplingMode sampling_mode, int i, int j, int k) {
-		if (sampling_mode == SamplingMode::PerCell)
-			return v[grid.cell_index(i, j, k)];
-		//	if (sampling_mode == SamplingMode::PerVertex)
-		return v[grid.vertex_index(i, j, k)];
+	S* _at(int index) {
+		return &v[components * index];
 	}
-	const T& at(const RegularGrid& grid, SamplingMode sampling_mode, int i, int j, int k) const {
+	const S* _at(int index) const {
+		return &v[components * index];
+	}
+	S* at(const RegularGrid& grid, SamplingMode sampling_mode, int i, int j, int k) {
 		if (sampling_mode == SamplingMode::PerCell)
-			return v[grid.cell_index(i, j, k)];
+			return _at(grid.cell_index(i, j, k));
 		//	if (sampling_mode == SamplingMode::PerVertex)
-		return v[grid.vertex_index(i, j, k)];
+		return _at(grid.vertex_index(i, j, k));
+	}
+	const S* at(const RegularGrid& grid, SamplingMode sampling_mode, int i, int j, int k) const {
+		if (sampling_mode == SamplingMode::PerCell)
+			return _at(grid.cell_index(i, j, k));
+		//	if (sampling_mode == SamplingMode::PerVertex)
+		return _at(grid.vertex_index(i, j, k));
+	}
+	void cwise_product(const SampledData<S>& a, const SampledData<S>& b) {
+		//if (a.components != b.components or a.components != components)
+		//	return;
+		if (a.v.num != v.num or b.v.num != v.num)
+			return;
+		for (int i=0; i<v.num; i++)
+			v[i] = a.v[i] * b.v[i];
 	}
 };
 

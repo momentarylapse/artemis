@@ -16,8 +16,8 @@ struct ScalarField {
 	RegularGrid grid;
 	ScalarType type;
 	SamplingMode sampling_mode;
-	SampledData<float, float> v32;
-	SampledData<double, double> v64;
+	SampledData<float> v32;
+	SampledData<double> v64;
 
 	double value(int i, int j, int k) const;
 	void set(int i, int j, int k, double f);
