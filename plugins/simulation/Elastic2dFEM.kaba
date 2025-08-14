@@ -26,12 +26,12 @@ class Elastic2dFEM extends Node
 	
 	func __init__()
 		super.__init__("Elastic2dFEM")
-		in_ux.__init__(self, "ux", PortFlags.NONE)
-		in_uy.__init__(self, "uy", PortFlags.NONE)
-		in_uz.__init__(self, "uz", PortFlags.NONE)
-		in_dt_ux.__init__(self, "dt-ux", PortFlags.NONE)
-		in_dt_uy.__init__(self, "dt-uy", PortFlags.NONE)
-		in_dt_uz.__init__(self, "dt-uz", PortFlags.NONE)
+		in_ux.__init__(self, "ux", PortFlags.MUTABLE)
+		in_uy.__init__(self, "uy", PortFlags.MUTABLE)
+		in_uz.__init__(self, "uz", PortFlags.MUTABLE)
+		in_dt_ux.__init__(self, "dt-ux", PortFlags.MUTABLE)
+		in_dt_uy.__init__(self, "dt-uy", PortFlags.MUTABLE)
+		in_dt_uz.__init__(self, "dt-uz", PortFlags.MUTABLE)
 		out_u.__init__(self, "u", PortFlags.NONE)
 		flags = NodeFlags.TIME_DEPENDENT
 		
