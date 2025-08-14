@@ -26,7 +26,7 @@ class MaxwellFDTD extends Node
 				
 					# E -> B
 					for mb in in_mb.value()
-						B += mb.componentwise_product(rotation_fw(E) * dt)
+						B += mb.cwise_product(rotation_fw(E) * dt)
 					else
 						B += rotation_fw(E) * dt
 					profiler.end(c1)
@@ -38,7 +38,7 @@ class MaxwellFDTD extends Node
 					# B -> E
 					profiler.begin(c3)
 					for me in in_me.value()
-						E -= me.componentwise_product(rotation_bw(B) * dt)
+						E -= me.cwise_product(rotation_bw(B) * dt)
 					else
 						E -= rotation_bw(B) * dt
 					profiler.end(c3)

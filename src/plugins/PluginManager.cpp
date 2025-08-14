@@ -16,6 +16,7 @@
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
+#include <data/field/MultiComponentField.h>
 #include <data/grid/RegularGrid.h>
 #include <data/mesh/PolygonMesh.h>
 #include <data/util/ColorMap.h>
@@ -136,6 +137,10 @@ data::VectorField create_vector_field(const data::RegularGrid& grid, const kaba:
 	return data::VectorField(grid, type2type(type), mode);
 }
 
+data::MultiComponentField create_multi_component_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode, int components) {
+	return data::MultiComponentField(grid, type2type(type), mode, components);
+}
+
 template<class T>
 void generic_assign(T& a, const T& b) {
 	a = b;
@@ -149,6 +154,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_func("run", &export_run);
 	ext->link_func("create_scalar_field", &create_scalar_field);
 	ext->link_func("create_vector_field", &create_vector_field);
+	ext->link_func("create_multi_component_field", &create_multi_component_field);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);
 	ext->link_func("rotation_fw", &processing::rotation_fw);
@@ -192,7 +198,24 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("VectorField.__isub__", &data::VectorField::operator-=);
 	ext->link_class_func("VectorField.__mul__", &data::VectorField::operator*);
 	ext->link_class_func("VectorField.__imul__", &data::VectorField::operator*=);
-	ext->link_class_func("VectorField.componentwise_product", &data::VectorField::componentwise_product);
+	ext->link_class_func("VectorField.cwise_product", &data::VectorField::componentwise_product);
+
+	ext->declare_class_size("MultiComponentField", sizeof(data::MultiComponentField));
+	ext->link_class_func("MultiComponentField.__init__", &kaba::generic_init<data::MultiComponentField>);
+	ext->link_class_func("MultiComponentField.__delete__", &kaba::generic_delete<data::MultiComponentField>);
+	ext->declare_class_element("MultiComponentField.grid", &data::MultiComponentField::grid);
+	ext->declare_class_element("MultiComponentField.v32", &data::MultiComponentField::v32);
+	ext->declare_class_element("MultiComponentField.v64", &data::MultiComponentField::v64);
+	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set32);
+	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value32);
+	ext->link_class_func("MultiComponentField.__assign__", &generic_assign<data::MultiComponentField>);
+	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
+	ext->link_class_func("MultiComponentField.__iadd__", &data::MultiComponentField::operator+=);
+	ext->link_class_func("MultiComponentField.__sub__", &data::MultiComponentField::operator-);
+	ext->link_class_func("MultiComponentField.__isub__", &data::MultiComponentField::operator-=);
+	ext->link_class_func("MultiComponentField.__mul__", &data::MultiComponentField::operator*);
+	ext->link_class_func("MultiComponentField.__imul__", &data::MultiComponentField::operator*=);
+	ext->link_class_func("MultiComponentField.cwise_product", &data::MultiComponentField::componentwise_product);
 
 
 	ext->declare_class_size("RegularGrid", sizeof(data::RegularGrid));
@@ -225,6 +248,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	link_ports<artemis::data::ScalarField>(ext, "ScalarField");
 	link_ports<artemis::data::VectorField>(ext, "VectorField");
+	link_ports<artemis::data::MultiComponentField>(ext, "MultiComponentField");
 	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
 	link_ports<Array<double>>(ext, "List");
 
@@ -258,6 +282,7 @@ void PluginManager::import_kaba() {
 	import_component_class<data::RegularGrid>(m, "RegularGrid");
 	import_component_class<data::ScalarField>(m, "ScalarField");
 	import_component_class<data::VectorField>(m, "VectorField");
+	import_component_class<data::MultiComponentField>(m, "MultiComponentField");
 	import_component_class<data::ColorMap>(m, "ColorMap");
 	import_component_class<graph::PlotData>(m, "PlotData");
 	import_component_class<graph::RenderData>(m, "RenderData");
