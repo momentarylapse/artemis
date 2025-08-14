@@ -10,19 +10,11 @@ class StringFEM extends Node
 	var in_dt_uy: InPortScalarField
 	var out_u: OutPortVectorField
 	
-	let length = 0.648 # m
-	let tension = 84.0 # N
-	#let gauge = 0.017 # inch
-	let diameter = 0.0004318 # m
+#	let length = 0.648 # m  (implicit via grid)
+	var tension: SettingFloat # [N]
+	var diameter: SettingFloat # [m]
 		
-	var grid: Grid
 	var mat: Material
-#	var tension: f32 # [N]
-	var radius: f32 # [m]
-	var phi_dx_phi: SparseMatrix
-	var phi_dx_dx_phi: SparseMatrix
-	var phi_phi: SparseMatrix
-	var phi_phi_inv: Matrix
 	
 	
 	func __init__()
@@ -34,36 +26,22 @@ class StringFEM extends Node
 		out_u.__init__(self, "u", PortFlags.NONE)
 		flags = NodeFlags.TIME_DEPENDENT
 		
-		radius = diameter / 2
+		tension.__init__(self, "tension", 84.0)
+		diameter.__init__(self, "diameter", 0.0004318) # gauge = 0.017 inch
+		
 		mat = nickel()
+
+	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField)
+		let laplace_ux = hessian_x(ux, 0, 0)
+		let laplace_uy = hessian_x(uy, 0, 0)
 		
-		grid.N = 0
-	
-	func mut reset(g: RegularGrid)
-		grid.N = g.nx
-		grid.D = length / grid.N #len(g.dx)
-		phi_dx_phi = grid.phi_dphi()
-		phi_dx_dx_phi = grid.phi_ddphi()
-		phi_phi = grid.phi_phi()
-		phi_phi_inv = inverse(phi_phi)
-	
-	func mut substep(dt: f32, out ux: f32[], out uy: f32[], out dt_ux: f32[], out dt_uy: f32[])
-		let phi_laplace_ux = mul(phi_dx_dx_phi, ux)
-		let phi_laplace_uy = mul(phi_dx_dx_phi, uy)
-		
+		let radius = f32(diameter()) / 2
 		let A = pi * radius^2
 		let µ = mat.density * A # [kg/m]
-		let C = tension / µ / 2 # [m²/s²]
+		let C = f32(tension()) / µ / 2 # [m²/s²]
 	
-		let phi_dt_dt_ux = phi_laplace_ux * C
-		let phi_dt_dt_uy = phi_laplace_uy * C
-#		print(ddu_phi)
-	
-		#let ddux = phi_phi.solve(ddux_phi)
-		#let dduy = phi_phi.solve(dduy_phi)
-		let dt_dt_ux = mul(phi_phi_inv, phi_dt_dt_ux)
-		let dt_dt_uy = mul(phi_phi_inv, phi_dt_dt_uy)
-#		print(ddu)
+		let dt_dt_ux = laplace_ux * C
+		let dt_dt_uy = laplace_uy * C
 	
 		dt_ux += dt_dt_ux * dt
 		dt_uy += dt_dt_uy * dt
@@ -71,15 +49,15 @@ class StringFEM extends Node
 		uy += dt_uy * dt
 			
 		# boundary
-		let n = grid.n()
-		ux[0] = 0
-		uy[0] = 0
-		dt_ux[0] = 0
-		dt_uy[0] = 0
-		ux[n-1] = 0
-		uy[n-1] = 0
-		dt_ux[n-1] = 0
-		dt_uy[n-1] = 0
+		let n = ux.grid.nx
+		ux.set(0,0,0, 0)
+		uy.set(0,0,0, 0)
+		dt_ux.set(0,0,0, 0)
+		dt_uy.set(0,0,0, 0)
+		ux.set(n-1,0,0, 0)
+		uy.set(n-1,0,0, 0)
+		dt_ux.set(n-1,0,0, 0)
+		dt_uy.set(n-1,0,0, 0)
 	
 	func override on_process()
 		# assume f32
@@ -88,19 +66,15 @@ class StringFEM extends Node
 			for uy in in_uy.value()
 				for dt_ux in in_dt_ux.value()
 					for dt_uy in in_dt_uy.value()
-						let g = ux.grid
-						if g.nx != grid.N
-							# grid changed... recreate everything
-							reset(g)
 		
 						let dt = 0.00002 #simulation_dt
 						let N = 100
 						for i in 0:N
-							substep(dt / N, ux.v32, uy.v32, dt_ux.v32, dt_uy.v32)
+							substep(dt / N, ux, uy, dt_ux, dt_uy)
 			
-						var vu = create_vector_field(g, f32, SamplingMode.PER_VERTEX)
+						var vu = create_vector_field(ux.grid, f32, SamplingMode.PER_VERTEX)
 			
-						for i in 0:g.nx+1
+						for i in 0:ux.grid.nx+1
 							vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,0])
 			
 						out_u.set(vu)

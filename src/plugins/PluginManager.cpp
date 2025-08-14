@@ -162,6 +162,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_func("rotation_fw", &processing::rotation_fw);
 	ext->link_func("rotation_bw", &processing::rotation_bw);
 	ext->link_func("laplace", &processing::laplace);
+	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("profiler.create_channel", &profiler::create_channel);
 	ext->link_func("profiler.begin", &profiler::begin);
 	ext->link_func("profiler.end", &profiler::end);
@@ -184,6 +185,12 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value32);
 	ext->link_class_func("ScalarField.__assign__", &generic_assign<data::ScalarField>);
+	ext->link_class_func("ScalarField.__add__", &data::ScalarField::operator+);
+	ext->link_class_func("ScalarField.__iadd__", &data::ScalarField::operator+=);
+	ext->link_class_func("ScalarField.__sub__", &data::ScalarField::operator-);
+	ext->link_class_func("ScalarField.__isub__", &data::ScalarField::operator-=);
+	ext->link_class_func("ScalarField.__mul__", &data::ScalarField::operator*);
+	ext->link_class_func("ScalarField.__imul__", &data::ScalarField::operator*=);
 
 	ext->declare_class_size("VectorField", sizeof(data::VectorField));
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<data::VectorField>);

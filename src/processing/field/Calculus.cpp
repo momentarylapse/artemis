@@ -5,6 +5,7 @@
 #include "Calculus.h"
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
+#include <data/field/BasisFields.h>
 #include "../helper/GlobalThreadPool.h"
 
 namespace artemis::processing {
@@ -164,6 +165,21 @@ data::ScalarField laplace(const data::ScalarField& f) {
 		t_laplace(f.grid, f.v32, out.v32);
 	else if (f.type == data::ScalarType::Float64)
 		t_laplace(f.grid, f.v64, out.v64);
+	return out;
+}
+
+data::ScalarField hessian_x(const data::ScalarField& f, int i, int j) {
+	data::ScalarField out(f.grid, f.type, f.sampling_mode);
+	if (f.type == data::ScalarType::Float32) {
+		auto& b = data::get_basis_fields(f.grid);
+		if (i == 0 and j == 0)
+			out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dx_phi, f.v32.v));
+		if (i == 1 and j == 1)
+			out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dy_dy_phi, f.v32.v));
+		if ((i == 0 and j == 1) or (i == 1 and j == 0))
+			out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dy_phi, f.v32.v));
+
+	}
 	return out;
 }
 

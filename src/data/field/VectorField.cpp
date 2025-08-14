@@ -3,7 +3,6 @@
 //
 
 #include "VectorField.h"
-//#include <processing/field/Calculus.h>
 #include <processing/helper/GlobalThreadPool.h>
 
 namespace artemis::data {

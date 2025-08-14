@@ -5,6 +5,7 @@ func main()
 
 	var grid = g.add_node("RegularGrid", [100,50])
 	grid.set("nx", 50)
+	grid.set("lx", 0.648) # length [m]
 	grid.set("ny", 0)
 	grid.set("nz", 0)
 
@@ -20,9 +21,11 @@ func main()
 	var dt_uy = g.add_node("ScalarField", [450,275])
 	dt_uy.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
 	dt_uy.set("type", 1)
-	dt_uy.set("formula", "exp( - 0.02 * (x-13)^2) *100")
+	dt_uy.set("formula", "exp( - 0.02 * (x-13)^2) * 2")
 
 	var sim = g.add_node("StringFEM", [400,400])
+	sim.set("tension", 84.0) # [N]
+	sim.set("diameter", 0.0004318) # [m]
 
 	var gr = g.add_node("GridRenderer", [100,500])
 	#gr.set("line-width", 2.0)
@@ -30,7 +33,7 @@ func main()
 	
 	var dr = g.add_node("DeformationRenderer", [300,500])
 	dr.set("scale", 10.0)
-	dr.set("radius", 0.4)
+	dr.set("radius", 0.004)
 
 	var canvas = g.add_node("Canvas", [200,650])
 

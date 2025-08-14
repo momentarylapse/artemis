@@ -194,6 +194,7 @@ add_executable(artemis
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
 	src/action/ActionMultiView.cpp
+	src/data/field/BasisFields.cpp
 	src/data/field/MultiComponentField.cpp
 	src/data/field/ScalarField.cpp
 	src/data/field/VectorField.cpp
@@ -581,6 +582,7 @@ add_library(moduleartemis SHARED
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
 	src/action/ActionMultiView.cpp
+	src/data/field/BasisFields.cpp
 	src/data/field/MultiComponentField.cpp
 	src/data/field/ScalarField.cpp
 	src/data/field/VectorField.cpp

@@ -95,10 +95,7 @@ struct SparseMatrix {
 	void clear(int _rows, int _cols) {
 		*this = SparseMatrix(_rows, _cols);
 	}
-	T& operator()(int i, int j) {
-		return e(i, j);
-	}
-	const T& operator()(int i, int j) const {
+	T operator()(int i, int j) const {
 		return e(i, j);
 	}
 	T get(int i, int j) {

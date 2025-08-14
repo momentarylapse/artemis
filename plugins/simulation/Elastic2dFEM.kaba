@@ -50,22 +50,22 @@ class Elastic2dFEM extends Node
 		phi_phi = grid.phi_phi()
 		phi_phi_inv = inverse(phi_phi)
 	
-	func mut substep(dt: f32, out ux: f32[], out uy: f32[], out uz: f32[], out dt_ux: f32[], out dt_uy: f32[], out dt_uz: f32[])
+	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
 	
 	# i: C_ijkl d_j d_k u_l 
 
-		let dx_dx_ux_phi = mul(phi_dx_dx_phi, ux)
-		let dx_dx_uy_phi = mul(phi_dx_dx_phi, uy)
-		let dx_dx_uz_phi = mul(phi_dx_dx_phi, uz)
+		let dx_dx_ux_phi = mul(phi_dx_dx_phi, ux.v32)
+		let dx_dx_uy_phi = mul(phi_dx_dx_phi, uy.v32)
+		let dx_dx_uz_phi = mul(phi_dx_dx_phi, uz.v32)
 		
-		let dx_dy_ux_phi = mul(phi_dx_dy_phi, ux)
-		let dx_dy_uy_phi = mul(phi_dx_dy_phi, uy)
-		let dx_dy_uz_phi = mul(phi_dx_dy_phi, uz)
+		let dx_dy_ux_phi = mul(phi_dx_dy_phi, ux.v32)
+		let dx_dy_uy_phi = mul(phi_dx_dy_phi, uy.v32)
+		let dx_dy_uz_phi = mul(phi_dx_dy_phi, uz.v32)
 		
-		let dy_dy_ux_phi = mul(phi_dy_dy_phi, ux)
-		let dy_dy_uy_phi = mul(phi_dy_dy_phi, uy)
-		let dy_dy_uz_phi = mul(phi_dy_dy_phi, uz)
+		let dy_dy_ux_phi = mul(phi_dy_dy_phi, ux.v32)
+		let dy_dy_uy_phi = mul(phi_dy_dy_phi, uy.v32)
+		let dy_dy_uz_phi = mul(phi_dy_dy_phi, uz.v32)
 		
 		var m: mat3
 		m._11 = 1.0/mat.E.x
@@ -114,9 +114,9 @@ class Elastic2dFEM extends Node
 		let dduz = mul(phi_phi_inv, dduz_phi)
 #		print(ddu)
 	
-		dt_ux += ddux * dt
-		dt_uy += dduy * dt
-		dt_uz += dduz * dt
+		dt_ux.v32 += ddux * dt
+		dt_uy.v32 += dduy * dt
+		dt_uz.v32 += dduz * dt
 		ux += dt_ux * dt
 		uy += dt_uy * dt
 		uz += dt_uz * dt
@@ -139,7 +139,7 @@ class Elastic2dFEM extends Node
 								let dt = 0.0000002 #simulation_dt
 								let N = 100
 								for i in 0:N
-									substep(dt / N, ux.v32, uy.v32, uz.v32, dt_ux.v32, dt_uy.v32, dt_uz.v32)
+									substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
 				
 								var vu = create_vector_field(g, f32, SamplingMode.PER_VERTEX)
 			
