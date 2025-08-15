@@ -21,11 +21,14 @@ func main()
 
 	var gr = g.add_node("GridRenderer", [100,500])
 	#gr.set("line-width", 2.0)
-	#gr.set("color", dyn([0.5,0.5,0.5,1]))
+	gr.set("color", dyn([0.3,0.3,0.3,1]))
 	
 	var dr = g.add_node("DeformationRenderer", [300,500])
 	dr.set("scale", 50.0)
 	dr.set("radius", 0.2)
+	dr.set("line-width", 3)
+	dr.set("show-balls", true)
+	dr.set("show-grid", true)
 
 	var canvas = g.add_node("Canvas", [200,650])
 

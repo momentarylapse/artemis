@@ -28,6 +28,9 @@ func main()
 	var dr = g.add_node("DeformationRenderer", [300,500])
 	dr.set("scale", 100.0)
 	dr.set("radius", 0.004)
+	dr.set("line-width", 3)
+	dr.set("show-balls", true)
+	dr.set("show-grid", true)
 
 	var canvas = g.add_node("Canvas", [200,650])
 

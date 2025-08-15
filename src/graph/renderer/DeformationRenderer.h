@@ -6,6 +6,7 @@
 #include <data/field/VectorField.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
+#include <lib/image/color.h>
 
 namespace artemis::graph {
 
@@ -19,6 +20,10 @@ public:
 
 	dataflow::Setting<double> scale{this, "scale", 1.0};
 	dataflow::Setting<double> radius{this, "radius", 0.1};
+	dataflow::Setting<bool> show_balls{this, "show-balls", false};
+	dataflow::Setting<bool> show_grid{this, "show-grid", true};
+	dataflow::Setting<double> line_width{this, "line-width", 1.0, "range=0:99:0.1"};
+	dataflow::Setting<color> _color{this, "color", Gray};
 
 	dataflow::InPort<artemis::data::VectorField> in_diff{this, "diff"};
 	dataflow::InPort<artemis::data::ScalarField> in_scalar{this, "scalar", dataflow::PortFlags::Optional};
