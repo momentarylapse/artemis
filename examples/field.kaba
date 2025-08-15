@@ -5,6 +5,7 @@ func main()
 
 	var a = g.add_node("RegularGrid", [300,100])
 	a.set("nz", 30)
+	a.set("lz", 30)
 
 	var b = g.add_node("GridRenderer", [150,400])
 	b.set("line-width", 2.0)
