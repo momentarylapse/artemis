@@ -46,16 +46,19 @@ void ScalarField::set32(int i, int j, int k, float f) {
 
 template<class T>
 void s_list_add(T& a, const T& b) {
-	/*processing::pool::run(a.num, [&a, &b] (int i) {
+#if 1
+	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
-	}, 1000);*/
+	}, 1000);
+#else
 	for (int i=0; i<a.num; i++)
 		a[i] += b[i];
+#endif
 }
 
 template<class T>
 void s_list_sub(T& a, const T& b) {
-#if 0
+#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
@@ -67,7 +70,7 @@ void s_list_sub(T& a, const T& b) {
 
 template<class T>
 void s_list_mul_single(T& a, float s) {
-#if 0
+#if 1
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 10000);

@@ -54,7 +54,7 @@ void VectorField::set32(int i, int j, int k, const vec3& vv) {
 
 template<class T>
 void v_list_add(T& a, const T& b) {
-#if 0
+#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
 	}, 1000);
@@ -66,7 +66,7 @@ void v_list_add(T& a, const T& b) {
 
 template<class T>
 void v_list_sub(T& a, const T& b) {
-#if 0
+#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
@@ -78,7 +78,7 @@ void v_list_sub(T& a, const T& b) {
 
 template<class T>
 void v_list_mul_single(T& a, float s) {
-#if 0
+#if 1
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 1000);
