@@ -4,13 +4,8 @@ use fem.d2.*
 use fem.material.*
 
 class Elastic2dFEM extends Node
-	var in_ux: InPortScalarField
-	var in_uy: InPortScalarField
-	var in_uz: InPortScalarField
-	var in_dt_ux: InPortScalarField
-	var in_dt_uy: InPortScalarField
-	var in_dt_uz: InPortScalarField
-	var out_u: OutPortVectorField
+	var in_u: InPortVectorField
+	var in_dt_u: InPortVectorField
 	
 	var grid: Grid
 	var mat: Material
@@ -26,13 +21,8 @@ class Elastic2dFEM extends Node
 	
 	func __init__()
 		super.__init__("Elastic2dFEM")
-		in_ux.__init__(self, "ux", PortFlags.MUTABLE)
-		in_uy.__init__(self, "uy", PortFlags.MUTABLE)
-		in_uz.__init__(self, "uz", PortFlags.MUTABLE)
-		in_dt_ux.__init__(self, "dt-ux", PortFlags.MUTABLE)
-		in_dt_uy.__init__(self, "dt-uy", PortFlags.MUTABLE)
-		in_dt_uz.__init__(self, "dt-uz", PortFlags.MUTABLE)
-		out_u.__init__(self, "u", PortFlags.NONE)
+		in_u.__init__(self, "u", PortFlags.MUTABLE)
+		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
 		flags = NodeFlags.TIME_DEPENDENT
 		
 		thickness = 0.01
@@ -52,20 +42,6 @@ class Elastic2dFEM extends Node
 	
 	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
-	
-	# i: C_ijkl d_j d_k u_l 
-
-		let dx_dx_ux_phi = mul(phi_dx_dx_phi, ux.v32)
-		let dx_dx_uy_phi = mul(phi_dx_dx_phi, uy.v32)
-		let dx_dx_uz_phi = mul(phi_dx_dx_phi, uz.v32)
-		
-		let dx_dy_ux_phi = mul(phi_dx_dy_phi, ux.v32)
-		let dx_dy_uy_phi = mul(phi_dx_dy_phi, uy.v32)
-		let dx_dy_uz_phi = mul(phi_dx_dy_phi, uz.v32)
-		
-		let dy_dy_ux_phi = mul(phi_dy_dy_phi, ux.v32)
-		let dy_dy_uy_phi = mul(phi_dy_dy_phi, uy.v32)
-		let dy_dy_uz_phi = mul(phi_dy_dy_phi, uz.v32)
 		
 		var m: mat3
 		m._11 = 1.0/mat.E.x
@@ -89,63 +65,71 @@ class Elastic2dFEM extends Node
 		let Cyzyz = mat.G.yz
 		let Cxzxz = mat.G.zx
 	
+	# i: C_ijkl d_j d_k u_l
+
+		let dx_dx_ux = hessian_x(ux, 0, 0)
+		let dx_dx_uy = hessian_x(uy, 0, 0)
+		let dx_dx_uz = hessian_x(uz, 0, 0)
+		
+		let dx_dy_ux = hessian_x(ux, 0, 1)
+		let dx_dy_uy = hessian_x(uy, 0, 1)
+		let dx_dy_uz = hessian_x(uz, 0, 1)
+		
+		let dy_dy_ux = hessian_x(ux, 1, 1)
+		let dy_dy_uy = hessian_x(uy, 1, 1)
+		let dy_dy_uz = hessian_x(uz, 1, 1)
+			
 		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
-#		var ddux_phi = dx_dx_ux_phi * Cxxxx + dx_dy_uy_phi * Cxxyy
-#		ddux_phi += dx_dy_uy_phi * Cxyxy + dy_dy_ux_phi * Cxyxy
+		var ddux = dx_dx_ux * Cxxxx
+		ddux += dx_dy_uy * Cxyxy + dy_dy_ux * Cxyxy
 		# yyyy + yyxx + (yyzz)   + yxyx + yxxy + (yzyz) + (yzzy)
-#		var dduy_phi = dy_dy_uy_phi * Cyyyy + dx_dy_ux_phi * Cxxyy
-#		dduy_phi += dx_dy_ux_phi * Cxyxy + dx_dx_uy_phi * Cxyxy
+		var dduy = dy_dy_uy * Cyyyy
+		dduy += dx_dy_ux * Cxyxy + dx_dx_uy * Cxyxy
 		# (zzzz) + (zzxx) + (zzyy)   + (zxzx) + zxxz + (zyzy) + zyyz
-#		let dduz_phi = dx_dx_uz_phi * Cxzxz + dy_dy_uz_phi * Cyzyz
-		
-		
-		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
-		var ddux_phi = dx_dx_ux_phi * Cxxxx
-		ddux_phi += dx_dy_uy_phi * Cxyxy + dy_dy_ux_phi * Cxyxy
-		# yyyy + yyxx + (yyzz)   + yxyx + yxxy + (yzyz) + (yzzy)
-		var dduy_phi = dy_dy_uy_phi * Cyyyy
-		dduy_phi += dx_dy_ux_phi * Cxyxy + dx_dx_uy_phi * Cxyxy
-		# (zzzz) + (zzxx) + (zzyy)   + (zxzx) + zxxz + (zyzy) + zyyz
-		let dduz_phi = dx_dx_uz_phi * Cxzxz + dy_dy_uz_phi * Cyzyz
-		
-	
-		let ddux = mul(phi_phi_inv, ddux_phi)
-		let dduy = mul(phi_phi_inv, dduy_phi)
-		let dduz = mul(phi_phi_inv, dduz_phi)
-#		print(ddu)
-	
-		dt_ux.v32 += ddux * dt
-		dt_uy.v32 += dduy * dt
-		dt_uz.v32 += dduz * dt
+		let dduz = dx_dx_uz * Cxzxz + dy_dy_uz * Cyzyz
+			
+		dt_ux += ddux * dt
+		dt_uy += dduy * dt
+		dt_uz += dduz * dt
 		ux += dt_ux * dt
 		uy += dt_uy * dt
 		uz += dt_uz * dt
-		#print(dux|>log)
 	
 	func override on_process()
 		# assume f32
 		# assume PER_VERTEX
-		for ux in in_ux.value()
-			for uy in in_uy.value()
-				for uz in in_uz.value()
-					for dt_ux in in_dt_ux.value()
-						for dt_uy in in_dt_uy.value()
-							for dt_uz in in_dt_uz.value()
-								let g = ux.grid
-								if g.nx != grid.NX or g.ny != grid.NY
-									# grid changed... recreate everything
-									reset(g)
-		
-								let dt = 0.0000002 #simulation_dt
-								let N = 100
-								for i in 0:N
-									substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
+		for u in in_u.value()
+			for dt_u in in_dt_u.value()
+				let g = u.grid
+				if g.nx != grid.NX or g.ny != grid.NY
+					# grid changed... recreate everything
+					reset(g)
 				
-								var vu = VectorField.create(g, f32, SamplingMode.PER_VERTEX)
+				var ux = u.get_component(0)
+				var uy = u.get_component(1)
+				var uz = u.get_component(2)
+				var dt_ux = dt_u.get_component(0)
+				var dt_uy = dt_u.get_component(1)
+				var dt_uz = dt_u.get_component(2)
+		
+				let dt = 0.0000002 #simulation_dt
+				let N = 100
+				for i in 0:N
+					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
+				
+			#	var vu = VectorField.create(g, f32, SamplingMode.PER_VERTEX)
 			
-								for i in 0:len(ux.v32)
-									vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,uz.v32[i]*10])
+			#	for i in 0:len(ux.v32)
+			#		vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,uz.v32[i]*10])
 			
-								out_u.set(vu)
+			#	out_u.set(vu)
+				u.set_component(0, ux)
+				u.set_component(1, uy)
+				u.set_component(2, uz)
+				dt_u.set_component(0, dt_ux)
+				dt_u.set_component(1, dt_uy)
+				dt_u.set_component(2, dt_uz)
+				in_u.mutated()
+				in_dt_u.mutated()
 	
 		
