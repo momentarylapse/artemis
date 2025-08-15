@@ -53,39 +53,48 @@ void VectorField::set32(int i, int j, int k, const vec3& vv) {
 }
 
 template<class T>
-void list_add(T& a, const T& b) {
+void v_list_add(T& a, const T& b) {
+#if 0
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
 	}, 1000);
-//	for (int i=0; i<a.num; i++)
-//		a[i] += b[i];
+#else
+	for (int i=0; i<a.num; i++)
+		a[i] += b[i];
+#endif
 }
 
 template<class T>
-void list_sub(T& a, const T& b) {
+void v_list_sub(T& a, const T& b) {
+#if 0
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
-//	for (int i=0; i<a.num; i++)
-//		a[i] -= b[i];
+#else
+	for (int i=0; i<a.num; i++)
+		a[i] -= b[i];
+#endif
 }
 
 template<class T>
-void list_mul_single(T& a, float s) {
+void v_list_mul_single(T& a, float s) {
+#if 0
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 1000);
-//	for (int i=0; i<a.num; i++)
-//		a[i] *= s;
+#else
+	for (int i=0; i<a.num; i++)
+		a[i] *= s;
+#endif
 }
 
 void VectorField::operator+=(const VectorField& o) {
 	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
-		list_add(v32.v, o.v32.v);
+		v_list_add(v32.v, o.v32.v);
 	else if (type == ScalarType::Float64)
-		list_add(v64.v, o.v64.v);
+		v_list_add(v64.v, o.v64.v);
 }
 
 VectorField VectorField::operator+(const VectorField& o) const {
@@ -98,9 +107,9 @@ void VectorField::operator-=(const VectorField& o) {
 	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
-		list_sub(v32.v, o.v32.v);
+		v_list_sub(v32.v, o.v32.v);
 	else if (type == ScalarType::Float64)
-		list_sub(v64.v, o.v64.v);
+		v_list_sub(v64.v, o.v64.v);
 }
 
 VectorField VectorField::operator-(const VectorField& o) const {
@@ -111,9 +120,9 @@ VectorField VectorField::operator-(const VectorField& o) const {
 
 void VectorField::operator*=(float o) {
 	if (type == ScalarType::Float32)
-		list_mul_single(v32.v, o);
+		v_list_mul_single(v32.v, o);
 	else if (type == ScalarType::Float64)
-		list_mul_single(v64.v, o);
+		v_list_mul_single(v64.v, o);
 }
 
 VectorField VectorField::operator*(float o) const {
@@ -158,13 +167,15 @@ ScalarField VectorField::get_component(int axis) const {;
 	if (axis < 0 or axis >= 3)
 		return s;
 	if (type == ScalarType::Float32) {
-		processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v32.v.num; i++) {
 			s.v32.v[i] = v32._at(i)[axis];
-		}, 1000);
+		}
 	} else if (type == ScalarType::Float64) {
-		processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v64.v.num; i++) {
 			s.v64.v[i] = v64._at(i)[axis];
-		}, 1000);
+		}
 	}
 	return s;
 }
@@ -175,13 +186,15 @@ void VectorField::set_component(int axis, const ScalarField& s) {
 	if (s.type != type or s.sampling_mode != sampling_mode)
 		return;
 	if (type == ScalarType::Float32) {
-		processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v32.v.num; i++) {
 			v32._at(i)[axis] = s.v32.v[i];
-		}, 1000);
+		}
 	} else if (type == ScalarType::Float64) {
-		processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v64.v.num; i++) {
 			v64._at(i)[axis] = s.v64.v[i];
-		}, 1000);
+		}
 	}
 }
 

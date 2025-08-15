@@ -17,10 +17,15 @@
 #include <view/ArtemisWindow.h>
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
+
+#include "lib/xhui/config.h"
 #include "storage/Storage.h"
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
+
+	if (xhui::config.get_bool("debug", false))
+		show_profiling = true;
 
 	data = session->data.get();
 	graph = session->graph;

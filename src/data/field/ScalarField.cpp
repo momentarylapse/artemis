@@ -4,6 +4,7 @@
 
 #include "ScalarField.h"
 #include <processing/helper/GlobalThreadPool.h>
+#include <lib/os/msg.h>
 
 namespace artemis::data {
 
@@ -44,39 +45,45 @@ void ScalarField::set32(int i, int j, int k, float f) {
 
 
 template<class T>
-void list_add(T& a, const T& b) {
-	processing::pool::run(a.num, [&a, &b] (int i) {
+void s_list_add(T& a, const T& b) {
+	/*processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
-	}, 1000);
-	//	for (int i=0; i<a.num; i++)
-	//		a[i] += b[i];
+	}, 1000);*/
+	for (int i=0; i<a.num; i++)
+		a[i] += b[i];
 }
 
 template<class T>
-void list_sub(T& a, const T& b) {
+void s_list_sub(T& a, const T& b) {
+#if 0
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
-	//	for (int i=0; i<a.num; i++)
-	//		a[i] -= b[i];
+#else
+	for (int i=0; i<a.num; i++)
+		a[i] -= b[i];
+#endif
 }
 
 template<class T>
-void list_mul_single(T& a, float s) {
+void s_list_mul_single(T& a, float s) {
+#if 0
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
-	}, 1000);
-	//	for (int i=0; i<a.num; i++)
-	//		a[i] *= s;
+	}, 10000);
+#else
+	for (int i=0; i<a.num; i++)
+		a[i] *= s;
+#endif
 }
 
 void ScalarField::operator+=(const ScalarField& o) {
 	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
-		list_add(v32.v, o.v32.v);
+		s_list_add(v32.v, o.v32.v);
 	else if (type == ScalarType::Float64)
-		list_add(v64.v, o.v64.v);
+		s_list_add(v64.v, o.v64.v);
 }
 
 ScalarField ScalarField::operator+(const ScalarField& o) const {
@@ -89,9 +96,9 @@ void ScalarField::operator-=(const ScalarField& o) {
 	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
-		list_sub(v32.v, o.v32.v);
+		s_list_sub(v32.v, o.v32.v);
 	else if (type == ScalarType::Float64)
-		list_sub(v64.v, o.v64.v);
+		s_list_sub(v64.v, o.v64.v);
 }
 
 ScalarField ScalarField::operator-(const ScalarField& o) const {
@@ -102,9 +109,9 @@ ScalarField ScalarField::operator-(const ScalarField& o) const {
 
 void ScalarField::operator*=(float o) {
 	if (type == ScalarType::Float32)
-		list_mul_single(v32.v, o);
+		s_list_mul_single(v32.v, o);
 	else if (type == ScalarType::Float64)
-		list_mul_single(v64.v, o);
+		s_list_mul_single(v64.v, o);
 }
 
 ScalarField ScalarField::operator*(float o) const {

@@ -27,6 +27,12 @@ struct BasisFields {
 	linalg::SparseMatrix<float> phi_dy_dy_phi;
 	linalg::SparseMatrix<float> phi_dy_dz_phi;
 	linalg::SparseMatrix<float> phi_dz_dz_phi;
+	linalg::Matrix<float> dx_dx;
+	linalg::Matrix<float> dx_dy;
+	linalg::Matrix<float> dx_dz;
+	linalg::Matrix<float> dy_dy;
+	linalg::Matrix<float> dy_dz;
+	linalg::Matrix<float> dz_dz;
 };
 
 BasisFields create_basis_fields(const RegularGrid& grid);

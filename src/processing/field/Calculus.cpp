@@ -173,11 +173,14 @@ data::ScalarField hessian_x(const data::ScalarField& f, int i, int j) {
 	if (f.type == data::ScalarType::Float32) {
 		auto& b = data::get_basis_fields(f.grid);
 		if (i == 0 and j == 0)
-			out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dx_phi, f.v32.v));
+			//out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dx_phi, f.v32.v));
+			out.v32.v = linalg::mul(b.dx_dx, f.v32.v);
 		if (i == 1 and j == 1)
-			out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dy_dy_phi, f.v32.v));
+			//out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dy_dy_phi, f.v32.v));
+			out.v32.v = linalg::mul(b.dy_dy, f.v32.v);
 		if ((i == 0 and j == 1) or (i == 1 and j == 0))
-			out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dy_phi, f.v32.v));
+			//out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dy_phi, f.v32.v));
+			out.v32.v = linalg::mul(b.dx_dy, f.v32.v);
 
 	}
 	return out;
