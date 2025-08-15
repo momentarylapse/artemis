@@ -6,6 +6,7 @@
 
 #include "base.h"
 #include "../grid/RegularGrid.h"
+#include <lib/base/tuple.h>
 #include <lib/math/vec3.h>
 
 struct dvec3 {
@@ -58,6 +59,8 @@ struct dvec3 {
 
 namespace artemis::data {
 
+struct ScalarField;
+
 struct VectorField {
 	VectorField();
 	explicit VectorField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode);
@@ -81,6 +84,11 @@ struct VectorField {
 	VectorField operator*(float o) const;
 
 	VectorField componentwise_product(const VectorField& o) const;
+	//void split(ScalarField& x, ScalarField& y, ScalarField& z) const;
+	base::tuple3<ScalarField, ScalarField, ScalarField> split() const;
+	ScalarField get_component(int i) const;
+	void set_component(int i, const ScalarField& s);
+	static VectorField merge(const ScalarField& x, const ScalarField& y, const ScalarField& z);
 };
 
 }

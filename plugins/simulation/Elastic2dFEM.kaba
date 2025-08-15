@@ -141,7 +141,7 @@ class Elastic2dFEM extends Node
 								for i in 0:N
 									substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
 				
-								var vu = create_vector_field(g, f32, SamplingMode.PER_VERTEX)
+								var vu = VectorField.create(g, f32, SamplingMode.PER_VERTEX)
 			
 								for i in 0:len(ux.v32)
 									vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,uz.v32[i]*10])

@@ -5,6 +5,9 @@
 #include "VectorField.h"
 #include <processing/helper/GlobalThreadPool.h>
 
+#include "ScalarField.h"
+#include "lib/os/msg.h"
+
 namespace artemis::data {
 
 VectorField::VectorField(const RegularGrid& g, ScalarType t, SamplingMode s) {
@@ -130,6 +133,79 @@ VectorField VectorField::componentwise_product(const VectorField& o) const {
 	}
 	return r;
 }
+
+base::tuple3<ScalarField, ScalarField, ScalarField> VectorField::split() const {
+	base::tuple3<ScalarField, ScalarField, ScalarField> r = {ScalarField(grid, type, sampling_mode), ScalarField(grid, type, sampling_mode), ScalarField(grid, type, sampling_mode)};
+
+	if (type == ScalarType::Float32) {
+		processing::pool::run(v32.v.num, [this, &r] (int i) {
+			r.a.v32.v[i] = v32._at(i)[0];
+			r.b.v32.v[i] = v32._at(i)[1];
+			r.c.v32.v[i] = v32._at(i)[2];
+		}, 1000);
+	} else if (type == ScalarType::Float64) {
+		processing::pool::run(v64.v.num, [this, &r] (int i) {
+			r.a.v64.v[i] = v64._at(i)[0];
+			r.b.v64.v[i] = v64._at(i)[1];
+			r.c.v64.v[i] = v64._at(i)[2];
+		}, 1000);
+	}
+	return r;
+}
+
+ScalarField VectorField::get_component(int axis) const {;
+	ScalarField s(grid, type, sampling_mode);
+	if (axis < 0 or axis >= 3)
+		return s;
+	if (type == ScalarType::Float32) {
+		processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+			s.v32.v[i] = v32._at(i)[axis];
+		}, 1000);
+	} else if (type == ScalarType::Float64) {
+		processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+			s.v64.v[i] = v64._at(i)[axis];
+		}, 1000);
+	}
+	return s;
+}
+
+void VectorField::set_component(int axis, const ScalarField& s) {
+	if (axis < 0 or axis >= 3)
+		return;
+	if (s.type != type or s.sampling_mode != sampling_mode)
+		return;
+	if (type == ScalarType::Float32) {
+		processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+			v32._at(i)[axis] = s.v32.v[i];
+		}, 1000);
+	} else if (type == ScalarType::Float64) {
+		processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+			v64._at(i)[axis] = s.v64.v[i];
+		}, 1000);
+	}
+}
+
+
+VectorField VectorField::merge(const ScalarField &x, const ScalarField &y, const ScalarField &z) {
+	VectorField v(x.grid, x.type, x.sampling_mode);
+
+	if (v.type == ScalarType::Float32) {
+		processing::pool::run(x.v32.v.num, [&v, &x, &y, &z] (int i) {
+			v.v32._at(i)[0] = *x.v32._at(i);
+			v.v32._at(i)[1] = *y.v32._at(i);
+		//	v.v32._at(i)[2] = *z.v32._at(i);
+		}, 1000);
+	} else if (v.type == ScalarType::Float64) {
+		processing::pool::run(x.v64.v.num, [&v, &x, &y, &z] (int i) {
+			v.v64._at(i)[0] = *x.v64._at(i);
+			v.v64._at(i)[1] = *y.v64._at(i);
+			v.v64._at(i)[2] = *z.v64._at(i);
+		}, 1000);
+	}
+	return v;
+}
+
+
 
 
 

@@ -154,9 +154,6 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_func("create_session", &create_session);
 	ext->link_func("start", &export_start);
 	ext->link_func("run", &export_run);
-	ext->link_func("create_scalar_field", &create_scalar_field);
-	ext->link_func("create_vector_field", &create_vector_field);
-	ext->link_func("create_multi_component_field", &create_multi_component_field);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);
 	ext->link_func("rotation_fw", &processing::rotation_fw);
@@ -191,6 +188,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("ScalarField.__isub__", &data::ScalarField::operator-=);
 	ext->link_class_func("ScalarField.__mul__", &data::ScalarField::operator*);
 	ext->link_class_func("ScalarField.__imul__", &data::ScalarField::operator*=);
+	ext->link_func("ScalarField.create", &create_scalar_field);
 
 	ext->declare_class_size("VectorField", sizeof(data::VectorField));
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<data::VectorField>);
@@ -208,6 +206,11 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("VectorField.__mul__", &data::VectorField::operator*);
 	ext->link_class_func("VectorField.__imul__", &data::VectorField::operator*=);
 	ext->link_class_func("VectorField.cwise_product", &data::VectorField::componentwise_product);
+	ext->link_func("VectorField.create", &create_vector_field);
+	ext->link_class_func("VectorField.split", &data::VectorField::split);
+	ext->link_class_func("VectorField.get_component", &data::VectorField::get_component);
+	ext->link_class_func("VectorField.set_component", &data::VectorField::set_component);
+	ext->link_func("VectorField.merge", &data::VectorField::merge);
 
 	ext->declare_class_size("MultiComponentField", sizeof(data::MultiComponentField));
 	ext->link_class_func("MultiComponentField.__init__", &kaba::generic_init<data::MultiComponentField>);
@@ -225,6 +228,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("MultiComponentField.__mul__", &data::MultiComponentField::operator*);
 	ext->link_class_func("MultiComponentField.__imul__", &data::MultiComponentField::operator*=);
 	ext->link_class_func("MultiComponentField.cwise_product", &data::MultiComponentField::componentwise_product);
+	ext->link_func("MultiComponentField.create", &create_multi_component_field);
 
 
 	ext->declare_class_size("RegularGrid", sizeof(data::RegularGrid));

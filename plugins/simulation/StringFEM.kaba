@@ -4,11 +4,8 @@ use fem.d1p1.*
 use fem.material.*
 
 class StringFEM extends Node
-	var in_ux: InPortScalarField
-	var in_uy: InPortScalarField
-	var in_dt_ux: InPortScalarField
-	var in_dt_uy: InPortScalarField
-	var out_u: OutPortVectorField
+	var in_u: InPortVectorField
+	var in_dt_u: InPortVectorField
 	
 #	let length = 0.648 # m  (implicit via grid)
 	var tension: SettingFloat # [N]
@@ -19,11 +16,8 @@ class StringFEM extends Node
 	
 	func __init__()
 		super.__init__("StringFEM")
-		in_ux.__init__(self, "ux", PortFlags.NONE)
-		in_uy.__init__(self, "uy", PortFlags.NONE)
-		in_dt_ux.__init__(self, "dt-ux", PortFlags.NONE)
-		in_dt_uy.__init__(self, "dt-uy", PortFlags.NONE)
-		out_u.__init__(self, "u", PortFlags.NONE)
+		in_u.__init__(self, "u", PortFlags.MUTABLE)
+		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
 		flags = NodeFlags.TIME_DEPENDENT
 		
 		tension.__init__(self, "tension", 84.0)
@@ -62,21 +56,29 @@ class StringFEM extends Node
 	func override on_process()
 		# assume f32
 		# assume PER_VERTEX
-		for ux in in_ux.value()
-			for uy in in_uy.value()
-				for dt_ux in in_dt_ux.value()
-					for dt_uy in in_dt_uy.value()
+		for u in in_u.value()
+			for dt_u in in_dt_u.value()
+			
+			#	var (ux, uy, uz) = u.split()
+			#	var (dt_ux, dt_uy, dt_uz) = dt_u.split()
+				var ux = u.get_component(0)
+				var uy = u.get_component(1)
+				var dt_ux = dt_u.get_component(0)
+				var dt_uy = dt_u.get_component(1)
 		
-						let dt = 0.00002 #simulation_dt
-						let N = 100
-						for i in 0:N
-							substep(dt / N, ux, uy, dt_ux, dt_uy)
+				let dt = 0.00002 #simulation_dt
+				let N = 10
+				for i in 0:N
+					substep(dt / N, ux, uy, dt_ux, dt_uy)
 			
-						var vu = create_vector_field(ux.grid, f32, SamplingMode.PER_VERTEX)
+			#	u = VectorField.merge(ux, uy, uy)
+			#	dt_u = VectorField.merge(dt_ux, dt_uy, dt_uy)
 			
-						for i in 0:ux.grid.nx+1
-							vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,0])
-			
-						out_u.set(vu)
+				u.set_component(0, ux)
+				u.set_component(1, uy)
+				dt_u.set_component(0, dt_ux)
+				dt_u.set_component(1, dt_uy)
+				in_u.mutated()
+				in_dt_u.mutated()
 	
 		

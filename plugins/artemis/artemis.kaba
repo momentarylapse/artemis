@@ -27,6 +27,8 @@ struct ScalarField
 	func extern __sub__(o: ScalarField) -> ScalarField
 	func extern mut __imul__(o: f32)
 	func extern __mul__(o: f32) -> ScalarField
+	
+	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> ScalarField
 
 struct VectorField
 	var grid: RegularGrid
@@ -43,6 +45,12 @@ struct VectorField
 	func extern mut __imul__(o: f32)
 	func extern __mul__(o: f32) -> VectorField
 	func extern cwise_product(o: VectorField) -> VectorField
+	
+	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> VectorField
+	func extern split() -> (ScalarField, ScalarField, ScalarField)
+	func extern get_component(i: i32) -> ScalarField
+	func extern mut set_component(i: i32, s: ScalarField)
+	func extern static merge(x: ScalarField, y: ScalarField, z: ScalarField) -> VectorField
 
 struct MultiComponentField
 	var grid: RegularGrid
@@ -59,6 +67,8 @@ struct MultiComponentField
 	func extern mut __imul__(o: f32)
 	func extern __mul__(o: f32) -> MultiComponentField
 	func extern cwise_product(o: MultiComponentField) -> MultiComponentField
+	
+	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiComponentField
 
 struct PlotData
 
@@ -170,10 +180,6 @@ var extern simulation_time: f32
 var extern simulation_dt: f32
 
 func extern current_session() -> Session&
-
-func extern create_scalar_field(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> ScalarField
-func extern create_vector_field(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> VectorField
-func extern create_multi_component_field(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiComponentField
 
 func extern gradient(f: ScalarField) -> VectorField
 func extern divergence(f: VectorField) -> ScalarField
