@@ -90,20 +90,26 @@ BasisFields create_basis_fields(const RegularGrid& grid) {
 	BasisFields b;
 	b.grid_hash = grid_hash(grid);
 
-	b.phi_phi = linalg::outer_product(bx.phi_phi, by.phi_phi);
+	b.phi_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_phi), bz.phi_phi);
 	b.phi_phi_inv = linalg::inverse(b.phi_phi);
 
-	b.phi_dx_phi = linalg::outer_product(bx.phi_d_phi, by.phi_phi); // ...
-	b.phi_dy_phi = linalg::outer_product(bx.phi_phi, by.phi_d_phi);
-//	b.phi_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_d_phi, by.phi_phi), bz.phi_d_phi);
+	b.phi_dx_phi = linalg::outer_product(linalg::outer_product(bx.phi_d_phi, by.phi_phi), bz.phi_phi);
+	b.phi_dy_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_d_phi), bz.phi_phi);
+	b.phi_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_phi), bz.phi_d_phi);
 
-	b.phi_dx_dx_phi = linalg::outer_product(bx.phi_dd_phi, by.phi_phi);
-	b.phi_dx_dy_phi = linalg::outer_product(bx.phi_d_phi, by.phi_d_phi);
-	b.phi_dy_dy_phi = linalg::outer_product(bx.phi_phi, by.phi_dd_phi);
+	b.phi_dx_dx_phi = linalg::outer_product(linalg::outer_product(bx.phi_dd_phi, by.phi_phi), bz.phi_phi);
+	b.phi_dx_dy_phi = linalg::outer_product(linalg::outer_product(bx.phi_d_phi, by.phi_d_phi), bz.phi_phi);
+	b.phi_dx_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_d_phi, by.phi_phi), bz.phi_d_phi);
+	b.phi_dy_dy_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_dd_phi), bz.phi_phi);
+	b.phi_dy_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_d_phi), bz.phi_d_phi);
+	b.phi_dz_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_phi), bz.phi_dd_phi);
 
 	b.dx_dx = linalg::mul(b.phi_phi_inv, b.phi_dx_dx_phi.to_matrix());
 	b.dx_dy = linalg::mul(b.phi_phi_inv, b.phi_dx_dy_phi.to_matrix());
+	b.dx_dz = linalg::mul(b.phi_phi_inv, b.phi_dx_dz_phi.to_matrix());
 	b.dy_dy = linalg::mul(b.phi_phi_inv, b.phi_dy_dy_phi.to_matrix());
+	b.dy_dz = linalg::mul(b.phi_phi_inv, b.phi_dy_dz_phi.to_matrix());
+	b.dz_dz = linalg::mul(b.phi_phi_inv, b.phi_dz_dz_phi.to_matrix());
 	return b;
 }
 
