@@ -25,20 +25,22 @@ void VectorFieldRenderer::draw_win(const yrenderer::RenderParams& params, MultiV
 	if (!f)
 		return;
 
+	float s = scale();
+
 	Array<vec3> points;
 	if (f->sampling_mode == artemis::data::SamplingMode::PerCell) {
 		for (int i=0; i<f->grid.nx; i++)
 			for (int j=0; j<f->grid.ny; j++)
 				for (int k=0; k<f->grid.nz; k++) {
 					points.add(f->grid.cell_center(i, j, k));
-					points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k).to32());
+					points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k).to32() * s);
 				}
 	} else if (f->sampling_mode == artemis::data::SamplingMode::PerVertex) {
 		for (int i=0; i<=f->grid.nx; i++)
 			for (int j=0; j<=f->grid.ny; j++)
 				for (int k=0; k<=f->grid.nz; k++) {
 					points.add(f->grid.vertex(i, j, k));
-					points.add(f->grid.vertex(i, j, k) + f->value(i, j, k).to32());
+					points.add(f->grid.vertex(i, j, k) + f->value(i, j, k).to32() * s);
 				}
 	}
 

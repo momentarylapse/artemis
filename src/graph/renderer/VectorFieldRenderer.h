@@ -20,6 +20,7 @@ public:
 	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
 
 	dataflow::Setting<double> line_width{this, "line-width", 2.0, "range=0:99:0.1"};
+	dataflow::Setting<double> scale{this, "scale", 1.0};
 	dataflow::Setting<color> _color{this, "color", Green};
 
 	dataflow::InPort<data::VectorField> in_field{this, "field"};

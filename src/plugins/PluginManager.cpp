@@ -118,7 +118,7 @@ public:
 	}
 };
 
-data::ScalarType type2type(const kaba::Class* type) {
+data::ScalarType type_kaba_to_data(const kaba::Class* type) {
 	if (type == kaba::TypeFloat32)
 		return data::ScalarType::Float32;
 	if (type == kaba::TypeFloat64)
@@ -131,16 +131,30 @@ data::ScalarType type2type(const kaba::Class* type) {
 	return data::ScalarType::None;
 }
 
+// FIXME will fail for external bindings :(
+const kaba::Class* type_data_to_kaba(data::ScalarType type) {
+	if (type == data::ScalarType::Float32)
+		return kaba::TypeFloat32;
+	if (type == data::ScalarType::Float64)
+		return kaba::TypeFloat64;
+	return kaba::TypeUnknown;
+}
+
 data::ScalarField create_scalar_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode) {
-	return data::ScalarField(grid, type2type(type), mode);
+	return data::ScalarField(grid, type_kaba_to_data(type), mode);
 }
 
 data::VectorField create_vector_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode) {
-	return data::VectorField(grid, type2type(type), mode);
+	return data::VectorField(grid, type_kaba_to_data(type), mode);
 }
 
 data::MultiComponentField create_multi_component_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode, int components) {
-	return data::MultiComponentField(grid, type2type(type), mode, components);
+	return data::MultiComponentField(grid, type_kaba_to_data(type), mode, components);
+}
+
+template<class T>
+const kaba::Class* field_get_type(const T& field) {
+	return type_data_to_kaba(field.type);
 }
 
 template<class T>
@@ -181,6 +195,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value32);
+	ext->link_class_func("ScalarField.type", &field_get_type<data::ScalarField>);
 	ext->link_class_func("ScalarField.__assign__", &generic_assign<data::ScalarField>);
 	ext->link_class_func("ScalarField.__add__", &data::ScalarField::operator+);
 	ext->link_class_func("ScalarField.__iadd__", &data::ScalarField::operator+=);
@@ -198,6 +213,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("VectorField.v64", &data::VectorField::v64);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
+	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);
 	ext->link_class_func("VectorField.__assign__", &generic_assign<data::VectorField>);
 	ext->link_class_func("VectorField.__add__", &data::VectorField::operator+);
 	ext->link_class_func("VectorField.__iadd__", &data::VectorField::operator+=);
@@ -220,6 +236,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("MultiComponentField.v64", &data::MultiComponentField::v64);
 	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set32);
 	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value32);
+	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__assign__", &generic_assign<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
 	ext->link_class_func("MultiComponentField.__iadd__", &data::MultiComponentField::operator+=);

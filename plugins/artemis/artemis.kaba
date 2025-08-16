@@ -20,6 +20,7 @@ struct ScalarField
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: f32)
 	func extern value(i: i32, j: i32, k: i32) -> f32
+	func extern type() -> kaba.Class&
 	func extern mut __assign__(o: ScalarField)
 	func extern mut __iadd__(o: ScalarField)
 	func extern __add__(o: ScalarField) -> ScalarField
@@ -37,6 +38,7 @@ struct VectorField
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
 	func extern value(i: i32, j: i32, k: i32) -> vec3
+	func extern type() -> kaba.Class&
 	func extern mut __assign__(o: VectorField)
 	func extern mut __iadd__(o: VectorField)
 	func extern __add__(o: VectorField) -> VectorField
@@ -59,6 +61,7 @@ struct MultiComponentField
 	func extern __delete__()
 	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
 	func extern value(i: i32, j: i32, k: i32) -> vec3
+	func extern type() -> kaba.Class&
 	func extern mut __assign__(o: MultiComponentField)
 	func extern mut __iadd__(o: MultiComponentField)
 	func extern __add__(o: MultiComponentField) -> MultiComponentField

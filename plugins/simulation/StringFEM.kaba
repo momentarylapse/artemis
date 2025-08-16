@@ -6,6 +6,7 @@ use fem.material.*
 class StringFEM extends Node
 	var in_u: InPortVectorField
 	var in_dt_u: InPortVectorField
+	var out_dt_dt_u: OutPortVectorField
 	
 #	let length = 0.648 # m  (implicit via grid)
 	var tension: SettingFloat # [N]
@@ -18,6 +19,7 @@ class StringFEM extends Node
 		super.__init__("StringFEM")
 		in_u.__init__(self, "u", PortFlags.MUTABLE)
 		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
+		out_dt_dt_u.__init__(self, "dt-dt-u", PortFlags.NONE)
 		flags = NodeFlags.TIME_DEPENDENT
 		
 		tension.__init__(self, "tension", 84.0)
@@ -25,33 +27,41 @@ class StringFEM extends Node
 		
 		mat = nickel()
 
-	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField)
+	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField, out dt_dt_ux: ScalarField, out dt_dt_uy: ScalarField, out dt_dt_uz: ScalarField)
 		let laplace_ux = hessian_x(ux, 0, 0)
 		let laplace_uy = hessian_x(uy, 0, 0)
+		let laplace_uz = hessian_x(uz, 0, 0)
 		
 		let radius = f32(diameter()) / 2
 		let A = pi * radius^2
 		let µ = mat.density * A # [kg/m]
 		let C = f32(tension()) / µ / 2 # [m²/s²]
 	
-		let dt_dt_ux = laplace_ux * C
-		let dt_dt_uy = laplace_uy * C
+		dt_dt_ux = laplace_ux * C
+		dt_dt_uy = laplace_uy * C
+		dt_dt_uz = laplace_uz * C
 	
 		dt_ux += dt_dt_ux * dt
 		dt_uy += dt_dt_uy * dt
+		dt_uz += dt_dt_uz * dt
 		ux += dt_ux * dt
 		uy += dt_uy * dt
+		uz += dt_uz * dt
 			
 		# boundary
 		let n = ux.grid.nx
 		ux.set(0,0,0, 0)
 		uy.set(0,0,0, 0)
+		uz.set(0,0,0, 0)
 		dt_ux.set(0,0,0, 0)
 		dt_uy.set(0,0,0, 0)
+		dt_uz.set(0,0,0, 0)
 		ux.set(n-1,0,0, 0)
 		uy.set(n-1,0,0, 0)
+		uz.set(n-1,0,0, 0)
 		dt_ux.set(n-1,0,0, 0)
 		dt_uy.set(n-1,0,0, 0)
+		dt_uz.set(n-1,0,0, 0)
 	
 	func override on_process()
 		# assume f32
@@ -63,22 +73,35 @@ class StringFEM extends Node
 			#	var (dt_ux, dt_uy, dt_uz) = dt_u.split()
 				var ux = u.get_component(0)
 				var uy = u.get_component(1)
+				var uz = u.get_component(2)
 				var dt_ux = dt_u.get_component(0)
 				var dt_uy = dt_u.get_component(1)
+				var dt_uz = dt_u.get_component(2)
+				var dt_dt_ux = ux # dummy
+				var dt_dt_uy = ux
+				var dt_dt_uz = ux
 		
 				let dt = 0.00002 #simulation_dt
 				let N = 10
 				for i in 0:N
-					substep(dt / N, ux, uy, dt_ux, dt_uy)
+					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz, dt_dt_ux, dt_dt_uy, dt_dt_uz)
 			
 			#	u = VectorField.merge(ux, uy, uy)
 			#	dt_u = VectorField.merge(dt_ux, dt_uy, dt_uy)
 			
 				u.set_component(0, ux)
 				u.set_component(1, uy)
+				u.set_component(2, uz)
 				dt_u.set_component(0, dt_ux)
 				dt_u.set_component(1, dt_uy)
+				dt_u.set_component(2, dt_uz)
 				in_u.mutated()
 				in_dt_u.mutated()
+				
+				var dt_dt_u = u # dummy
+				dt_dt_u.set_component(0, dt_dt_ux)
+				dt_dt_u.set_component(1, dt_dt_uy)
+				dt_dt_u.set_component(2, dt_dt_uz)
+				out_dt_dt_u.set(dt_dt_u)
 	
 		
