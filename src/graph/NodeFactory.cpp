@@ -13,6 +13,8 @@
 #include "field/IsoSurface.h"
 #include "field/ScalarField.h"
 #include "field/VectorField.h"
+#include "field/VectorFieldComponent.h"
+#include "field/VectorFieldLength.h"
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
@@ -87,6 +89,8 @@ void init_factory() {
 	register_node_class<Divergence>("Divergence", {dataflow::NodeCategory::Field});
 	register_node_class<Rotation>("Rotation", {dataflow::NodeCategory::Field});
 	register_node_class<Laplace>("Laplace", {dataflow::NodeCategory::Field});
+	register_node_class<VectorFieldComponent>("VectorFieldComponent", {dataflow::NodeCategory::Field});
+	register_node_class<VectorFieldLength>("VectorFieldLength", {dataflow::NodeCategory::Field});
 
 	register_node_class_p<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});

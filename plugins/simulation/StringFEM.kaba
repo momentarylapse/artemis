@@ -11,6 +11,7 @@ class StringFEM extends Node
 #	let length = 0.648 # m  (implicit via grid)
 	var tension: SettingFloat # [N]
 	var diameter: SettingFloat # [m]
+	var fixed_ends: SettingBool
 		
 	var mat: Material
 	
@@ -24,6 +25,7 @@ class StringFEM extends Node
 		
 		tension.__init__(self, "tension", 84.0)
 		diameter.__init__(self, "diameter", 0.0004318) # gauge = 0.017 inch
+		fixed_ends.__init__(self, "fixed-ends", true)
 		
 		mat = nickel()
 
@@ -49,6 +51,8 @@ class StringFEM extends Node
 		uz += dt_uz * dt
 			
 		# boundary
+		if not fixed_ends()
+			return
 		let n = ux.grid.nx
 		ux.set(0,0,0, 0)
 		uy.set(0,0,0, 0)

@@ -219,6 +219,22 @@ VectorField VectorField::merge(const ScalarField &x, const ScalarField &y, const
 }
 
 
+ScalarField VectorField::length() const {;
+	ScalarField s(grid, type, sampling_mode);
+	if (type == ScalarType::Float32) {
+		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v32.v.num; i++) {
+			s.v32.v[i] = ((vec3*)v32._at(i))->length();
+		}
+	} else if (type == ScalarType::Float64) {
+		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v64.v.num; i++) {
+			s.v64.v[i] = ((dvec3*)v64._at(i))->length();
+		}
+	}
+	return s;
+}
+
 
 
 

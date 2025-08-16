@@ -225,6 +225,8 @@ add_executable(artemis
 	src/graph/field/Rotation.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
+	src/graph/field/VectorFieldComponent.cpp
+	src/graph/field/VectorFieldLength.cpp
 	src/graph/grid/RegularGrid.cpp
 	src/graph/list/List.cpp
 	src/graph/list/ListAccumulator.cpp
@@ -613,6 +615,8 @@ add_library(moduleartemis SHARED
 	src/graph/field/Rotation.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
+	src/graph/field/VectorFieldComponent.cpp
+	src/graph/field/VectorFieldLength.cpp
 	src/graph/grid/RegularGrid.cpp
 	src/graph/list/List.cpp
 	src/graph/list/ListAccumulator.cpp

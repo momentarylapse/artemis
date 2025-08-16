@@ -55,6 +55,9 @@ struct dvec3 {
 	vec3 to32() const {
 		return vec3((float)x, (float)y, (float)z);
 	}
+	double length() const {
+		return sqrt(x * x + y * y + z * z);
+	}
 };
 
 namespace artemis::data {
@@ -87,6 +90,7 @@ struct VectorField {
 	//void split(ScalarField& x, ScalarField& y, ScalarField& z) const;
 	base::tuple3<ScalarField, ScalarField, ScalarField> split() const;
 	ScalarField get_component(int i) const;
+	ScalarField length() const;
 	void set_component(int i, const ScalarField& s);
 	static VectorField merge(const ScalarField& x, const ScalarField& y, const ScalarField& z);
 };
