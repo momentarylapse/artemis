@@ -275,8 +275,9 @@ Dialog x x padding=0
 		session->cur_mode->on_draw_post(p);
 		p->set_color(White);
 		p->set_font_size(xhui::Theme::_default.font_size * 1.5f);
+		// TODO overlay...
 		for (int i=0; i<session->message_str.num; i++)
-			session->drawing_helper->draw_boxed_str(p, _area.center() + vec2(0, 20*i), session->message_str[i], 0);
+			session->drawing_helper->draw_boxed_str(p, p->area().center() + vec2(0, 20*i), session->message_str[i], 0);
 	});
 	event_x("area", xhui::event_id::MouseMove, [this] {
 		if (!session->cur_mode or !session->cur_mode->multi_view)

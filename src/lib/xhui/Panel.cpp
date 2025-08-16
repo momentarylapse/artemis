@@ -297,6 +297,16 @@ void Panel::set_visible(const string& id, bool visible) {
 	request_redraw();
 }
 
+void Panel::activate(const string &id) {
+	for (auto& c: controls)
+		if (c->id == id and c->can_grab_focus)
+			if (auto w = get_window()) {
+				w->focus_control = c;
+				request_redraw();
+			}
+}
+
+
 void Panel::set_options(const string& id, const string& options) {
 	for_control(id, [&options] (Control* c) {
 		for (const auto& o: options.explode(",")) {

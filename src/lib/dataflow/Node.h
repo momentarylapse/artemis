@@ -22,6 +22,7 @@ class OutPortBase;
 class Graph;
 
 enum class NodeCategory {
+	None,
 	Field,
 	Grid,
 	Mesh,

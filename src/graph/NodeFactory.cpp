@@ -127,7 +127,7 @@ void init_factory() {
 Array<string> enumerate_nodes(dataflow::NodeCategory category) {
 	base::set<string> _classes;
 	for (const auto& d: node_class_db)
-		if (d.categories.contains(category))
+		if (d.categories.contains(category) or category == dataflow::NodeCategory::None)
 			_classes.add(d.name);
 	return _classes;
 }

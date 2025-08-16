@@ -22,21 +22,21 @@ static constexpr float NODE_WIDTH = 150.0f;
 static constexpr float NODE_HEIGHT = 50.0f;
 static constexpr float PORT_DX = 30.0f;
 static constexpr float PORT_DY = 10.0f;
-static constexpr float PANEL_WIDTH = 320.0f;
+static constexpr float PANEL_WIDTH = 280.0f;
 
 class NodeListPanel : public xhui::Panel {
 public:
+	Array<string> classes_filtered;
+
 	explicit NodeListPanel() : xhui::Panel("node-list-panel") {
 		from_source(R"foodelim(
 Dialog x ''
 	Grid ? '' class=card
-		Group node-list-group 'New node' height=350
-			TabControl category 'field\\grid\\mesh\\render\\sim'
-				ListView list-field 'class' nobar expandy dragsource=new-node
-				ListView list-grid 'class' nobar expandy dragsource=new-node
-				ListView list-mesh 'class' nobar expandy dragsource=new-node
-				ListView list-renderer 'class' nobar expandy dragsource=new-node
-				ListView list-simulation 'class' nobar expandy dragsource=new-node
+		Group node-list-group 'New node' height=500
+			Grid ? ''
+				Edit filter ''
+				---|
+				ListView list 'class' nobar expandy dragsource=new-node format=m
 )foodelim");
 
 		struct X {
@@ -50,18 +50,33 @@ Dialog x ''
 			{dataflow::NodeCategory::Renderer, "renderer", "render"},
 			{dataflow::NodeCategory::Simulation, "simulation", "sim"}
 		};
-		for (const auto& [category, name, title]: categories) {
-			string list_id = "list-" + name;
-			const auto classes = artemis::graph::enumerate_nodes(category);
-			for (const auto& c: classes) {
-				add_string(list_id, c);
-			}
-			event_x(list_id, xhui::event_id::DragStart, [this, classes, list_id] {
-				int i = get_int(list_id);
-				if (i >= 0)
-					get_window()->start_drag(classes[i], "add-node:" + classes[i]);
-			});
-		}
+		string list_id = "list";
+		const auto all_classes = artemis::graph::enumerate_nodes(dataflow::NodeCategory::None);
+		classes_filtered = all_classes;
+		auto fill_list = [this, list_id] {
+			reset(list_id);
+			for (const auto& c: classes_filtered)
+				add_string(list_id, c);// + "\n<b> x</b>");
+		};
+		fill_list();
+
+		xhui::run_later(0.1f, [this] {
+			activate("filter");
+		});
+
+		event("filter", [this, all_classes, fill_list] {
+			string filter = get_string("filter").lower();
+			classes_filtered.clear();
+			for (const auto& c: all_classes)
+				if (c.lower().find(filter) >= 0)
+					classes_filtered.add(c);
+			fill_list();
+		});
+		event_x("list", xhui::event_id::DragStart, [this, list_id] {
+			int i = get_int(list_id);
+			if (i >= 0)
+				get_window()->start_drag(classes_filtered[i], "add-node:" + classes_filtered[i]);
+		});
 
 		size_mode_x = SizeMode::Shrink;
 		size_mode_y = SizeMode::Shrink;
@@ -336,9 +351,7 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 
 		dnd_offset = m - selection->node->pos;
 	} else if (!selection) {
-		node_panel = new NodeListPanel();
-		node_panel->min_width_user = PANEL_WIDTH;
-		embed("dock", 0, 0, node_panel);
+		open_node_list_panel();
 	}
 
 	request_redraw();
@@ -370,6 +383,13 @@ void GraphEditor::on_mouse_leave(const vec2& m) {
 	request_redraw();
 }
 
+void GraphEditor::open_node_list_panel() {
+	node_panel = new NodeListPanel();
+	node_panel->min_width_user = PANEL_WIDTH;
+	embed("dock", 0, 0, node_panel);
+}
+
+
 void GraphEditor::on_key_down(int key) {
 	if (key == xhui::KEY_DELETE or key == xhui::KEY_BACKSPACE) {
 		if (selection and selection->type == HoverType::Cable) {
@@ -383,6 +403,8 @@ void GraphEditor::on_key_down(int key) {
 			hover = base::None;
 		}
 	}
+	if (key == xhui::KEY_TAB)
+		open_node_list_panel();
 }
 
 

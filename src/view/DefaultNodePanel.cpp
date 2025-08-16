@@ -13,6 +13,9 @@
 
 #include "dialog/ColorMapDialog.h"
 
+namespace kaba {
+	extern const Class* TypeFloat64List;
+}
 
 void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
 
@@ -107,6 +110,12 @@ Dialog x ''
 					ss->set(cm);
 				});
 			});
+		} else if (s->class_ == kaba::TypeFloat64List) {
+			auto ss = node->settings[i]->as<Array<double>>();
+			add_control("Edit", "", 1, i, id);
+			set_options(id, "expandx");
+			enable(id, false);
+			set_string(id, str((*ss)()));
 		} else {
 			add_control("Label", format("(%s)", s->class_->name), 1, i, "");
 		}
