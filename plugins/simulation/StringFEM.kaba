@@ -56,12 +56,12 @@ class StringFEM extends Node
 		dt_ux.set(0,0,0, 0)
 		dt_uy.set(0,0,0, 0)
 		dt_uz.set(0,0,0, 0)
-		ux.set(n-1,0,0, 0)
-		uy.set(n-1,0,0, 0)
-		uz.set(n-1,0,0, 0)
-		dt_ux.set(n-1,0,0, 0)
-		dt_uy.set(n-1,0,0, 0)
-		dt_uz.set(n-1,0,0, 0)
+		ux.set(n,0,0, 0)
+		uy.set(n,0,0, 0)
+		uz.set(n,0,0, 0)
+		dt_ux.set(n,0,0, 0)
+		dt_uy.set(n,0,0, 0)
+		dt_uz.set(n,0,0, 0)
 	
 	func override on_process()
 		# assume f32
@@ -81,7 +81,7 @@ class StringFEM extends Node
 				var dt_dt_uy = ux
 				var dt_dt_uz = ux
 		
-				let dt = 0.00002 #simulation_dt
+				let dt = current_session().graph.dt
 				let N = 10
 				for i in 0:N
 					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz, dt_dt_ux, dt_dt_uy, dt_dt_uz)

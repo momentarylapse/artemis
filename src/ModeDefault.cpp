@@ -30,9 +30,9 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	data = session->data.get();
 	graph = session->graph;
 
-	xhui::run_repeated(0.1f, [this] {
+	xhui::run_repeated(session->simulation_update_dt, [this] {
 		if (simulation_active)
-			graph->iterate_simulation(0.1f);
+			graph->iterate_simulation();
 		if (graph->iterate())
 			session->win->request_redraw();
 	});
@@ -52,7 +52,7 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	});
 	win->event("simulation-stop", [this] {
 		simulation_active = false;
-		artemis::graph::_current_simulation_time_ = 0;
+		session->graph->t = 0;
 		graph->reset_state();
 		update_menu();
 	});
@@ -63,8 +63,8 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 void ModeDefault::update_menu() {
 	auto win = session->win;
 	win->enable("simulation-start", !simulation_active);
-	win->enable("simulation-pause", simulation_active or artemis::graph::_current_simulation_time_ > 0);
-	win->enable("simulation-stop", simulation_active or artemis::graph::_current_simulation_time_ > 0);
+	win->enable("simulation-pause", simulation_active or session->graph->t > 0);
+	win->enable("simulation-stop", simulation_active or session->graph->t > 0);
 }
 
 artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
@@ -84,12 +84,22 @@ void ModeDefault::on_draw_win(const yrenderer::RenderParams& params, MultiViewWi
 	}
 }
 
+string nice_time(float t, float dt) {
+	if (dt < 0.0001f)
+		return format("%.2f us", t * 1000000.0f);
+	if (dt < 0.001f)
+		return format("%.3f ms", t * 1000.0f);
+	if (dt < 0.01f)
+		return format("%.3f s", t);
+	return format("%.2f s", t);
+}
+
 void ModeDefault::on_draw_post(Painter* p) {
 	if (auto c = get_canvas(graph))
 		c->draw_2d(p);
 
 	p->set_color(White);
-	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %.1f", artemis::graph::_current_simulation_time_));
+	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %s", nice_time(session->graph->t, session->graph->dt)));
 
 	if (show_profiling) {
 		auto report = profiler::digest_report(profiler::previous_frame_timing);

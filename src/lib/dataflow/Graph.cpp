@@ -23,6 +23,7 @@ void Graph::clear() {
 
 void Graph::add_node(dataflow::Node* node) {
 	nodes.add(node);
+	node->graph = this;
 	profiler::set_parent(node->channel, channel);
 	out_changed();
 }

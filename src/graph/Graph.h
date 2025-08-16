@@ -9,17 +9,14 @@
 
 namespace artemis::graph {
 
-extern float _current_simulation_time_;
-extern float _current_simulation_dt_;
-
-
 class Graph : public dataflow::Graph {
 public:
 	explicit Graph(Session* session);
 
-	void iterate_simulation(float dt);
+	void iterate_simulation();
 
 	Session* session;
+	float t, dt;
 };
 
 

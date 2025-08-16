@@ -172,15 +172,13 @@ class SettingColor
 class Graph
 	func extern add_node(name: string, pos: vec2) -> Node&
 	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
+	var t: f32
+	var dt: f32
 
 
 
 class Session
 	var graph: owned![Graph]
-
-
-var extern simulation_time: f32
-var extern simulation_dt: f32
 
 func extern current_session() -> Session&
 

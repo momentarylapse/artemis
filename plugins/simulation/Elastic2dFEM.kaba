@@ -7,38 +7,23 @@ class Elastic2dFEM extends Node
 	var in_u: InPortVectorField
 	var in_dt_u: InPortVectorField
 	
-	var grid: Grid
-	var mat: Material
-	var phi_dx_phi: SparseMatrix
-	var phi_dy_phi: SparseMatrix
-	var phi_dx_dx_phi: SparseMatrix
-	var phi_dx_dy_phi: SparseMatrix
-	var phi_dy_dy_phi: SparseMatrix
-	var phi_phi: SparseMatrix
-	var phi_phi_inv: Matrix
-	var thickness: f32
+	var substeps: SettingInt
+	var thickness: SettingFloat
+	
+	var mat: Material # TODO in port
 	
 	
 	func __init__()
 		super.__init__("Elastic2dFEM")
 		in_u.__init__(self, "u", PortFlags.MUTABLE)
 		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
+		substeps.__init__(self, "substeps", 100)
+		thickness.__init__(self, "thickness", 0.01)
 		flags = NodeFlags.TIME_DEPENDENT
 		
-		thickness = 0.01
 		mat = nickel()
 		
 		#grid.N = 0
-	
-	func mut reset(g: RegularGrid)
-		grid.init([len(g.dx), len(g.dy)], [g.nx, g.ny])
-		phi_dx_phi = grid.phi_dx_phi()
-		phi_dy_phi = grid.phi_dy_phi()
-		phi_dx_dx_phi = grid.phi_dx_dx_phi()
-		phi_dx_dy_phi = grid.phi_dx_dy_phi()
-		phi_dy_dy_phi = grid.phi_dy_dy_phi()
-		phi_phi = grid.phi_phi()
-		phi_phi_inv = inverse(phi_phi)
 	
 	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
@@ -101,9 +86,6 @@ class Elastic2dFEM extends Node
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()
 				let g = u.grid
-				if g.nx != grid.NX or g.ny != grid.NY
-					# grid changed... recreate everything
-					reset(g)
 				
 				var ux = u.get_component(0)
 				var uy = u.get_component(1)
@@ -112,17 +94,11 @@ class Elastic2dFEM extends Node
 				var dt_uy = dt_u.get_component(1)
 				var dt_uz = dt_u.get_component(2)
 		
-				let dt = 0.0000002 #simulation_dt
-				let N = 100
+				let dt = current_session().graph.dt
+				let N = substeps()
 				for i in 0:N
 					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
-				
-			#	var vu = VectorField.create(g, f32, SamplingMode.PER_VERTEX)
 			
-			#	for i in 0:len(ux.v32)
-			#		vu.set(i, 0, 0, [ux.v32[i]*10,uy.v32[i]*10,uz.v32[i]*10])
-			
-			#	out_u.set(vu)
 				u.set_component(0, ux)
 				u.set_component(1, uy)
 				u.set_component(2, uz)

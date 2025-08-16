@@ -3,13 +3,11 @@
 //
 
 #include "VectorField.h"
+#include "../Graph.h"
 #include <processing/helper/GlobalThreadPool.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
 
-namespace artemis::graph {
-	extern float _current_simulation_time_;
-}
 
 namespace artemis::graph {
 
@@ -47,6 +45,7 @@ func f(p: vec3, t: f32) -> vec3
 				return;
 			}
 		}
+		float t = static_cast<Graph*>(graph)->t;
 
 		if (auto f = f_p) {
 			data::VectorField s(*g,
@@ -55,13 +54,13 @@ func f(p: vec3, t: f32) -> vec3
 
 			switch (sampling_mode()) {
 			case data::SamplingMode::PerCell:
-				processing::pool::run({0,0,0}, {g->nx, g->ny, g->nz}, [&s, f] (int i, int j, int k) {
-					s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, _current_simulation_time_)));
+				processing::pool::run({0,0,0}, {g->nx, g->ny, g->nz}, [&s, f, t] (int i, int j, int k) {
+					s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, t)));
 				}, 200);
 				break;
 			case data::SamplingMode::PerVertex:
-				processing::pool::run({0,0,0}, {g->nx+1, g->ny+1, g->nz+1}, [&s, f] (int i, int j, int k) {
-					s.set(i, j, k, dvec3(f({(float)i, (float)j, (float)k}, _current_simulation_time_)));
+				processing::pool::run({0,0,0}, {g->nx+1, g->ny+1, g->nz+1}, [&s, f, t] (int i, int j, int k) {
+					s.set(i, j, k, dvec3(f({(float)i, (float)j, (float)k}, t)));
 				}, 200);
 			}
 			out(s);

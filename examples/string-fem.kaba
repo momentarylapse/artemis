@@ -2,6 +2,7 @@ use plugins.artemis.*
 
 func main()
 	var g = weak(current_session().graph)
+	g.dt = 0.00002
 
 	var grid = g.add_node("RegularGrid", [100,50])
 	grid.set("nx", 50)

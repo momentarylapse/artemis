@@ -177,8 +177,6 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_func("profiler.create_channel", &profiler::create_channel);
 	ext->link_func("profiler.begin", &profiler::begin);
 	ext->link_func("profiler.end", &profiler::end);
-	ext->link("simulation_time", &artemis::graph::_current_simulation_time_);
-	ext->link("simulation_dt", &artemis::graph::_current_simulation_dt_);
 
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
@@ -289,6 +287,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_setting<color>(ext, "Color");
 
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
+	ext->declare_class_element("Graph.t", &artemis::graph::Graph::t);
+	ext->declare_class_element("Graph.dt", &artemis::graph::Graph::dt);
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
 

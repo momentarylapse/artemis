@@ -121,6 +121,8 @@ public:
 
 	owned<artemis::graph::DataGraph> data;
 	artemis::graph::Graph* graph;
+
+	float simulation_update_dt = 0.1f; // "outside" / how often to perform steps
 };
 
 Session *create_session();

@@ -19,6 +19,7 @@ namespace dataflow {
 class SettingBase;
 class InPortBase;
 class OutPortBase;
+class Graph;
 
 enum class NodeCategory {
 	Field,
@@ -51,6 +52,7 @@ public:
 	void set(const string& key, const Any& value);
 	Any get(const string& key) const;
 
+	Graph* graph = nullptr;
 	string name;
 	vec2 pos;
 	int channel;

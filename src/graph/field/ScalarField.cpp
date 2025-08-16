@@ -3,12 +3,9 @@
 //
 
 #include "ScalarField.h"
+#include "../Graph.h"
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
-
-namespace artemis::graph {
-	extern float _current_simulation_time_;
-}
 
 namespace artemis::graph {
 
@@ -47,6 +44,8 @@ func f(p: vec3, t: f32) -> f32
 			}
 		}
 
+		float t = static_cast<Graph*>(graph)->t;
+
 		if (auto f = f_p) {
 			data::ScalarField s(*g,
 				type(),
@@ -57,13 +56,13 @@ func f(p: vec3, t: f32) -> f32
 				for (int i=0; i<g->nx; i++)
 					for (int j=0; j<g->ny; j++)
 						for (int k=0; k<g->nz; k++)
-							s.set32(i, j, k, f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, _current_simulation_time_));
+							s.set32(i, j, k, f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, t));
 				break;
 			case data::SamplingMode::PerVertex:
 				for (int i=0; i<=g->nx; i++)
 					for (int j=0; j<=g->ny; j++)
 						for (int k=0; k<=g->nz; k++)
-							s.set32(i, j, k, f({(float)i, (float)j, (float)k}, _current_simulation_time_));
+							s.set32(i, j, k, f({(float)i, (float)j, (float)k}, t));
 			}
 			out(s);
 		}

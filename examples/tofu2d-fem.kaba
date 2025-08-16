@@ -2,13 +2,14 @@ use plugins.artemis.*
 
 func main()
 	var g = weak(current_session().graph)
+	g.dt = 0.0000001
 
 	var grid = g.add_node("RegularGrid", [100,50])
 	grid.set("nx", 12)
 	grid.set("ny", 8)
 	grid.set("nz", 0)
-	grid.set("lx", 12)
-	grid.set("ly", 8)
+	grid.set("lx", 1.2)
+	grid.set("ly", 0.8)
 
 	var u = g.add_node("VectorField:ux", [200,200])
 	u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
@@ -17,15 +18,15 @@ func main()
 	dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
 	dt_u.set("formula", "[exp( - 0.5 * len(p - vec3(0,2,0))^2) *10000, 0, 0]")
 
-	var sim = g.add_node("Elastic2dFEM:Solver", [400,400])
+	var sim = g.add_node("Elastic2dFEM:Solver", [400,350])
 
 	var gr = g.add_node("GridRenderer", [100,500])
 	#gr.set("line-width", 2.0)
 	gr.set("color", dyn([0.3,0.3,0.3,1]))
 	
 	var dr = g.add_node("DeformationRenderer", [300,500])
-	dr.set("scale", 50.0)
-	dr.set("radius", 0.2)
+	dr.set("scale", 20.0)
+	dr.set("radius", 0.02)
 	dr.set("line-width", 3)
 	dr.set("show-balls", true)
 	dr.set("show-grid", true)
