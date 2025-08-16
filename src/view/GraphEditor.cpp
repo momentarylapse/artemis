@@ -91,6 +91,9 @@ Dialog x ''
 	event_x("graph", xhui::event_id::MouseMove, [this] {
 		on_mouse_move(get_window()->mouse_position(), {0,0});
 	});
+	event_x("graph", xhui::event_id::MouseWheel, [this] {
+		on_mouse_wheel(get_window()->state.scroll);
+	});
 	event_x("graph", xhui::event_id::LeftButtonDown, [this] {
 		on_left_button_down(get_window()->mouse_position());
 	});
@@ -107,7 +110,7 @@ Dialog x ''
 	event_x("graph", xhui::event_id::DragDrop, [this] {
 		if (get_window()->drag.payload.match("add-node:*")) {
 			graph->add_node(artemis::graph::create_node(session, get_window()->drag.payload.sub(9)));
-			graph->nodes.back()->pos = get_window()->mouse_position();
+			graph->nodes.back()->pos = from_screen(get_window()->mouse_position());
 		}
 	});
 
@@ -116,16 +119,16 @@ Dialog x ''
 	});
 }
 
-rect node_area(dataflow::Node* n) {
-	return {n->pos, n->pos + vec2(NODE_WIDTH, NODE_HEIGHT)};
+rect GraphEditor::node_area(dataflow::Node* n) {
+	return {to_screen(n->pos), to_screen(n->pos + vec2(NODE_WIDTH, NODE_HEIGHT))};
 }
 
-vec2 node_in_port_pos(dataflow::Node* n, int i) {
-	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->in_ports.num - 1) / 2) * PORT_DX, -PORT_DY);
+vec2 GraphEditor::node_in_port_pos(dataflow::Node* n, int i) {
+	return to_screen(n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->in_ports.num - 1) / 2) * PORT_DX, -PORT_DY));
 }
 
-vec2 node_out_port_pos(dataflow::Node* n, int i) {
-	return n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->out_ports.num - 1) / 2) * PORT_DX, NODE_HEIGHT + PORT_DY);
+vec2 GraphEditor::node_out_port_pos(dataflow::Node* n, int i) {
+	return to_screen(n->pos + vec2(NODE_WIDTH / 2 + ((float)i - (float)(n->out_ports.num - 1) / 2) * PORT_DX, NODE_HEIGHT + PORT_DY));
 }
 
 template<class P>
@@ -142,10 +145,19 @@ string port_description(P* p) {
 	return format("<b>%s</b>, type <b>%s</b>", p->name, p->class_->name);
 }
 
+vec2 GraphEditor::to_screen(const vec2 &p) const {
+	return p * view_scale + view_offset;
+}
+
+vec2 GraphEditor::from_screen(const vec2 &p) const {
+	return (p - view_offset) / view_scale;
+}
+
+
 Array<vec2> GraphEditor::cable_spline(const dataflow::CableInfo& c) {
 	vec2 A = node_out_port_pos(c.source, c.source_port);
 	vec2 B = node_in_port_pos(c.sink, c.sink_port);
-	return DrawingHelper::spline(A, A + vec2(0, 160), B - vec2(0, 160), B);
+	return DrawingHelper::spline(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B);
 }
 
 
@@ -158,13 +170,13 @@ void GraphEditor::on_draw(Painter* p) {
 
 	for (const auto& [i, c]: enumerate(graph->cables())) {
 		p->set_color(Gray);
-		p->set_line_width(3);
+		p->set_line_width(3 * view_scale);
 		if (selection and selection->type == HoverType::Cable and selection->index == i) {
 			p->set_color(White);
-			p->set_line_width(4);
+			p->set_line_width(4 * view_scale);
 		} else if (hover and hover->type == HoverType::Cable and hover->index == i) {
 			p->set_color(color::interpolate(Gray, White, 0.3f));
-			p->set_line_width(3);
+			p->set_line_width(3 * view_scale);
 		}
 		p->draw_lines(cable_spline(c));
 	}
@@ -178,12 +190,12 @@ void GraphEditor::on_draw(Painter* p) {
 	if (get_window()->button(0)) {
 		if (selection and selection->type == HoverType::OutPort) {
 			p->set_color(White);
-			p->set_line_width(3);
+			p->set_line_width(3 * view_scale);
 			p->draw_line(node_out_port_pos(selection->node, selection->index), get_window()->mouse_position());
 		}
 		if (selection and selection->type == HoverType::InPort) {
 			p->set_color(White);
-			p->set_line_width(3);
+			p->set_line_width(3 * view_scale);
 			p->draw_line(node_in_port_pos(selection->node, selection->index), get_window()->mouse_position());
 		}
 	}
@@ -207,12 +219,12 @@ void GraphEditor::on_draw(Painter* p) {
 }
 
 void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
-	p->set_font("", xhui::Theme::_default.font_size, true, false);
+	p->set_font("", xhui::Theme::_default.font_size * view_scale, true, false);
 
 	if (selection and selection->type == HoverType::Node and selection->node == n) {
 		p->set_color(Red.with_alpha(0.7f));
-		p->set_roundness(14);
-		p->draw_rect(node_area(n).grow(4));
+		p->set_roundness(14 * view_scale);
+		p->draw_rect(node_area(n).grow(4 * view_scale));
 	}
 	color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
 	if (n->flags & dataflow::NodeFlags::Resource)
@@ -222,25 +234,25 @@ void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 	if (hover and hover->type == HoverType::Node and hover->node == n)
 		bg = color::interpolate(bg, White, 0.2f);
 	p->set_color(bg);
-	p->set_roundness(10);
+	p->set_roundness(10 * view_scale);
 	p->draw_rect(node_area(n));
 
 	p->set_color(White);
-	p->set_font("", xhui::Theme::_default.font_size, true, false);
+	p->set_font("", xhui::Theme::_default.font_size * view_scale, true, false);
 	{
 		const string name = n->name.explode(":").back();
-		const float w = p->get_str_width(name);
-		p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5), name);
+		const float w = p->get_str_width(name) / view_scale;
+		p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5)), name);
 		if (n->dirty)
-			p->draw_str(n->pos + vec2(NODE_WIDTH / 2, 35), "X");
+			p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2, 35)), "X");
 	}
-	p->set_font("", xhui::Theme::_default.font_size, false, false);
+	p->set_font("", xhui::Theme::_default.font_size * view_scale, false, false);
 
 	if (n->name.find(":") >= 0) {
 		p->set_color(White.with_alpha(0.7f));
 		const string class_name = n->name.explode(":")[0];
-		const float w = p->get_str_width(class_name);
-		p->draw_str(n->pos + vec2(NODE_WIDTH / 2 - w/2, 20), class_name);
+		const float w = p->get_str_width(class_name) / view_scale;
+		p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2 - w/2, 20)), class_name);
 	}
 
 
@@ -248,13 +260,13 @@ void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 		p->set_color(Gray);
 		if (hover and hover->type == HoverType::InPort and hover->node == n and hover->index == i)
 			p->set_color(White);
-		p->draw_circle(node_in_port_pos(n, i), 5);
+		p->draw_circle(node_in_port_pos(n, i), 5 * view_scale);
 	}
 	for (int i=0; i<n->out_ports.num; i++) {
 		p->set_color(Gray);
 		if (hover and hover->type == HoverType::OutPort and hover->node == n and hover->index == i)
 			p->set_color(White);
-		p->draw_circle(node_out_port_pos(n, i), 5);
+		p->draw_circle(node_out_port_pos(n, i), 5 * view_scale);
 	}
 }
 
@@ -296,6 +308,17 @@ void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 
 	request_redraw();
 }
+
+void GraphEditor::on_mouse_wheel(const vec2 &d) {
+	const vec2 m = get_window()->state.m;
+	const vec2 mm = from_screen(m);
+	view_scale = clamp(view_scale * expf(0.2f * d.y), 0.1f, 10.0f);
+	view_offset -= to_screen(mm) - m;
+
+	hover = get_hover(m);
+	request_redraw();
+}
+
 
 void GraphEditor::on_left_button_down(const vec2& m) {
 	hover = get_hover(m);

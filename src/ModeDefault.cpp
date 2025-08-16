@@ -98,13 +98,27 @@ void ModeDefault::on_draw_post(Painter* p) {
 	if (auto c = get_canvas(graph))
 		c->draw_2d(p);
 
+	auto draw_str_right = [p] (const vec2& pos, const string& str) {
+		float w = p->get_str_width(str);
+		p->draw_str(pos - vec2(w, 0), str);
+	};
+
 	p->set_color(White);
-	p->draw_str(p->area().p11() - vec2(100, 50), format("t = %s", nice_time(session->graph->t, session->graph->dt)));
+	p->set_font_size(xhui::Theme::_default.font_size * 1.3f);
+	draw_str_right(p->area().p11() - vec2(30, 50), format("t = %s", nice_time(session->graph->t, session->graph->dt)));
+	p->set_font_size(xhui::Theme::_default.font_size);
 
 	if (show_profiling) {
+		p->set_color(xhui::Theme::_default.text_disabled);
+		p->set_font_size(xhui::Theme::_default.font_size * 0.85f);
 		auto report = profiler::digest_report(profiler::previous_frame_timing);
-		for (const auto& [i, c]: enumerate(report))
-			p->draw_str(p->area().p00() + vec2(20, 20 + 20 * (float)i), format("%s  %.2f  %.2f  %.d", profiler::get_name(c.channel), c.average * 1000, c.total * 1000, c.count));
+		for (const auto& [i, c]: enumerate(report)) {
+			draw_str_right(p->area().p00() + vec2(140, 20 + 18 * (float)i), profiler::get_name(c.channel));
+			draw_str_right(p->area().p00() + vec2(180, 20 + 18 * (float)i), format("%.2f", c.average * 1000));
+			draw_str_right(p->area().p00() + vec2(220, 20 + 18 * (float)i), format("%.2f", c.total * 1000));
+			draw_str_right(p->area().p00() + vec2(260, 20 + 18 * (float)i), format("%.d", c.count));
+		}
+		p->set_font_size(xhui::Theme::_default.font_size);
 	}
 }
 
