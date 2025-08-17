@@ -41,10 +41,12 @@ class Elastic2dFEM extends Node
 		let dy_dy_ux = hessian_x(ux, 1, 1)
 		let dy_dy_uy = hessian_x(uy, 1, 1)
 		let dy_dy_uz = hessian_x(uz, 1, 1)
+		
+		# C.xxyy etc will be ignored for now...
 			
 		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
 		var ddux = dx_dx_ux * C.xxxx
-		ddux += dx_dy_uy * C.xyxy + dy_dy_ux * C.xyxy
+		ddux += (dx_dy_uy + dy_dy_ux) * C.xyxy
 		# yyyy + yyxx + (yyzz)   + yxyx + yxxy + (yzyz) + (yzzy)
 		var dduy = dy_dy_uy * C.yyyy
 		dduy += dx_dy_ux * C.xyxy + dx_dx_uy * C.xyxy
