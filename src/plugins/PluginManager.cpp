@@ -320,8 +320,8 @@ void PluginManager::import_kaba() {
 }
 
 void PluginManager::find_plugins() {
-	Path dir = directory() | "simulation";
-	for (const auto& e: os::fs::search(dir, "*.kaba", "f")) {
+	Path dir = directory() | "nodes";
+	for (const auto& e: os::fs::search(dir, "*.kaba", "fr")) {
 		string name = e.basename_no_ext();
 		plugin_classes.set(name, dir | e);
 	}
