@@ -171,7 +171,7 @@ Dialog x x padding=0
 		Grid main-grid '' spacing=0
 			.
 			Overlay ? ''
-				DrawingArea area '' grabfocus width=400 expandx
+				DrawingArea area '' grabfocus width=400 greedfactorx=1.6 expandx
 				Grid overlay-main-grid '' margin=25
 					Label ? '' ignorehover expandx
 					Grid overlay-button-grid-right '' spacing=20
