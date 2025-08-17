@@ -7,8 +7,10 @@
 
 #include <lib/math/vec3.h>
 #include <lib/math/Box.h>
+#include <lib/base/tuple.h>
 
 namespace artemis::data {
+	enum class SamplingMode;
 
 struct RegularGrid {
 	RegularGrid();
@@ -25,6 +27,9 @@ struct RegularGrid {
 
 	Array<vec3> vertices() const;
 	Array<vec3> cell_centers() const;
+	Array<vec3> points(SamplingMode mode) const;
+
+	Array<base::tuple<int, int>> edges() const;
 
 	int nx, ny, nz;
 	vec3 dx, dy, dz;

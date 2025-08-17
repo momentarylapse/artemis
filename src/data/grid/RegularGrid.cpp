@@ -4,6 +4,8 @@
 
 #include "RegularGrid.h"
 
+#include "data/field/base.h"
+
 namespace artemis::data {
 
 RegularGrid::RegularGrid(int _nx, int _ny, int _nz, const vec3& _dx, const vec3& _dy, const vec3& _dz) {
@@ -54,23 +56,50 @@ Box RegularGrid::bounding_box() const {
 
 Array<vec3> RegularGrid::vertices() const {
 	Array<vec3> points;
-	//points.resize(vertex_count());
-	for (int i=0; i<=nx; i++)
+	points.simple_reserve(vertex_count());
+	for (int k=0; k<=nz; k++)
 		for (int j=0; j<=ny; j++)
-			for (int k=0; k<=nz; k++)
+			for (int i=0; i<=nx; i++)
 				points.add(vertex(i, j, k));
 	return points;
 }
 
 Array<vec3> RegularGrid::cell_centers() const {
 	Array<vec3> points;
-	//points.resize(cell_count());
+	points.simple_reserve(cell_count());
 	for (int i=0; i<nx; i++)
 		for (int j=0; j<ny; j++)
 			for (int k=0; k<nz; k++)
 				points.add(cell_center(i, j, k));
 	return points;
 }
+
+Array<vec3> RegularGrid::points(SamplingMode mode) const {
+	if (mode == SamplingMode::PerCell)
+		return cell_centers();
+	if (mode == SamplingMode::PerVertex)
+		return vertices();
+	return {};
+}
+
+Array<base::tuple<int, int>> RegularGrid::edges() const {
+	Array<base::tuple<int, int>> edges;
+	for (int i=0; i<=nx; i++)
+		for (int j=0; j<=ny; j++)
+			for (int k=0; k<nz; k++)
+				edges.add({vertex_index(i, j, k), vertex_index(i, j, k + 1)});
+	for (int i=0; i<=nx; i++)
+		for (int j=0; j<ny; j++)
+			for (int k=0; k<=nz; k++)
+				edges.add({vertex_index(i, j, k), vertex_index(i, j + 1, k)});
+	for (int i=0; i<nx; i++)
+		for (int j=0; j<=ny; j++)
+			for (int k=0; k<=nz; k++)
+				edges.add({vertex_index(i, j, k), vertex_index(i + 1, j, k)});
+	return edges;
+}
+
+
 
 }
 

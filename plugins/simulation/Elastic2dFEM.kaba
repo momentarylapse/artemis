@@ -28,27 +28,7 @@ class Elastic2dFEM extends Node
 	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
 		
-		var m: mat3
-		m._11 = 1.0/mat.E.x
-		m._22 = 1.0/mat.E.y
-		m._33 = 1.0/mat.E.z
-		m._12 = -mat.v.xy/mat.E.x
-		m._23 = -mat.v.yz/mat.E.y
-		m._13 = -mat.v.zx/mat.E.z
-		m._21 = m._12
-		m._32 = m._23
-		m._31 = m._13
-		let mi = m.inverse()
-		
-		let Cxxxx = mat.E.x #mi._11
-		let Cyyyy = mat.E.y #mi._22
-		let Czzzz = mat.E.z #mi._33
-		let Cxxyy = 0#mi._12 # = Cyyxx
-		let Cyyzz = 0#mi._23
-		let Cxxzz = 0#mi._13
-		let Cxyxy = mat.G.xy # = Cyxyx = Cxyyx = Cyxxy
-		let Cyzyz = mat.G.yz
-		let Cxzxz = mat.G.zx
+		let C = mat.elastic_modulus()
 	
 	# i: C_ijkl d_j d_k u_l
 
@@ -65,13 +45,13 @@ class Elastic2dFEM extends Node
 		let dy_dy_uz = hessian_x(uz, 1, 1)
 			
 		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
-		var ddux = dx_dx_ux * Cxxxx
-		ddux += dx_dy_uy * Cxyxy + dy_dy_ux * Cxyxy
+		var ddux = dx_dx_ux * C.xxxx
+		ddux += dx_dy_uy * C.xyxy + dy_dy_ux * C.xyxy
 		# yyyy + yyxx + (yyzz)   + yxyx + yxxy + (yzyz) + (yzzy)
-		var dduy = dy_dy_uy * Cyyyy
-		dduy += dx_dy_ux * Cxyxy + dx_dx_uy * Cxyxy
+		var dduy = dy_dy_uy * C.yyyy
+		dduy += dx_dy_ux * C.xyxy + dx_dx_uy * C.xyxy
 		# (zzzz) + (zzxx) + (zzyy)   + (zxzx) + zxxz + (zyzy) + zyyz
-		let dduz = dx_dx_uz * Cxzxz + dy_dy_uz * Cyzyz
+		let dduz = dx_dx_uz * C.xzxz + dy_dy_uz * C.yzyz
 			
 		dt_ux += ddux * dt
 		dt_uy += dduy * dt

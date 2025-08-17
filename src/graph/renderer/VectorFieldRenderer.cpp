@@ -5,6 +5,7 @@
 #include "VectorFieldRenderer.h"
 #include <Session.h>
 #include <lib/image/color.h>
+#include <lib/base/iter.h>
 #include <view/DrawingHelper.h>
 
 namespace artemis::graph {
@@ -25,23 +26,12 @@ void VectorFieldRenderer::draw_win(const yrenderer::RenderParams& params, MultiV
 	if (!f)
 		return;
 
-	float s = scale();
+	float s = (float)scale();
 
 	Array<vec3> points;
-	if (f->sampling_mode == artemis::data::SamplingMode::PerCell) {
-		for (int i=0; i<f->grid.nx; i++)
-			for (int j=0; j<f->grid.ny; j++)
-				for (int k=0; k<f->grid.nz; k++) {
-					points.add(f->grid.cell_center(i, j, k));
-					points.add(f->grid.cell_center(i, j, k) + f->value(i, j, k).to32() * s);
-				}
-	} else if (f->sampling_mode == artemis::data::SamplingMode::PerVertex) {
-		for (int i=0; i<=f->grid.nx; i++)
-			for (int j=0; j<=f->grid.ny; j++)
-				for (int k=0; k<=f->grid.nz; k++) {
-					points.add(f->grid.vertex(i, j, k));
-					points.add(f->grid.vertex(i, j, k) + f->value(i, j, k).to32() * s);
-				}
+	for (const auto& [i, p]: enumerate(f->grid.points(f->sampling_mode))) {
+		points.add(p);
+		points.add(p + f->_value32(i) * s);
 	}
 
 	session->drawing_helper->set_color(_color());

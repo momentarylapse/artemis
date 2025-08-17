@@ -1,28 +1,58 @@
 struct x2vec3
-	var xy, yz, zx: float
+	var xy, yz, zx: f32
+
+struct ElasticModulus
+	var xxxx, yyyy, zzzz: f32
+	var xxyy, yyzz, xxzz: f32
+	var xyxy, yzyz, xzxz: f32
 
 struct Material
 	#var Cxx = 1.0
 	#var Cxy = 0.5
-	var density: float # [kg/m³]
+	var density: f32 # [kg/m³]
 	var E: vec3 # Young's modulus along main axes [Pa=N/m²]
 	var v: x2vec3 # Poisson's ratio
 	var G: x2vec3 # shear modulus
+	
+	func elastic_modulus() -> ElasticModulus
+		var m: mat3
+		m._11 = 1.0/E.x
+		m._22 = 1.0/E.y
+		m._33 = 1.0/E.z
+		m._12 = -v.xy/E.x
+		m._23 = -v.yz/E.y
+		m._13 = -v.zx/E.z
+		m._21 = m._12
+		m._32 = m._23
+		m._31 = m._13
+		let mi = m.inverse()
+		
+		var C: ElasticModulus
+		C.xxxx = E.x #mi._11
+		C.yyyy = E.y #mi._22
+		C.zzzz = E.z #mi._33
+		C.xxyy = 0#mi._12 # = Cyyxx
+		C.yyzz = 0#mi._23
+		C.xxzz = 0#mi._13
+		C.xyxy = G.xy # = Cyxyx = Cxyyx = Cyxxy
+		C.yzyz = G.yz
+		C.xzxz = G.zx
+		return C
 	
 	
 
 #let NICKEL: Material = [8908.0]
 
-func metal(density: float, E: float, G: float, v: float) -> Material
+func metal(density: f32, E: f32, G: f32, v: f32) -> Material
 	let bulk_modulus = E / 3 / (1 - 2*v)
 	return [density, [E,E,E], [v,v,v], [G,G,G]]
 
 # grain along x
-func wood(density: float, E: vec3, v: x2vec3, G: x2vec3) -> Material
+func wood(density: f32, E: vec3, v: x2vec3, G: x2vec3) -> Material
 	return [density, E, v, G]
 	
 # https://www.engineeringtoolbox.com/timber-mechanical-properties-d_1789.html
-func wood1(density: float, E1: float, E2: float, G: float) -> Material
+func wood1(density: f32, E1: f32, E2: f32, G: f32) -> Material
 	return [density, [E1, E2, E], [0,0,0], [G,G,G]]
 
 

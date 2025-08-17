@@ -45,6 +45,14 @@ vec3 VectorField::value32(int i, int j, int k) const {
 	return {0,0,0};
 }
 
+vec3 VectorField::_value32(int index) const {
+	if (type == ScalarType::Float32)
+		return *(vec3*)v32._at(index);
+	if (type == ScalarType::Float64)
+		return ((dvec3*)v64._at(index))->to32();
+	return {0,0,0};
+}
+
 void VectorField::set32(int i, int j, int k, const vec3& vv) {
 	if (type == ScalarType::Float32)
 		*(vec3*)v32.at(grid, sampling_mode, i, j, k) = vv;
