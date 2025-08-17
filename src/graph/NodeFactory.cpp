@@ -116,7 +116,8 @@ void init_factory() {
 			{dataflow::NodeCategory::Simulation}, // TODO
 			[class_name=class_name] (Session*, const string& name) {
 				auto n = (dataflow::Node*)artemis::PluginManager::create_instance(class_name);
-				n->name = name;
+				if (n)
+					n->name = name;
 				return n;
 			}
 		});

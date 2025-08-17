@@ -1,5 +1,9 @@
 use kaba
 
+enum SamplingMode
+	PER_CELL
+	PER_VERTEX
+
 struct Mesh
 	func extern __init__()
 
@@ -7,10 +11,7 @@ struct RegularGrid
 	func extern __init__()
 	var nx, ny, nz: i32
 	var dx, dy, dz: vec3
-
-enum SamplingMode
-	PER_CELL
-	PER_VERTEX
+	func extern points(mode: SamplingMode) -> vec3[]
 
 struct ScalarField
 	var grid: RegularGrid
@@ -108,41 +109,50 @@ enum PortFlags
 
 # TODO kaba template classes!
 class InPortScalarField
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> ScalarField*
 	func extern mutated()
 class OutPortScalarField
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: ScalarField)
 
 class InPortVectorField
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> VectorField*
 	func extern mutated()
 class OutPortVectorField
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: VectorField)
 
 class InPortMultiComponentField
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> MultiComponentField*
 	func extern mutated()
 class OutPortMultiComponentField
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: MultiComponentField)
 	
 class InPortRegularGrid
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> RegularGrid*
 	func extern mutated()
 
 class InPortList
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> f64[]*
 	func extern mutated()
 class OutPortList
-	func extern __init__(node: Node, name: string, flags: PortFlags)
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: f64[])
+
+class InPortVectorList
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> vec3[]*
+	func extern mutated()
+class OutPortVectorList
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: vec3[])
+
 
 class SettingFloat
 	func extern __init__(node: Node, name: string, value: f64, options: string = "")

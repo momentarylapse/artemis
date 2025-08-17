@@ -3,25 +3,33 @@ use plugins.artemis.*
 func main()
 	var g = weak(current_session().graph)
 
-	var a = g.add_node("RegularGrid", [300,100])
+	var grid = g.add_node("RegularGrid", [300,100])
+	
+	var vertices = g.add_node("GridPoints:Vertices", [300, 300])
+	vertices.set("cell-centers", false)
+	
+	var cells = g.add_node("GridPoints:CellCenters", [500, 300])
+	cells.set("cell-centers", true)
 
-	var b = g.add_node("GridRenderer", [100,400])
+	var b = g.add_node("GridRenderer", [100,450])
 	b.set("line-width", 2.0)
 	b.set("color", dyn([0.5,0.5,0.5,1]))
 
-	var c = g.add_node("PointListRenderer", [300,400])
+	var c = g.add_node("PointListRenderer", [300,450])
 	c.set("radius", 0.1)
 	c.set("color", dyn([0.7,0,1,1]))
 
-	var d = g.add_node("PointListRenderer", [500,400])
+	var d = g.add_node("PointListRenderer", [500,450])
 	d.set("radius", 0.2)
 	d.set("color", dyn([1,1,1,1]))
 	
 	var canvas = g.add_node("Canvas", [300, 600])
 
-	g.connect(a, 0, b, 0)
-	g.connect(a, 1, c, 0)
-	g.connect(a, 2, d, 0)
+	g.connect(grid, 0, b, 0)
+	g.connect(grid, 0, vertices, 0)
+	g.connect(grid, 0, cells, 0)
+	g.connect(vertices, 0, c, 0)
+	g.connect(cells, 0, d, 0)
 	g.connect(b, 0, canvas, 0)
 	g.connect(c, 0, canvas, 0)
 	g.connect(d, 0, canvas, 0)

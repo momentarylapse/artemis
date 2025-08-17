@@ -20,7 +20,7 @@ class StringFEM extends Node
 		super.__init__("StringFEM")
 		in_u.__init__(self, "u", PortFlags.MUTABLE)
 		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
-		out_dt_dt_u.__init__(self, "dt-dt-u", PortFlags.NONE)
+		out_dt_dt_u.__init__(self, "dt-dt-u")
 		flags = NodeFlags.TIME_DEPENDENT
 		
 		tension.__init__(self, "tension", 84.0)

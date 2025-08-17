@@ -24,9 +24,6 @@ public:
 	dataflow::Setting<double> lx{this, "lx", 8.0};
 	dataflow::Setting<double> ly{this, "ly", 8.0};
 	dataflow::Setting<double> lz{this, "lz", 1.0};
-
-	dataflow::OutPort<Array<vec3>> out_vertices{this, "vertices"};
-	dataflow::OutPort<Array<vec3>> out_cell_centers{this, "cell_centers"};
 };
 
 } // graph

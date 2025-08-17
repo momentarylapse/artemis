@@ -247,13 +247,14 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 
 	ext->declare_class_size("RegularGrid", sizeof(data::RegularGrid));
-	ext->declare_class_element("RegularGrid.nx", &artemis::data::RegularGrid::nx);
-	ext->declare_class_element("RegularGrid.ny", &artemis::data::RegularGrid::ny);
-	ext->declare_class_element("RegularGrid.nz", &artemis::data::RegularGrid::nz);
-	ext->declare_class_element("RegularGrid.dx", &artemis::data::RegularGrid::dx);
-	ext->declare_class_element("RegularGrid.dy", &artemis::data::RegularGrid::dy);
-	ext->declare_class_element("RegularGrid.dz", &artemis::data::RegularGrid::dz);
-	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<artemis::data::RegularGrid>);
+	ext->declare_class_element("RegularGrid.nx", &data::RegularGrid::nx);
+	ext->declare_class_element("RegularGrid.ny", &data::RegularGrid::ny);
+	ext->declare_class_element("RegularGrid.nz", &data::RegularGrid::nz);
+	ext->declare_class_element("RegularGrid.dx", &data::RegularGrid::dx);
+	ext->declare_class_element("RegularGrid.dy", &data::RegularGrid::dy);
+	ext->declare_class_element("RegularGrid.dz", &data::RegularGrid::dz);
+	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<data::RegularGrid>);
+	ext->link_class_func("RegularGrid.points", &data::RegularGrid::points);
 
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
@@ -279,6 +280,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<artemis::data::MultiComponentField>(ext, "MultiComponentField");
 	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
 	link_ports<Array<double>>(ext, "List");
+	link_ports<Array<vec3>>(ext, "VectorList");
 
 	link_setting<double>(ext, "Float");
 	link_setting<int>(ext, "Int");
@@ -328,13 +330,14 @@ void PluginManager::find_plugins() {
 }
 
 void* PluginManager::create_instance(const string& name) {
-	for (const auto& [n, f] : artemis::PluginManager::plugin_classes)
+	for (const auto& [n, f] : plugin_classes)
 		if (name == n) {
 			auto m = kaba::default_context->load_module(f);
 			for (const auto c: m->classes())
 				if (c->name == name)
 					return c->create_instance();
 		}
+	msg_error("NOT FOUND: " + name);
 	return nullptr;
 }
 

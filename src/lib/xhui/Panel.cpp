@@ -273,8 +273,10 @@ color Panel::get_color(const string& id) const {
 
 void Panel::reset(const string& id) {
 	for (auto& c: controls)
-		if (c->id == id)
+		if (c->id == id) {
 			c->reset();
+			return; // we might delete controls here...
+		}
 }
 
 void Panel::enable(const string& id, bool enabled) {

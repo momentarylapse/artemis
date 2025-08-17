@@ -1,0 +1,19 @@
+use artemis.*
+
+class GridPoints extends Node
+	var in_grid: InPortRegularGrid
+	var out_points: OutPortVectorList
+	var cell_centers: SettingBool
+	
+	func __init__()
+		super.__init__("GridPoints")
+		in_grid.__init__(self, "in")
+		out_points.__init__(self, "out")
+		cell_centers.__init__(self, "cell-centers", false)
+	
+	func override on_process()
+		for g in in_grid.value()
+			if cell_centers()
+				out_points.set(g.points(SamplingMode.PER_CELL))
+			else
+				out_points.set(g.points(SamplingMode.PER_VERTEX))
