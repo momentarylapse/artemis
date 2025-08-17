@@ -67,9 +67,9 @@ Array<vec3> RegularGrid::vertices() const {
 Array<vec3> RegularGrid::cell_centers() const {
 	Array<vec3> points;
 	points.simple_reserve(cell_count());
-	for (int i=0; i<nx; i++)
+	for (int k=0; k<nz; k++)
 		for (int j=0; j<ny; j++)
-			for (int k=0; k<nz; k++)
+			for (int i=0; i<nx; i++)
 				points.add(cell_center(i, j, k));
 	return points;
 }
