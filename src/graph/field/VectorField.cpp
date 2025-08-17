@@ -22,6 +22,10 @@ VectorField::VectorField() : ResourceNode("VectorField") {
 
 void VectorField::on_process() {
 	if (auto g = in_grid.value()) {
+		if (g->type != data::GridType::Regular)
+			return;
+
+		auto& rg = *g->regular;
 
 		if (formula() != cached_formula or !f_p) {
 			cached_formula = formula();
@@ -48,18 +52,18 @@ func f(p: vec3, t: f32) -> vec3
 		float t = static_cast<Graph*>(graph)->t;
 
 		if (auto f = f_p) {
-			data::VectorField s(*g,
+			data::VectorField s(rg,
 				type(),
 				sampling_mode());
 
 			switch (sampling_mode()) {
 			case data::SamplingMode::PerCell:
-				processing::pool::run({0,0,0}, {g->nx, g->ny, g->nz}, [&s, f, t] (int i, int j, int k) {
+				processing::pool::run({0,0,0}, {rg.nx, rg.ny, rg.nz}, [&s, f, t] (int i, int j, int k) {
 					s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, t)));
 				}, 200);
 				break;
 			case data::SamplingMode::PerVertex:
-				processing::pool::run({0,0,0}, {g->nx+1, g->ny+1, g->nz+1}, [&s, f, t] (int i, int j, int k) {
+				processing::pool::run({0,0,0}, {rg.nx+1, rg.ny+1, rg.nz+1}, [&s, f, t] (int i, int j, int k) {
 					s.set(i, j, k, dvec3(f({(float)i, (float)j, (float)k}, t)));
 				}, 200);
 			}

@@ -20,6 +20,9 @@ ScalarField::ScalarField() : ResourceNode("ScalarField") {
 
 void ScalarField::on_process() {
 	if (auto g = in_grid.value()) {
+		if (g->type != data::GridType::Regular)
+			return;
+		auto& rg = *g->regular;
 
 		if (formula() != cached_formula or !f_p) {
 			cached_formula = formula();
@@ -47,21 +50,21 @@ func f(p: vec3, t: f32) -> f32
 		float t = static_cast<Graph*>(graph)->t;
 
 		if (auto f = f_p) {
-			data::ScalarField s(*g,
+			data::ScalarField s(rg,
 				type(),
 				sampling_mode());
 
 			switch (sampling_mode()) {
 			case data::SamplingMode::PerCell:
-				for (int i=0; i<g->nx; i++)
-					for (int j=0; j<g->ny; j++)
-						for (int k=0; k<g->nz; k++)
+				for (int i=0; i<rg.nx; i++)
+					for (int j=0; j<rg.ny; j++)
+						for (int k=0; k<rg.nz; k++)
 							s.set32(i, j, k, f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, t));
 				break;
 			case data::SamplingMode::PerVertex:
-				for (int i=0; i<=g->nx; i++)
-					for (int j=0; j<=g->ny; j++)
-						for (int k=0; k<=g->nz; k++)
+				for (int i=0; i<=rg.nx; i++)
+					for (int j=0; j<=rg.ny; j++)
+						for (int k=0; k<=rg.nz; k++)
 							s.set32(i, j, k, f({(float)i, (float)j, (float)k}, t));
 			}
 			out(s);

@@ -198,6 +198,7 @@ add_executable(artemis
 	src/data/field/MultiComponentField.cpp
 	src/data/field/ScalarField.cpp
 	src/data/field/VectorField.cpp
+	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
 	src/data/mesh/GeometryBall.cpp
 	src/data/mesh/GeometryCube.cpp
@@ -588,6 +589,7 @@ add_library(moduleartemis SHARED
 	src/data/field/MultiComponentField.cpp
 	src/data/field/ScalarField.cpp
 	src/data/field/VectorField.cpp
+	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
 	src/data/mesh/GeometryBall.cpp
 	src/data/mesh/GeometryCube.cpp

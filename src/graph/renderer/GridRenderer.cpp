@@ -20,23 +20,32 @@ void GridRenderer::on_process() {
 
 
 void GridRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-	if (auto r = regular.value()) {
+	if (auto g = regular.value()) {
 		Array<vec3> points;
-		for (int i=0; i<=r->nx; i++)
-			for (int j=0; j<=r->ny; j++) {
-				points.add(r->vertex(i, j, 0));
-				points.add(r->vertex(i, j, r->nz));
+		if (g->type == data::GridType::Regular) {
+			auto r = *g->regular;
+			for (int i=0; i<=r.nx; i++)
+				for (int j=0; j<=r.ny; j++) {
+					points.add(r.vertex(i, j, 0));
+					points.add(r.vertex(i, j, r.nz));
+				}
+			for (int i=0; i<=r.nx; i++)
+				for (int k=0; k<=r.nz; k++) {
+					points.add(r.vertex(i, 0, k));
+					points.add(r.vertex(i, r.ny, k));
+				}
+			for (int j=0; j<=r.ny; j++)
+				for (int k=0; k<=r.nz; k++) {
+					points.add(r.vertex(0, j, k));
+					points.add(r.vertex(r.nx, j, k));
+				}
+		} else {
+			const auto vertices = g->vertices();
+			for (const auto& [a, b]: g->edges()) {
+				points.add(vertices[a]);
+				points.add(vertices[b]);
 			}
-		for (int i=0; i<=r->nx; i++)
-			for (int k=0; k<=r->nz; k++) {
-				points.add(r->vertex(i, 0, k));
-				points.add(r->vertex(i, r->ny, k));
-			}
-		for (int j=0; j<=r->ny; j++)
-			for (int k=0; k<=r->nz; k++) {
-				points.add(r->vertex(0, j, k));
-				points.add(r->vertex(r->nx, j, k));
-			}
+		}
 
 		session->drawing_helper->set_color(_color());
 		session->drawing_helper->set_line_width((float)line_width());

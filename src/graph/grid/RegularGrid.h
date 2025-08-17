@@ -2,17 +2,16 @@
 // Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef REGULARGRIDSOURCE_H
-#define REGULARGRIDSOURCE_H
+#pragma once
 
 #include <lib/dataflow/ResourceNode.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
-#include <data/grid/RegularGrid.h>
+#include <data/grid/Grid.h>
 
 namespace artemis::graph {
 
-class RegularGrid : public dataflow::ResourceNode<data::RegularGrid> {
+class RegularGrid : public dataflow::ResourceNode<data::Grid> {
 public:
 	RegularGrid() : ResourceNode("RegularGrid") {}
 
@@ -27,5 +26,3 @@ public:
 };
 
 } // graph
-
-#endif //REGULARGRIDSOURCE_H

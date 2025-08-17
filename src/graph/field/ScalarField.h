@@ -7,7 +7,7 @@
 #include <lib/dataflow/ResourceNode.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
-#include <data/grid/RegularGrid.h>
+#include <data/grid/Grid.h>
 #include <data/field/ScalarField.h>
 #include <lib/kaba/kaba.h>
 
@@ -26,7 +26,7 @@ public:
 		{data::SamplingMode::PerCell, data::SamplingMode::PerVertex}, {"PerCell", "PerVertex"}};
 	dataflow::Setting<bool> time_dependent{this, "time-dependent", false};
 
-	dataflow::InPort<data::RegularGrid> in_grid{this, "grid"};
+	dataflow::InPort<data::Grid> in_grid{this, "grid"};
 
 	string cached_formula;
 	owned<kaba::Context> ctx;

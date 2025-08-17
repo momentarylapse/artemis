@@ -1,7 +1,7 @@
 use artemis.*
 
 class GridPoints extends Node
-	var in_grid: InPortRegularGrid
+	var in_grid: InPortGrid
 	var out_points: OutPortVectorList
 	var cell_centers: SettingBool
 	

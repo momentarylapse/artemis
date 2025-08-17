@@ -13,6 +13,11 @@ struct RegularGrid
 	var dx, dy, dz: vec3
 	func extern points(mode: SamplingMode) -> vec3[]
 
+struct Grid
+	var regular: RegularGrid?
+	func extern __init__()
+	func extern points(mode: SamplingMode) -> vec3[]
+
 struct ScalarField
 	var grid: RegularGrid
 	var v32: f32[]
@@ -132,9 +137,9 @@ class OutPortMultiComponentField
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: MultiComponentField)
 	
-class InPortRegularGrid
+class InPortGrid
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> RegularGrid*
+	func extern value() -> Grid*
 	func extern mutated()
 
 class InPortList

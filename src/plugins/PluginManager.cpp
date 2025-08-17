@@ -18,6 +18,7 @@
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
 #include <data/field/MultiComponentField.h>
+#include <data/grid/Grid.h>
 #include <data/grid/RegularGrid.h>
 #include <data/mesh/PolygonMesh.h>
 #include <data/util/ColorMap.h>
@@ -256,6 +257,11 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<data::RegularGrid>);
 	ext->link_class_func("RegularGrid.points", &data::RegularGrid::points);
 
+	ext->declare_class_size("Grid", sizeof(data::Grid));
+	ext->declare_class_element("Grid.regular", &data::Grid::regular);
+	ext->link_class_func("Grid.__init__", &kaba::generic_init<data::Grid>);
+	ext->link_class_func("Grid.points", &data::Grid::points);
+
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
 
@@ -275,10 +281,10 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 		ext->link_virtual("Node.create_panel", &dataflow::Node::create_panel, &n);
 	}
 
-	link_ports<artemis::data::ScalarField>(ext, "ScalarField");
-	link_ports<artemis::data::VectorField>(ext, "VectorField");
-	link_ports<artemis::data::MultiComponentField>(ext, "MultiComponentField");
-	link_ports<artemis::data::RegularGrid>(ext, "RegularGrid");
+	link_ports<data::ScalarField>(ext, "ScalarField");
+	link_ports<data::VectorField>(ext, "VectorField");
+	link_ports<data::MultiComponentField>(ext, "MultiComponentField");
+	link_ports<data::Grid>(ext, "Grid");
 	link_ports<Array<double>>(ext, "List");
 	link_ports<Array<vec3>>(ext, "VectorList");
 
@@ -289,8 +295,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_setting<color>(ext, "Color");
 
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
-	ext->declare_class_element("Graph.t", &artemis::graph::Graph::t);
-	ext->declare_class_element("Graph.dt", &artemis::graph::Graph::dt);
+	ext->declare_class_element("Graph.t", &graph::Graph::t);
+	ext->declare_class_element("Graph.dt", &graph::Graph::dt);
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
 
@@ -311,6 +317,7 @@ void PluginManager::import_kaba() {
 
 	auto m = kaba::default_context->load_module("artemis/artemis.kaba");
 	import_component_class<PolygonMesh>(m, "Mesh");
+	import_component_class<data::Grid>(m, "Grid");
 	import_component_class<data::RegularGrid>(m, "RegularGrid");
 	import_component_class<data::ScalarField>(m, "ScalarField");
 	import_component_class<data::VectorField>(m, "VectorField");
