@@ -16,7 +16,7 @@ func main()
 	
 	var dt_u = g.add_node("VectorField:du/dt", [400,200])
 	dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
-	dt_u.set("formula", "[exp( - 0.5 * len(p - vec3(0,2,0))^2) *10000, 0, 0]")
+	dt_u.set("formula", "[exp( - 50 * len(p - vec3(0,0.2,0))^2) *10000, 0, 0]")
 
 	var sim = g.add_node("Elastic2dFEM:Solver", [400,350])
 

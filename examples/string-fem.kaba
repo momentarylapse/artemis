@@ -13,11 +13,11 @@ func main()
 	var u = g.add_node("VectorField", [200,200])
 	u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
 	u.set("type", 1)
-	u.set("formula", "[0.001 * exp( - 0.02 * (x-25)^2) * 2, 0, 0]")
+	u.set("formula", "[0.001 * exp( - 200.0 * (x-0.30)^2), 0, 0]")
 	var dt_u = g.add_node("VectorField", [400,200])
 	dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
 	dt_u.set("type", 1)
-	dt_u.set("formula", "[0, exp( - 0.02 * (x-13)^2) * 2, 0]")
+	dt_u.set("formula", "[0, exp( - 200.0 * (x-0.15)^2) * 2, 0]")
 
 	var sim = g.add_node("StringFEM", [400,350])
 	sim.set("tension", 84.0) # [N]

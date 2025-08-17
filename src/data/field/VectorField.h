@@ -78,6 +78,8 @@ struct VectorField {
 	void set(int i, int j, int k, const dvec3& v);
 	vec3 value32(int i, int j, int k) const;
 	void set32(int i, int j, int k, const vec3& v);
+	void _set(int index, const dvec3& v);
+	void _set32(int index, const vec3& v);
 	vec3 _value32(int index) const;
 
 	void operator+=(const VectorField& o);

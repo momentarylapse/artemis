@@ -23,6 +23,8 @@ struct ScalarField {
 	void set(int i, int j, int k, double f);
 	float value32(int i, int j, int k) const;
 	void set32(int i, int j, int k, float f);
+	void _set(int index, double f);
+	void _set32(int index, float f);
 
 	void operator+=(const ScalarField& o);
 	ScalarField operator+(const ScalarField& o) const;

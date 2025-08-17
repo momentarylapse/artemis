@@ -37,6 +37,13 @@ void VectorField::set(int i, int j, int k, const dvec3& vv) {
 		*(dvec3*)v64.at(grid, sampling_mode, i, j, k) = vv;
 }
 
+void VectorField::_set(int index, const dvec3& vv) {
+	if (type == ScalarType::Float32)
+		*(vec3*)v32._at(index) = vv.to32();
+	else if (type == ScalarType::Float64)
+		*(dvec3*)v64._at(index) = vv;
+}
+
 vec3 VectorField::value32(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
 		return *(vec3*)v32.at(grid, sampling_mode, i, j, k);
@@ -58,6 +65,13 @@ void VectorField::set32(int i, int j, int k, const vec3& vv) {
 		*(vec3*)v32.at(grid, sampling_mode, i, j, k) = vv;
 	else if (type == ScalarType::Float64)
 		*(dvec3*)v64.at(grid, sampling_mode, i, j, k) = dvec3(vv);
+}
+
+void VectorField::_set32(int index, const vec3& vv) {
+	if (type == ScalarType::Float32)
+		*(vec3*)v32._at(index) = vv;
+	else if (type == ScalarType::Float64)
+		*(dvec3*)v64._at(index) = dvec3(vv);
 }
 
 template<class T>

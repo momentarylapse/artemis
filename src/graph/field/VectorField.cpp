@@ -7,6 +7,7 @@
 #include <processing/helper/GlobalThreadPool.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
+#include <lib/base/iter.h>
 
 
 namespace artemis::graph {
@@ -56,17 +57,9 @@ func f(p: vec3, t: f32) -> vec3
 				type(),
 				sampling_mode());
 
-			switch (sampling_mode()) {
-			case data::SamplingMode::PerCell:
-				processing::pool::run({0,0,0}, {rg.nx, rg.ny, rg.nz}, [&s, f, t] (int i, int j, int k) {
-					s.set(i, j, k, dvec3(f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, t)));
-				}, 200);
-				break;
-			case data::SamplingMode::PerVertex:
-				processing::pool::run({0,0,0}, {rg.nx+1, rg.ny+1, rg.nz+1}, [&s, f, t] (int i, int j, int k) {
-					s.set(i, j, k, dvec3(f({(float)i, (float)j, (float)k}, t)));
-				}, 200);
-			}
+			for (const auto& [i, p] : enumerate(g->points(sampling_mode())))
+				s._set32(i, f(p, t));
+
 			out(s);
 		}
 	}

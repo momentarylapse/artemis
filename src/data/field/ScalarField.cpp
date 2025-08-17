@@ -43,6 +43,17 @@ void ScalarField::set32(int i, int j, int k, float f) {
 	set(i, j, k, (double)f);
 }
 
+void ScalarField::_set(int index, double f) {
+	if (type == ScalarType::Float32)
+		*v32._at(index) = (float)f;
+	else if (type == ScalarType::Float64)
+		*v64._at(index) = f;
+}
+
+void ScalarField::_set32(int index, float f) {
+	_set(index, (double)f);
+}
+
 
 template<class T>
 void s_list_add(T& a, const T& b) {

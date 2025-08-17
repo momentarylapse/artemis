@@ -6,6 +6,7 @@
 #include "../Graph.h"
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
+#include <lib/base/iter.h>
 
 namespace artemis::graph {
 
@@ -54,19 +55,9 @@ func f(p: vec3, t: f32) -> f32
 				type(),
 				sampling_mode());
 
-			switch (sampling_mode()) {
-			case data::SamplingMode::PerCell:
-				for (int i=0; i<rg.nx; i++)
-					for (int j=0; j<rg.ny; j++)
-						for (int k=0; k<rg.nz; k++)
-							s.set32(i, j, k, f({(float)i + 0.5f, (float)j + 0.5f, (float)k + 0.5f}, t));
-				break;
-			case data::SamplingMode::PerVertex:
-				for (int i=0; i<=rg.nx; i++)
-					for (int j=0; j<=rg.ny; j++)
-						for (int k=0; k<=rg.nz; k++)
-							s.set32(i, j, k, f({(float)i, (float)j, (float)k}, t));
-			}
+			for (const auto& [i, p] : enumerate(g->points(sampling_mode())))
+				s._set32(i, f(p, t));
+
 			out(s);
 		}
 	}
