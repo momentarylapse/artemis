@@ -5,6 +5,7 @@
 #pragma once
 
 #include <lib/base/base.h>
+#include <lib/base/error.h>
 #include <lib/pattern/Observable.h>
 
 class Session;
@@ -34,8 +35,8 @@ public:
 	void add_node(dataflow::Node* node);
 	void remove_node(dataflow::Node* node);
 
-	void connect(OutPortBase& source, InPortBase& sink);
-	void connect(const CableInfo& c);
+	base::expected<int> connect(OutPortBase& source, InPortBase& sink);
+	base::expected<int> connect(const CableInfo& c);
 	void unconnect(OutPortBase& source, InPortBase& sink);
 	void unconnect(const CableInfo& c);
 

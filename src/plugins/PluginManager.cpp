@@ -28,8 +28,6 @@
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 
-#include "lib/xhui/Application.h"
-
 extern Session* _current_session_;
 
 Session* export_start();
@@ -68,13 +66,10 @@ dataflow::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, c
 }
 
 bool graph_connect(dataflow::Graph* g, dataflow::Node* source, int source_port, dataflow::Node* sink, int sink_port) {
-	try {
-		g->connect({source, source_port, sink, sink_port});
-		return true;
-	} catch (Exception& e) {
-		msg_error("connect failed: " + e.message());
-		return false;
-	}
+	auto r = g->connect({source, source_port, sink, sink_port});
+	if (!r)
+		msg_error("connect failed: " + r.error().msg);
+	return r.has_value();
 }
 
 void node_init(dataflow::Node* n, const string& name) {

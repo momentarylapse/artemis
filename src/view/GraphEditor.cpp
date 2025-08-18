@@ -361,20 +361,16 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 void GraphEditor::on_left_button_up(const vec2& m) {
 	if (selection and selection->type == HoverType::OutPort) {
 		if (hover and hover->type == HoverType::InPort) {
-			try {
-				artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
-			} catch (Exception& e) {
-				session->set_message(e.message());
-			}
+			auto r = artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
+			if (!r)
+				session->set_message(r.error().msg);
 		}
 	}
 	if (selection and selection->type == HoverType::InPort) {
 		if (hover and hover->type == HoverType::OutPort) {
-			try {
-				artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
-			} catch (Exception& e) {
-				session->set_message(e.message());
-			}
+			auto r = artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
+			if (!r)
+				session->set_message(r.error().msg);
 		}
 	}
 }

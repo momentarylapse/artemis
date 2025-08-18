@@ -6,6 +6,7 @@
 #include "Port.h"
 #include "Node.h"
 #include <lib/base/algo.h>
+#include <lib/base/error.h>
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
 
@@ -43,21 +44,22 @@ bool port_type_match(const OutPortBase& source, const InPortBase& sink) {
 	return source.class_ == sink.class_;
 }
 
-void Graph::connect(OutPortBase& source, InPortBase& sink) {
+base::expected<int> Graph::connect(OutPortBase& source, InPortBase& sink) {
 	if (!port_type_match(source, sink))
-		throw Exception(format("failed to connect: %s  vs  %s", source.class_->name, sink.class_->name));
+		return base::Error{format("failed to connect: %s  vs  %s", source.class_->name, sink.class_->name)};
 	if (sink.sources.num > 0 and !(sink.flags & PortFlags::Multi))
-		throw Exception(format("failed to connect: sink already connected"));
+		return base::Error{format("failed to connect: sink already connected")};
 	if ((sink.flags & PortFlags::Mutable) and !(source.flags & PortFlags::Mutable))
-		throw Exception(format("failed to connect: sink is mutable, source is not"));
+		return base::Error{format("failed to connect: sink is mutable, source is not")};
 
 	sink.sources.add(&source);
 	source.targets.add(&sink);
 	out_changed();
+	return 0;
 }
 
-void Graph::connect(const CableInfo& c) {
-	connect(*c.source->out_ports[c.source_port], *c.sink->in_ports[c.sink_port]);
+base::expected<int> Graph::connect(const CableInfo& c) {
+	return connect(*c.source->out_ports[c.source_port], *c.sink->in_ports[c.sink_port]);
 }
 
 void Graph::unconnect(OutPortBase& source, InPortBase& sink) {
