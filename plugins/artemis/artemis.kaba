@@ -83,6 +83,8 @@ struct PlotData
 
 struct RenderData
 
+struct GenericData # dummy for receiving anything
+
 struct ColorMap
 	var colors: Color[]
 	var values: f32[]
@@ -157,6 +159,12 @@ class InPortVectorList
 class OutPortVectorList
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: vec3[])
+
+class InPortGeneric
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> GenericData*
+	func extern types() -> kaba.Class&[]
+	func extern mutated()
 
 
 class SettingFloat

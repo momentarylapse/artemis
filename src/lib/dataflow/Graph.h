@@ -45,5 +45,7 @@ public:
 	bool iterate();
 };
 
+bool port_type_match(const OutPortBase& source, const InPortBase& sink);
+
 } // dataflow
 

@@ -155,9 +155,10 @@ string port_description(P* p) {
 		flags.add("optional");
 	if (p->flags & dataflow::PortFlags::Multi)
 		flags.add("multi");
+	string type = p->class_->name;
 	if (flags.num > 0)
-		return format("<b>%s</b>, type <b>%s</b>  (%s)", p->name, p->class_->name, implode(flags, ", "));
-	return format("<b>%s</b>, type <b>%s</b>", p->name, p->class_->name);
+		return format("<b>%s</b>, type <b>%s</b>  (%s)", p->name, type, implode(flags, ", "));
+	return format("<b>%s</b>, type <b>%s</b>", p->name, type);
 }
 
 vec2 GraphEditor::to_screen(const vec2 &p) const {

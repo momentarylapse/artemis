@@ -41,9 +41,17 @@ void InPortBase::mutated() {
 
 bool InPortBase::has_value() const {
 	for (auto s: sources)
-		if (s->has_value())
+		if (s->has_value)
 			return true;
 	return false;
+}
+
+Array<const kaba::Class*> InPortBase::types() const {
+	Array<const kaba::Class*> r;
+	for (auto s: sources)
+		if (s->has_value)
+			r.add(s->class_);
+	return r;
 }
 
 

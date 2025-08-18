@@ -29,7 +29,7 @@ void connect_through(Graph* g, const dataflow::CableInfo& c, const Array<string>
 void auto_connect(Graph* g, const dataflow::CableInfo& c) {
 	auto source = c.source->out_ports[c.source_port];
 	auto sink = c.sink->in_ports[c.sink_port];
-	if (source->class_ == sink->class_) {
+	if (dataflow::port_type_match(*source, *sink)) {
 		g->connect(c);
 	} else if (source->class_->name == "Mesh" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"MeshRenderer"});
@@ -43,9 +43,9 @@ void auto_connect(Graph* g, const dataflow::CableInfo& c) {
 		connect_through(g, c, {"PointListRenderer"});
 	} else if (source->class_->name == "PlotData" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"Plotter"});
-	} else if (source->class_->name == "f32[]" and sink->class_->name == "RenderData") {
+	} else if (source->class_->name == "f64[]" and sink->class_->name == "RenderData") {
 		connect_through(g, c, {"ListPlot", "Plotter"});
-	} else if (source->class_->name == "f32[]" and sink->class_->name == "PlotData") {
+	} else if (source->class_->name == "f64[]" and sink->class_->name == "PlotData") {
 		connect_through(g, c, {"ListPlot"});
 	} else {
 		throw Exception(format("can not connect  %s  to  %s", source->class_->name, sink->class_->name));

@@ -97,6 +97,7 @@ void link_ports(kaba::Exporter* ext, const string& name) {
 	ext->link_class_func("InPort" + name + ".__init__", &port_init<dataflow::InPort<T>>);
 	ext->link_class_func("InPort" + name + ".value", &dataflow::InPort<T>::value);
 	ext->link_class_func("InPort" + name + ".mutated", &dataflow::InPort<T>::mutated);
+	ext->link_class_func("InPort" + name + ".types", &dataflow::InPort<T>::types);
 
 	ext->declare_class_size("OutPort" + name, sizeof(dataflow::OutPort<T>));
 	ext->link_class_func("OutPort" + name + ".__init__", &port_init<dataflow::OutPort<T>>);
@@ -158,11 +159,6 @@ const kaba::Class* field_get_type(const T& field) {
 	return type_data_to_kaba(field.type);
 }
 
-template<class T>
-void generic_assign(T& a, const T& b) {
-	a = b;
-}
-
 void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	ext->link_func("current_session", &current_session);
@@ -195,7 +191,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value32);
 	ext->link_class_func("ScalarField.type", &field_get_type<data::ScalarField>);
-	ext->link_class_func("ScalarField.__assign__", &generic_assign<data::ScalarField>);
+	ext->link_class_func("ScalarField.__assign__", &kaba::generic_assign<data::ScalarField>);
 	ext->link_class_func("ScalarField.__add__", &data::ScalarField::operator+);
 	ext->link_class_func("ScalarField.__iadd__", &data::ScalarField::operator+=);
 	ext->link_class_func("ScalarField.__sub__", &data::ScalarField::operator-);
@@ -213,7 +209,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
 	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);
-	ext->link_class_func("VectorField.__assign__", &generic_assign<data::VectorField>);
+	ext->link_class_func("VectorField.__assign__", &kaba::generic_assign<data::VectorField>);
 	ext->link_class_func("VectorField.__add__", &data::VectorField::operator+);
 	ext->link_class_func("VectorField.__iadd__", &data::VectorField::operator+=);
 	ext->link_class_func("VectorField.__sub__", &data::VectorField::operator-);
@@ -236,7 +232,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set32);
 	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value32);
 	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
-	ext->link_class_func("MultiComponentField.__assign__", &generic_assign<data::MultiComponentField>);
+	ext->link_class_func("MultiComponentField.__assign__", &kaba::generic_assign<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
 	ext->link_class_func("MultiComponentField.__iadd__", &data::MultiComponentField::operator+=);
 	ext->link_class_func("MultiComponentField.__sub__", &data::MultiComponentField::operator-);
@@ -287,6 +283,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<data::Grid>(ext, "Grid");
 	link_ports<Array<double>>(ext, "List");
 	link_ports<Array<vec3>>(ext, "VectorList");
+	link_ports<dataflow::GenericData>(ext, "Generic"); // :P
 
 	link_setting<double>(ext, "Float");
 	link_setting<int>(ext, "Int");
@@ -326,6 +323,9 @@ void PluginManager::import_kaba() {
 	import_component_class<graph::PlotData>(m, "PlotData");
 	import_component_class<graph::RenderData>(m, "RenderData");
 	import_component_class<data::SamplingMode>(m, "SamplingMode");
+	import_component_class<dataflow::GenericData>(m, "GenericData");
+
+	dataflow::generic_type = dataflow::get_class<dataflow::GenericData>();
 }
 
 void PluginManager::find_plugins() {

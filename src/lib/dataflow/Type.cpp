@@ -19,6 +19,8 @@ namespace kaba {
 
 namespace dataflow {
 
+const kaba::Class* generic_type = nullptr;
+
 base::map<const std::type_info*, const kaba::Class*> type_map;
 
 void link_basic_types() {

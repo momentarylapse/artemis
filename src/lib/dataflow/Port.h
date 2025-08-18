@@ -33,7 +33,8 @@ public:
 	PortFlags flags;
 	Array<InPortBase*> targets;
 	void mutated();
-	std::function<bool()> has_value;
+	bool has_value = false;
+	void* generic_value_pointer = nullptr;
 };
 
 class InPortBase {
@@ -46,6 +47,7 @@ public:
 	Array<OutPortBase*> sources;
 	void mutated();
 	bool has_value() const;
+	Array<const kaba::Class*> types() const;
 };
 
 
@@ -57,20 +59,16 @@ class InPort : public InPortBase {
 public:
 	InPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : InPortBase(owner, name, get_class<T>(), flags) {}
 	const T* value() const {
-		if (sources.num == 0)
-			return nullptr;
-		auto typed_source = reinterpret_cast<OutPort<T>*>(sources[0]);
-		if (!typed_source->value)
-			return nullptr;
-		return &(*typed_source->value);
+		for (auto s: sources)
+			if (s->has_value)
+				return reinterpret_cast<T*>(s->generic_value_pointer);
+		return nullptr;
 	}
-	const Array<T*> values() const {
+	Array<T*> values() const {
 		Array<T*> r;
-		for (auto s: sources) {
-			auto typed_source = reinterpret_cast<OutPort<T>*>(s);
-			if (typed_source->value)
-				r.add(&(*typed_source->value));
-		}
+		for (auto s: sources)
+			if (s->has_value)
+				r.add(reinterpret_cast<T*>(s->generic_value_pointer));
 		return r;
 	}
 };
@@ -79,15 +77,18 @@ template<class T>
 class OutPort : public OutPortBase {
 public:
 	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, get_class<T>(), flags) {
-		has_value = [this] {
-			return value.has_value();
-		};
+		generic_value_pointer = &_value;
 	}
 	void operator()(const T& v) {
-		value = v;
+		_value = v;
+		has_value = true;
 		mutated();
 	}
-	base::optional<T> value;
+	T& value() {
+		return _value;
+	}
+private:
+	T _value;
 };
 
 } // graph

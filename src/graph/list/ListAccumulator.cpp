@@ -7,14 +7,11 @@
 namespace artemis::graph {
 
 void ListAccumulator::on_process() {
-	if (!out_list.value.has_value())
-		out_list.value = Array<double>{};
-
 	if (in_number.has_value()) {
-		out_list.value->add(*in_number.value());
+		out_list.value().add(*in_number.value());
 		if (capacity() > 0)
-			while (out_list.value->num > capacity())
-				out_list.value->erase(0);
+			while (out_list.value().num > capacity())
+				out_list.value().erase(0);
 
 		out_list.mutated();
 	}
