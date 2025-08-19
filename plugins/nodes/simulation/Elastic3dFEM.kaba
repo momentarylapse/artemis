@@ -16,7 +16,7 @@ class Elastic3dFEM extends Node
 		
 		mat = nickel()
 	
-	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+	func mut substep(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
 	
 	# i: C_ijkl d_j d_k u_l
@@ -69,7 +69,6 @@ class Elastic3dFEM extends Node
 		#print(dux|>log)
 	
 	func override on_process()
-		# assume f32
 		# assume PER_VERTEX
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()

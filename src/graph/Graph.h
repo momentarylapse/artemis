@@ -16,7 +16,7 @@ public:
 	void iterate_simulation();
 
 	Session* session;
-	float t, dt;
+	double t, dt;
 };
 
 

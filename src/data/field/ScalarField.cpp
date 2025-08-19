@@ -57,38 +57,23 @@ void ScalarField::_set32(int index, float f) {
 
 template<class T>
 void s_list_add(T& a, const T& b) {
-#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
 	}, 1000);
-#else
-	for (int i=0; i<a.num; i++)
-		a[i] += b[i];
-#endif
 }
 
 template<class T>
 void s_list_sub(T& a, const T& b) {
-#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
-#else
-	for (int i=0; i<a.num; i++)
-		a[i] -= b[i];
-#endif
 }
 
 template<class T>
-void s_list_mul_single(T& a, float s) {
-#if 1
+void s_list_mul_single(T& a, double s) {
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 10000);
-#else
-	for (int i=0; i<a.num; i++)
-		a[i] *= s;
-#endif
 }
 
 void ScalarField::operator+=(const ScalarField& o) {
@@ -121,14 +106,14 @@ ScalarField ScalarField::operator-(const ScalarField& o) const {
 	return r;
 }
 
-void ScalarField::operator*=(float o) {
+void ScalarField::operator*=(double o) {
 	if (type == ScalarType::Float32)
 		s_list_mul_single(v32.v, o);
 	else if (type == ScalarType::Float64)
 		s_list_mul_single(v64.v, o);
 }
 
-ScalarField ScalarField::operator*(float o) const {
+ScalarField ScalarField::operator*(double o) const {
 	auto r = *this;
 	r *= o;
 	return r;

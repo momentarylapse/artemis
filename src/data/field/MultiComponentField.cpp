@@ -35,28 +35,11 @@ void MultiComponentField::set(int i, int j, int k, int n, double vv) {
 		v64.at(grid, sampling_mode, i, j, k)[n] = vv;
 }
 
-float MultiComponentField::value32(int i, int j, int k, int n) const {
-	if (type == ScalarType::Float32)
-		return v32.at(grid, sampling_mode, i, j, k)[n];
-	if (type == ScalarType::Float64)
-		return (float)v64.at(grid, sampling_mode, i, j, k)[n];
-	return 0;
-}
-
-void MultiComponentField::set32(int i, int j, int k, int n, float vv) {
-	if (type == ScalarType::Float32)
-		v32.at(grid, sampling_mode, i, j, k)[n] = vv;
-	else if (type == ScalarType::Float64)
-		v64.at(grid, sampling_mode, i, j, k)[n] = (double)vv;
-}
-
 template<class T>
 void list_add(T& a, const T& b) {
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
 	}, 1000);
-//	for (int i=0; i<a.num; i++)
-//		a[i] += b[i];
 }
 
 template<class T>
@@ -64,17 +47,13 @@ void list_sub(T& a, const T& b) {
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
-//	for (int i=0; i<a.num; i++)
-//		a[i] -= b[i];
 }
 
 template<class T>
-void list_mul_single(T& a, float s) {
+void list_mul_single(T& a, double s) {
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 1000);
-//	for (int i=0; i<a.num; i++)
-//		a[i] *= s;
 }
 
 void MultiComponentField::operator+=(const MultiComponentField& o) {
@@ -107,14 +86,14 @@ MultiComponentField MultiComponentField::operator-(const MultiComponentField& o)
 	return r;
 }
 
-void MultiComponentField::operator*=(float o) {
+void MultiComponentField::operator*=(double o) {
 	if (type == ScalarType::Float32)
 		list_mul_single(v32.v, o);
 	else if (type == ScalarType::Float64)
 		list_mul_single(v64.v, o);
 }
 
-MultiComponentField MultiComponentField::operator*(float o) const {
+MultiComponentField MultiComponentField::operator*(double o) const {
 	auto r = *this;
 	r *= o;
 	return r;

@@ -30,15 +30,15 @@ class StringFEM extends Node
 		
 		mat = nickel()
 
-	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField, out dt_dt_ux: ScalarField, out dt_dt_uy: ScalarField, out dt_dt_uz: ScalarField)
+	func mut substep(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField, out dt_dt_ux: ScalarField, out dt_dt_uy: ScalarField, out dt_dt_uz: ScalarField)
 		let laplace_ux = hessian_x(ux, 0, 0)
 		let laplace_uy = hessian_x(uy, 0, 0)
 		let laplace_uz = hessian_x(uz, 0, 0)
 		
-		let radius = f32(diameter()) / 2
-		let A = pi * radius^2
+		let radius = diameter() / 2
+		let A = f64(pi) * radius^2
 		let µ = mat.density * A # [kg/m]
-		let C = f32(tension()) / µ / 2 # [m²/s²]
+		let C = tension() / µ / 2 # [m²/s²]
 	
 		dt_dt_ux = laplace_ux * C
 		dt_dt_uy = laplace_uy * C
@@ -69,7 +69,6 @@ class StringFEM extends Node
 		dt_uz.set(n,0,0, 0)
 	
 	func override on_process()
-		# assume f32
 		# assume PER_VERTEX
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()

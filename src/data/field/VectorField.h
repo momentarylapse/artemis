@@ -80,14 +80,19 @@ struct VectorField {
 	void set32(int i, int j, int k, const vec3& v);
 	void _set(int index, const dvec3& v);
 	void _set32(int index, const vec3& v);
+	dvec3 _value(int index) const;
 	vec3 _value32(int index) const;
 
+	dvec3 average() const;
+
 	void operator+=(const VectorField& o);
+//	void operator+=(const dvec3& o);
 	VectorField operator+(const VectorField& o) const;
 	void operator-=(const VectorField& o);
+//	void operator-=(const dvec3& o);
 	VectorField operator-(const VectorField& o) const;
-	void operator*=(float o);
-	VectorField operator*(float o) const;
+	void operator*=(double o);
+	VectorField operator*(double o) const;
 
 	VectorField componentwise_product(const VectorField& o) const;
 	//void split(ScalarField& x, ScalarField& y, ScalarField& z) const;

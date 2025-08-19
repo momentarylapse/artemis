@@ -26,6 +26,14 @@ int RegularGrid::cell_count() const {
 int RegularGrid::vertex_count() const {
 	return (nx + 1) * (ny + 1) * (nz + 1);
 }
+int RegularGrid::count(SamplingMode mode) const {
+	if (mode == SamplingMode::PerCell)
+		return cell_count();
+	if (mode == SamplingMode::PerVertex)
+		return vertex_count();
+	return 0;
+}
+
 
 int RegularGrid::cell_index(int i, int j, int k) const {
 	return i + j * nx + k * nx * ny;

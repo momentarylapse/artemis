@@ -30,8 +30,8 @@ struct ScalarField {
 	ScalarField operator+(const ScalarField& o) const;
 	void operator-=(const ScalarField& o);
 	ScalarField operator-(const ScalarField& o) const;
-	void operator*=(float o);
-	ScalarField operator*(float o) const;
+	void operator*=(double o);
+	ScalarField operator*(double o) const;
 };
 
 }

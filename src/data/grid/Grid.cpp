@@ -58,4 +58,10 @@ int Grid::cell_count() const {
 	return 0;
 }
 
+int Grid::count(SamplingMode mode) const {
+	if (type == GridType::Regular)
+		return regular->count(mode);
+	return 0;
+}
+
 }

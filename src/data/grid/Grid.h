@@ -22,6 +22,7 @@ struct Grid : Sharable<base::Empty> {
 
 	int vertex_count() const;
 	int cell_count() const;
+	int count(SamplingMode mode) const;
 	Box bounding_box() const;
 
 	Array<vec3> vertices() const;

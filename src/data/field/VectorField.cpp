@@ -45,69 +45,64 @@ void VectorField::_set(int index, const dvec3& vv) {
 }
 
 vec3 VectorField::value32(int i, int j, int k) const {
+	return value(i, j, k).to32();
+}
+
+dvec3 VectorField::_value(int index) const {
 	if (type == ScalarType::Float32)
-		return *(vec3*)v32.at(grid, sampling_mode, i, j, k);
+		return dvec3(*(vec3*)v32._at(index));
 	if (type == ScalarType::Float64)
-		return ((dvec3*)v64.at(grid, sampling_mode, i, j, k))->to32();
+		return *(dvec3*)v64._at(index);
 	return {0,0,0};
 }
 
 vec3 VectorField::_value32(int index) const {
-	if (type == ScalarType::Float32)
-		return *(vec3*)v32._at(index);
-	if (type == ScalarType::Float64)
-		return ((dvec3*)v64._at(index))->to32();
-	return {0,0,0};
+	return _value(index).to32();
 }
 
 void VectorField::set32(int i, int j, int k, const vec3& vv) {
-	if (type == ScalarType::Float32)
-		*(vec3*)v32.at(grid, sampling_mode, i, j, k) = vv;
-	else if (type == ScalarType::Float64)
-		*(dvec3*)v64.at(grid, sampling_mode, i, j, k) = dvec3(vv);
+	set(i, j, k, dvec3(vv));
 }
 
 void VectorField::_set32(int index, const vec3& vv) {
-	if (type == ScalarType::Float32)
-		*(vec3*)v32._at(index) = vv;
-	else if (type == ScalarType::Float64)
-		*(dvec3*)v64._at(index) = dvec3(vv);
+	_set(index, dvec3(vv));
 }
+
+dvec3 VectorField::average() const {
+	dvec3 sum = {0,0,0};
+	if (type == ScalarType::Float32)
+		for (int i = 0; i<3; i++)
+			sum += _value(i);
+	return sum / grid.count(sampling_mode);
+}
+
 
 template<class T>
 void v_list_add(T& a, const T& b) {
-#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] += b[i];
 	}, 1000);
-#else
-	for (int i=0; i<a.num; i++)
-		a[i] += b[i];
-#endif
+}
+
+template<class T, class V>
+void v_list_add_single(T& a, const V& b) {
+	processing::pool::run(a.v.num / a.components, [&a, &b] (int i) {
+		*(V*)a._at(i) += b;
+	}, 1000);
 }
 
 template<class T>
 void v_list_sub(T& a, const T& b) {
-#if 1
 	processing::pool::run(a.num, [&a, &b] (int i) {
 		a[i] -= b[i];
 	}, 1000);
-#else
-	for (int i=0; i<a.num; i++)
-		a[i] -= b[i];
-#endif
 }
 
 template<class T>
-void v_list_mul_single(T& a, float s) {
-#if 1
+void v_list_mul_single(T& a, double s) {
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 1000);
-#else
-	for (int i=0; i<a.num; i++)
-		a[i] *= s;
-#endif
 }
 
 void VectorField::operator+=(const VectorField& o) {
@@ -118,6 +113,13 @@ void VectorField::operator+=(const VectorField& o) {
 	else if (type == ScalarType::Float64)
 		v_list_add(v64.v, o.v64.v);
 }
+
+/*void VectorField::operator+=(const dvec3& o) {
+	if (type == ScalarType::Float32)
+		v_list_add_single(v32, o.to32());
+	else if (type == ScalarType::Float64)
+		v_list_add_single(v64, o);
+}*/
 
 VectorField VectorField::operator+(const VectorField& o) const {
 	auto r = *this;
@@ -140,14 +142,14 @@ VectorField VectorField::operator-(const VectorField& o) const {
 	return r;
 }
 
-void VectorField::operator*=(float o) {
+void VectorField::operator*=(double o) {
 	if (type == ScalarType::Float32)
 		v_list_mul_single(v32.v, o);
 	else if (type == ScalarType::Float64)
 		v_list_mul_single(v64.v, o);
 }
 
-VectorField VectorField::operator*(float o) const {
+VectorField VectorField::operator*(double o) const {
 	auto r = *this;
 	r *= o;
 	return r;

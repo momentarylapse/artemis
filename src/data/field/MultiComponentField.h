@@ -23,15 +23,13 @@ namespace artemis::data {
 
 		double value(int i, int j, int k, int n) const;
 		void set(int i, int j, int k, int n, double v);
-		float value32(int i, int j, int k, int n) const;
-		void set32(int i, int j, int k, int n, float v);
 
 		void operator+=(const MultiComponentField& o);
 		MultiComponentField operator+(const MultiComponentField& o) const;
 		void operator-=(const MultiComponentField& o);
 		MultiComponentField operator-(const MultiComponentField& o) const;
-		void operator*=(float o);
-		MultiComponentField operator*(float o) const;
+		void operator*=(double o);
+		MultiComponentField operator*(double o) const;
 
 		MultiComponentField componentwise_product(const MultiComponentField& o) const;
 	};

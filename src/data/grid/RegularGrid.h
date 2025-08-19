@@ -18,6 +18,8 @@ struct RegularGrid {
 
 	int vertex_count() const;
 	int cell_count() const;
+	int count(SamplingMode mode) const;
+
 	int cell_index(int i, int j, int k) const;
 	int vertex_index(int i, int j, int k) const;
 	vec3 index_to_pos(float i, float j, float k) const;

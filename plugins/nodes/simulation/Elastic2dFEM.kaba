@@ -23,7 +23,7 @@ class Elastic2dFEM extends Node
 		
 		#grid.N = 0
 	
-	func mut substep(dt: f32, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+	func mut substep(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
 		
 		let C = mat.elastic_modulus()
@@ -61,7 +61,6 @@ class Elastic2dFEM extends Node
 		uz += dt_uz * dt
 	
 	func override on_process()
-		# assume f32
 		# assume PER_VERTEX
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()

@@ -183,8 +183,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("ScalarField.v64", &data::ScalarField::v64);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
-	ext->link_class_func("ScalarField.set", &data::ScalarField::set32);
-	ext->link_class_func("ScalarField.value", &data::ScalarField::value32);
+	ext->link_class_func("ScalarField.set", &data::ScalarField::set);
+	ext->link_class_func("ScalarField.value", &data::ScalarField::value);
 	ext->link_class_func("ScalarField.type", &field_get_type<data::ScalarField>);
 	ext->link_class_func("ScalarField.__assign__", &kaba::generic_assign<data::ScalarField>);
 	ext->link_class_func("ScalarField.__add__", &data::ScalarField::operator+);
@@ -224,8 +224,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("MultiComponentField.grid", &data::MultiComponentField::grid);
 	ext->declare_class_element("MultiComponentField.v32", &data::MultiComponentField::v32);
 	ext->declare_class_element("MultiComponentField.v64", &data::MultiComponentField::v64);
-	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set32);
-	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value32);
+	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set);
+	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value);
 	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__assign__", &kaba::generic_assign<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
