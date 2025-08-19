@@ -91,9 +91,13 @@ Dialog x x padding=0
 			Grid left-grid '' spacing=0
 				.
 				---|
-				Overlay ? ''
+				Overlay code-editor-panel '' visible=no
 					MultilineEdit code-editor '' height=300 monospace fontsize=16
 					Grid overlay-code-grid '' margin=25
+						Grid ? ''
+							Label ? '' ignorehover expandx
+							Button close-code-editor 'X' noexpandx
+						---|
 						Label ? '' ignorehover expandy
 						---|
 						Grid overlay-button-grid-code-bottom '' spacing=20
@@ -101,15 +105,17 @@ Dialog x x padding=0
 			Overlay ? ''
 				DrawingArea area '' grabfocus width=400 greedfactorx=1.6 expandx
 				Grid overlay-main-grid '' margin=25
-					Label ? '' ignorehover expandx
-					Grid overlay-button-grid-right '' spacing=20
-						Button cam-rotate 'R' image=rf-rotate height=50 width=50 padding=7 noexpandx ignorefocus
-						---|
-						Button cam-move 'M' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
+					Grid ? ''
+						Label ? '' ignorehover expandx
+						Grid overlay-button-grid-right '' spacing=20
+							Button cam-rotate 'R' image=rf-rotate height=50 width=50 padding=7 noexpandx ignorefocus
+							---|
+							Button cam-move 'M' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
 					---|
 					Label ? '' ignorehover expandy
 					---|
 					Grid overlay-button-grid-bottom '' spacing=20
+						Label ? '' ignorehover expandx
 						Button simulation-start 'Start' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 						Button simulation-pause 'Pause' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 						Button simulation-stop 'Stop' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
@@ -284,6 +290,9 @@ Dialog x x padding=0
 	});
 	event("code-run", [this] {
 		code_editor->run();
+	});
+	event("close-code-editor", [this] {
+		set_visible("code-editor-panel", false);
 	});
 	event_x(id, xhui::event_id::Close, [this] {
 		if (!session->cur_mode->get_data() or session->cur_mode->get_data()->action_manager->is_save())

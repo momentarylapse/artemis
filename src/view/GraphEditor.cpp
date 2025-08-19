@@ -91,13 +91,15 @@ GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
 Dialog x ''
 	Overlay ? ''
 		DrawingArea graph '' grabfocus width=400 expandx
-		Grid overlay-grid '' margin=20
-			Grid ? ''
+		Grid overlay-grid '' margin=25
+			Grid ? '' spacing=20
+				Label ? '' ignorehover expandx
 				Button add-node '+' height=50 width=50 padding=7 noexpandx ignorefocus
+				Button show-code-editor 'E' height=50 width=50 padding=7 noexpandx ignorefocus
 			---|
 			Grid ? ''
-				Label ? '' expandy
-				Label ? '' expandx
+				Label ? '' ignorehover expandy
+				Label ? '' ignorehover expandx
 				---|
 				Grid dock ''
 				.
@@ -134,6 +136,10 @@ Dialog x ''
 	});
 	event("add-node", [this] {
 		open_node_list_panel();
+	});
+	event("show-code-editor", [this] {
+		if (auto w = get_window())
+			w->set_visible("code-editor-panel", true);
 	});
 
 	graph->out_changed >> create_sink([this] {

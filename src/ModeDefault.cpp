@@ -103,9 +103,9 @@ void ModeDefault::on_draw_post(Painter* p) {
 		p->draw_str(pos - vec2(w, 0), str);
 	};
 
-	p->set_color(White);
+	p->set_color(xhui::Theme::_default.text_label);
 	p->set_font_size(xhui::Theme::_default.font_size * 1.3f);
-	draw_str_right(p->area().p11() - vec2(30, 50), format("t = %s", nice_time(session->graph->t, session->graph->dt)));
+	draw_str_right(p->area().p11() - vec2(320, 55), format("t = %s", nice_time(session->graph->t, session->graph->dt)));
 	p->set_font_size(xhui::Theme::_default.font_size);
 
 	if (show_profiling) {
