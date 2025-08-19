@@ -92,11 +92,15 @@ Dialog x ''
 	Overlay ? ''
 		DrawingArea graph '' grabfocus width=400 expandx
 		Grid overlay-grid '' margin=20
-			Label ? '' expandy
-			Label ? '' expandx
+			Grid ? ''
+				Button add-node '+' height=50 width=50 padding=7 noexpandx ignorefocus
 			---|
-			Grid dock ''
-			.
+			Grid ? ''
+				Label ? '' expandy
+				Label ? '' expandx
+				---|
+				Grid dock ''
+				.
 )foodelim");
 
 
@@ -127,6 +131,9 @@ Dialog x ''
 			graph->add_node(artemis::graph::create_node(session, get_window()->drag.payload.sub(9)));
 			graph->nodes.back()->pos = from_screen(get_window()->mouse_position());
 		}
+	});
+	event("add-node", [this] {
+		open_node_list_panel();
 	});
 
 	graph->out_changed >> create_sink([this] {
@@ -352,7 +359,6 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 
 		dnd_offset = m - selection->node->pos;
 	} else if (!selection) {
-		open_node_list_panel();
 	}
 
 	request_redraw();
