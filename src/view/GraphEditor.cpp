@@ -10,6 +10,7 @@
 #include <graph/NodeFactory.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
+#include <lib/dataflow/Type.h>
 #include <lib/base/iter.h>
 #include <lib/base/sort.h>
 #include <lib/os/msg.h>
@@ -130,8 +131,21 @@ Dialog x ''
 
 	event_x("graph", xhui::event_id::DragDrop, [this] {
 		if (get_window()->drag.payload.match("add-node:*")) {
-			graph->add_node(artemis::graph::create_node(session, get_window()->drag.payload.sub(9)));
-			graph->nodes.back()->pos = from_screen(get_window()->mouse_position());
+			const auto m = get_window()->mouse_position();
+			auto n = artemis::graph::create_node(session, get_window()->drag.payload.sub(9));
+			n->pos = from_screen(m);
+			graph->add_node(n);
+			if (hover and hover->type == HoverType::OutPort and n->in_ports.num > 0) {
+				if (dataflow::port_type_match(*hover->node->out_ports[hover->index], *n->in_ports[0])) {
+					n->pos.y += 50;
+					graph->connect(dataflow::CableInfo{hover->node, hover->index, n, 0});
+				}
+			} else if (hover and hover->type == HoverType::InPort and n->out_ports.num > 0) {
+				if (dataflow::port_type_match(*n->out_ports[0], *hover->node->in_ports[hover->index])) {
+					n->pos.y -= 100;
+					graph->connect(dataflow::CableInfo{n, 0, hover->node, hover->index});
+				}
+			}
 		}
 	});
 	event("add-node", [this] {
@@ -368,7 +382,9 @@ base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
 
 void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 	if (get_window()->button(0)) {
-		if (selection and selection->type == HoverType::Node) {
+		if (get_window()->drag.active and get_window()->drag.payload.match("add-node:*")) {
+			hover = get_hover(m);
+		} else if (selection and selection->type == HoverType::Node) {
 			selection->node->pos = m - dnd_offset;
 		} else if (selection and (selection->type == HoverType::OutPort or selection->type == HoverType::InPort)) {
 			// new connection
