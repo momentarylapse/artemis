@@ -183,13 +183,56 @@ Array<vec2> GraphEditor::cable_spline(const dataflow::CableInfo& c) {
 	return DrawingHelper::spline(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B);
 }
 
+void GraphEditor::draw_grid(Painter* p) {
+	p->set_color(xhui::Theme::_default.background);
+	p->draw_rect(_area);
+	p->set_line_width(max(1.0f * view_scale, 1.0f));
+	p->set_contiguous(false);
+
+	rect view_area = rect(from_screen(_area.p00()), from_screen(_area.p11()));
+	color c0 = color::interpolate(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.07f * min(view_scale, 1.0f));
+	color c1 = color::interpolate(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.15f * min(view_scale, 1.0f));
+	const float D = 20.0f;
+	Array<vec2> points;
+	for (int i=(int)floorf(view_area.y1 / D); i<(int)ceilf(view_area.y2 / D); i++) {
+		if (i % 5 == 0)
+			continue;
+		float y = to_screen({0, (float)i*D}).y;
+		points.add({_area.x1, y});
+		points.add({_area.x2, y});
+	}
+	for (int i=(int)floorf(view_area.x1 / D); i<(int)ceilf(view_area.x2 / D); i++) {
+		if (i % 5 == 0)
+			continue;
+		float x = to_screen({(float)i*D, 0}).x;
+		points.add({x, _area.y1});
+		points.add({x, _area.y2});
+	}
+	p->set_color(c0);
+	p->draw_lines(points);
+
+
+	points.clear();
+	for (int i=(int)floorf(view_area.y1 / (D*5)); i<(int)ceilf(view_area.y2 / (D*5)); i++) {
+		float y = to_screen({0, (float)i*D*5}).y;
+		points.add({_area.x1, y});
+		points.add({_area.x2, y});
+	}
+	for (int i=(int)floorf(view_area.x1 / (D*5)); i<(int)ceilf(view_area.x2 / (D*5)); i++) {
+		float x = to_screen({(float)i*D*5, 0}).x;
+		points.add({x, _area.y1});
+		points.add({x, _area.y2});
+	}
+	p->set_color(c1);
+	p->draw_lines(points);
+	p->set_contiguous(true);
+}
 
 void GraphEditor::on_draw(Painter* p) {
 	auto clip0 = p->clip();
 	p->set_clip(_area);
-	p->set_color(xhui::Theme::_default.background);
-	p->draw_rect(_area);
 
+	draw_grid(p);
 
 	for (const auto& [i, c]: enumerate(graph->cables())) {
 		p->set_color(Gray);
@@ -335,7 +378,7 @@ void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 void GraphEditor::on_mouse_wheel(const vec2 &d) {
 	const vec2 m = get_window()->state.m;
 	const vec2 mm = from_screen(m);
-	view_scale = clamp(view_scale * expf(0.2f * d.y), 0.1f, 10.0f);
+	view_scale = clamp(view_scale * expf(0.2f * d.y), 0.5f, 10.0f);
 	view_offset -= to_screen(mm) - m;
 
 	hover = get_hover(m);

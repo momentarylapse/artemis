@@ -35,6 +35,7 @@ public:
 
 	void open_node_list_panel();
 
+	void draw_grid(Painter* p);
 	void draw_node(Painter* p, dataflow::Node* node);
 
 	rect node_area(dataflow::Node* n);
