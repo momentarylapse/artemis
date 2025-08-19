@@ -12,8 +12,11 @@ namespace artemis::processing {
 
 data::VectorField gradient(const data::ScalarField& f) {
 	data::VectorField v(f.grid, f.type, f.sampling_mode);
+	ivec3 end = {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1};
+	if (v.sampling_mode == data::SamplingMode::PerVertex)
+		end = {v.grid.nx,v.grid.ny,v.grid.nz};
 
-	pool::run({0,0,0}, {f.grid.nx-1,f.grid.ny-1,f.grid.nz-1}, [&f, &v] (int i, int j, int k) {
+	pool::run({0,0,0}, end, [&f, &v] (int i, int j, int k) {
 		double f0 = f.value(i, j, k);
 		double fx = f.value(i+1, j, k);
 		double fy = f.value(i, j+1, k);
@@ -26,8 +29,11 @@ data::VectorField gradient(const data::ScalarField& f) {
 
 data::ScalarField divergence(const data::VectorField& v) {
 	data::ScalarField div(v.grid, v.type, v.sampling_mode);
+	ivec3 end = {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1};
+	if (v.sampling_mode == data::SamplingMode::PerVertex)
+		end = {v.grid.nx,v.grid.ny,v.grid.nz};
 
-	pool::run({0,0,0}, {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1}, [&div, &v] (int i, int j, int k) {
+	pool::run({0,0,0}, end, [&div, &v] (int i, int j, int k) {
 		dvec3 v0 = v.value(i, j, k);
 		double vxx = v.value(i+1, j, k).x;
 		double vyy = v.value(i, j+1, k).y;

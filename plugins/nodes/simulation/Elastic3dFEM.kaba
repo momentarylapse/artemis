@@ -4,6 +4,7 @@ use fem.material.*
 class Elastic3dFEM extends Node
 	var in_u: InPortVectorField
 	var in_dt_u: InPortVectorField
+	var substeps: SettingInt
 	
 	var mat: Material
 	
@@ -12,6 +13,7 @@ class Elastic3dFEM extends Node
 		super.__init__("Elastic2dFEM")
 		in_u.__init__(self, "u", PortFlags.MUTABLE)
 		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
+		substeps.__init__(self, "substeps", 100)
 		flags = NodeFlags.TIME_DEPENDENT
 		
 		mat = nickel()
@@ -81,7 +83,7 @@ class Elastic3dFEM extends Node
 				var dt_uz = dt_u.get_component(2)
 		
 				let dt = current_session().graph.dt
-				let N = 100
+				let N = substeps()
 				for i in 0:N
 					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
 			
