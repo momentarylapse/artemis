@@ -193,6 +193,7 @@ class SettingColor
 	func extern mut set(value: Color)
 
 class Graph
+	func extern clear()
 	func extern add_node(name: string, pos: vec2) -> Node&
 	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
 	var t: f32

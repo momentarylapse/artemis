@@ -503,6 +503,7 @@ add_executable(artemis
 	src/view/dialog/ColorMapDialog.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
+	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
 	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp
@@ -894,6 +895,7 @@ add_library(moduleartemis SHARED
 	src/view/dialog/ColorMapDialog.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
+	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
 	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp

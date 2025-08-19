@@ -22,15 +22,16 @@
 #include "DrawingHelper.h"
 #include "GraphEditor.h"
 #include "MultiView.h"
+#include "CodeEditor.h"
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
-#include <lib/xhui/draw/font.h>
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/yrenderer/Renderer.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>
 #include "y/helper/ResourceManager.h"
 #include "storage/Storage.h"
 #include "Session.h"
+#include "plugins/PluginManager.h"
 
 
 extern string AppName;
@@ -41,88 +42,6 @@ Session* session;
 rect dynamicly_scaled_area(ygfx::FrameBuffer*) { return {}; }
 rect dynamicly_scaled_source() { return {}; }
 void ExternalModelCleanup(Model *m) {}
-
-namespace xhui {
-#ifdef HAS_LIB_GL
-	void init_nix();
-	extern owned<nix::Context> _nix_context;
-#endif
-}
-
-#if 0
-class TestRenderer : public Renderer {
-public:
-	vulkan::VertexBuffer* vbx;
-	SceneView scene_view;
-	RenderViewData rvd;
-	shared<Shader> shader;
-	Material* material;
-	quaternion ang = quaternion::ID;
-	Camera* cam;
-	Light* light;
-
-	TestRenderer() : Renderer("test") {
-		resource_manager = _resource_manager;
-		vbx = new VertexBuffer("3f,3f,2f");
-		vbx->create_quad(rect::ID_SYM);
-		try {
-			shader = resource_manager->load_surface_shader("default.shader", "forward", "default", "");
-			material = resource_manager->load_material("");
-			material->albedo = White;
-			material->metal = 0.0f;
-			material->roughness = 0.9f;
-			material->emission = color(1, 0.1f, 0.1f, 0.1f);
-			material->textures = {tex_white};
-			material->pass0.cull_mode = 0;
-		} catch(Exception& e) {
-			msg_error(e.message());
-		}
-
-		cam = new Camera();
-		cam->owner = new Entity;
-		scene_view.cam = cam;
-		cam->owner->pos = {0, 0,-10};
-		cam->min_depth = 1;
-		cam->max_depth = 100;
-		rvd.scene_view = &scene_view;
-
-		light = new Light(White, -1, -1);
-		light->owner = new Entity;
-		//light->owner->ang = quaternion::rotation({0,1,0}, pi);
-		//light->light.harshness = 0.5f;
-	}
-	void prepare(const RenderParams& params) override {
-		ang = quaternion::rotation({0,1,0}, 0.02f) * ang;
-	}
-	void draw(const RenderParams& params) override {
-		auto cb = params.command_buffer;
-		cb->clear(params.area, {data_world->meta_data.background_color}, 1.0);
-
-	//	scene_view.choose_lights();
-		{
-			scene_view.lights.clear();
-			scene_view.shadow_index = -1;
-			//	if (l->allow_shadow)
-			//		scene_view.shadow_index = scene_view.lights.num;
-			scene_view.lights.add(light);
-		}
-
-		scene_view.cam->update_matrices(params.desired_aspect_ratio);
-		rvd.set_projection_matrix(scene_view.cam->m_projection);
-		rvd.set_view_matrix(scene_view.cam->m_view);
-		rvd.update_lights();
-		rvd.ubo.num_lights = scene_view.lights.num;
-		rvd.ubo.shadow_index = scene_view.shadow_index;
-
-		rvd.begin_draw();
-
-
-		auto& rd = rvd.start(params,  mat4::rotation(ang), shader.get(), *material, 0, PrimitiveTopology::TRIANGLES, vbx);
-		rd.apply(params);
-		cb->draw(vbx);
-	}
-};
-#endif
 
 
 namespace yrenderer {
@@ -169,7 +88,16 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 Dialog x x padding=0
 	Grid grid ''
 		Grid main-grid '' spacing=0
-			.
+			Grid left-grid '' spacing=0
+				.
+				---|
+				Overlay ? ''
+					MultilineEdit code-editor '' height=300 monospace fontsize=16
+					Grid overlay-code-grid '' margin=25
+						Label ? '' ignorehover expandy
+						---|
+						Grid overlay-button-grid-code-bottom '' spacing=20
+							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 			Overlay ? ''
 				DrawingArea area '' grabfocus width=400 greedfactorx=1.6 expandx
 				Grid overlay-main-grid '' margin=25
@@ -191,7 +119,9 @@ Dialog x x padding=0
 
 	//toolbar = (xhui::Toolbar*)get_control("toolbar");
 
-	embed("main-grid", 0, 0, new GraphEditor(session));
+	embed("left-grid", 0, 0, new GraphEditor(session));
+
+	code_editor = new CodeEditor(this, "code-editor", artemis::PluginManager::directory());
 
 #ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;
@@ -351,6 +281,9 @@ Dialog x x padding=0
 			set_options("mouse-action", "image=rf-translate");
 		}
 		set_string("mouse-action", session->cur_mode->multi_view->action_controller->action.name().sub(0, 1).upper());
+	});
+	event("code-run", [this] {
+		code_editor->run();
 	});
 	event_x(id, xhui::event_id::Close, [this] {
 		if (!session->cur_mode->get_data() or session->cur_mode->get_data()->action_manager->is_save())

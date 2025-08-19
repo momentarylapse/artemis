@@ -291,6 +291,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("Graph.dt", &graph::Graph::dt);
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
+	ext->link_class_func("Graph.clear", &graph::Graph::clear);
 
 }
 

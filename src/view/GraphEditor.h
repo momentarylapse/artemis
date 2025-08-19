@@ -2,8 +2,7 @@
 // Created by michi on 09.03.25.
 //
 
-#ifndef GRAPHEDITOR_H
-#define GRAPHEDITOR_H
+#pragma once
 
 
 #include <lib/base/optional.h>
@@ -71,5 +70,3 @@ public:
 };
 
 
-
-#endif //GRAPHEDITOR_H

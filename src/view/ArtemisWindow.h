@@ -16,6 +16,7 @@ namespace yrenderer {
 }
 class MultiViewRenderer;
 class Session;
+class CodeEditor;
 
 class ArtemisWindow : public obs::Node<xhui::Window> {
 public:
@@ -31,6 +32,8 @@ public:
 	obs::sink in_saved;
 
 	xhui::Toolbar* toolbar;
+
+	CodeEditor* code_editor;
 
 	explicit ArtemisWindow(Session* session);
 
