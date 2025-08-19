@@ -185,6 +185,9 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value);
+	ext->link_class_func("ScalarField.average", &data::ScalarField::average);
+	ext->link_class_func("ScalarField.min", &data::ScalarField::min);
+	ext->link_class_func("ScalarField.max", &data::ScalarField::max);
 	ext->link_class_func("ScalarField.type", &field_get_type<data::ScalarField>);
 	ext->link_class_func("ScalarField.__assign__", &kaba::generic_assign<data::ScalarField>);
 	ext->link_class_func("ScalarField.__add__", &data::ScalarField::operator+);
@@ -203,12 +206,15 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("VectorField.v64", &data::VectorField::v64);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
+	ext->link_class_func("VectorField.average", &data::VectorField::average32);
 	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);
 	ext->link_class_func("VectorField.__assign__", &kaba::generic_assign<data::VectorField>);
 	ext->link_class_func("VectorField.__add__", &data::VectorField::operator+);
-	ext->link_class_func("VectorField.__iadd__", &data::VectorField::operator+=);
+	ext->link_class_func("VectorField.__iadd__:VectorField:VectorField", &data::VectorField::operator+=);
+	ext->link_class_func("VectorField.__iadd__:VectorField:math.vec3", &data::VectorField::iadd_single32);
 	ext->link_class_func("VectorField.__sub__", &data::VectorField::operator-);
-	ext->link_class_func("VectorField.__isub__", &data::VectorField::operator-=);
+	ext->link_class_func("VectorField.__isub__:VectorField:VectorField", &data::VectorField::operator-=);
+	ext->link_class_func("VectorField.__isub__:VectorField:math.vec3", &data::VectorField::isub_single32);
 	ext->link_class_func("VectorField.__mul__", &data::VectorField::operator*);
 	ext->link_class_func("VectorField.__imul__", &data::VectorField::operator*=);
 	ext->link_class_func("VectorField.cwise_product", &data::VectorField::componentwise_product);

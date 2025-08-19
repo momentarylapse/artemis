@@ -70,12 +70,15 @@ void VectorField::_set32(int index, const vec3& vv) {
 
 dvec3 VectorField::average() const {
 	dvec3 sum = {0,0,0};
-	if (type == ScalarType::Float32)
-		for (int i = 0; i<3; i++)
-			sum += _value(i);
-	return sum / grid.count(sampling_mode);
+	int n = grid.count(sampling_mode);
+	for (int i = 0; i<n; i++)
+		sum += _value(i);
+	return sum / n;
 }
 
+vec3 VectorField::average32() const {
+	return average().to32();
+}
 
 template<class T>
 void v_list_add(T& a, const T& b) {
@@ -114,12 +117,16 @@ void VectorField::operator+=(const VectorField& o) {
 		v_list_add(v64.v, o.v64.v);
 }
 
-/*void VectorField::operator+=(const dvec3& o) {
+void VectorField::iadd_single(const dvec3& o) {
 	if (type == ScalarType::Float32)
 		v_list_add_single(v32, o.to32());
 	else if (type == ScalarType::Float64)
 		v_list_add_single(v64, o);
-}*/
+}
+
+void VectorField::iadd_single32(const vec3& o) {
+	iadd_single(dvec3(o));
+}
 
 VectorField VectorField::operator+(const VectorField& o) const {
 	auto r = *this;
@@ -140,6 +147,14 @@ VectorField VectorField::operator-(const VectorField& o) const {
 	auto r = *this;
 	r -= o;
 	return r;
+}
+
+void VectorField::isub_single(const dvec3& o) {
+	iadd_single({-o.x, -o.y, -o.z});
+}
+
+void VectorField::isub_single32(const vec3& o) {
+	isub_single(dvec3(o));
 }
 
 void VectorField::operator*=(double o) {

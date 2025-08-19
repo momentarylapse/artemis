@@ -89,6 +89,8 @@ class Elastic3dFEM extends Node
 				u.set_component(0, ux)
 				u.set_component(1, uy)
 				u.set_component(2, uz)
+				u -= u.average()
+				
 				dt_u.set_component(0, dt_ux)
 				dt_u.set_component(1, dt_uy)
 				dt_u.set_component(2, dt_uz)

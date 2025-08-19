@@ -28,6 +28,14 @@ double ScalarField::value(int i, int j, int k) const {
 	return 0.0;
 }
 
+double ScalarField::_value(int index) const {
+	if (type == ScalarType::Float32)
+		return (double)*v32._at(index);
+	if (type == ScalarType::Float64)
+		return *v64._at(index);
+	return 0;
+}
+
 void ScalarField::set(int i, int j, int k, double f) {
 	if (type == ScalarType::Float32)
 		*v32.at(grid, sampling_mode, i, j, k) = (float)f;
@@ -48,10 +56,6 @@ void ScalarField::_set(int index, double f) {
 		*v32._at(index) = (float)f;
 	else if (type == ScalarType::Float64)
 		*v64._at(index) = f;
-}
-
-void ScalarField::_set32(int index, float f) {
-	_set(index, (double)f);
 }
 
 
@@ -118,5 +122,34 @@ ScalarField ScalarField::operator*(double o) const {
 	r *= o;
 	return r;
 }
+
+double ScalarField::average() const {
+	double sum = 0;
+	int n = grid.count(sampling_mode);
+	for (int i = 0; i<n; i++)
+		sum += _value(i);
+	return sum;
+}
+
+double ScalarField::min() const {
+	int n = grid.count(sampling_mode);
+	if (n == 0)
+		return 0;
+	double r = _value(0);
+	for (int i = 0; i<n; i++)
+		r = ::min(r, _value(i));
+	return r;
+}
+
+double ScalarField::max() const {
+	int n = grid.count(sampling_mode);
+	if (n == 0)
+		return 0;
+	double r = _value(0);
+	for (int i = 0; i<n; i++)
+		r = ::max(r, _value(i));
+	return r;
+}
+
 
 }

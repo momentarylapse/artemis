@@ -84,12 +84,17 @@ struct VectorField {
 	vec3 _value32(int index) const;
 
 	dvec3 average() const;
+	vec3 average32() const;
 
 	void operator+=(const VectorField& o);
 //	void operator+=(const dvec3& o);
+	void iadd_single(const dvec3& o);
+	void iadd_single32(const vec3& o);
 	VectorField operator+(const VectorField& o) const;
 	void operator-=(const VectorField& o);
 //	void operator-=(const dvec3& o);
+	void isub_single(const dvec3& o);
+	void isub_single32(const vec3& o);
 	VectorField operator-(const VectorField& o) const;
 	void operator*=(double o);
 	VectorField operator*(double o) const;
