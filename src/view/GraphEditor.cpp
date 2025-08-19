@@ -271,9 +271,15 @@ void GraphEditor::on_draw(Painter* p) {
 		draw_node(p, n);
 	p->set_font("", xhui::Theme::_default.font_size, false, false);
 
-
-	// new cable?
-	if (get_window()->button(0)) {
+	if (mode == Mode::Selecting) {
+		color c = color(1, 0.1f, 0.9f, 0.1f);
+		p->set_color(c.with_alpha(0.2f));
+		p->draw_rect(rect(to_screen(selection_start), get_window()->mouse_position()).canonical());
+		p->set_color(c);
+		p->set_fill(false);
+		p->draw_rect(rect(to_screen(selection_start), get_window()->mouse_position()));
+		p->set_fill(true);
+	} else if (mode == Mode::CreatingNewCable) {
 		if (selection and selection->type == HoverType::OutPort) {
 			p->set_color(White);
 			p->set_line_width(3 * view_scale);
@@ -307,7 +313,7 @@ void GraphEditor::on_draw(Painter* p) {
 void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 	p->set_font("", xhui::Theme::_default.font_size * view_scale, true, false);
 
-	if (selection and selection->type == HoverType::Node and selection->node == n) {
+	if (selected_nodes.contains(n)) {
 		p->set_color(Red.with_alpha(0.7f));
 		p->set_roundness(14 * view_scale);
 		p->draw_rect(node_area(n).grow(4 * view_scale));
@@ -381,13 +387,27 @@ base::optional<GraphEditor::Hover> GraphEditor::get_hover(const vec2& m) {
 }
 
 void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
-	if (get_window()->button(0)) {
+	if (mode == Mode::Selecting) {
+		rect r = rect(to_screen(selection_start), m).canonical();
+		selected_nodes.clear();
+		for (auto n: graph->nodes)
+			if (node_area(n).overlaps(r))
+				selected_nodes.add(n);
+		if (selected_nodes.num == 1) {
+			// TODO check if already open...
+			selection = Hover{HoverType::Node, selected_nodes[0], -1};
+			open_node_panel(selected_nodes[0]);
+		}
+	} else if (mode == Mode::MovingNodes) {
+		vec2 cur_pos = to_screen(m);
+		for (auto n: graph->nodes)
+			if (selected_nodes.contains(n))
+				n->pos += cur_pos - moving_last_pos;
+		moving_last_pos = cur_pos;
+	} else if (mode == Mode::CreatingNewCable) {
+		hover = get_hover(m);
+	} else if (get_window()->button(0)) {
 		if (get_window()->drag.active and get_window()->drag.payload.match("add-node:*")) {
-			hover = get_hover(m);
-		} else if (selection and selection->type == HoverType::Node) {
-			selection->node->pos = m - dnd_offset;
-		} else if (selection and (selection->type == HoverType::OutPort or selection->type == HoverType::InPort)) {
-			// new connection
 			hover = get_hover(m);
 		}
 	} else {
@@ -411,6 +431,15 @@ void GraphEditor::on_mouse_wheel(const vec2 &d) {
 void GraphEditor::on_left_button_down(const vec2& m) {
 	hover = get_hover(m);
 	selection = hover;
+	if (selection and selection->type == HoverType::Node) {
+		if (!selected_nodes.contains(selection->node)) {
+			selected_nodes.clear();
+			selected_nodes.add(selection->node);
+		}
+	} else {
+		selected_nodes.clear();
+	}
+	mode = Mode::Default;
 
 	if (node_panel) {
 		unembed(node_panel);
@@ -418,32 +447,44 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 	}
 
 	if (selection and selection->type == HoverType::Node) {
-		node_panel = selection->node->create_panel();
-		node_panel->min_width_user = PANEL_WIDTH;
-		embed("dock", 0, 0, node_panel);
+		open_node_panel(selection->node);
 
-		dnd_offset = m - selection->node->pos;
+		mode = Mode::MovingNodes;
+		moving_last_pos = to_screen(m);
+	} else if (selection and (selection->type == HoverType::OutPort or selection->type == HoverType::InPort)) {
+		mode = Mode::CreatingNewCable;
 	} else if (!selection) {
+		mode = Mode::Selecting;
+		selection_start = from_screen(m);
 	}
 
 	request_redraw();
 }
 
+void GraphEditor::open_node_panel(dataflow::Node* n) {
+	node_panel = n->create_panel();
+	node_panel->min_width_user = PANEL_WIDTH;
+	embed("dock", 0, 0, node_panel);
+}
+
 void GraphEditor::on_left_button_up(const vec2& m) {
-	if (selection and selection->type == HoverType::OutPort) {
-		if (hover and hover->type == HoverType::InPort) {
-			auto r = artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
-			if (!r)
-				session->set_message(r.error().msg);
+	if (mode == Mode::CreatingNewCable) {
+		if (selection and selection->type == HoverType::OutPort) {
+			if (hover and hover->type == HoverType::InPort) {
+				auto r = artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
+				if (!r)
+					session->set_message(r.error().msg);
+			}
+		}
+		if (selection and selection->type == HoverType::InPort) {
+			if (hover and hover->type == HoverType::OutPort) {
+				auto r = artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
+				if (!r)
+					session->set_message(r.error().msg);
+			}
 		}
 	}
-	if (selection and selection->type == HoverType::InPort) {
-		if (hover and hover->type == HoverType::OutPort) {
-			auto r = artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
-			if (!r)
-				session->set_message(r.error().msg);
-		}
-	}
+	mode = Mode::Default;
 }
 
 void GraphEditor::on_mouse_leave(const vec2& m) {

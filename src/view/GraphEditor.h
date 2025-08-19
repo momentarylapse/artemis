@@ -9,6 +9,8 @@
 #include <lib/pattern/Observable.h>
 #include <lib/xhui/Panel.h>
 
+#include "lib/base/set.h"
+
 class Session;
 
 namespace dataflow {
@@ -33,6 +35,7 @@ public:
 	void on_draw(Painter* p);
 
 	void open_node_list_panel();
+	void open_node_panel(dataflow::Node* n);
 
 	void draw_grid(Painter* p);
 	void draw_node(Painter* p, dataflow::Node* node);
@@ -61,8 +64,17 @@ public:
 	base::optional<Hover> hover;
 	base::optional<Hover> selection;
 	base::optional<Hover> get_hover(const vec2& m);
+	base::set<dataflow::Node*> selected_nodes;
 
-	vec2 dnd_offset;
+	enum class Mode {
+		Default,
+		CreatingNewCable,
+		Selecting,
+		MovingNodes
+	} mode = Mode::Default;
+	vec2 selection_start = vec2(0,0);
+
+	vec2 moving_last_pos = vec2(0,0);
 	float view_scale = 1.0f;
 	vec2 view_offset = vec2(0,0);
 	vec2 to_screen(const vec2& p) const;
