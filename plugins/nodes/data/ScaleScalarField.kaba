@@ -1,0 +1,16 @@
+use artemis.*
+
+class ScaleScalarField extends Node
+	var in_field: InPortScalarField
+	var out_field: OutPortScalarField
+	var factor: SettingFloat
+	
+	func __init__()
+		super.__init__("ScaleScalarField")
+		in_field.__init__(self, "in")
+		out_field.__init__(self, "out")
+		factor.__init__(self, "factor", 1.0)
+	
+	func override on_process()
+		for f in in_field.value()
+			out_field.set(f * factor())
