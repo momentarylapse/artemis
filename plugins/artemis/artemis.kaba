@@ -89,8 +89,6 @@ struct PlotData
 
 struct RenderData
 
-struct GenericData # dummy for receiving anything
-
 struct ColorMap
 	var colors: Color[]
 	var values: f32[]
@@ -120,57 +118,58 @@ enum PortFlags
 	OPTIONAL = 2
 	MULTI = 4
 
+struct GenericData
+	type: kaba.Class&
+	p: void&
+	
+class InPortBase
+	func extern __init__(node: Node, name: string, type: kaba.Class*, flags: PortFlags = PortFlags.NONE)
+	func extern generic_values() -> GenericData[]
+	func extern mutated()
+class OutPortBase
+	func extern __init__(node: Node, name: string, type: kaba.Class*, value: void*, flags: PortFlags = PortFlags.NONE)
+	func extern generic_set(p: void*)
+
+
 # TODO kaba template classes!
-class InPortScalarField
+class InPortScalarField extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> ScalarField*
-	func extern mutated()
-class OutPortScalarField
+class OutPortScalarField extends OutPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: ScalarField)
 
-class InPortVectorField
+class InPortVectorField extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> VectorField*
-	func extern mutated()
-class OutPortVectorField
+class OutPortVectorField extends OutPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: VectorField)
 
-class InPortMultiComponentField
+class InPortMultiComponentField extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> MultiComponentField*
-	func extern mutated()
-class OutPortMultiComponentField
+class OutPortMultiComponentField extends OutPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: MultiComponentField)
 	
-class InPortGrid
+class InPortGrid extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> Grid*
-	func extern mutated()
 
-class InPortList
+class InPortList extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> f64[]*
-	func extern mutated()
-class OutPortList
+class OutPortList extends OutPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: f64[])
 
-class InPortVectorList
+class InPortVectorList extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> vec3[]*
-	func extern mutated()
-class OutPortVectorList
+class OutPortVectorList extends OutPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern set(x: vec3[])
-
-class InPortGeneric
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> GenericData*
-	func extern types() -> kaba.Class&[]
-	func extern mutated()
 
 
 class SettingFloat

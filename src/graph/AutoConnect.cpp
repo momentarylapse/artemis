@@ -33,23 +33,23 @@ base::expected<int> auto_connect(Graph* g, const dataflow::CableInfo& c) {
 	auto sink = c.sink->in_ports[c.sink_port];
 	if (dataflow::port_type_match(*source, *sink))
 		return g->connect(c);
-	if (source->class_->name == "Mesh" and sink->class_->name == "RenderData")
+	if (source->type->name == "Mesh" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"MeshRenderer"});
-	if (source->class_->name == "Grid" and sink->class_->name == "RenderData")
+	if (source->type->name == "Grid" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"GridRenderer"});
-	if (source->class_->name == "ScalarField" and sink->class_->name == "RenderData")
+	if (source->type->name == "ScalarField" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"VolumeRenderer"});
-	if (source->class_->name == "VectorField" and sink->class_->name == "RenderData")
+	if (source->type->name == "VectorField" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"VectorFieldRenderer"});
-	if (source->class_->name == "vec3[]" and sink->class_->name == "RenderData")
+	if (source->type->name == "vec3[]" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"PointListRenderer"});
-	if (source->class_->name == "PlotData" and sink->class_->name == "RenderData")
+	if (source->type->name == "PlotData" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"Plotter"});
-	if (source->class_->name == "f64[]" and sink->class_->name == "RenderData")
+	if (source->type->name == "f64[]" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"ListPlot", "Plotter"});
-	if (source->class_->name == "f64[]" and sink->class_->name == "PlotData")
+	if (source->type->name == "f64[]" and sink->type->name == "PlotData")
 		return connect_through(g, c, {"ListPlot"});
-	return base::Error{format("can not connect  <b>%s</b>  to  <b>%s</b>", source->class_->name, sink->class_->name)};
+	return base::Error{format("can not connect  <b>%s</b>  to  <b>%s</b>", source->type->name, sink->type->name)};
 }
 
 } // graph

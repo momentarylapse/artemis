@@ -14,8 +14,6 @@ namespace kaba {
 
 namespace dataflow {
 
-extern const kaba::Class* generic_type;
-
 extern base::map<const std::type_info*, const kaba::Class*> type_map;
 
 void link_basic_types();
@@ -25,8 +23,6 @@ template<class T>
 const kaba::Class* get_class() {
 	return _get_class(&typeid(T));
 }
-
-struct GenericData {};
 
 } // dataflow
 

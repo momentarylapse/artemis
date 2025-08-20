@@ -1,15 +1,15 @@
 use artemis.*
 
 class GenericTest extends Node
-	var in_x: InPortGeneric
+	var in_x: InPortBase
 	
 	func __init__()
 		super.__init__("GenericTest")
-		in_x.__init__(self, "x")
+		in_x.__init__(self, "x", nil)
 	
 	func override on_process()
-		for f in in_x.value()
-			print(in_x.types())
-			if in_x.types()[0] == f64
-				print(&f as f64&)
+		for i=>v in in_x.generic_values()
+			print(v.type)
+			if v.type == f64
+				print(v.p as f64&)
 

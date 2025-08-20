@@ -39,14 +39,14 @@ void Graph::remove_node(dataflow::Node* node) {
 }
 
 bool port_type_match(const OutPortBase& source, const InPortBase& sink) {
-	if (sink.class_ == generic_type)
+	if (!sink.type)
 		return true;
-	return source.class_ == sink.class_;
+	return source.type == sink.type;
 }
 
 base::expected<int> Graph::connect(OutPortBase& source, InPortBase& sink) {
 	if (!port_type_match(source, sink))
-		return base::Error{format("failed to connect: %s  vs  %s", source.class_->name, sink.class_->name)};
+		return base::Error{format("failed to connect: %s  vs  %s", source.type->name, sink.type->name)};
 	if (sink.sources.num > 0 and !(sink.flags & PortFlags::Multi))
 		return base::Error{format("failed to connect: sink already connected")};
 	if ((sink.flags & PortFlags::Mutable) and !(source.flags & PortFlags::Mutable))

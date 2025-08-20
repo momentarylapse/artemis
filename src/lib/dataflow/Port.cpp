@@ -11,13 +11,20 @@ bool operator&(PortFlags a, PortFlags b) {
 	return ((int)a) & ((int)b);
 }
 
-OutPortBase::OutPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags) {
+OutPortBase::OutPortBase(Node* owner, const string& name, const kaba::Class* type, void* p, PortFlags flags) {
 	this->owner = owner;
 	this->name = name;
-	this->class_ = class_;
+	this->type = type;
+	generic_value_pointer = p;
 	this->flags = flags;
 	port_index = owner->out_ports.num;
 	owner->out_ports.add(this);
+}
+
+void OutPortBase::generic_set(void *p) {
+	generic_value_pointer = p;
+	has_value = true;
+	mutated();
 }
 
 void OutPortBase::mutated() {
@@ -26,10 +33,10 @@ void OutPortBase::mutated() {
 }
 
 
-InPortBase::InPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags) {
+InPortBase::InPortBase(Node* owner, const string& name, const kaba::Class* type_filter, PortFlags flags) {
 	this->owner = owner;
 	this->name = name;
-	this->class_ = class_;
+	this->type = type_filter;
 	this->flags = flags;
 	owner->in_ports.add(this);
 }
@@ -46,11 +53,11 @@ bool InPortBase::has_value() const {
 	return false;
 }
 
-Array<const kaba::Class*> InPortBase::types() const {
-	Array<const kaba::Class*> r;
+Array<GenericData> InPortBase::generic_values() const {
+	Array<GenericData> r;
 	for (auto s: sources)
 		if (s->has_value)
-			r.add(s->class_);
+			r.add({s->type, s->generic_value_pointer});
 	return r;
 }
 

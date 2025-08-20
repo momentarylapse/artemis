@@ -182,7 +182,9 @@ string port_description(P* p) {
 		flags.add("optional");
 	if (p->flags & dataflow::PortFlags::Multi)
 		flags.add("multi");
-	string type = p->class_->name;
+	string type = "*";
+	if (p->type)
+		type = p->type->name;
 	if (flags.num > 0)
 		return format("<b>%s</b>, type <b>%s</b>  (%s)", p->name, type, implode(flags, ", "));
 	return format("<b>%s</b>, type <b>%s</b>", p->name, type);
@@ -299,7 +301,7 @@ void GraphEditor::on_draw(Painter* p) {
 		tip = format("input %s", port_description(hover->node->in_ports[hover->index]));
 	if (hover and hover->type == HoverType::Cable) {
 		const auto c = graph->cables()[hover->index];
-		tip = format("cable, type <b>%s</b>", c.source->out_ports[c.source_port]->class_->name);
+		tip = format("cable, type <b>%s</b>", c.source->out_ports[c.source_port]->type->name);
 	}
 
 	if (tip != "") {

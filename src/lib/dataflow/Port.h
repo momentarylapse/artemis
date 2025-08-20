@@ -10,6 +10,8 @@
 #include <lib/base/optional.h>
 #include <lib/kaba/kaba.h>
 
+#include "lib/base/xparam.h"
+
 namespace dataflow {
 
 class Node;
@@ -25,29 +27,35 @@ bool operator&(PortFlags a, PortFlags b);
 
 class OutPortBase {
 public:
-	explicit OutPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags);
+	explicit OutPortBase(Node* owner, const string& name, const kaba::Class* type, void* p, PortFlags flags);
 	Node* owner;
 	int port_index;
 	string name;
-	const kaba::Class* class_;
+	const kaba::Class* type; // never null!
 	PortFlags flags;
 	Array<InPortBase*> targets;
+	void generic_set(void* p);
 	void mutated();
 	bool has_value = false;
 	void* generic_value_pointer = nullptr;
 };
 
+struct GenericData {
+	const kaba::Class* type;
+	void* p;
+};
+
 class InPortBase {
 public:
-	explicit InPortBase(Node* owner, const string& name, const kaba::Class* class_, PortFlags flags);
+	explicit InPortBase(Node* owner, const string& name, const kaba::Class* type_filter, PortFlags flags);
 	Node* owner;
 	string name;
-	const kaba::Class* class_;
+	const kaba::Class* type; // filter, can be null
 	PortFlags flags;
 	Array<OutPortBase*> sources;
 	void mutated();
 	bool has_value() const;
-	Array<const kaba::Class*> types() const;
+	Array<GenericData> generic_values() const;
 };
 
 
@@ -76,13 +84,11 @@ public:
 template<class T>
 class OutPort : public OutPortBase {
 public:
-	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, get_class<T>(), flags) {
-		generic_value_pointer = &_value;
+	OutPort(Node* owner, const string& name, PortFlags flags = PortFlags::None) : OutPortBase(owner, name, get_class<T>(), &_value, flags) {
 	}
-	void operator()(const T& v) {
+	void operator()(const typename base::xparam<T>::t v) {
 		_value = v;
-		has_value = true;
-		mutated();
+		generic_set(&_value);
 	}
 	T& value() {
 		return _value;

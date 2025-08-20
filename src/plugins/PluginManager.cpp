@@ -91,8 +91,6 @@ void link_ports(kaba::Exporter* ext, const string& name) {
 	ext->declare_class_size("InPort" + name, sizeof(dataflow::InPort<T>));
 	ext->link_class_func("InPort" + name + ".__init__", &port_init<dataflow::InPort<T>>);
 	ext->link_class_func("InPort" + name + ".value", &dataflow::InPort<T>::value);
-	ext->link_class_func("InPort" + name + ".mutated", &dataflow::InPort<T>::mutated);
-	ext->link_class_func("InPort" + name + ".types", &dataflow::InPort<T>::types);
 
 	ext->declare_class_size("OutPort" + name, sizeof(dataflow::OutPort<T>));
 	ext->link_class_func("OutPort" + name + ".__init__", &port_init<dataflow::OutPort<T>>);
@@ -277,6 +275,22 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 		ext->link_virtual("Node.on_process", &dataflow::Node::on_process, &n);
 		ext->link_virtual("Node.create_panel", &dataflow::Node::create_panel, &n);
 	}
+	{
+		ext->declare_class_size("GenericData", sizeof(dataflow::GenericData));
+		ext->declare_class_element("GenericData.type", &dataflow::GenericData::type);
+		ext->declare_class_element("GenericData.p", &dataflow::GenericData::p);
+	}
+	{
+		ext->declare_class_size("InPortBase", sizeof(dataflow::InPortBase));
+		ext->link_class_func("InPortBase.__init__", &kaba::generic_init_ext<dataflow::InPortBase, dataflow::Node*, const string&, const kaba::Class*, dataflow::PortFlags>);
+		ext->link_class_func("InPortBase.mutated", &dataflow::InPortBase::mutated);
+		ext->link_class_func("InPortBase.generic_values", &dataflow::InPortBase::generic_values);
+	}
+	{
+		ext->declare_class_size("OutPortBase", sizeof(dataflow::OutPortBase));
+		ext->link_class_func("OutPortBase.__init__", &kaba::generic_init_ext<dataflow::OutPortBase, dataflow::Node*, const string&, const kaba::Class*, void*, dataflow::PortFlags>);
+		ext->link_class_func("OutPortBase.generic_set", &dataflow::OutPortBase::generic_set);
+	}
 
 	link_ports<data::ScalarField>(ext, "ScalarField");
 	link_ports<data::VectorField>(ext, "VectorField");
@@ -284,7 +298,6 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<data::Grid>(ext, "Grid");
 	link_ports<Array<double>>(ext, "List");
 	link_ports<Array<vec3>>(ext, "VectorList");
-	link_ports<dataflow::GenericData>(ext, "Generic"); // :P
 
 	link_setting<double>(ext, "Float");
 	link_setting<int>(ext, "Int");
@@ -325,9 +338,6 @@ void PluginManager::import_kaba() {
 	import_component_class<graph::PlotData>(m, "PlotData");
 	import_component_class<graph::RenderData>(m, "RenderData");
 	import_component_class<data::SamplingMode>(m, "SamplingMode");
-	import_component_class<dataflow::GenericData>(m, "GenericData");
-
-	dataflow::generic_type = dataflow::get_class<dataflow::GenericData>();
 }
 
 void PluginManager::find_plugins() {
