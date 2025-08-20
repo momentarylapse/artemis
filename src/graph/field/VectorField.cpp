@@ -58,7 +58,7 @@ func f(p: vec3, t: f32) -> vec3
 				sampling_mode());
 
 			for (const auto& [i, p] : enumerate(g->points(sampling_mode())))
-				s._set32(i, f(p, t));
+				s.set(i, dvec3(f(p, t)));
 
 			out(s);
 		}

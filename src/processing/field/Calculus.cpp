@@ -17,11 +17,11 @@ data::VectorField gradient(const data::ScalarField& f) {
 		end = {v.grid.nx,v.grid.ny,v.grid.nz};
 
 	pool::run({0,0,0}, end, [&f, &v] (int i, int j, int k) {
-		double f0 = f.value(i, j, k);
-		double fx = f.value(i+1, j, k);
-		double fy = f.value(i, j+1, k);
-		double fz = f.value(i, j, k+1);
-		v.set(i, j, k, dvec3(fx - f0, fy - f0, fz - f0));
+		double f0 = f._value(i, j, k);
+		double fx = f._value(i+1, j, k);
+		double fy = f._value(i, j+1, k);
+		double fz = f._value(i, j, k+1);
+		v._set(i, j, k, dvec3(fx - f0, fy - f0, fz - f0));
 	}, 200);
 
 	return v;
@@ -34,11 +34,11 @@ data::ScalarField divergence(const data::VectorField& v) {
 		end = {v.grid.nx,v.grid.ny,v.grid.nz};
 
 	pool::run({0,0,0}, end, [&div, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		double vxx = v.value(i+1, j, k).x;
-		double vyy = v.value(i, j+1, k).y;
-		double vzz = v.value(i, j, k+1).z;
-		div.set(i, j, k, (vxx - v0.x) + (vyy - v0.y) + (vzz - v0.z));
+		dvec3 v0 = v._value(i, j, k);
+		double vxx = v._value(i+1, j, k).x;
+		double vyy = v._value(i, j+1, k).y;
+		double vzz = v._value(i, j, k+1).z;
+		div._set(i, j, k, (vxx - v0.x) + (vyy - v0.y) + (vzz - v0.z));
 	}, 200);
 
 	return div;
@@ -49,50 +49,50 @@ data::VectorField rotation_fw(const data::VectorField& v) {
 
 	// volume
 	pool::run({0,0,0}, {v.grid.nx-1, v.grid.ny-1, v.grid.nz-1}, [&v, &rot] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vx = v.value(i+1, j, k);
-		dvec3 vy = v.value(i, j+1, k);
-		dvec3 vz = v.value(i, j, k+1);
-		rot.set(i, j, k, dvec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vx = v._value(i+1, j, k);
+		dvec3 vy = v._value(i, j+1, k);
+		dvec3 vz = v._value(i, j, k+1);
+		rot._set(i, j, k, dvec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
 	}, 200);
 	// face x/y
 	pool::run({0,0,v.grid.nz-1}, {v.grid.nx-1,v.grid.ny-1,v.grid.nz}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vx = v.value(i+1, j, k);
-		dvec3 vy = v.value(i, j+1, k);
-		rot.set(i, j, k, dvec3((vy.z - v0.z), - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vx = v._value(i+1, j, k);
+		dvec3 vy = v._value(i, j+1, k);
+		rot._set(i, j, k, dvec3((vy.z - v0.z), - (vx.z - v0.z), (vx.y - v0.y) - (vy.x - v0.x)));
 	}, 200);
 	// face x/z
 	pool::run({0,v.grid.ny-1,0}, {v.grid.nx-1,v.grid.ny,v.grid.nz-1}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vx = v.value(i+1, j, k);
-		dvec3 vz = v.value(i, j, k+1);
-		rot.set(i, j, k, dvec3(- (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vx = v._value(i+1, j, k);
+		dvec3 vz = v._value(i, j, k+1);
+		rot._set(i, j, k, dvec3(- (vz.y - v0.y), (vz.x - v0.x) - (vx.z - v0.z), (vx.y - v0.y)));
 	}, 200);
 	// face y/z
 	pool::run({v.grid.nx-1,0,0}, {v.grid.nx,v.grid.ny-1,v.grid.nz-1}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vy = v.value(i, j+1, k);
-		dvec3 vz = v.value(i, j, k+1);
-		rot.set(i, j, k, dvec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x), - (vy.x - v0.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vy = v._value(i, j+1, k);
+		dvec3 vz = v._value(i, j, k+1);
+		rot._set(i, j, k, dvec3((vy.z - v0.z) - (vz.y - v0.y), (vz.x - v0.x), - (vy.x - v0.x)));
 	}, 200);
 	// edge x
 	pool::run({0,v.grid.ny-1,v.grid.nz-1}, {v.grid.nx-1,v.grid.ny,v.grid.nz}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vx = v.value(i+1, j, k);
-		rot.set(i, j, k, dvec3(0, - (vx.z - v0.z), (vx.y - v0.y)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vx = v._value(i+1, j, k);
+		rot._set(i, j, k, dvec3(0, - (vx.z - v0.z), (vx.y - v0.y)));
 	}, 200);
 	// edge y
 	pool::run({v.grid.nx-1,0,v.grid.nz-1}, {v.grid.nx,v.grid.ny-1,v.grid.nz}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vy = v.value(i, j+1, k);
-		rot.set(i, j, k, dvec3((vy.z - v0.z), 0, - (vy.x - v0.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vy = v._value(i, j+1, k);
+		rot._set(i, j, k, dvec3((vy.z - v0.z), 0, - (vy.x - v0.x)));
 	}, 200);
 	// edge z
 	pool::run({v.grid.nx-1,v.grid.ny-1,0}, {v.grid.nx,v.grid.ny,v.grid.nz-1}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vz = v.value(i, j, k+1);
-		rot.set(i, j, k, dvec3(- (vz.y - v0.y), (vz.x - v0.x), 0));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vz = v._value(i, j, k+1);
+		rot._set(i, j, k, dvec3(- (vz.y - v0.y), (vz.x - v0.x), 0));
 	}, 200);
 
 	return rot;
@@ -102,50 +102,50 @@ data::VectorField rotation_bw(const data::VectorField& v) {
 	data::VectorField rot(v.grid, v.type, v.sampling_mode);
 
 	pool::run({1,1,1}, {v.grid.nx, v.grid.ny, v.grid.nz}, [&v, &rot] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vnx = v.value(i-1, j, k);
-		dvec3 vny = v.value(i, j-1, k);
-		dvec3 vnz = v.value(i, j, k-1);
-		rot.set(i, j, k, dvec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vnx = v._value(i-1, j, k);
+		dvec3 vny = v._value(i, j-1, k);
+		dvec3 vnz = v._value(i, j, k-1);
+		rot._set(i, j, k, dvec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
 	}, 200);
 	// face x/y
 	pool::run({1,1,0}, {v.grid.nx,v.grid.ny,1}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vnx = v.value(i-1, j, k);
-		dvec3 vny = v.value(i, j-1, k);
-		rot.set(i, j, k, dvec3((v0.z - vny.z), - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vnx = v._value(i-1, j, k);
+		dvec3 vny = v._value(i, j-1, k);
+		rot._set(i, j, k, dvec3((v0.z - vny.z), - (v0.z - vnx.z), (v0.y - vnx.y) - (v0.x - vny.x)));
 	}, 200);
 	// face x/z
 	pool::run({1,0,1}, {v.grid.nx,1,v.grid.nz}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vnx = v.value(i-1, j, k);
-		dvec3 vnz = v.value(i, j, k-1);
-		rot.set(i, j, k, dvec3(- (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vnx = v._value(i-1, j, k);
+		dvec3 vnz = v._value(i, j, k-1);
+		rot._set(i, j, k, dvec3(- (v0.y - vnz.y), (v0.x - vnz.x) - (v0.z - vnx.z), (v0.y - vnx.y)));
 	}, 200);
 	// face y/z
 	pool::run({0,1,1}, {1,v.grid.ny,v.grid.nz}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vny = v.value(i, j-1, k);
-		dvec3 vnz = v.value(i, j, k-1);
-		rot.set(i, j, k, dvec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x), - (v0.x - vny.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vny = v._value(i, j-1, k);
+		dvec3 vnz = v._value(i, j, k-1);
+		rot._set(i, j, k, dvec3((v0.z - vny.z) - (v0.y - vnz.y), (v0.x - vnz.x), - (v0.x - vny.x)));
 	}, 200);
 	// edge x
 	pool::run({1,0,0}, {v.grid.nx,1,1}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vnx = v.value(i-1, j, k);
-			rot.set(i, j, k, dvec3(0, - (v0.z - vnx.z), (v0.y - vnx.y)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vnx = v._value(i-1, j, k);
+			rot._set(i, j, k, dvec3(0, - (v0.z - vnx.z), (v0.y - vnx.y)));
 	}, 200);
 	// edge y
 	pool::run({0,1,0}, {1,v.grid.ny,1}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vny = v.value(i, j-1, k);
-		rot.set(i, j, k, dvec3((v0.z - vny.z), 0, - (v0.x - vny.x)));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vny = v._value(i, j-1, k);
+		rot._set(i, j, k, dvec3((v0.z - vny.z), 0, - (v0.x - vny.x)));
 	}, 200);
 	// edge z
 	pool::run({0,0,1}, {1,1,v.grid.nz}, [&rot, &v] (int i, int j, int k) {
-		dvec3 v0 = v.value(i, j, k);
-		dvec3 vnz = v.value(i, j, k-1);
-		rot.set(i, j, k, dvec3(- (v0.y - vnz.y), (v0.x - vnz.x), 0));
+		dvec3 v0 = v._value(i, j, k);
+		dvec3 vnz = v._value(i, j, k-1);
+		rot._set(i, j, k, dvec3(- (v0.y - vnz.y), (v0.x - vnz.x), 0));
 	}, 200);
 
 	return rot;

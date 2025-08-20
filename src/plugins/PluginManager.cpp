@@ -183,8 +183,10 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("ScalarField.v64", &data::ScalarField::v64);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
-	ext->link_class_func("ScalarField.set", &data::ScalarField::set);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value);
+	ext->link_class_func("ScalarField.set", &data::ScalarField::set);
+	ext->link_class_func("ScalarField._set", &data::ScalarField::_set);
+	ext->link_class_func("ScalarField._value", &data::ScalarField::_value);
 	ext->link_class_func("ScalarField.average", &data::ScalarField::average);
 	ext->link_class_func("ScalarField.min", &data::ScalarField::min);
 	ext->link_class_func("ScalarField.max", &data::ScalarField::max);
@@ -206,6 +208,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("VectorField.v64", &data::VectorField::v64);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
+	ext->link_class_func("VectorField._set", &data::VectorField::_set32);
+	ext->link_class_func("VectorField._value", &data::VectorField::_value32);
 	ext->link_class_func("VectorField.average", &data::VectorField::average32);
 	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);
 	ext->link_class_func("VectorField.__assign__", &kaba::generic_assign<data::VectorField>);

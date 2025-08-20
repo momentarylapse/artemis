@@ -38,7 +38,7 @@ void DeformationRenderer::draw_win(const yrenderer::RenderParams& params, MultiV
 
 	if (show_balls()) {
 		for (const auto& [i, p]: enumerate(g.points(d->sampling_mode))) {
-			vec3 pos = p + d->_value32(i) * s;
+			vec3 pos = p + d->value32(i) * s;
 			session->drawing_helper->draw_mesh(params, rvd,
 				mat4::translation(pos) * mat4::scale(r, r, r),
 				vertex_buffer.get(),
@@ -53,20 +53,20 @@ void DeformationRenderer::draw_win(const yrenderer::RenderParams& params, MultiV
 			for (int i=0; i<g.nx; i++)
 				for (int j=0; j<g.ny; j++)
 					for (int k=0; k<g.nz-1; k++) {
-						points.add(g.cell_center(i, j, k) + d->value32(i, j, k) * s);
-						points.add(g.cell_center(i, j, k + 1) + d->value32(i, j, k + 1) * s);
+						points.add(g.cell_center(i, j, k) + d->_value32(i, j, k) * s);
+						points.add(g.cell_center(i, j, k + 1) + d->_value32(i, j, k + 1) * s);
 					}
 			for (int i=0; i<g.nx; i++)
 				for (int j=0; j<g.ny-1; j++)
 					for (int k=0; k<g.nz; k++) {
-						points.add(g.cell_center(i, j, k) + d->value32(i, j, k) * s);
-						points.add(g.cell_center(i, j + 1, k) + d->value32(i, j + 1, k) * s);
+						points.add(g.cell_center(i, j, k) + d->_value32(i, j, k) * s);
+						points.add(g.cell_center(i, j + 1, k) + d->_value32(i, j + 1, k) * s);
 					}
 			for (int i=0; i<g.nx-1; i++)
 				for (int j=0; j<g.ny; j++)
 					for (int k=0; k<g.nz; k++) {
-						points.add(g.cell_center(i, j, k) + d->value32(i, j, k) * s);
-						points.add(g.cell_center(i + 1, j, k) + d->value32(i + 1, j, k) * s);
+						points.add(g.cell_center(i, j, k) + d->_value32(i, j, k) * s);
+						points.add(g.cell_center(i + 1, j, k) + d->_value32(i + 1, j, k) * s);
 					}
 
 			session->drawing_helper->set_color(_color());
@@ -79,8 +79,8 @@ void DeformationRenderer::draw_win(const yrenderer::RenderParams& params, MultiV
 			Array<vec3> points;
 			auto p0 = g.vertices();
 			for (const auto& [a, b]: g.edges()) {
-				points.add(p0[a] + d->_value32(a) * s);
-				points.add(p0[b] + d->_value32(b) * s);
+				points.add(p0[a] + d->value(a).to32() * s);
+				points.add(p0[b] + d->value(b).to32() * s);
 			}
 
 			session->drawing_helper->set_color(_color());

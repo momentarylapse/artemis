@@ -20,19 +20,19 @@ MultiComponentField::MultiComponentField(const RegularGrid& g, ScalarType t, Sam
 
 MultiComponentField::MultiComponentField() : MultiComponentField(RegularGrid(), ScalarType::None, SamplingMode::PerCell, 1) {}
 
-double MultiComponentField::value(int i, int j, int k, int n) const {
+double MultiComponentField::value(int index, int n) const {
 	if (type == ScalarType::Float32)
-		return (double)v32.at(grid, sampling_mode, i, j, k)[n];
+		return (double)v32._at(index)[n];
 	if (type == ScalarType::Float64)
-		return v64.at(grid, sampling_mode, i, j, k)[n];
+		return v64._at(index)[n];
 	return 0;
 }
 
-void MultiComponentField::set(int i, int j, int k, int n, double vv) {
+void MultiComponentField::set(int index, int n, double vv) {
 	if (type == ScalarType::Float32)
-		v32.at(grid, sampling_mode, i, j, k)[n] = (float)vv;
+		v32._at(index)[n] = (float)vv;
 	else if (type == ScalarType::Float64)
-		v64.at(grid, sampling_mode, i, j, k)[n] = vv;
+		v64._at(index)[n] = vv;
 }
 
 template<class T>

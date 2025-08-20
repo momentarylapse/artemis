@@ -22,7 +22,7 @@ VectorField::VectorField(const RegularGrid& g, ScalarType t, SamplingMode s) {
 
 VectorField::VectorField() : VectorField(RegularGrid(), ScalarType::None, SamplingMode::PerCell) {}
 
-dvec3 VectorField::value(int i, int j, int k) const {
+dvec3 VectorField::_value(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
 		return dvec3(*(vec3*)v32.at(grid, sampling_mode, i, j, k));
 	if (type == ScalarType::Float64)
@@ -30,25 +30,25 @@ dvec3 VectorField::value(int i, int j, int k) const {
 	return {0,0,0};
 }
 
-void VectorField::set(int i, int j, int k, const dvec3& vv) {
+void VectorField::_set(int i, int j, int k, const dvec3& vv) {
 	if (type == ScalarType::Float32)
 		*(vec3*)v32.at(grid, sampling_mode, i, j, k) = vv.to32();
 	else if (type == ScalarType::Float64)
 		*(dvec3*)v64.at(grid, sampling_mode, i, j, k) = vv;
 }
 
-void VectorField::_set(int index, const dvec3& vv) {
+void VectorField::set(int index, const dvec3& vv) {
 	if (type == ScalarType::Float32)
 		*(vec3*)v32._at(index) = vv.to32();
 	else if (type == ScalarType::Float64)
 		*(dvec3*)v64._at(index) = vv;
 }
 
-vec3 VectorField::value32(int i, int j, int k) const {
-	return value(i, j, k).to32();
+vec3 VectorField::_value32(int i, int j, int k) const {
+	return _value(i, j, k).to32();
 }
 
-dvec3 VectorField::_value(int index) const {
+dvec3 VectorField::value(int index) const {
 	if (type == ScalarType::Float32)
 		return dvec3(*(vec3*)v32._at(index));
 	if (type == ScalarType::Float64)
@@ -56,23 +56,23 @@ dvec3 VectorField::_value(int index) const {
 	return {0,0,0};
 }
 
-vec3 VectorField::_value32(int index) const {
-	return _value(index).to32();
+vec3 VectorField::value32(int index) const {
+	return value(index).to32();
 }
 
-void VectorField::set32(int i, int j, int k, const vec3& vv) {
-	set(i, j, k, dvec3(vv));
+void VectorField::_set32(int i, int j, int k, const vec3& vv) {
+	_set(i, j, k, dvec3(vv));
 }
 
-void VectorField::_set32(int index, const vec3& vv) {
-	_set(index, dvec3(vv));
+void VectorField::set32(int index, const vec3& vv) {
+	set(index, dvec3(vv));
 }
 
 dvec3 VectorField::average() const {
 	dvec3 sum = {0,0,0};
 	int n = grid.count(sampling_mode);
 	for (int i = 0; i<n; i++)
-		sum += _value(i);
+		sum += value(i);
 	return sum / n;
 }
 

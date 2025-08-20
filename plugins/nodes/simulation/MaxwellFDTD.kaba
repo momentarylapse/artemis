@@ -61,18 +61,18 @@ class MaxwellFDTD extends Node
 			for j in 0:10
 				for k in 0:v.grid.nz
 					let f = 1 - 0.2*exp(-0.2 * j^2)
-					v.set(i, j, k, v.value(i, j, k) * f)
+					v._set(i, j, k, v._value(i, j, k) * f)
 					let jj = v.grid.ny - j - 1
-					v.set(i, jj, k, v.value(i, jj, k) * f)
+					v._set(i, jj, k, v._value(i, jj, k) * f)
 	
 	func dampen_z(out v: VectorField)
 		for i in 0:v.grid.nx
 			for j in 0:v.grid.ny
 				for k in 0:10
 					let f = 1 - 0.2*exp(-0.2 * k^2)
-					v.set(i, j, k, v.value(i, j, k) * f)
+					v._set(i, j, k, v._value(i, j, k) * f)
 					let kk = v.grid.nz - k - 1
-					v.set(i, j, kk, v.value(i, j, kk) * f)
+					v._set(i, j, kk, v._value(i, j, kk) * f)
 	
 	var in_e: InPortVectorField
 	var in_b: InPortVectorField

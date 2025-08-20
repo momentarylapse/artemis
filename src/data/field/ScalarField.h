@@ -19,12 +19,12 @@ struct ScalarField {
 	SampledData<float> v32;
 	SampledData<double> v64;
 
-	double value(int i, int j, int k) const;
-	void set(int i, int j, int k, double f);
-	float value32(int i, int j, int k) const;
-	void set32(int i, int j, int k, float f);
-	double _value(int index) const;
-	void _set(int index, double f);
+	double value(int index) const;
+	void set(int index, double f);
+	double _value(int i, int j, int k) const;
+	void _set(int i, int j, int k, double f);
+	float _value32(int i, int j, int k) const;
+	void _set32(int i, int j, int k, float f);
 
 	double average() const;
 	double min() const;

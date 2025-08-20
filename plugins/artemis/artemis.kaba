@@ -24,8 +24,10 @@ struct ScalarField
 #	var v64: f64[]
 	func extern __init__()
 	func extern __delete__()
-	func extern mut set(i: i32, j: i32, k: i32, v: f64)
-	func extern value(i: i32, j: i32, k: i32) -> f64
+	func extern mut set(index: i32, v: f64)
+	func extern value(index: i32) -> f64
+	func extern mut _set(i: i32, j: i32, k: i32, v: f64)
+	func extern _value(i: i32, j: i32, k: i32) -> f64
 	func extern type() -> kaba.Class&
 	func extern average() -> f64
 	func extern min() -> f64
@@ -45,8 +47,10 @@ struct VectorField
 #	var v32: vec3[]
 	func extern __init__()
 	func extern __delete__()
-	func extern mut set(i: i32, j: i32, k: i32, v: vec3)
-	func extern value(i: i32, j: i32, k: i32) -> vec3
+	func extern mut set(index: i32, v: vec3)
+	func extern value(index: i32) -> vec3
+	func extern mut _set(i: i32, j: i32, k: i32, v: vec3)
+	func extern _value(i: i32, j: i32, k: i32) -> vec3
 	func extern type() -> kaba.Class&
 	func extern average() -> vec3
 	func extern mut __assign__(o: VectorField)

@@ -21,8 +21,8 @@ namespace artemis::data {
 		SampledData<float> v32;
 		SampledData<double> v64;
 
-		double value(int i, int j, int k, int n) const;
-		void set(int i, int j, int k, int n, double v);
+		double value(int index, int n) const;
+		void set(int index, int n, double v);
 
 		void operator+=(const MultiComponentField& o);
 		MultiComponentField operator+(const MultiComponentField& o) const;

@@ -97,7 +97,7 @@ void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWi
 			for (int i=0; i<f->grid.nx; i++)
 				for (int j=0; j<f->grid.ny; j++)
 					for (int k=0; k<f->grid.nz; k++) {
-						float v = f->value32(i, j, k);
+						float v = f->_value32(i, j, k);
 						session->drawing_helper->draw_mesh(params, rvd,
 							mat4::translation(f->grid.cell_center(i, j, k)) * mat4::scale(v, v, v),
 							vertex_buffer.get(),
@@ -107,7 +107,7 @@ void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWi
 			for (int i=0; i<=f->grid.nx; i++)
 				for (int j=0; j<=f->grid.ny; j++)
 					for (int k=0; k<=f->grid.nz; k++) {
-						float v = f->value32(i, j, k);
+						float v = f->_value32(i, j, k);
 						session->drawing_helper->draw_mesh(params, rvd,
 							mat4::translation(f->grid.vertex(i, j, k)) * mat4::scale(v, v, v),
 							vertex_buffer.get(),

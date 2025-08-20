@@ -31,7 +31,7 @@ void VectorFieldRenderer::draw_win(const yrenderer::RenderParams& params, MultiV
 	Array<vec3> points;
 	for (const auto& [i, p]: enumerate(f->grid.points(f->sampling_mode))) {
 		points.add(p);
-		points.add(p + f->_value32(i) * s);
+		points.add(p + f->value32(i) * s);
 	}
 
 	session->drawing_helper->set_color(_color());

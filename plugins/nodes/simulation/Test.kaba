@@ -13,7 +13,7 @@ class Test extends Node
 			for i in 0:f.grid.nx
 				for j in 0:f.grid.ny
 					for k in 0:f.grid.nz
-						f.set(i, j, k, sin(k*0.3 + t))
+						f._set(i, j, k, sin(k*0.3 + t))
 			in_x.mutated()
 			#out_y.set(laplace(f))
 		
