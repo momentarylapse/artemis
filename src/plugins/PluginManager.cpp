@@ -302,6 +302,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<data::VectorField>(ext, "VectorField");
 	link_ports<data::MultiComponentField>(ext, "MultiComponentField");
 	link_ports<data::Grid>(ext, "Grid");
+	link_ports<double>(ext, "Float");
+	link_ports<vec3>(ext, "Vector");
 	link_ports<Array<double>>(ext, "List");
 	link_ports<Array<vec3>>(ext, "VectorList");
 

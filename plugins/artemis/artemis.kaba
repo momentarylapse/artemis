@@ -161,6 +161,20 @@ class InPortGrid extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> Grid*
 
+class InPortFloat extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> f64*
+class OutPortFloat extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: f64)
+
+class InPortVector extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> vec3*
+class OutPortVector extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: vec3)
+
 class InPortList extends InPortBase
 	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
 	func extern value() -> f64[]*

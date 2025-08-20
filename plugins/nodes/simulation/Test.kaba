@@ -1,6 +1,10 @@
 use artemis.*
 
-class Test extends Node
+class Test extends Node	
+	var in_x: InPortScalarField
+	#var out_y: OutPortScalarField
+
+
 	func __init__()
 		super.__init__("Test")
 		in_x.__init__(self, "x", PortFlags.MUTABLE)
@@ -17,6 +21,3 @@ class Test extends Node
 			in_x.mutated()
 			#out_y.set(laplace(f))
 		
-	
-	var in_x: InPortScalarField
-	#var out_y: OutPortScalarField

@@ -1,6 +1,14 @@
 use artemis.*
 
 class MaxwellFDTD extends Node
+	var in_e: InPortVectorField
+	var in_b: InPortVectorField
+	#var in_rho: InPortScalarField
+	var in_j: InPortVectorField
+	var in_me: InPortVectorField
+	var in_mb: InPortVectorField
+	var c1, c2, c3, c4, c5: i32
+	
 	func __init__()
 		super.__init__("MaxwellFDTD")
 		in_e.__init__(self, "e", PortFlags.MUTABLE)
@@ -74,10 +82,3 @@ class MaxwellFDTD extends Node
 					let kk = v.grid.nz - k - 1
 					v._set(i, j, kk, v._value(i, j, kk) * f)
 	
-	var in_e: InPortVectorField
-	var in_b: InPortVectorField
-	#var in_rho: InPortScalarField
-	var in_j: InPortVectorField
-	var in_me: InPortVectorField
-	var in_mb: InPortVectorField
-	var c1, c2, c3, c4, c5: i32

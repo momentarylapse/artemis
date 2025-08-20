@@ -1,0 +1,20 @@
+use artemis.*
+
+class VectorComponent extends Node
+	var in_vector: InPortVector
+	var out_float: OutPortFloat
+	var component: SettingInt
+	
+	func __init__()
+		super.__init__("VectorComponent")
+		in_vector.__init__(self, "in")
+		out_float.__init__(self, "out")
+		component.__init__(self, "component", 0)
+	
+	func override on_process()
+		for v in in_vector.value()
+			let c = *component()
+			if c >= 0 and c <= 2
+				out_float.set(v._e[c])
+		
+	
