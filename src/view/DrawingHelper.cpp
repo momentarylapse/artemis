@@ -268,8 +268,9 @@ Array<vec2> DrawingHelper::spline(const vec2& a, const vec2& b, const vec2& c, c
 	return points;
 }
 
-TextLayout TextLayout::from_format_string(const string& s) {
-	float font_size = xhui::Theme::_default.font_size;
+TextLayout TextLayout::from_format_string(const string& s, float font_size) {
+	if (font_size < 0)
+		font_size = xhui::Theme::_default.font_size;
 	vec2 pos = vec2(0, 0);
 	TextLayout l;
 	auto add = [&] (const string& text, bool bold) {
@@ -287,8 +288,9 @@ TextLayout TextLayout::from_format_string(const string& s) {
 	int offset = 0;
 	while (true) {
 		int next = s.find("<b>", offset);
-		if (next > offset) {
-			add(s.sub_ref(offset, next), false);
+		if (next >= offset) {
+			if (next > offset)
+				add(s.sub_ref(offset, next), false);
 			offset = next + 3;
 			next = s.find("</b>", offset);
 			if (next > offset) {
@@ -320,17 +322,17 @@ void DrawingHelper::draw_text_layout(Painter* p, const vec2& pos, const TextLayo
 	}
 }
 
-void DrawingHelper::draw_text_layout_with_box(Painter* p, const vec2& pos, const TextLayout& l) {
+void DrawingHelper::draw_text_layout_with_box(Painter* p, const vec2& pos, const TextLayout& l, const color& bg, float padding, float roundness) {
 	/*vec2 size = p->get_str_size(str);
 	vec2 pos = _pos;
 	if (align == 0)
 		pos.x -= size.x / 2;
 	if (align == 1)
 		pos.x -= size.x;*/
-	p->set_color(xhui::Theme::_default.background_button);
-	p->set_roundness(7);
+	p->set_color(bg);
+	p->set_roundness(roundness);
 	auto box = l.box();
-	p->draw_rect(rect(pos + box.p00(), pos + box.p11()).grow(7));
+	p->draw_rect(rect(pos + box.p00(), pos + box.p11()).grow(padding));
 	p->set_color(xhui::Theme::_default.text_label);
 	p->set_roundness(0);
 	draw_text_layout(p, pos, l);

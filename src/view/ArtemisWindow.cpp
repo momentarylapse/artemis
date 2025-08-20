@@ -28,9 +28,12 @@
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/yrenderer/Renderer.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>
+
+#include "Session.h"
 #include "y/helper/ResourceManager.h"
 #include "storage/Storage.h"
 #include "Session.h"
+#include "lib/base/iter.h"
 #include "plugins/PluginManager.h"
 
 
@@ -76,8 +79,7 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 		session->error(format("Action failed: %s\nReason: %s", am->error_location.c_str(), am->error_message.c_str()));
 	}),
 	in_saved(this, [this] {
-		msg_write("SAVED");
-		session->set_message("Saved!");
+		session->info("Saved!");
 		update_menu();
 	})
 {
@@ -86,7 +88,7 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 
 	from_source(R"foodelim(
 Dialog x x padding=0
-	Grid grid ''
+	Overlay ? ''
 		Grid main-grid '' spacing=0
 			Grid left-grid '' spacing=0
 				.
@@ -120,6 +122,7 @@ Dialog x x padding=0
 						Button simulation-pause 'Pause' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 						Button simulation-stop 'Stop' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 						Button simulation-step 'Step' height=50 width=50 padding=7 noexpandx ignorefocus
+		DrawingArea overlay-area '' ignorehover
 )foodelim");
 	Panel::set_option("padding", "0");
 
@@ -209,11 +212,6 @@ Dialog x x padding=0
 		renderer->draw(p);
 		session->cur_mode->multi_view->on_draw(p);
 		session->cur_mode->on_draw_post(p);
-		p->set_color(White);
-		p->set_font_size(xhui::Theme::_default.font_size * 1.5f);
-		// TODO overlay...
-		for (int i=0; i<session->message_str.num; i++)
-			session->drawing_helper->draw_boxed_str(p, p->area().center() + vec2(0, 20*i), session->message_str[i], 0);
 	});
 	event_x("area", xhui::event_id::MouseMove, [this] {
 		if (!session->cur_mode or !session->cur_mode->multi_view)
@@ -293,6 +291,21 @@ Dialog x x padding=0
 	});
 	event("close-code-editor", [this] {
 		set_visible("code-editor-panel", false);
+	});
+	event_xp("overlay-area", xhui::event_id::Draw, [this] (Painter* p) {
+		for (const auto& [i, m]: enumerate(session->messages)) {
+			color bg = xhui::Theme::_default.background_button;
+			string text = m.text;
+			if (m.type == Session::Message::Type::Error) {
+				//bg = color(1, 0.5f, 0, 0);
+				bg = color(1, 0.5f, 0.3f, 0);
+				text = "<b>ERROR</b>: " +  m.text;
+			} else if (m.type == Session::Message::Type::Warning) {
+				bg = color(1, 0.5f, 0.3f, 0);
+			}
+			const auto l = TextLayout::from_format_string(text, xhui::Theme::_default.font_size * 1.5f);
+			DrawingHelper::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box().width()/2, 30.0f*i), l, bg, 14, 10);
+		}
 	});
 	event_x(id, xhui::event_id::Close, [this] {
 		if (!session->cur_mode->get_data() or session->cur_mode->get_data()->action_manager->is_save())

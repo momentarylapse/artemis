@@ -49,7 +49,7 @@ base::expected<int> auto_connect(Graph* g, const dataflow::CableInfo& c) {
 		return connect_through(g, c, {"ListPlot", "Plotter"});
 	if (source->class_->name == "f64[]" and sink->class_->name == "PlotData")
 		return connect_through(g, c, {"ListPlot"});
-	return base::Error{format("can not connect  %s  to  %s", source->class_->name, sink->class_->name)};
+	return base::Error{format("can not connect  <b>%s</b>  to  <b>%s</b>", source->class_->name, sink->class_->name)};
 }
 
 } // graph

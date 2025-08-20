@@ -296,27 +296,30 @@ void Session::set_mode_now(Mode *m) {
 
 
 void Session::remove_message() {
-	message_str.erase(0);
+	messages.erase(0);
 	win->request_redraw();
 }
 
-void Session::set_message(const string &message) {
-	msg_write(message);
-	message_str.add(message);
+void Session::add_message(Message::Type type, const string &message) {
+	msg_write(message.replace("<b>", "").replace("</b>", ""));
+	messages.add({type, message});
 	win->request_redraw();
-	xhui::run_later(2.0f, [this] {
+	xhui::run_later(3.0f, [this] {
 		remove_message();
 	});
 }
 
 
 void Session::error(const string &message) {
-#if 0
-	//set_info_text(message, {"error", "allow-close"});
-	hui::error_box(win, _("Error"), message);
-#else
-	set_message("ERROR: " + message);
-#endif
+	add_message(Message::Type::Error, message);
+}
+
+void Session::info(const string &message) {
+	add_message(Message::Type::Info, message);
+}
+
+void Session::warning(const string &message) {
+	add_message(Message::Type::Warning, message);
 }
 
 Mode *Session::get_mode(int preferred_type) {

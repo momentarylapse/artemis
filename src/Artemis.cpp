@@ -61,10 +61,10 @@ void start_session_load_file(Session* parent, const Path& filename) {
 			if (auto f = (f_p)m->match_function("main", "void", {})) {
 				f();
 			} else {
-				s->set_message(format("script %s does not contain 'func main()'", filename));
+				s->error(format("script %s does not contain 'func main()'", filename));
 			}
 		} else {
-			s->set_message(format("unknown file extension: %s", filename));
+			s->error(format("unknown file extension: %s", filename));
 		}
 	});
 }

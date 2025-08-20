@@ -304,7 +304,7 @@ void GraphEditor::on_draw(Painter* p) {
 
 	if (tip != "") {
 		const auto l = TextLayout::from_format_string(tip);
-		DrawingHelper::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l);
+		DrawingHelper::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l, xhui::Theme::_default.background_button);
 	}
 
 	p->set_clip(clip0);
@@ -399,7 +399,7 @@ void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 			open_node_panel(selected_nodes[0]);
 		}
 	} else if (mode == Mode::MovingNodes) {
-		vec2 cur_pos = to_screen(m);
+		vec2 cur_pos = from_screen(m);
 		for (auto n: graph->nodes)
 			if (selected_nodes.contains(n))
 				n->pos += cur_pos - moving_last_pos;
@@ -450,7 +450,7 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 		open_node_panel(selection->node);
 
 		mode = Mode::MovingNodes;
-		moving_last_pos = to_screen(m);
+		moving_last_pos = from_screen(m);
 	} else if (selection and (selection->type == HoverType::OutPort or selection->type == HoverType::InPort)) {
 		mode = Mode::CreatingNewCable;
 	} else if (!selection) {
@@ -473,14 +473,14 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 			if (hover and hover->type == HoverType::InPort) {
 				auto r = artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
 				if (!r)
-					session->set_message(r.error().msg);
+					session->error(r.error().msg);
 			}
 		}
 		if (selection and selection->type == HoverType::InPort) {
 			if (hover and hover->type == HoverType::OutPort) {
 				auto r = artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
 				if (!r)
-					session->set_message(r.error().msg);
+					session->error(r.error().msg);
 			}
 		}
 	}

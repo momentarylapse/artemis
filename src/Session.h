@@ -79,10 +79,21 @@ public:
 
 	Mode *get_mode(int type);
 
-	void set_message(const string &message);
+	struct Message {
+		enum class Type {
+			Info,
+			Warning,
+			Error
+		};
+		Type type;
+		string text;
+	};
+	void add_message(Message::Type type, const string &message);
 	void remove_message();
+	void info(const string &message);
+	void warning(const string &message);
 	void error(const string &message);
-	Array<string> message_str;
+	Array<Message> messages;
 
 	base::future<void> allow_termination();
 

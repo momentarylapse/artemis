@@ -3,23 +3,21 @@
 //
 
 #include "ModeDefault.h"
-
 #include <Session.h>
-#include <lib/dataflow/Node.h>
 #include <graph/Graph.h>
 #include <graph/renderer/Canvas.h>
 #include <graph/renderer/RendererNode.h>
+#include <lib/dataflow/Node.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
-#include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
+#include <lib/xhui/config.h>
 #include <lib/base/iter.h>
+#include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
 #include <view/ArtemisWindow.h>
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
-
-#include "lib/xhui/config.h"
-#include "storage/Storage.h"
+#include <storage/Storage.h>
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	multi_view = new MultiView(session);
@@ -124,10 +122,14 @@ void ModeDefault::on_draw_post(Painter* p) {
 
 void ModeDefault::on_command(const string& id) {
 	if (id == "save") {
-		session->storage->auto_save(data);
+		session->storage->auto_save(data).then([this] {
+			session->info("saved");
+		});
 	}
 	if (id == "save-as") {
-		session->storage->save_as(data);
+		session->storage->save_as(data).then([this] {
+			session->info("saved");
+		});
 	}
 }
 
