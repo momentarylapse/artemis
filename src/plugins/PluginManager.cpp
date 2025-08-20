@@ -14,6 +14,7 @@
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
 #include <lib/linalg/_kaba_export.h>
+#include <lib/fft/_kaba_export.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
@@ -50,6 +51,7 @@ void PluginManager::init() {
 	kaba::config.directory = directory();
 	kaba::default_context->register_package_init("artemis", directory() | "artemis", &export_kaba);
 	kaba::default_context->register_package_init("linalg", directory() | "linalg", &export_package_linalg);
+	kaba::default_context->register_package_init("fft", directory() | "fft", &export_package_fft);
 	import_kaba();
 	find_plugins();
 }
