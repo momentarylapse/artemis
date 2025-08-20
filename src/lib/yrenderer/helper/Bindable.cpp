@@ -77,7 +77,7 @@ void apply_shader_data(const RenderParams& params, Shader*, const Any &shader_da
 	}
 }
 #else
-void apply_shader_data(const RenderParams&, Shader *s, const Any &shader_data) {
+void apply_shader_data(const RenderParams&, Shader *s, const Any& shader_data) {
 	if (shader_data.is_empty())
 		return;
 	if (shader_data.is_dict()) {
