@@ -1,0 +1,18 @@
+use artemis.*
+
+class ScaleVector extends Node
+	var in_vector: InPortVector
+	var out_vector: OutPortVector
+	var factor: SettingFloat
+	
+	func __init__()
+		super.__init__("ScaleVector")
+		in_vector.__init__(self, "in")
+		out_vector.__init__(self, "out")
+		factor.__init__(self, "factor", 1)
+	
+	func override on_process()
+		for v in in_vector.value()
+			out_vector.set(v * f32(factor()))
+		
+	

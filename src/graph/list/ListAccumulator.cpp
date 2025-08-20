@@ -4,6 +4,8 @@
 
 #include "ListAccumulator.h"
 
+#include "lib/os/msg.h"
+
 namespace artemis::graph {
 
 void ListAccumulator::on_process() {
@@ -13,6 +15,7 @@ void ListAccumulator::on_process() {
 			while (out_list.value().num > capacity())
 				out_list.value().erase(0);
 
+		out_list.has_value = true;
 		out_list.mutated();
 	}
 }

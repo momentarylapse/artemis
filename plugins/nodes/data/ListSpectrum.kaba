@@ -1,0 +1,21 @@
+use artemis.*
+use fft
+
+class ListSpectrum extends Node
+	var in_list: InPortList
+	var out_spectrum: OutPortList
+	
+	func __init__()
+		super.__init__("ListSpectrum")
+		in_list.__init__(self, "in")
+		out_spectrum.__init__(self, "out")
+	
+	func override on_process()
+		for list in in_list.value()
+			let r = list |> f64.__f32__
+			var z: Complex[]
+			fft.r2c(r, z)
+			let s = z |> abs |> f32.__f64__
+			out_spectrum.set(s)
+		
+	

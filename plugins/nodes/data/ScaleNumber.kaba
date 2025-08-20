@@ -1,0 +1,18 @@
+use artemis.*
+
+class ScaleNumber extends Node
+	var in_float: InPortFloat
+	var out_float: OutPortFloat
+	var factor: SettingFloat
+	
+	func __init__()
+		super.__init__("ScaleNumber")
+		in_float.__init__(self, "in")
+		out_float.__init__(self, "out")
+		factor.__init__(self, "factor", 1)
+	
+	func override on_process()
+		for v in in_float.value()
+			out_float.set(v * factor())
+		
+	
