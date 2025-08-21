@@ -2,8 +2,7 @@
 // Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef REGULARGRID_H
-#define REGULARGRID_H
+#pragma once
 
 #include <lib/math/vec3.h>
 #include <lib/math/Box.h>
@@ -39,5 +38,3 @@ struct RegularGrid {
 
 }
 
-
-#endif //REGULARGRID_H

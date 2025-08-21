@@ -5,6 +5,7 @@
 #pragma once
 
 #include "RegularGrid.h"
+#include "UnstructuredGrid.h"
 #include <lib/base/optional.h>
 #include <lib/base/pointer.h>
 
@@ -13,12 +14,14 @@ enum class SamplingMode;
 
 enum class GridType {
 	None,
-	Regular
+	Regular,
+	Unstructured
 };
 
 struct Grid : Sharable<base::Empty> {
 	Grid();
 	explicit Grid(const RegularGrid& g);
+	explicit Grid(const UnstructuredGrid& g);
 
 	int vertex_count() const;
 	int cell_count() const;
@@ -33,6 +36,7 @@ struct Grid : Sharable<base::Empty> {
 
 	GridType type;
 	base::optional<RegularGrid> regular;
+	base::optional<UnstructuredGrid> unstructured;
 };
 
 }

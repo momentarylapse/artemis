@@ -218,6 +218,7 @@ add_executable(artemis
 	src/data/field/VectorField.cpp
 	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
+	src/data/grid/UnstructuredGrid.cpp
 	src/data/mesh/GeometryBall.cpp
 	src/data/mesh/GeometryCube.cpp
 	src/data/mesh/GeometryCylinder.cpp
@@ -612,6 +613,7 @@ add_library(moduleartemis SHARED
 	src/data/field/VectorField.cpp
 	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
+	src/data/grid/UnstructuredGrid.cpp
 	src/data/mesh/GeometryBall.cpp
 	src/data/mesh/GeometryCube.cpp
 	src/data/mesh/GeometryCylinder.cpp

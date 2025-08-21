@@ -3,7 +3,6 @@
 //
 
 #include "RegularGrid.h"
-
 #include "data/field/base.h"
 
 namespace artemis::data {
