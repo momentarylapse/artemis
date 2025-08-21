@@ -2,7 +2,7 @@ use plugins.artemis.*
 
 func main()
 	var g = weak(current_session().graph)
-	g.dt = 0.00002
+	g.dt = 0.00005
 
 	var body_grid = g.add_node("RegularGrid:body", [100,50])
 	body_grid.set("nx", 12)
@@ -11,6 +11,7 @@ func main()
 	body_grid.set("lx", 0.8)
 	body_grid.set("ly", 0.4)
 	body_grid.set("lz", 0.1)
+	body_grid.set("offset", dyn([-0.0666,-0.2,0]))
 
 	var body_u = g.add_node("VectorField:u - body", [200,200])
 	body_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))

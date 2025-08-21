@@ -16,7 +16,12 @@ Grid::Grid(const RegularGrid& g) {
 	regular = g;
 }
 
-	Box Grid::bounding_box() const {
+Grid::Grid(const UnstructuredGrid& g) {
+	type = GridType::Unstructured;
+	unstructured = g;
+}
+
+Box Grid::bounding_box() const {
 	if (type == GridType::Regular)
 		return regular->bounding_box();
 	if (type == GridType::Unstructured)

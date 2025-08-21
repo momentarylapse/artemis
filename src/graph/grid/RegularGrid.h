@@ -23,6 +23,7 @@ public:
 	dataflow::Setting<double> lx{this, "lx", 8.0};
 	dataflow::Setting<double> ly{this, "ly", 8.0};
 	dataflow::Setting<double> lz{this, "lz", 1.0};
+	dataflow::Setting<vec3> offset{this, "offset", {0,0,0}};
 };
 
 } // graph

@@ -7,13 +7,14 @@
 
 namespace artemis::data {
 
-RegularGrid::RegularGrid(int _nx, int _ny, int _nz, const vec3& _dx, const vec3& _dy, const vec3& _dz) {
+RegularGrid::RegularGrid(int _nx, int _ny, int _nz, const vec3& _dx, const vec3& _dy, const vec3& _dz, const vec3& _offset) {
 	nx = _nx;
 	ny = _ny;
 	nz = _nz;
 	dx = _dx;
 	dy = _dy;
 	dz = _dz;
+	offset = _offset;
 }
 
 RegularGrid::RegularGrid() : RegularGrid(8, 8, 8) {}
@@ -44,7 +45,7 @@ int RegularGrid::vertex_index(int i, int j, int k) const {
 
 
 vec3 RegularGrid::index_to_pos(float i, float j, float k) const {
-	return i * dx + j * dy + k * dz;
+	return offset + i * dx + j * dy + k * dz;
 }
 
 vec3 RegularGrid::vertex(int i, int j, int k) const {
@@ -58,7 +59,7 @@ vec3 RegularGrid::cell_center(int i, int j, int k) const {
 
 Box RegularGrid::bounding_box() const {
 	// FIXME... :P
-	return {v_0, vertex(nx, ny, nz)};
+	return {vertex(0, 0, 0), vertex(nx, ny, nz)};
 }
 
 Array<vec3> RegularGrid::vertices() const {
