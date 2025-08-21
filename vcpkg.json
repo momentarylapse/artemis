@@ -6,7 +6,6 @@
     "glew",
     "glfw3",
     "opengl",
-    "shaderc",
     "spirv-tools",
     "vulkan",
     "vulkan-headers",
