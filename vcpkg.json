@@ -1,0 +1,15 @@
+{
+  "dependencies": [
+    "armadillo",
+    "fftw3",
+    "freetype",
+    "glew",
+    "glfw3",
+    "opengl",
+    "shaderc",
+    "spirv-tools",
+    "vulkan",
+    "vulkan-headers",
+    "zlib"
+  ]
+}

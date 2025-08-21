@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 
+if(WIN32)
+	list(APPEND COMPILE_OPTIONS /permissive-)
+endif()
+
 
 #=======================================================================================
 #    libraries
@@ -207,7 +211,7 @@ list(APPEND DEPS Threads::Threads)
 #    target artemis
 #=======================================================================================
 
-add_executable(artemis
+add_executable(artemis WIN32
 	src/action/Action.cpp
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
