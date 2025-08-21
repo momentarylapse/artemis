@@ -1,0 +1,188 @@
+use artemis.*
+use fem.material.*
+
+class GuitarFEM extends Node
+	var in_u_body: InPortVectorField
+	var in_dt_u_body: InPortVectorField
+	var in_u_string: InPortVectorField
+	var in_dt_u_string: InPortVectorField
+	var substeps: SettingInt
+	var attach0: SettingInt
+	var attach1: SettingInt
+#	let length = 0.648 # m  (implicit via grid)
+	var tension: SettingFloat # [N]
+	var diameter: SettingFloat # [m]
+	
+	var mat_body: Material
+	var mat_string: Material
+	
+	
+	func __init__()
+		super.__init__("GuitarFEM")
+		in_u_body.__init__(self, "u-body", PortFlags.MUTABLE)
+		in_dt_u_body.__init__(self, "dt-u-body", PortFlags.MUTABLE)
+		in_u_string.__init__(self, "u-string", PortFlags.MUTABLE)
+		in_dt_u_string.__init__(self, "dt-u-string", PortFlags.MUTABLE)
+		substeps.__init__(self, "substeps", 100)
+		attach0.__init__(self, "attach0", 0)
+		attach1.__init__(self, "attach1", 100)
+		tension.__init__(self, "tension", 84.0)
+		diameter.__init__(self, "diameter", 0.0004318) # gauge = 0.017 inch
+		flags = NodeFlags.TIME_DEPENDENT
+		
+		mat_body = maple()
+		mat_string = nickel()
+	
+	func mut substep_body(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+	#	print("---------------------")
+	
+	# i: C_ijkl d_j d_k u_l
+	
+		let dx_dx_ux = hessian_x(ux, 0, 0)
+		let dx_dx_uy = hessian_x(uy, 0, 0)
+		let dx_dx_uz = hessian_x(uz, 0, 0)
+	
+		let dx_dy_ux = hessian_x(ux, 0, 1)
+		let dx_dy_uy = hessian_x(uy, 0, 1)
+		let dx_dy_uz = hessian_x(uz, 0, 1)
+	
+		let dx_dz_ux = hessian_x(ux, 0, 2)
+		let dx_dz_uy = hessian_x(uy, 0, 2)
+		let dx_dz_uz = hessian_x(uz, 0, 2)
+	
+		let dy_dy_ux = hessian_x(ux, 1, 1)
+		let dy_dy_uy = hessian_x(uy, 1, 1)
+		let dy_dy_uz = hessian_x(uz, 1, 1)
+	
+		let dy_dz_ux = hessian_x(ux, 1, 2)
+		let dy_dz_uy = hessian_x(uy, 1, 2)
+		let dy_dz_uz = hessian_x(uz, 1, 2)
+	
+		let dz_dz_ux = hessian_x(ux, 2, 2)
+		let dz_dz_uy = hessian_x(uy, 2, 2)
+		let dz_dz_uz = hessian_x(uz, 2, 2)
+		
+		let C = mat_body.elastic_modulus()
+	
+		# C.xxyy etc will be ignored for now...
+		
+		var fx = dx_dx_ux * C.xxxx
+		fx += (dx_dy_uy + dy_dy_ux) * C.xyxy
+		fx += (dx_dz_uz + dz_dz_ux) * C.xzxz
+		var fy = dy_dy_uy * C.yyyy
+		fy += (dx_dy_ux + dx_dx_uy) * C.xyxy
+		fy += (dy_dz_uz + dz_dz_uy) * C.yzyz
+		var fz = dz_dz_uz * C.zzzz
+		fz += (dx_dz_ux + dx_dx_uz) * C.xzxz
+		fz += (dy_dz_uy + dy_dy_uz) * C.yzyz
+		
+	
+		dt_ux += fx * (dt / mat_body.density)
+		dt_uy += fy * (dt / mat_body.density)
+		dt_uz += fz * (dt / mat_body.density)
+		ux += dt_ux * dt
+		uy += dt_uy * dt
+		uz += dt_uz * dt
+		#print(dux|>log)
+		
+	func mut substep_string(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+		let laplace_ux = hessian_x(ux, 0, 0)
+		let laplace_uy = hessian_x(uy, 0, 0)
+		let laplace_uz = hessian_x(uz, 0, 0)
+		
+		let radius = diameter() / 2
+		let A = f64(pi) * radius^2
+		let µ = mat_string.density * A # [kg/m]
+		let C = tension() / µ / 2 # [m²/s²]
+	
+		let dt_dt_ux = laplace_ux * C
+		let dt_dt_uy = laplace_uy * C
+		let dt_dt_uz = laplace_uz * C
+	
+		dt_ux += dt_dt_ux * dt
+		dt_uy += dt_dt_uy * dt
+		dt_uz += dt_dt_uz * dt
+		ux += dt_ux * dt
+		uy += dt_uy * dt
+		uz += dt_uz * dt
+
+	func ssync(out s: ScalarField, is: i32, out b: ScalarField, ib: i32, a: f64)
+		let v = (1.0 - a) * s.value(is) + a * b.value(ib)
+		s.set(is, v)
+		b.set(ib, v)
+		
+	func sync(out usx: ScalarField, out usy: ScalarField, out usz: ScalarField, out dt_usx: ScalarField, out dt_usy: ScalarField, out dt_usz: ScalarField, out ubx: ScalarField, out uby: ScalarField, out ubz: ScalarField, out dt_ubx: ScalarField, out dt_uby: ScalarField, out dt_ubz: ScalarField)
+		let is0 = 0
+		let is1 = usx.grid.nx
+		let ib0 = attach0()
+		let ib1 = attach1()
+		let a = 0.5 as f64
+		ssync(usx, is0, ubx, ib0, a)
+		ssync(usy, is0, uby, ib0, a)
+		ssync(usz, is0, ubz, ib0, a)
+		ssync(dt_usx, is0, dt_ubx, ib0, a)
+		ssync(dt_usy, is0, dt_uby, ib0, a)
+		ssync(dt_usz, is0, dt_ubz, ib0, a)
+		ssync(usx, is1, ubx, ib1, a)
+		ssync(usy, is1, uby, ib1, a)
+		ssync(usz, is1, ubz, ib1, a)
+		ssync(dt_usx, is1, dt_ubx, ib1, a)
+		ssync(dt_usy, is1, dt_uby, ib1, a)
+		ssync(dt_usz, is1, dt_ubz, ib1, a)
+	
+	func override on_process()
+		# assume PER_VERTEX
+		for ub in in_u_body.value()
+			for dt_ub in in_dt_u_body.value()
+				for us in in_u_string.value()
+					for dt_us in in_dt_u_string.value()
+			
+						var ubx = ub.get_component(0)
+						var uby = ub.get_component(1)
+						var ubz = ub.get_component(2)
+						var dt_ubx = dt_ub.get_component(0)
+						var dt_uby = dt_ub.get_component(1)
+						var dt_ubz = dt_ub.get_component(2)
+						
+						var usx = us.get_component(0)
+						var usy = us.get_component(1)
+						var usz = us.get_component(2)
+						var dt_usx = dt_us.get_component(0)
+						var dt_usy = dt_us.get_component(1)
+						var dt_usz = dt_us.get_component(2)
+		
+		
+						let dt = current_session().graph.dt
+						let N = substeps()
+						for i in 0:N
+							substep_body(dt / N, ubx, uby, ubz, dt_ubx, dt_uby, dt_ubz)
+							substep_string(dt / N, usx, usy, usz, dt_usx, dt_usy, dt_usz)
+							sync(usx, usy, usz, dt_usx, dt_usy, dt_usz, ubx, uby, ubz, dt_ubx, dt_uby, dt_ubz)
+							
+			
+			
+						ub.set_component(0, ubx)
+						ub.set_component(1, uby)
+						ub.set_component(2, ubz)
+						let d = ub.average()
+						ub -= d
+				
+						dt_ub.set_component(0, dt_ubx)
+						dt_ub.set_component(1, dt_uby)
+						dt_ub.set_component(2, dt_ubz)
+						in_u_body.mutated()
+						in_dt_u_body.mutated()
+						
+	
+						us.set_component(0, usx)
+						us.set_component(1, usy)
+						us.set_component(2, usz)
+						us -= d
+				
+						dt_us.set_component(0, dt_usx)
+						dt_us.set_component(1, dt_usy)
+						dt_us.set_component(2, dt_usz)
+						in_u_string.mutated()
+						in_dt_u_string.mutated()
+						
+		

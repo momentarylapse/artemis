@@ -12,9 +12,9 @@ func main()
 	grid.set("ly", 0.6)
 	grid.set("lz", 0.2)
 
-	var u = g.add_node("VectorField", [200,200])
+	var u = g.add_node("VectorField:u", [200,200])
 	u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
-	var dt_u = g.add_node("VectorField", [400,200])
+	var dt_u = g.add_node("VectorField:du/dt", [400,200])
 	dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
 	dt_u.set("formula", "[exp( - 50 * len(p - vec3(0,0.2,0))^2) *100, 0, 0]")
 

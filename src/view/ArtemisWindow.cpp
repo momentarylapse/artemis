@@ -171,9 +171,6 @@ Dialog x x padding=0
 		session->ctx->shader_manager = session->resource_manager->shader_manager;
 		session->ctx->texture_manager = session->resource_manager->texture_manager;
 		session->resource_manager->shader_manager->default_shader = "default.shader";
-/*#ifdef USING_OPENGL
-		session->resource_manager->ctx = xhui::_nix_context.get();
-#endif*/
 		session->drawing_helper = new DrawingHelper(pp->context, session->ctx);
 		try {
 			session->resource_manager->shader_manager->load_shader_module("module-basic-data.shader");

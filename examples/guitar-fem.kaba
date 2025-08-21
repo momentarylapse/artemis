@@ -1,0 +1,88 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+	g.dt = 0.00002
+
+	var body_grid = g.add_node("RegularGrid:body", [100,50])
+	body_grid.set("nx", 12)
+	body_grid.set("ny", 6)
+	body_grid.set("nz", 2)
+	body_grid.set("lx", 0.8)
+	body_grid.set("ly", 0.4)
+	body_grid.set("lz", 0.1)
+
+	var body_u = g.add_node("VectorField:u - body", [200,200])
+	body_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	var body_dt_u = g.add_node("VectorField:du/dt - body", [400,200])
+	body_dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+#	body_dt_u.set("formula", "[exp( - 50 * len(p - vec3(0,0.2,0))^2) *100, 0, 0]")
+
+	var sim = g.add_node("GuitarFEM", [400,350])
+	sim.set("attach0", 3*13+1)
+	sim.set("attach1", 3*13+10)
+
+	var body_gr = g.add_node("GridRenderer", [100,500])
+	body_gr.set("mode", 0)
+	#body_gr.set("line-width", 2.0)
+	#body_gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var body_dr = g.add_node("DeformationRenderer", [300,500])
+	body_dr.set("scale", 100.0)
+	body_dr.set("radius", 0.005)
+	body_dr.set("show-balls", true)
+	
+	
+	
+
+	var string_grid = g.add_node("RegularGrid:string", [500,50])
+	string_grid.set("nx", 50)
+	string_grid.set("lx", 0.648) # length [m]
+	string_grid.set("ny", 0)
+	string_grid.set("nz", 0)
+
+	var string_u = g.add_node("VectorField:u - string", [600,200])
+	string_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	string_u.set("type", 1)
+#	string_u.set("formula", "[0.001 * exp( - 200.0 * (x-0.30)^2), 0, 0]")
+	var string_dt_u = g.add_node("VectorField:du/dt - string", [800,200])
+	string_dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
+	string_dt_u.set("type", 1)
+	string_dt_u.set("formula", "[0, exp( - 200.0 * (x-0.15)^2) * 2, 0]")
+
+	var string_gr = g.add_node("GridRenderer", [500,500])
+	#gr.set("line-width", 2.0)
+	#gr.set("color", dyn([0.5,0.5,0.5,1]))
+	
+	var string_dr = g.add_node("DeformationRenderer", [700,500])
+	string_dr.set("scale", 100.0)
+	string_dr.set("radius", 0.004)
+	string_dr.set("line-width", 3)
+	string_dr.set("show-balls", true)
+	string_dr.set("show-grid", true)
+	
+	
+
+	var canvas = g.add_node("Canvas", [200,650])
+
+	g.connect(body_grid, 0, body_u, 0)
+	g.connect(body_grid, 0, body_dt_u, 0)
+	g.connect(body_u, 0, sim, 0)
+	g.connect(body_dt_u, 0, sim, 1)
+	
+	g.connect(string_grid, 0, string_u, 0)
+	g.connect(string_grid, 0, string_dt_u, 0)
+	g.connect(string_u, 0, sim, 2)
+	g.connect(string_dt_u, 0, sim, 3)
+	
+	g.connect(body_grid, 0, body_gr, 0)
+	g.connect(body_gr, 0, canvas, 0)
+	g.connect(body_u, 0, body_dr, 0)
+	g.connect(body_dr, 0, canvas, 0)
+	
+	g.connect(string_grid, 0, string_gr, 0)
+	g.connect(string_gr, 0, canvas, 0)
+	g.connect(string_u, 0, string_dr, 0)
+	g.connect(string_dr, 0, canvas, 0)
+
+
