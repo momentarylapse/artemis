@@ -75,6 +75,10 @@ void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWi
 
 		auto cm = color_map();
 
+		// "scale" color map
+		for (auto& v: cm.values)
+			v /= (float)scale();
+
 		if (solid())
 			for (auto& c: cm.colors)
 				c.a = 1;

@@ -26,6 +26,7 @@ public:
 
 	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 	dataflow::Setting<bool> solid{this, "solid", false};
+	dataflow::Setting<double> scale{this, "scale", 1.0};
 	dataflow::Setting<data::ColorMap> color_map{this, "color_map", data::ColorMap::_default_transparent};
 
 	owned<ygfx::VertexBuffer> vertex_buffer;
