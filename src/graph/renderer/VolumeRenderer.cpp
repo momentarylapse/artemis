@@ -7,8 +7,10 @@
 #include <data/mesh/GeometrySphere.h>
 #include <data/mesh/GeometryCube.h>
 #include <view/DrawingHelper.h>
+#include <lib/any/conversion.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/Context.h>
+#include <lib/yrenderer/helper/Bindable.h>
 
 namespace artemis::graph {
 
@@ -83,6 +85,12 @@ void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWi
 			for (auto& c: cm.colors)
 				c.a = 1;
 
+#if 0
+		Any data;
+		data.dict_set("pattern0[0]:0", color_to_any(cm.colors[0]));
+		data.dict_set("map_count:80", cm.colors.num);
+		yrenderer::apply_shader_data(params, shader, data);
+#endif
 #ifdef USING_VULKAN
 		params.command_buffer->push_constant(0, sizeof(color)*cm.colors.num, &cm.colors[0]);
 		params.command_buffer->push_constant(64, sizeof(float)*cm.values.num, &cm.values[0]);
