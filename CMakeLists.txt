@@ -514,6 +514,7 @@ add_executable(artemis WIN32
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
 	src/view/MultiView.cpp
+	src/view/NodeListPanel.cpp
 	src/y/audio/audio.cpp
 	src/y/audio/AudioBuffer.cpp
 	src/y/audio/AudioStream.cpp
@@ -910,6 +911,7 @@ add_library(moduleartemis SHARED
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
 	src/view/MultiView.cpp
+	src/view/NodeListPanel.cpp
 	src/y/audio/audio.cpp
 	src/y/audio/AudioBuffer.cpp
 	src/y/audio/AudioStream.cpp

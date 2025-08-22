@@ -37,20 +37,6 @@ static vec2 s2v(const string &s) {
 	return {0,0};
 }
 
-// RGBA
-static string c2s(const color &c) {
-	return format("%.3f %.3f %.3f %.3f", c.r, c.g, c.b, c.a);
-}
-
-static color s2c(const string &s) {
-	auto x = s.explode(" ");
-	if (x.num >= 4)
-		return color(x[3]._float(), x[0]._float(), x[1]._float(), x[2]._float());
-	if (x.num == 3)
-		return color(1, x[0]._float(), x[1]._float(), x[2]._float());
-	return White;
-}
-
 void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data, bool deep) {
 	data->reset();
 
