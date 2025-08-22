@@ -24,9 +24,13 @@ public:
 	static void find_plugins();
 
 	static Path directory();
+	static Path template_directory();
 
 	static base::map<string, Path> plugin_classes;
 	static void* create_instance(const string& name);
+
+	static void find_templates();
+	static Array<string> template_classes;
 };
 
 }

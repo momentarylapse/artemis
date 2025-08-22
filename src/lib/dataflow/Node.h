@@ -27,7 +27,8 @@ enum class NodeCategory {
 	Grid,
 	Mesh,
 	Renderer,
-	Simulation
+	Simulation,
+	Meta
 };
 
 enum class NodeFlags {

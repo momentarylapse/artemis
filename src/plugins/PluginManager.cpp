@@ -37,6 +37,7 @@ void export_run();
 namespace artemis {
 
 base::map<string, Path> PluginManager::plugin_classes;
+Array<string> PluginManager::template_classes;
 
 
 Path PluginManager::directory() {
@@ -54,6 +55,7 @@ void PluginManager::init() {
 	kaba::default_context->register_package_init("fft", directory() | "fft", &export_package_fft);
 	import_kaba();
 	find_plugins();
+	find_templates();
 }
 
 Session* current_session() {
@@ -368,6 +370,18 @@ void* PluginManager::create_instance(const string& name) {
 	return nullptr;
 }
 
+Path PluginManager::template_directory() {
+	return os::app::directory_dynamic | "templates";
+}
+
+
+void PluginManager::find_templates() {
+	os::fs::create_directory(template_directory());
+	for (const auto& e: os::fs::search(template_directory(), "*.artemis", "f")) {
+		string name = e.basename_no_ext();
+		template_classes.add(name);
+	}
+}
 
 
 }

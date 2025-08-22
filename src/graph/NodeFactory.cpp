@@ -122,6 +122,16 @@ void init_factory() {
 			}
 		});
 	}
+	for (const auto& class_name : artemis::PluginManager::template_classes) {
+		node_class_db.add({
+			class_name,
+			{dataflow::NodeCategory::Meta},
+			[class_name=class_name] (Session*, const string& name) {
+				msg_error("TOTO template instance");
+				return nullptr;
+			}
+		});
+	}
 }
 
 

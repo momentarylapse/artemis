@@ -19,6 +19,7 @@
 #include "DrawingHelper.h"
 #include "lib/os/app.h"
 #include "lib/os/filesystem.h"
+#include "plugins/PluginManager.h"
 #include "storage/Storage.h"
 
 
@@ -462,7 +463,7 @@ void GraphEditor::on_key_down(int key) {
 		open_node_list_panel();
 	if (key == xhui::KEY_G) {
 		if (selected_nodes.num >= 2) {
-			const Path dir = os::app::directory_dynamic | "templates";
+			const Path dir = artemis::PluginManager::template_directory();
 			os::fs::create_directory(dir);
 			artemis::graph::DataGraph group(session);
 
