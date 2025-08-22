@@ -7,12 +7,12 @@
 #include <lib/base/base.h>
 #include <lib/base/error.h>
 #include <lib/pattern/Observable.h>
+#include "Node.h"
 
 class Session;
 
 namespace dataflow {
 
-class Node;
 class InPortBase;
 class OutPortBase;
 
@@ -23,17 +23,16 @@ struct CableInfo {
 	int sink_port;
 };
 
-class Graph : public obs::Node<VirtualBase> {
+class Graph : public Node {
 public:
 	Graph();
 
-	int channel;
-	Array<dataflow::Node*> nodes;
+	Array<Node*> nodes;
 
 	void clear();
 
-	void add_node(dataflow::Node* node);
-	void remove_node(dataflow::Node* node);
+	void add_node(Node* node);
+	void remove_node(Node* node);
 
 	base::expected<int> connect(OutPortBase& source, InPortBase& sink);
 	base::expected<int> connect(const CableInfo& c);

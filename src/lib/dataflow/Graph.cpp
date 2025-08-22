@@ -12,8 +12,7 @@
 
 namespace dataflow {
 
-Graph::Graph() {
-	channel = profiler::create_channel("graph");
+Graph::Graph() : Node("graph") {
 }
 
 void Graph::clear() {
@@ -22,14 +21,14 @@ void Graph::clear() {
 		remove_node(n);
 }
 
-void Graph::add_node(dataflow::Node* node) {
+void Graph::add_node(Node* node) {
 	nodes.add(node);
 	node->graph = this;
 	profiler::set_parent(node->channel, channel);
 	out_changed();
 }
 
-void Graph::remove_node(dataflow::Node* node) {
+void Graph::remove_node(Node* node) {
 	auto cc = cables();
 	for (const auto& c: cc)
 		if (c.source == node or c.sink == node)

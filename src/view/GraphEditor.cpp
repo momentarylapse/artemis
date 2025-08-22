@@ -17,6 +17,9 @@
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
 #include "DrawingHelper.h"
+#include "lib/os/app.h"
+#include "lib/os/filesystem.h"
+#include "storage/Storage.h"
 
 
 static constexpr float NODE_WIDTH = 150.0f;
@@ -457,6 +460,34 @@ void GraphEditor::on_key_down(int key) {
 	}
 	if (key == xhui::KEY_TAB)
 		open_node_list_panel();
+	if (key == xhui::KEY_G) {
+		if (selected_nodes.num >= 2) {
+			const Path dir = os::app::directory_dynamic | "templates";
+			os::fs::create_directory(dir);
+			artemis::graph::DataGraph group(session);
+
+			for (auto n: selected_nodes) {
+				group.graph.add_node(n);
+			}
+
+			for (const auto& c: graph->cables()) {
+				if (selected_nodes.contains(c.source) and !selected_nodes.contains(c.sink)) {
+					// group output port
+					group.graph.out_ports.add(c.source->out_ports[c.source_port]);
+				} else if (!selected_nodes.contains(c.source) and selected_nodes.contains(c.sink)) {
+					// group input port
+					group.graph.in_ports.add(c.sink->in_ports[c.sink_port]);
+				}
+			}
+
+			session->storage->save(dir | "a.artemis", &group);
+
+			for (auto n: selected_nodes)
+				n->graph = session->graph;
+
+			session->info("node group created");
+		}
+	}
 }
 
 
