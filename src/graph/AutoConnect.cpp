@@ -9,6 +9,7 @@
 #include <lib/dataflow/Node.h>
 #include <lib/dataflow/Graph.h>
 #include <lib/dataflow/Port.h>
+#include <lib/kaba/syntax/Class.h>
 
 namespace artemis::graph {
 

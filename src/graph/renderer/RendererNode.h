@@ -2,9 +2,9 @@
 // Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef RENDERERNODE_H
-#define RENDERERNODE_H
+#pragma once
 
+#include <lib/base/optional.h>
 #include <lib/dataflow/Node.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
@@ -46,4 +46,3 @@ public:
 
 } // graph
 
-#endif //RENDERERNODE_H

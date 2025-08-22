@@ -8,6 +8,7 @@
 #include <lib/base/algo.h>
 #include <lib/base/error.h>
 #include <lib/os/msg.h>
+#include <lib/kaba/syntax/Class.h>
 #include <lib/profiler/Profiler.h>
 
 namespace dataflow {

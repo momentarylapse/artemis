@@ -2,11 +2,11 @@
 // Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef VOLUMERENDERER_H
-#define VOLUMERENDERER_H
+#pragma once
 
 #include <data/field/ScalarField.h>
 #include <data/util/ColorMap.h>
+#include <lib/base/pointer.h>
 #include <lib/dataflow/Port.h>
 #include "RendererNode.h"
 
@@ -37,4 +37,3 @@ public:
 
 } // graph
 
-#endif //VOLUMERENDERER_H

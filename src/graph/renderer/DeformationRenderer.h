@@ -4,6 +4,7 @@
 #include "RendererNode.h"
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
+#include <lib/base/pointer.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>

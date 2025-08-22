@@ -34,7 +34,7 @@ Dialog x ''
 		set_target("settings-grid");
 		add_control("Label", s->name, 0, i, "");
 		string id = format("setting-%d", i);
-		if (s->class_ == kaba::TypeFloat64) {
+		if (s->type == kaba::TypeFloat64) {
 			auto ss = node->settings[i]->as<double>();
 			add_control("SpinButton", "", 1, i, id);
 			set_options(id, "expandx");
@@ -46,7 +46,7 @@ Dialog x ''
 			event(id, [this, id, ss] {
 				ss->set((double)get_float(id));
 			});
-		} else if (s->class_ == kaba::TypeInt32) {
+		} else if (s->type == kaba::TypeInt32) {
 			auto ss = node->settings[i]->as<int>();
 			if (s->options.head(4) == "set=") {
 				auto xx = s->options.sub(5, -1).parse_tokens(":,");
@@ -73,7 +73,7 @@ Dialog x ''
 					ss->set(get_int(id));
 				});
 			}
-		} else if (s->class_ == kaba::TypeString) {
+		} else if (s->type == kaba::TypeString) {
 			auto ss = node->settings[i]->as<string>();
 			add_control("Edit", "", 1, i, id);
 			set_options(id, "expandx");
@@ -81,7 +81,7 @@ Dialog x ''
 			event(id, [this, id, ss] {
 				ss->set(get_string(id));
 			});
-		} else if (s->class_ == kaba::TypeBool) {
+		} else if (s->type == kaba::TypeBool) {
 			auto ss = node->settings[i]->as<bool>();
 			add_control("CheckBox", "", 1, i, id);
 			set_options(id, "expandx");
@@ -89,7 +89,7 @@ Dialog x ''
 			event(id, [this, id, ss] {
 				ss->set(is_checked(id));
 			});
-		} else if (s->class_ == kaba::TypeColor) {
+		} else if (s->type == kaba::TypeColor) {
 			auto ss = node->settings[i]->as<color>();
 			add_control("ColorButton", "", 1, i, id);
 			set_options(id, "expandx");
@@ -97,7 +97,7 @@ Dialog x ''
 			event(id, [this, id, ss] {
 				ss->set(get_color(id));
 			});
-		} else if (s->class_->name == "ColorMap") {
+		} else if (s->type->name == "ColorMap") {
 			auto ss = node->settings[i]->as<artemis::data::ColorMap>();
 			add_control("DrawingArea", "", 1, i, id);
 			set_options(id, "expandx");
@@ -110,14 +110,14 @@ Dialog x ''
 					ss->set(cm);
 				});
 			});
-		} else if (s->class_ == kaba::TypeFloat64List) {
+		} else if (s->type == kaba::TypeFloat64List) {
 			auto ss = node->settings[i]->as<Array<double>>();
 			add_control("Edit", "", 1, i, id);
 			set_options(id, "expandx");
 			enable(id, false);
 			set_string(id, str((*ss)()));
 		} else {
-			add_control("Label", format("(%s)", s->class_->name), 1, i, "");
+			add_control("Label", format("(%s)", s->type->name), 1, i, "");
 		}
 	}
 	if (node->settings.num == 0)

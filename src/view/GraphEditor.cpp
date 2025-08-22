@@ -14,11 +14,11 @@
 #include <lib/base/iter.h>
 #include <lib/base/sort.h>
 #include <lib/os/msg.h>
+#include <lib/os/filesystem.h>
+#include <lib/kaba/syntax/Class.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
 #include "DrawingHelper.h"
-#include "lib/os/app.h"
-#include "lib/os/filesystem.h"
 #include "plugins/PluginManager.h"
 #include "storage/Storage.h"
 

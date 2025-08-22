@@ -23,21 +23,18 @@ class Setting;
 
 class SettingBase {
 public:
-	explicit SettingBase(Node* owner, const string& name, const kaba::Class* class_, const string& options);
+	explicit SettingBase(Node* owner, const string& name, const kaba::Class* type, void* p, const string& options);
 	void set_generic(const Any& value);
 	Any get_generic() const;
 	template<class T>
 	Setting<T>* as() {
 		return static_cast<Setting<T>*>(this);
 	}
-	template<class T>
-	const Setting<T>* as_const() const {
-		return static_cast<const Setting<T>*>(this);
-	}
 	Node* owner;
 	string name;
 	string options;
-	const kaba::Class* class_;
+	const kaba::Class* type;
+	void* generic_value_pointer = nullptr;
 
 	std::function<void()> on_update;
 };
@@ -46,7 +43,7 @@ template<class T>
 class Setting : public SettingBase {
 	friend class SettingBase;
 public:
-	Setting(Node* owner, const string& name, const T& value, const string& options = "") : SettingBase(owner, name, get_class<T>(), options) {
+	Setting(Node* owner, const string& name, const T& value, const string& options = "") : SettingBase(owner, name, get_class<T>(), &this->value, options) {
 		this->value = value;
 	}
 	const T& operator()() const {
