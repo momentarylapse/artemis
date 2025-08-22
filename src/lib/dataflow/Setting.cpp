@@ -27,4 +27,11 @@ Any SettingBase::get_generic() const {
 	return kaba::dynify(generic_value_pointer, type);
 }
 
+void SettingBase::generic_set(void *p) {
+	generic_value_pointer = p;
+	owner->dirty = true;
+	if (on_update)
+		on_update();
+}
+
 } // graph

@@ -30,13 +30,17 @@ public:
 	Setting<T>* as() {
 		return static_cast<Setting<T>*>(this);
 	}
+
 	Node* owner;
 	string name;
 	string options;
 	const kaba::Class* type;
-	void* generic_value_pointer = nullptr;
+	void* generic_value_pointer; // never null!
 
 	std::function<void()> on_update;
+
+protected:
+	void generic_set(void *p);
 };
 
 template<class T>
@@ -47,13 +51,12 @@ public:
 		this->value = value;
 	}
 	const T& operator()() const {
-		return this->value;
+		return *static_cast<const T*>(generic_value_pointer); // might point to a source port
+		//return this->value;
 	}
 	void set(const typename base::xparam<T>::t value) {
 		this->value = value;
-		owner->dirty = true;
-		if (on_update)
-			on_update();
+		generic_set(&this->value);
 	}
 protected:
 	T value;
