@@ -270,6 +270,8 @@ void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 		bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
 	else if (n->flags & dataflow::NodeFlags::TimeDependent)
 		bg = color::interpolate(color(1, 0, 0.7f, 0), xhui::Theme::_default.background_low, 0.3f);
+	else if (n->flags & dataflow::NodeFlags::Meta)
+		bg = color::interpolate(color(1, 0.5f, 0.5f, 0.5f), xhui::Theme::_default.background_low, 0.3f);
 	if (hover and hover->type == HoverType::Node and hover->node == n)
 		bg = color::interpolate(bg, White, 0.2f);
 	p->set_color(bg);
@@ -463,28 +465,13 @@ void GraphEditor::on_key_down(int key) {
 		open_node_list_panel();
 	if (key == xhui::KEY_G) {
 		if (selected_nodes.num >= 2) {
-			const Path dir = artemis::PluginManager::template_directory();
+
+			auto group = graph->group_nodes(selected_nodes);
+
+			/*const Path dir = artemis::PluginManager::template_directory();
 			os::fs::create_directory(dir);
-			artemis::graph::DataGraph group(session);
-
-			for (auto n: selected_nodes) {
-				group.graph.add_node(n);
-			}
-
-			for (const auto& c: graph->cables()) {
-				if (selected_nodes.contains(c.source) and !selected_nodes.contains(c.sink)) {
-					// group output port
-					group.graph.out_ports.add(c.source->out_ports[c.source_port]);
-				} else if (!selected_nodes.contains(c.source) and selected_nodes.contains(c.sink)) {
-					// group input port
-					group.graph.in_ports.add(c.sink->in_ports[c.sink_port]);
-				}
-			}
-
-			session->storage->save(dir | "a.artemis", &group);
-
-			for (auto n: selected_nodes)
-				n->graph = session->graph;
+			artemis::graph::DataGraph data_group(session);
+			session->storage->save(dir | "a.artemis", &data_group);*/
 
 			session->info("node group created");
 		}

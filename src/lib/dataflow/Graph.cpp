@@ -38,6 +38,15 @@ void Graph::remove_node(Node* node) {
 	//delete node;
 }
 
+void Graph::add_in_port_forward(InPortBase *target) {
+	_in_ports_forward.add(new InPortForward(this, target));
+}
+
+void Graph::add_out_port_forward(OutPortBase *target) {
+	_out_ports_forward.add(new OutPortForward(this, target));
+}
+
+
 bool port_type_match(const OutPortBase& source, const InPortBase& sink) {
 	if (!sink.type)
 		return true;
@@ -98,6 +107,11 @@ bool Graph::iterate() {
 	profiler::end(channel);
 	return updated_any;
 }
+
+void Graph::on_process() {
+	iterate();
+}
+
 
 void Graph::reset_state() {
 	for (auto n: nodes)

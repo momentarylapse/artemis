@@ -5,6 +5,7 @@
 #pragma once
 
 #include <lib/dataflow/Graph.h>
+#include <lib/base/pointer.h>
 #include <data/Data.h>
 
 namespace artemis::graph {
@@ -14,6 +15,8 @@ public:
 	explicit Graph(Session* session);
 
 	void iterate_simulation();
+
+	Graph* group_nodes(const base::set<Node*>& selected_nodes);
 
 	Session* session;
 	double t, dt;
@@ -25,7 +28,7 @@ public:
 	explicit DataGraph(Session* session);
 	void reset() override;
 
-	Graph graph;
+	owned<Graph> graph;
 };
 
 }

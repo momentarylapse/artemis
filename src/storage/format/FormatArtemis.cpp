@@ -48,16 +48,16 @@ void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data,
 			if (e.tag == "node") {
 				auto n = artemis::graph::create_node(data->session, e.value("class"));
 				n->pos = s2v(e.value("pos"));
-				data->graph.add_node(n);
+				data->graph->add_node(n);
 				for (const auto& ee: e.elements)
 					n->set(ee.tag, Any::parse(ee.text));
 			} else if (e.tag == "cable") {
 				int id0 = e.value("source")._int();
 				int id1 = e.value("sink")._int();
-				if (id0 >= 0 and id1 >= 0 and id0 < data->graph.nodes.num and id1 < data->graph.nodes.num) {
-					auto source = data->graph.nodes[id0];
-					auto sink = data->graph.nodes[id1];
-					data->graph.connect({source, e.value("source_port")._int(), sink, e.value("sink_port")._int()});
+				if (id0 >= 0 and id1 >= 0 and id0 < data->graph->nodes.num and id1 < data->graph->nodes.num) {
+					auto source = data->graph->nodes[id0];
+					auto sink = data->graph->nodes[id1];
+					data->graph->connect({source, e.value("source_port")._int(), sink, e.value("sink_port")._int()});
 				}
 			}
 		}
@@ -80,28 +80,28 @@ void FormatArtemis::_save(const Path &filename, artemis::graph::DataGraph *data)
 	{
 		auto g = xml::Element("graph");
 
-		for (const auto& n: data->graph.nodes) {
+		for (const auto& n: data->graph->nodes) {
 			auto nn = xml::Element("node").witha("class", n->name).witha("pos", v2s(n->pos));
 			for (const auto s: n->settings)
 				nn.add(xml::Element(s->name, s->get_generic().repr()));
 			g.add(nn);
 		}
 
-		for (const auto& c: data->graph.cables()) {
-			int id0 = data->graph.nodes.find(c.source);
-			int id1 = data->graph.nodes.find(c.sink);
+		for (const auto& c: data->graph->cables()) {
+			int id0 = data->graph->nodes.find(c.source);
+			int id1 = data->graph->nodes.find(c.sink);
 			if (id0 < 0 or id1 < 0) // we might be a group with exterior connections...
 				continue;
 			auto cc = xml::Element("cable").witha("source", str(id0)).witha("source_port", str(c.source_port)).witha("sink", str(id1)).witha("sink_port", str(c.sink_port));
 			g.add(cc);
 		}
-		for (auto p: data->graph.out_ports) {
-			int owner_id = data->graph.nodes.find(p->owner);
+		for (auto p: data->graph->out_ports) {
+			int owner_id = data->graph->nodes.find(p->owner);
 			int port_id = p->owner->out_ports.find(p);
 			g.add(xml::Element("outport").witha("source", str(owner_id)).witha("source_port", str(port_id)));
 		}
-		for (auto p: data->graph.in_ports) {
-			int owner_id = data->graph.nodes.find(p->owner);
+		for (auto p: data->graph->in_ports) {
+			int owner_id = data->graph->nodes.find(p->owner);
 			int port_id = p->owner->in_ports.find(p);
 			g.add(xml::Element("inport").witha("sink", str(owner_id)).witha("sink_port", str(port_id)));
 		}

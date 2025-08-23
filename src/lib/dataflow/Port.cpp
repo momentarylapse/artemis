@@ -61,5 +61,14 @@ Array<GenericData> InPortBase::generic_values() const {
 	return r;
 }
 
+OutPortForward::OutPortForward(Node* owner, OutPortBase *target) : OutPortBase(owner, target->name, target->type, target->generic_value_pointer, target->flags) {
+	this->target = target;
+}
+
+InPortForward::InPortForward(Node* owner, InPortBase *target) : InPortBase(owner, target->name, target->type, target->flags) {
+	this->target = target;
+}
+
+
 
 } // graph

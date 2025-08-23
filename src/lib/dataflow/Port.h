@@ -94,5 +94,17 @@ private:
 	T _value;
 };
 
+class InPortForward : public InPortBase {
+public:
+	explicit InPortForward(Node* owner, InPortBase* target);
+	InPortBase* target;
+};
+
+class OutPortForward : public OutPortBase {
+public:
+	explicit OutPortForward(Node* owner, OutPortBase* target);
+	OutPortBase* target;
+};
+
 } // graph
 
