@@ -608,7 +608,7 @@ bool Window::button_down(int index) const {
 	return false;
 }
 
-	bool Window::is_key_pressed(int key) const {
+bool Window::is_key_pressed(int key) const {
 	if (key == KEY_CONTROL)
 		return state.key[KEY_LCONTROL] or state.key[KEY_RCONTROL];
 	if (key == KEY_SHIFT)
