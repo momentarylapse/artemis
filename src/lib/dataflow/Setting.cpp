@@ -21,6 +21,9 @@ SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _
 
 void SettingBase::set_generic(const Any& value) {
 	kaba::unwrap_any(value, generic_value_pointer, type);
+	owner->dirty = true;
+	if (on_update)
+		on_update();
 }
 
 Any SettingBase::get_generic() const {
