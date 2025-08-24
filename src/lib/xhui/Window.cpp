@@ -31,6 +31,8 @@ Window::Window(const string &_title, int w, int h, Flags _flags) : Panel(":windo
 	if (flags & Flags::OWN_DECORATION) {
 		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+	} else {
+		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
 	}
 
 	if (!(flags & Flags::FAKE)) {
