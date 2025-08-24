@@ -12,6 +12,8 @@
 #include <lib/yrenderer/Context.h>
 #include <lib/yrenderer/helper/Bindable.h>
 
+#include "lib/base/iter.h"
+
 namespace artemis::graph {
 
 VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
@@ -37,14 +39,15 @@ void VolumeRenderer::on_process() {
 	int nx = f->sampling_mode == data::SamplingMode::PerCell ? f->grid.nx : f->grid.nx + 1;
 	int ny = f->sampling_mode == data::SamplingMode::PerCell ? f->grid.ny : f->grid.ny + 1;
 	int nz = f->sampling_mode == data::SamplingMode::PerCell ? f->grid.nz : f->grid.nz + 1;
-	if (!tex)
+	if (!tex or nx != tex->width or ny != tex->height or nz != tex->depth)
 		tex = new ygfx::VolumeTexture(nx, ny, nz, "r:f32");
 	tex->set_options("wrap=clamp,magfilter=nearest");
 #ifdef USING_VULKAN
 	if (f->type == data::ScalarType::Float32)
 		tex->writex(&f->v32.v[0], nx, ny, nz, "r:f32");
 #else
-#warning "UNIMPLEMENTED: VolumeRenderer for OpenGL"
+	if (f->type == data::ScalarType::Float32)
+		tex->write_float(f->v32.v);
 #endif
 	material->textures[0] = tex.get();
 	material_solid->textures[0] = tex.get();
@@ -85,21 +88,13 @@ void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWi
 			for (auto& c: cm.colors)
 				c.a = 1;
 
-#if 0
 		Any data;
-		data.dict_set("pattern0[0]:0", color_to_any(cm.colors[0]));
+		for (const auto& [i, c]: enumerate(cm.colors)) {
+			data.dict_set(format("map_colors[%d]:%d", i, i*16), color_to_any(c));
+			data.dict_set(format("map_values[%d]:%d", i, 64+i*4), cm.values[i]);
+		}
 		data.dict_set("map_count:80", cm.colors.num);
 		yrenderer::apply_shader_data(params, shader, data);
-#endif
-#ifdef USING_VULKAN
-		params.command_buffer->push_constant(0, sizeof(color)*cm.colors.num, &cm.colors[0]);
-		params.command_buffer->push_constant(64, sizeof(float)*cm.values.num, &cm.values[0]);
-		params.command_buffer->push_constant(80, 4, &cm.colors.num);
-#else
-		//shader->set_floats("pattern0", &t->texture_scale[0].x, 3);
-		//shader->set_floats("pattern1", &t->texture_scale[1].x, 3);
-		shader->set_int("map_count", 0);
-#endif
 		rd.draw_triangles(params, vertex_buffer.get());
 	} else {
 		GeometrySphere mesh(v_0, 1, 2);
