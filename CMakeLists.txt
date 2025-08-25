@@ -383,6 +383,16 @@ add_executable(artemis WIN32
 	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
+	src/lib/syntaxhighlight/BaseParser.cpp
+	src/lib/syntaxhighlight/ParserC.cpp
+	src/lib/syntaxhighlight/ParserCmake.cpp
+	src/lib/syntaxhighlight/ParserHui.cpp
+	src/lib/syntaxhighlight/ParserIni.cpp
+	src/lib/syntaxhighlight/ParserKaba.cpp
+	src/lib/syntaxhighlight/ParserPython.cpp
+	src/lib/syntaxhighlight/ParserShader.cpp
+	src/lib/syntaxhighlight/ParserText.cpp
+	src/lib/syntaxhighlight/Theme.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -781,6 +791,16 @@ add_library(moduleartemis SHARED
 	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
+	src/lib/syntaxhighlight/BaseParser.cpp
+	src/lib/syntaxhighlight/ParserC.cpp
+	src/lib/syntaxhighlight/ParserCmake.cpp
+	src/lib/syntaxhighlight/ParserHui.cpp
+	src/lib/syntaxhighlight/ParserIni.cpp
+	src/lib/syntaxhighlight/ParserKaba.cpp
+	src/lib/syntaxhighlight/ParserPython.cpp
+	src/lib/syntaxhighlight/ParserShader.cpp
+	src/lib/syntaxhighlight/ParserText.cpp
+	src/lib/syntaxhighlight/Theme.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp

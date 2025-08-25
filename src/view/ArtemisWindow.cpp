@@ -94,7 +94,7 @@ Dialog x x padding=0
 				.
 				---|
 				Overlay code-editor-panel '' visible=no
-					MultilineEdit code-editor '' height=300 monospace fontsize=16
+					MultilineEdit code-editor '' greedfactory=0.5 monospace fontsize=15 linenumbers __altbg lineheightscale=1.1 focusframe=no
 					Grid overlay-code-grid '' margin=25
 						Grid ? ''
 							Label ? '' ignorehover expandx
@@ -130,7 +130,7 @@ Dialog x x padding=0
 
 	embed("left-grid", 0, 0, new GraphEditor(session));
 
-	code_editor = new CodeEditor(this, "code-editor", artemis::PluginManager::directory());
+	code_editor = new CodeEditor(session, this, "code-editor", artemis::PluginManager::directory());
 
 #ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;

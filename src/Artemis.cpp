@@ -7,6 +7,7 @@
 #include <view/ArtemisWindow.h>
 #include <plugins/PluginManager.h>
 #include <lib/kaba/kaba.h>
+#include <lib/syntaxhighlight/Theme.h>
 #include <lib/os/msg.h>
 
 #include "storage/Storage.h"
@@ -78,6 +79,7 @@ Session* export_start() {
 	}
 
 	kaba::init();
+	syntaxhighlight::init();
 	try {
 		artemis::PluginManager::init();
 	} catch (Exception &e) {
@@ -107,6 +109,7 @@ namespace os::app {
 		}
 
 		kaba::init();
+		syntaxhighlight::init();
 		try {
 			artemis::PluginManager::init();
 		} catch (Exception &e) {

@@ -15,6 +15,8 @@ namespace xhui {
 
 //#define PERF_OUT
 
+constexpr float DEFAULT_LINE_NUMBER_WIDTH = 50.0f;
+
 
 FontFlags operator|(FontFlags a, FontFlags b) {
 	return (FontFlags)((int)a | (int)b);
@@ -72,7 +74,6 @@ void Edit::Cache::rebuild(const string& text) {
 void Edit::set_string(const string &s) {
 	text = s;
 	cache.rebuild(text);
-	line_number_area_width = -1;
 	//set_cursor_pos(0); // depends on cache update (after on_draw!)
 	cursor_pos = 0;
 	selection_start = 0;
@@ -170,6 +171,12 @@ void Edit::on_key_down(int key) {
 	if (key == KEY_X + mod) {
 		clipboard::copy(get_range(selection_start, cursor_pos));
 		delete_selection();
+	}
+	if (key == KEY_A + mod) {
+		// select all
+		selection_start = 0;
+		cursor_pos = text.num;
+		request_redraw();
 	}
 	if (key == KEY_Z + mod and current_history_index > 0) {
 		auto& op = history[-- current_history_index];
@@ -404,7 +411,6 @@ void Edit::_replace_range(Index i0, Index i1, const string& t) {
 
 	text = text.sub_ref(0, i0) + t + text.sub_ref(i1);
 	cache.rebuild(text);
-	line_number_area_width = -1;
 	auto map_index = [i0, i1, &t] (int index) {
 		if (index >= i1)
 			return index - (i1 - i0) + t.num;
@@ -511,6 +517,17 @@ void Edit::_draw(Painter *p) {
 	p->set_color(bg);
 	p->set_roundness(Theme::_default.button_radius);
 	p->draw_rect(_area);
+
+	// focus frame
+	if (has_focus() and show_focus_frame) {
+		p->set_color(Theme::_default.background_button_primary.with_alpha(0.6f));
+		p->draw_rect(_area);
+
+		float dr = Theme::_default.focus_frame_width;
+		p->set_roundness(Theme::_default.button_radius - dr);
+		p->set_color(bg);
+		p->draw_rect(_area.grow(-dr));
+	}
 	p->set_roundness(0);
 
 	draw_text(p);
@@ -518,9 +535,10 @@ void Edit::_draw(Painter *p) {
 	if (show_line_numbers) {
 		p->set_font("monospace", font_size, false, false);
 		//p->set_font(Theme::_default.font_name, Theme::_default.font_size, false, false);
-		line_number_area_width = 50;//p->get_str_width(str(cache.lines.num));
+		line_number_area_width = DEFAULT_LINE_NUMBER_WIDTH;//p->get_str_width(str(cache.lines.num));
 
-		p->set_color(Theme::_default.background);
+
+		p->set_color(alt_background ? Theme::_default.background : color::interpolate(Theme::_default.background_active, bg, 0.7f));
 		p->draw_rect({_area.x1, _area.x1 + line_number_area_width, _area.y1, _area.y2});
 
 		int cursor_line = index_to_line_pos(cursor_pos).line;
@@ -538,16 +556,6 @@ void Edit::_draw(Painter *p) {
 			}
 	}
 
-	// focus frame
-	if (has_focus() and show_focus_frame) {
-		p->set_color(Theme::_default.background_button_primary.with_alpha(0.6f));
-		p->draw_rect(_area);
-
-		float dr = Theme::_default.focus_frame_width;
-		p->set_roundness(Theme::_default.button_radius - dr);
-		p->set_color(bg);
-		p->draw_rect(_area.grow(-dr));
-	}
 	p->set_font(Theme::_default.font_name, Theme::_default.font_size, false, false);
 	p->set_line_width(1);
 	p->set_roundness(0);
@@ -636,7 +644,7 @@ void Edit::set_option(const string& key, const string& value) {
 		request_redraw();
 	} else if (key == "linenumbers") {
 		show_line_numbers = true;
-		line_number_area_width = -1;
+		line_number_area_width = DEFAULT_LINE_NUMBER_WIDTH;
 		request_redraw();
 	} else {
 		Control::set_option(key, value);
