@@ -12,6 +12,9 @@ CodeEditor::CodeEditor(xhui::Panel* _panel, const string& _id, const Path& _pack
 	id = _id;
 	package_dir = _package_dir;
 
+	//panel->set_options(id, "fontsize=50,lineheightscale=2.0");
+	panel->set_options(id, "fontsize=16,lineheightscale=1.1,linenumbers,focusframe=no");
+
 	panel->set_string(id, R"foodelim(use artemis.*
 
 func main()

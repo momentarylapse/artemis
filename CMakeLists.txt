@@ -298,7 +298,6 @@ add_executable(artemis WIN32
 	src/lib/kaba/lib/lib_image.cpp
 	src/lib/kaba/lib/lib_kaba.cpp
 	src/lib/kaba/lib/lib_math.cpp
-	src/lib/kaba/lib/lib_net.cpp
 	src/lib/kaba/lib/lib_os.cpp
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
@@ -355,6 +354,7 @@ add_executable(artemis WIN32
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/net/_kaba_export.cpp
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
@@ -579,6 +579,7 @@ target_link_directories(artemis PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(artemis PUBLIC ${COMPILE_OPTIONS})
 target_compile_definitions(artemis PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(artemis PUBLIC ${DEPS})
+target_include_directories(artemis PUBLIC src/)
 target_include_directories(artemis PUBLIC src)
 target_include_directories(artemis PUBLIC src/y)
 
@@ -695,7 +696,6 @@ add_library(moduleartemis SHARED
 	src/lib/kaba/lib/lib_image.cpp
 	src/lib/kaba/lib/lib_kaba.cpp
 	src/lib/kaba/lib/lib_math.cpp
-	src/lib/kaba/lib/lib_net.cpp
 	src/lib/kaba/lib/lib_os.cpp
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
@@ -752,6 +752,7 @@ add_library(moduleartemis SHARED
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/net/_kaba_export.cpp
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
@@ -980,6 +981,7 @@ target_link_libraries(moduleartemis PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(moduleartemis PUBLIC -fvisibility=hidden)
 endif()
+target_include_directories(moduleartemis PUBLIC src/)
 target_include_directories(moduleartemis PUBLIC src)
 target_include_directories(moduleartemis PUBLIC src/y)
 set_target_properties(moduleartemis PROPERTIES EXCLUDE_FROM_ALL TRUE)
