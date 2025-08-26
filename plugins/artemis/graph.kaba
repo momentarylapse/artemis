@@ -1,0 +1,125 @@
+use data.*
+use grid.*
+use fields.*
+use kaba
+
+
+enum NodeFlags
+	NONE = 0
+	RESOURCE = 1
+	RENDERER = 2
+	TIME_DEPENDENT = 4
+
+class Node
+	func extern __init__(name: string)
+	func extern virtual __delete__()
+	func extern mut process()
+	func extern virtual mut on_process()
+	func extern virtual mut create_panel() -> void*
+	func extern mut set(key: string, value: Any)
+	var name: string
+	var channel: i32
+	var flags: NodeFlags
+	var dirty: bool
+
+enum PortFlags
+	NONE = 0
+	MUTABLE = 1
+	OPTIONAL = 2
+	MULTI = 4
+	
+class InPortBase
+	func extern __init__(node: Node, name: string, type: kaba.Class*, flags: PortFlags = PortFlags.NONE)
+	func extern generic_values() -> GenericData[]
+	func extern mutated()
+class OutPortBase
+	func extern __init__(node: Node, name: string, type: kaba.Class*, value: void*, flags: PortFlags = PortFlags.NONE)
+	func extern generic_set(p: void*)
+
+
+# TODO kaba template classes!
+class InPortScalarField extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> ScalarField*
+class OutPortScalarField extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: ScalarField)
+
+class InPortVectorField extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> VectorField*
+class OutPortVectorField extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: VectorField)
+
+class InPortMultiComponentField extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> MultiComponentField*
+class OutPortMultiComponentField extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: MultiComponentField)
+	
+class InPortGrid extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> Grid*
+
+class InPortFloat extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> f64*
+class OutPortFloat extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: f64)
+
+class InPortVector extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> vec3*
+class OutPortVector extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: vec3)
+
+class InPortList extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> f64[]*
+class OutPortList extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: f64[])
+
+class InPortVectorList extends InPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern value() -> vec3[]*
+class OutPortVectorList extends OutPortBase
+	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
+	func extern set(x: vec3[])
+
+
+class SettingFloat
+	func extern __init__(node: Node, name: string, value: f64, options: string = "")
+	func extern call() -> f64&
+	func extern mut set(value: f64)
+
+class SettingInt
+	func extern __init__(node: Node, name: string, value: i32, options: string = "")
+	func extern call() -> i32&
+	func extern mut set(value: i32)
+
+class SettingBool
+	func extern __init__(node: Node, name: string, value: bool, options: string = "")
+	func extern call() -> bool&
+	func extern mut set(value: bool)
+
+class SettingString
+	func extern __init__(node: Node, name: string, value: string, options: string = "")
+	func extern call() -> string&
+	func extern mut set(value: string)
+
+class SettingColor
+	func extern __init__(node: Node, name: string, value: Color, options: string = "")
+	func extern call() -> Color&
+	func extern mut set(value: Color)
+
+class Graph
+	func extern clear()
+	func extern add_node(name: string, pos: vec2) -> Node&
+	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
+	var t: f64
+	var dt: f64

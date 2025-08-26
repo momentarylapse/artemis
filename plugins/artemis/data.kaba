@@ -1,0 +1,18 @@
+use kaba
+
+struct Mesh
+	func extern __init__()
+
+
+struct PlotData
+
+struct RenderData
+
+struct ColorMap
+	var colors: Color[]
+	var values: f32[]
+
+
+struct GenericData
+	type: kaba.Class&
+	p: void&

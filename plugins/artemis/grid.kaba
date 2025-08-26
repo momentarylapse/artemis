@@ -1,0 +1,17 @@
+
+enum SamplingMode
+	PER_CELL
+	PER_VERTEX
+
+struct RegularGrid
+	func extern __init__()
+	var nx, ny, nz: i32
+	var dx, dy, dz: vec3
+	var offset: vec3
+	func extern points(mode: SamplingMode) -> vec3[]
+
+struct Grid
+	var regular: RegularGrid?
+	func extern __init__()
+	func extern points(mode: SamplingMode) -> vec3[]
+

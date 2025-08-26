@@ -338,16 +338,20 @@ void PluginManager::import_kaba() {
 	dataflow::link_basic_types();
 
 	auto m = kaba::default_context->load_module("artemis/artemis.kaba");
-	import_component_class<PolygonMesh>(m, "Mesh");
-	import_component_class<data::Grid>(m, "Grid");
-	import_component_class<data::RegularGrid>(m, "RegularGrid");
-	import_component_class<data::ScalarField>(m, "ScalarField");
-	import_component_class<data::VectorField>(m, "VectorField");
-	import_component_class<data::MultiComponentField>(m, "MultiComponentField");
-	import_component_class<data::ColorMap>(m, "ColorMap");
-	import_component_class<graph::PlotData>(m, "PlotData");
-	import_component_class<graph::RenderData>(m, "RenderData");
-	import_component_class<data::SamplingMode>(m, "SamplingMode");
+	auto mdata = kaba::default_context->load_module("artemis/data.kaba");
+	auto mgrid = kaba::default_context->load_module("artemis/grid.kaba");
+	auto mfields = kaba::default_context->load_module("artemis/fields.kaba");
+	auto mgraph = kaba::default_context->load_module("artemis/graph.kaba");
+	import_component_class<PolygonMesh>(mdata, "Mesh");
+	import_component_class<data::Grid>(mgrid, "Grid");
+	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
+	import_component_class<data::ScalarField>(mfields, "ScalarField");
+	import_component_class<data::VectorField>(mfields, "VectorField");
+	import_component_class<data::MultiComponentField>(mfields, "MultiComponentField");
+	import_component_class<data::ColorMap>(mdata, "ColorMap");
+	import_component_class<graph::PlotData>(mdata, "PlotData");
+	import_component_class<graph::RenderData>(mdata, "RenderData");
+	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
 }
 
 void PluginManager::find_plugins() {
