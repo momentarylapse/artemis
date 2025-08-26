@@ -38,16 +38,35 @@ Array<float> ticks(float x_min, float x_max, float scale) {
 }
 
 void Plotter::draw_2d(Painter* p) {
+	if (!active())
+		return;
 	auto area = p->area();
-
-	float y_min = -5;
-	float y_max = 15;
 
 	float x_scale = area.width() / (float)(x_max() - x_min());
 	float x_offset = area.x1 - (float)x_min() * x_scale;
 
-	float y_scale = - area.height() / (y_max - y_min);
-	float y_offset = area.y1 - y_max * y_scale;
+	if (auto_zoom()) {
+		float y0 = 0, y1 = 0;
+		for (const auto d: in_plot.values()) {
+			if (d->f) {
+
+			} else {
+				if (y0 == y1 and d->points.num > 0)
+					y0 = y1 = d->points[0].y;
+				for (const auto& pp: d->points) {
+					y0 = min(y0, pp.y);
+					y1 = max(y1, pp.y);
+				}
+			}
+		}
+		if (y0 != y1) {
+			y_min.set(y0 - (y1-y0) * 0.1f);
+			y_max.set(y1 + (y1-y0) * 0.1f);
+		}
+	}
+
+	float y_scale = - area.height() / ((float)y_max() - (float)y_min());
+	float y_offset = area.y1 - (float)y_max() * y_scale;
 
 	auto project = [=] (const vec2& v) {
 		return vec2(x_offset + v.x * x_scale, y_offset + v.y * y_scale);
@@ -56,8 +75,8 @@ void Plotter::draw_2d(Painter* p) {
 	p->set_color(color::interpolate(xhui::Theme::_default.text_disabled, xhui::Theme::_default.background_low, 0.75f));
 	p->set_line_width(1);
 	for (float x: ticks((float)x_min(), (float)x_max(), x_scale))
-		p->draw_line(project({x, y_min}), project({x, y_max}));
-	for (float y: ticks(y_min, y_max, -y_scale))
+		p->draw_line(project({x, (float)y_min()}), project({x, (float)y_max()}));
+	for (float y: ticks((float)y_min(), (float)y_max(), -y_scale))
 		p->draw_line(project({(float)x_min(), y}), project({(float)x_max(), y}));
 
 	for (const auto d: in_plot.values()) {

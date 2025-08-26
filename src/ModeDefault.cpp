@@ -82,14 +82,44 @@ void ModeDefault::on_draw_win(const yrenderer::RenderParams& params, MultiViewWi
 	}
 }
 
-string nice_time(float t, float dt) {
-	if (dt < 0.0001f)
-		return format("%.2f us", t * 1000000.0f);
-	if (dt < 0.001f)
-		return format("%.3f ms", t * 1000.0f);
-	if (dt < 0.01f)
-		return format("%.3f s", t);
-	return format("%.2f s", t);
+string nice_time(double t, double dt) {
+	Array<string> s;
+	if (t >= 3600)
+		s.add(format("%d h", (int)(t / 3600)));
+
+	if (t >= 60) {
+		if (t >= 3600)
+			s.add(format("%03d min", (int)(t / 60) % 60));
+		else
+			s.add(format("%d min", (int)(t / 60) % 60));
+	}
+	if (t >= 1) {
+		if (t >= 60)
+			s.add(format("%03d s", (int)t % 60));
+		else
+			s.add(format("%d s", (int)t % 60));
+	}
+	if (t >= 0.001 and dt < 1) {
+		if (t >= 1)
+			s.add(format("%03d ms", (int)(t * 1000) % 1000));
+		else
+			s.add(format("%d ms", (int)(t * 1000) % 1000));
+	}
+	if (t >= 0.000001 and dt < 0.001) {
+		if (t >= 0.001)
+			s.add(format("%03d us", (int)(t * 1000000) % 1000));
+		else
+			s.add(format("%d us", (int)(t * 1000000) % 1000));
+	}
+	if (dt < 0.000001) {
+		if (t >= 0.000001)
+			s.add(format("%03d ns", (int)(t * 1000000000) % 1000));
+		else
+			s.add(format("%d ns", (int)(t * 1000000000) % 1000));
+	}
+	if (s.num == 0)
+		return "0 s";
+	return implode(s, " ");
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
@@ -107,14 +137,18 @@ void ModeDefault::on_draw_post(Painter* p) {
 	p->set_font_size(xhui::Theme::_default.font_size);
 
 	if (show_profiling) {
-		p->set_color(xhui::Theme::_default.text_disabled);
 		p->set_font_size(xhui::Theme::_default.font_size * 0.85f);
 		auto report = profiler::digest_report(profiler::previous_frame_timing);
 		for (const auto& [i, c]: enumerate(report)) {
+			float fraction = c.total / max(profiler::previous_frame_timing.total_time, 0.01f);
+			if (fraction > 0.03)
+				p->set_color(xhui::Theme::_default.text);
+			else
+				p->set_color(xhui::Theme::_default.text_disabled);
 			draw_str_right(p->area().p00() + vec2(140, 20 + 18 * (float)i), profiler::get_name(c.channel));
-			draw_str_right(p->area().p00() + vec2(180, 20 + 18 * (float)i), format("%.2f", c.average * 1000));
-			draw_str_right(p->area().p00() + vec2(220, 20 + 18 * (float)i), format("%.2f", c.total * 1000));
-			draw_str_right(p->area().p00() + vec2(260, 20 + 18 * (float)i), format("%.d", c.count));
+			draw_str_right(p->area().p00() + vec2(190, 20 + 18 * (float)i), format("%.1f%%", fraction * 100));
+			draw_str_right(p->area().p00() + vec2(230, 20 + 18 * (float)i), format("%.2f", c.average * 1000));
+			draw_str_right(p->area().p00() + vec2(270, 20 + 18 * (float)i), format("%.d", c.count));
 		}
 		p->set_font_size(xhui::Theme::_default.font_size);
 	}
