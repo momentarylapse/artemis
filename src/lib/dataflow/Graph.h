@@ -46,9 +46,11 @@ public:
 
 	Array<CableInfo> cables() const;
 
-	void reset_state();
 	bool iterate();
 	void on_process() override;
+
+	// trigger all updates (for simulations)
+	void reset_state();
 };
 
 bool port_type_match(const OutPortBase& source, const InPortBase& sink);

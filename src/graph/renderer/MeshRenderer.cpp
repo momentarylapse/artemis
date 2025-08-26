@@ -9,6 +9,8 @@
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/Context.h>
 
+#include "lib/os/msg.h"
+
 namespace artemis::graph {
 
 base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
@@ -20,9 +22,12 @@ base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
 	return b;
 }
 
-MeshRenderer::MeshRenderer(Session* s) : RendererNode(s, "MeshRenderer") {
+MeshRenderer::MeshRenderer(Session* s) : RenderEmitterNode(s, "MeshRenderer") {
+	if (!s->ctx)
+		msg_error("no ctx");
 	material = new yrenderer::Material(s->ctx);
 	material->textures.add(s->ctx->tex_white);
+	vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 }
 
 MeshRenderer::~MeshRenderer() = default;
@@ -32,8 +37,6 @@ void MeshRenderer::on_process() {
 	if (!mesh)
 		return;
 
-	if (!vertex_buffer)
-		vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 	mesh->build(vertex_buffer.get());
 
 	material->roughness = (float)roughness();
@@ -41,26 +44,18 @@ void MeshRenderer::on_process() {
 	material->albedo = albedo();
 	material->emission = emission();
 
-	out_draw({active(), mesh_bounding_box(*mesh), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-		draw_win(params, win, rvd);
-	}});
+	send_out();
 }
 
-void MeshRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
+void MeshRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) {
 	auto vb = vertex_buffer.get();
-	if (!vb)
-		return;
-
-	{
-		// FIXME workaround for mesh rendering bug...
-		Array<vec3> points;
-		points.add({0,0,0});
-		points.add({0,0,0});
-		session->drawing_helper->draw_lines(points, false);
-	}
-
 	session->drawing_helper->draw_mesh(params, rvd, mat4::ID, vb, material.get());
 }
+
+base::optional<Box> MeshRenderer::bounding_box() const {
+	return mesh_bounding_box(*in_mesh.value());
+}
+
 
 
 } // graph

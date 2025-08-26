@@ -13,6 +13,8 @@
 
 #include "Session.h"
 
+namespace artemis::view {
+
 CodeEditor::CodeEditor(Session* _session, xhui::Panel* _panel, const string& _id, const Path& _package_dir) {
 	session = _session;
 	panel = _panel;
@@ -70,6 +72,8 @@ void CodeEditor::run() {
 	} catch (kaba::Exception& e) {
 		session->error(e.message());
 	}
+}
+
 }
 
 

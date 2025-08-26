@@ -27,7 +27,7 @@ base::future<Session*> emit_empty_session(Session* parent);
 
 void start_session_empty(Session* parent) {
 	emit_empty_session(parent).then([] (Session* s) {
-		if (true) {
+		if (false) {
 			auto canvas = artemis::graph::create_node(s, "Canvas");
 			canvas->pos = {300, 600};
 			s->graph->add_node(canvas);
@@ -36,14 +36,18 @@ void start_session_empty(Session* parent) {
 			teapot->pos = {300, 200};
 			s->graph->add_node(teapot);
 			auto renderer = artemis::graph::create_node(s, "MeshRenderer");
-			renderer->pos = {300, 400};
+			renderer->pos = {300, 350};
 			//renderer->set("emission", color_to_any(Green));
 			s->graph->add_node(renderer);
+			auto scene = artemis::graph::create_node(s, "SceneRenderer");
+			scene->pos = {300, 500};
+			s->graph->add_node(scene);
 			auto canvas = artemis::graph::create_node(s, "Canvas");
-			canvas->pos = {300, 600};
+			canvas->pos = {300, 650};
 			s->graph->add_node(canvas);
 			s->graph->connect({teapot, 0, renderer, 0});
-			s->graph->connect({renderer, 0, canvas, 0});
+			s->graph->connect({renderer, 0, scene, 0});
+			s->graph->connect({scene, 0, canvas, 0});
 		}
 		s->set_mode(new ModeDefault(s));
 	});

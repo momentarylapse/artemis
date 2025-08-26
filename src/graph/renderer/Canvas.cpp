@@ -3,15 +3,24 @@
 //
 
 #include "Canvas.h"
+#include "view/Canvas.h"
+
 #include <Session.h>
 #include <view/DrawingHelper.h>
 #include <view/MultiView.h>
+#include "view/ArtemisWindow.h"
 
 namespace artemis::graph {
 
-void Canvas::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-	session->drawing_helper->clear(params, background());
+void Canvas::on_process() {
+	view::RenderNode* child = nullptr;
+	if (in_draw.has_value())
+		child = in_draw.value()->render_node;
+	session->win->canvas->set_child(child);
+}
 
+/*
+void Canvas::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
 	if (!camera_defined) {
 		base::optional<Box> bounding_box;
 		for (auto& d: in_draw.values()) {
@@ -36,14 +45,7 @@ void Canvas::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* wi
 	for (auto d: in_draw.values())
 		if (d->f_draw_3d_transparent and d->active)
 			d->f_draw_3d_transparent(params, win, rvd);
-}
-
-void Canvas::draw_2d(Painter* p) {
-	for (auto& d: in_draw.values()) {
-		if (d->f_draw_2d and d->active)
-			d->f_draw_2d(p);
-	}
-}
+}*/
 
 
 } // graph

@@ -22,6 +22,7 @@
 #include "plugins/PluginManager.h"
 #include "storage/Storage.h"
 
+namespace artemis::view {
 
 static constexpr float NODE_WIDTH = 150.0f;
 static constexpr float NODE_HEIGHT = 50.0f;
@@ -284,8 +285,10 @@ void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 		const string name = n->name.explode(":").back();
 		const float w = p->get_str_width(name) / view_scale;
 		p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2 - w/2, 5)), name);
-		if (n->dirty)
-			p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2, 35)), "X");
+		if (n->state == dataflow::NodeState::Uninitialized)
+			p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2, 35)), "U");
+		else if (n->state == dataflow::NodeState::Dirty)
+			p->draw_str(to_screen(n->pos + vec2(NODE_WIDTH / 2, 35)), "*");
 	}
 	p->set_font("", xhui::Theme::_default.font_size * view_scale, false, false);
 
@@ -478,7 +481,7 @@ void GraphEditor::on_key_down(int key) {
 	}
 }
 
-
+}
 
 
 

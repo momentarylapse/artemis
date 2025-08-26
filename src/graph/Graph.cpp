@@ -21,7 +21,7 @@ void Graph::iterate_simulation() {
 	for (auto n: nodes)
 		if (n->flags & dataflow::NodeFlags::TimeDependent and n->has_necessary_inputs()) {
 			n->process();
-			n->dirty = false;
+			n->state = dataflow::NodeState::Complete;
 		}
 }
 

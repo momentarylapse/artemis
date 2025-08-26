@@ -23,12 +23,14 @@
 #include "GraphEditor.h"
 #include "MultiView.h"
 #include "CodeEditor.h"
+#include "Canvas.h"
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/yrenderer/Renderer.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>
 
+#include "SceneRenderer.h"
 #include "Session.h"
 #include "y/helper/ResourceManager.h"
 #include "storage/Storage.h"
@@ -105,15 +107,9 @@ Dialog x x padding=0
 						Grid overlay-button-grid-code-bottom '' spacing=20
 							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 			Overlay ? ''
-				DrawingArea area '' grabfocus width=400 greedfactorx=1.6 expandx
+				DrawingArea canvas-fake '' grabfocus width=400 greedfactorx=1.6 expandx
+				Grid canvas-grid ''
 				Grid overlay-main-grid '' margin=25
-					Grid ? ''
-						Label ? '' ignorehover expandx
-						Grid overlay-button-grid-right '' spacing=20
-							Button cam-rotate 'R' image=rf-rotate height=50 width=50 padding=7 noexpandx ignorefocus
-							---|
-							Button cam-move 'M' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
-					---|
 					Label ? '' ignorehover expandy
 					---|
 					Grid overlay-button-grid-bottom '' spacing=20
@@ -128,9 +124,14 @@ Dialog x x padding=0
 
 	//toolbar = (xhui::Toolbar*)get_control("toolbar");
 
-	embed("left-grid", 0, 0, new GraphEditor(session));
+	graph_editor = new artemis::view::GraphEditor(session);
+	embed("left-grid", 0, 0, graph_editor);
 
-	code_editor = new CodeEditor(session, this, "code-editor", artemis::PluginManager::directory());
+	code_editor = new artemis::view::CodeEditor(session, this, "code-editor", artemis::PluginManager::directory());
+
+
+	canvas = new artemis::view::Canvas(session);
+	embed("canvas-grid", 0, 0, canvas.get());
 
 #ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;
@@ -163,7 +164,7 @@ Dialog x x padding=0
 		session->cur_mode->on_command("redo");
 	});
 
-	event_xp("area", xhui::event_id::Initialize, [this] (Painter* p) {
+	event_xp("canvas-fake", xhui::event_id::Initialize, [this] (Painter* p) {
 		auto pp = (xhui::Painter*)p;
 		session->ctx = yrenderer::api_init_xhui(pp);
 		session->resource_manager = new ResourceManager(session->ctx, "", "", "");
@@ -193,96 +194,9 @@ Dialog x x padding=0
 
 		session->promise_started(session);
 	});
-	event_xp(id, xhui::event_id::JustBeforeDraw, [this] (Painter* p) {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		if (auto da = static_cast<xhui::DrawingArea*>(get_control("area")))
-			da->for_painter_do(static_cast<xhui::Painter*>(p), [this] (Painter* p) {
-				session->cur_mode->multi_view->set_area(p->area());
-				renderer->before_draw(p);
-			});
-	});
-	event_xp("area", xhui::event_id::Draw, [this] (Painter* p) {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		session->cur_mode->multi_view->set_area(p->area());
-		renderer->draw(p);
-		session->cur_mode->multi_view->on_draw(p);
-		session->cur_mode->on_draw_post(p);
-	});
-	event_x("area", xhui::event_id::MouseMove, [this] {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		session->cur_mode->multi_view->on_mouse_move(state.m, state.m - state_prev.m);
-		session->cur_mode->on_mouse_move(state.m, state.m - state_prev.m);
-	});
-	event_x("area", xhui::event_id::MouseWheel, [this] {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		session->cur_mode->multi_view->on_mouse_wheel(state.m, state.scroll);
-	});
-	event_x("area", xhui::event_id::MouseLeave, [this] {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		session->cur_mode->multi_view->on_mouse_leave();
-		session->cur_mode->on_mouse_leave(state.m);
-	});
-	event_x("area", xhui::event_id::LeftButtonDown, [this] {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		session->cur_mode->multi_view->on_left_button_down(state.m);
-		session->cur_mode->on_left_button_down(state.m);
-	});
-	event_x("area", xhui::event_id::LeftButtonUp, [this] {
-		if (!session->cur_mode or !session->cur_mode->multi_view)
-			return;
-		session->cur_mode->multi_view->on_left_button_up(state.m);
-		session->cur_mode->on_left_button_up(state.m);
-	});
-	event_x("area", xhui::event_id::KeyDown, [this] {
-		session->cur_mode->multi_view->on_key_down(state.key_code);
-		session->cur_mode->on_key_down(state.key_code);
-	});
-	event_x("cam-move", xhui::event_id::LeftButtonDown, [this] {
-		set_mouse_mode(0);
-	});
-	event_x("cam-move", xhui::event_id::LeftButtonUp, [this] {
-		set_mouse_mode(1);
-	});
-	event_x("cam-move", xhui::event_id::MouseMove, [this] {
-		vec2 d = state.m - state_prev.m;
-		if (state.lbut) {
-			if (is_key_pressed(xhui::KEY_SHIFT))
-				session->cur_mode->multi_view->view_port.move(vec3(0,0,d.y) / 800.0f);
-			else
-				session->cur_mode->multi_view->view_port.move(vec3(-d.x, d.y, 0) / 800.0f);
-		}
-	});
-	event_x("cam-rotate", xhui::event_id::LeftButtonDown, [this] {
-		set_mouse_mode(0);
-	});
-	event_x("cam-rotate", xhui::event_id::LeftButtonUp, [this] {
-		set_mouse_mode(1);
-	});
-	event_x("cam-rotate", xhui::event_id::MouseMove, [this] {
-		vec2 d = state.m - state_prev.m;
-		if (state.lbut)
-			session->cur_mode->multi_view->view_port.rotate(quaternion::rotation({d.y*0.003f, d.x*0.003f, 0}));
-	});
-	event("mouse-action", [this] {
-		auto& mode = session->cur_mode->multi_view->action_controller->action.mode;
-		if (mode == MouseActionMode::MOVE) {
-			mode = MouseActionMode::ROTATE;
-			set_options("mouse-action", "image=rf-rotate");
-		} else if (mode == MouseActionMode::ROTATE) {
-			mode = MouseActionMode::SCALE;
-			set_options("mouse-action", "image=rf-scale");
-		} else if (mode == MouseActionMode::SCALE) {
-			mode = MouseActionMode::MOVE;
-			set_options("mouse-action", "image=rf-translate");
-		}
-		set_string("mouse-action", session->cur_mode->multi_view->action_controller->action.name().sub(0, 1).upper());
-	});
+
+
+
 	event("code-run", [this] {
 		code_editor->run();
 	});

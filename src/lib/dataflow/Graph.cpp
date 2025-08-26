@@ -63,6 +63,7 @@ base::expected<int> Graph::connect(OutPortBase& source, InPortBase& sink) {
 
 	sink.sources.add(&source);
 	source.targets.add(&sink);
+	sink.owner->on_input_changed(&sink);
 	out_changed();
 	return 0;
 }
@@ -74,6 +75,7 @@ base::expected<int> Graph::connect(const CableInfo& c) {
 void Graph::unconnect(OutPortBase& source, InPortBase& sink) {
 	base::remove(sink.sources, &source);
 	base::remove(source.targets, &sink);
+	sink.owner->on_input_changed(&sink);
 	out_changed();
 }
 
@@ -98,9 +100,15 @@ bool Graph::iterate() {
 	// TODO DAG
 	bool updated_any = false;
 	for (auto n: nodes)
-		if (n->dirty and n->has_necessary_inputs()) {
+		if (n->state == NodeState::Uninitialized) {
+			n->additional_init();
+			updated_any = true;
+		}
+
+	for (auto n: nodes)
+		if (n->state == NodeState::Dirty and n->has_necessary_inputs()) {
 			n->process();
-			n->dirty = false;
+			n->state = NodeState::Complete;
 			updated_any = true;
 		}
 
@@ -112,14 +120,11 @@ void Graph::on_process() {
 	iterate();
 }
 
-
 void Graph::reset_state() {
 	for (auto n: nodes)
-		n->dirty = true;
+		if (n->state == NodeState::Complete)
+			n->state = NodeState::Dirty;
 }
-
-
-
 
 
 } // graph

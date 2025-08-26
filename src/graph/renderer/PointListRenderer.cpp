@@ -21,7 +21,7 @@ base::optional<Box> point_list_bounding_box(const Array<vec3>& points) {
 	return b;
 }
 
-PointListRenderer::PointListRenderer(Session* s) : RendererNode(s, "PointListRenderer") {
+PointListRenderer::PointListRenderer(Session* s) : RenderEmitterNode(s, "PointListRenderer") {
 	material = new yrenderer::Material(s->ctx);
 	material->textures.add(s->ctx->tex_white);
 }
@@ -37,20 +37,14 @@ void PointListRenderer::on_process() {
 	} else {
 		trails.clear();
 	}
-
-	if (!active())
-		return;
-
-	if (auto points = in_points.value()) {
-		// TODO
-		out_draw(RenderData{active(), point_list_bounding_box(*points), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-			draw_win(params, win, rvd);
-		}});
-	}
+	send_out();
 }
 
+base::optional<Box> PointListRenderer::bounding_box() const {
+	return point_list_bounding_box(*in_points.value());
+}
 
-void PointListRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
+void PointListRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) {
 	if (!vertex_buffer)
 		vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 

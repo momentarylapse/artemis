@@ -11,13 +11,14 @@
 
 namespace artemis::graph {
 
-class VectorFieldRenderer : public RendererNode {
+class VectorFieldRenderer : public RenderEmitterNode {
 public:
-	explicit VectorFieldRenderer(Session* s) : RendererNode(s, "VectorFieldRenderer") {}
+	explicit VectorFieldRenderer(Session* s) : RenderEmitterNode(s, "VectorFieldRenderer") {}
 
 	void on_process() override;
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
+	void on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) override;
+	base::optional<Box> bounding_box() const override;
 
 	dataflow::Setting<double> line_width{this, "line-width", 2.0, "range=0:99:0.1"};
 	dataflow::Setting<double> scale{this, "scale", 1.0};

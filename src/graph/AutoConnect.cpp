@@ -34,16 +34,29 @@ base::expected<int> auto_connect(Graph* g, const dataflow::CableInfo& c) {
 	auto sink = c.sink->in_ports[c.sink_port];
 	if (dataflow::port_type_match(*source, *sink))
 		return g->connect(c);
-	if (source->type->name == "Mesh" and sink->type->name == "RenderData")
+	// TODO recursive "solver"
+	if (source->type->name == "Mesh" and sink->type->name == "DrawCall")
 		return connect_through(g, c, {"MeshRenderer"});
-	if (source->type->name == "Grid" and sink->type->name == "RenderData")
+	if (source->type->name == "Mesh" and sink->type->name == "RenderData")
+		return connect_through(g, c, {"MeshRenderer", "SceneRenderer"});
+	if (source->type->name == "DrawCall" and sink->type->name == "RenderData")
+		return connect_through(g, c, {"SceneRenderer"});
+	if (source->type->name == "Grid" and sink->type->name == "DrawCall")
 		return connect_through(g, c, {"GridRenderer"});
-	if (source->type->name == "ScalarField" and sink->type->name == "RenderData")
+	if (source->type->name == "Grid" and sink->type->name == "RenderData")
+		return connect_through(g, c, {"GridRenderer", "SceneRenderer"});
+	if (source->type->name == "ScalarField" and sink->type->name == "DrawCall")
 		return connect_through(g, c, {"VolumeRenderer"});
-	if (source->type->name == "VectorField" and sink->type->name == "RenderData")
+	if (source->type->name == "ScalarField" and sink->type->name == "RenderData")
+		return connect_through(g, c, {"VolumeRenderer", "SceneRenderer"});
+	if (source->type->name == "VectorField" and sink->type->name == "DrawCall")
 		return connect_through(g, c, {"VectorFieldRenderer"});
-	if (source->type->name == "vec3[]" and sink->type->name == "RenderData")
+	if (source->type->name == "VectorField" and sink->type->name == "RenderData")
+		return connect_through(g, c, {"VectorFieldRenderer", "SceneRenderer"});
+	if (source->type->name == "vec3[]" and sink->type->name == "DrawCall")
 		return connect_through(g, c, {"PointListRenderer"});
+	if (source->type->name == "vec3[]" and sink->type->name == "RenderData")
+		return connect_through(g, c, {"PointListRenderer", "SceneRenderer"});
 	if (source->type->name == "PlotData" and sink->type->name == "RenderData")
 		return connect_through(g, c, {"Plotter"});
 	if (source->type->name == "f64[]" and sink->type->name == "RenderData")

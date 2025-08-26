@@ -51,7 +51,7 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	win->event("simulation-stop", [this] {
 		simulation_active = false;
 		session->graph->t = 0;
-		graph->reset_state();
+		session->graph->reset_state();
 		update_menu();
 	});
 
@@ -70,16 +70,6 @@ artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
 		if (n->flags & dataflow::NodeFlags::Canvas)
 			return static_cast<artemis::graph::Canvas*>(n);
 	return nullptr;
-}
-
-void ModeDefault::on_draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-	if (auto c = get_canvas(graph)) {
-		if (c->background().a < 0)
-			c->background.set(xhui::Theme::_default.background_low);
-		c->draw_win(params, win, rvd);
-	} else {
-		session->drawing_helper->clear(params, Red);//xhui::Theme::_default.background_low);
-	}
 }
 
 string nice_time(double t, double dt) {
@@ -123,9 +113,6 @@ string nice_time(double t, double dt) {
 }
 
 void ModeDefault::on_draw_post(Painter* p) {
-	if (auto c = get_canvas(graph))
-		c->draw_2d(p);
-
 	auto draw_str_right = [p] (const vec2& pos, const string& str) {
 		float w = p->get_str_width(str);
 		p->draw_str(pos - vec2(w, 0), str);

@@ -7,21 +7,20 @@
 
 namespace artemis::graph {
 
-DeformationRenderer::DeformationRenderer(Session* s) : RendererNode(s, "DeformationRenderer") {}
+DeformationRenderer::DeformationRenderer(Session* s) : RenderEmitterNode(s, "DeformationRenderer") {}
 
 void DeformationRenderer::on_process() {
 	auto d = in_diff.value();
 	if (!d)
 		return;
-
-	out_draw(RenderData{active(), d->grid.bounding_box(), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-		draw_win(params, win, rvd);
-	}});
+	send_out();
 }
 
+base::optional<Box> DeformationRenderer::bounding_box() const {
+	return in_diff.value()->grid.bounding_box();
+}
 
-void DeformationRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-
+void DeformationRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) {
 	auto d = in_diff.value();
 	if (!d)
 		return;

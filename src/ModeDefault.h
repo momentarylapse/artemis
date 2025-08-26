@@ -18,7 +18,6 @@ class ModeDefault : public Mode {
 public:
 	explicit ModeDefault(Session* session);
 
-	void on_draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) override;
 	void on_draw_post(Painter*) override;
 	void on_command(const string& id) override;
 	void on_key_down(int key) override;

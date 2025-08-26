@@ -4,9 +4,11 @@ struct Mesh
 	func extern __init__()
 
 
+# opaque types for the data graph
 struct PlotData
-
 struct RenderData
+struct DrawCall
+
 
 struct ColorMap
 	var colors: Color[]

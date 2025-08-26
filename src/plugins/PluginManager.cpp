@@ -274,12 +274,13 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 		ext->declare_class_size("Node", sizeof(dataflow::Node));
 		ext->declare_class_element("Node.name", &dataflow::Node::name);
 		ext->declare_class_element("Node.channel", &dataflow::Node::channel);
-		ext->declare_class_element("Node.dirty", &dataflow::Node::dirty);
+		ext->declare_class_element("Node._state", &dataflow::Node::state);
 		ext->declare_class_element("Node.flags", &dataflow::Node::flags);
 		ext->link_class_func("Node.__init__", &node_init);
 		ext->link_class_func("Node.set", &dataflow::Node::set);
 		ext->link_class_func("Node.process", &dataflow::Node::process);
 		ext->link_virtual("Node.__delete__", &GenericVDeleter<dataflow::Node>::__delete__, &n);
+		ext->link_virtual("Node.additional_init", &dataflow::Node::additional_init, &n);
 		ext->link_virtual("Node.on_process", &dataflow::Node::on_process, &n);
 		ext->link_virtual("Node.create_panel", &dataflow::Node::create_panel, &n);
 	}
@@ -351,6 +352,7 @@ void PluginManager::import_kaba() {
 	import_component_class<data::ColorMap>(mdata, "ColorMap");
 	import_component_class<graph::PlotData>(mdata, "PlotData");
 	import_component_class<graph::RenderData>(mdata, "RenderData");
+	import_component_class<graph::DrawCall>(mdata, "DrawCall");
 	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
 }
 

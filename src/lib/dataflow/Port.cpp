@@ -29,7 +29,7 @@ void OutPortBase::generic_set(void *p) {
 
 void OutPortBase::mutated() {
 	for (auto t: targets)
-		t->owner->dirty = true;
+		t->owner->on_input_changed(t);
 }
 
 

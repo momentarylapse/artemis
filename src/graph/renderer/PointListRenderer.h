@@ -17,13 +17,14 @@ namespace yrenderer {
 
 namespace artemis::graph {
 
-class PointListRenderer : public RendererNode {
+class PointListRenderer : public RenderEmitterNode {
 public:
 	explicit PointListRenderer(Session* s);
 
 	void on_process() override;
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
+	base::optional<Box> bounding_box() const override;
+	void on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) override;
 
 	dataflow::Setting<double> radius{this, "radius", 0.2, "range=0:99:0.1"};
 	dataflow::Setting<int> trail_length{this, "trail-length", 0, "range=0:"};

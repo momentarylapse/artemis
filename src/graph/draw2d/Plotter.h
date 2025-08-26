@@ -7,6 +7,11 @@
 #include "../renderer/RendererNode.h"
 #include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
+#include <lib/base/pointer.h>
+
+namespace artemis::view {
+	class RenderNode;
+}
 
 namespace artemis::graph {
 
@@ -21,7 +26,7 @@ struct PlotData {
 
 class Plotter : public RendererNode {
 public:
-	explicit Plotter(Session* s) : RendererNode(s, "Plotter") {}
+	explicit Plotter(Session* s);
 
 	void on_process() override;
 
@@ -35,6 +40,8 @@ public:
 	dataflow::Setting<double> y_max{this, "y-max", 15};
 
 	dataflow::InPort<PlotData> in_plot{this, "plot", dataflow::PortFlags::Multi};
+
+	shared<view::RenderNode> render_node;
 };
 
 } // graph

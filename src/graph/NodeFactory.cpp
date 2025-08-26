@@ -21,6 +21,8 @@
 #include "renderer/Canvas.h"
 #include "renderer/DeformationRenderer.h"
 #include "renderer/GridRenderer.h"
+#include "renderer/LayoutGrid.h"
+#include "renderer/SceneRenderer.h"
 #include "renderer/MeshRenderer.h"
 #include "renderer/PointListRenderer.h"
 #include "renderer/VectorFieldRenderer.h"
@@ -93,6 +95,8 @@ void init_factory() {
 	register_node_class<VectorFieldLength>("VectorFieldLength", {dataflow::NodeCategory::Field});
 
 	register_node_class_p<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<LayoutGrid>("LayoutGrid", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<MeshRenderer>("MeshRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});

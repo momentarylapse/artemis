@@ -2,8 +2,8 @@
 // Created by michi on 09.03.25.
 //
 
-#ifndef MESHRENDERER_H
-#define MESHRENDERER_H
+#pragma once
+
 
 #include "RendererNode.h"
 #include <lib/dataflow/Port.h>
@@ -13,14 +13,15 @@
 
 namespace artemis::graph {
 
-class MeshRenderer : public RendererNode {
+class MeshRenderer : public RenderEmitterNode {
 public:
 	explicit MeshRenderer(Session* s);
 	~MeshRenderer() override;
 
 	void on_process() override;
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
+	void on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) override;
+	base::optional<Box> bounding_box() const override;
 
 	dataflow::InPort<PolygonMesh> in_mesh{this, "mesh"};
 
@@ -34,5 +35,3 @@ public:
 };
 
 } // graph
-
-#endif //MESHRENDERER_H

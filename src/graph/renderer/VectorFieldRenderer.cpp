@@ -11,17 +11,14 @@
 namespace artemis::graph {
 
 void VectorFieldRenderer::on_process() {
-	auto f = in_field.value();
-	if (!f)
-		return;
-
-	out_draw(RenderData{active(), f->grid.bounding_box(), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-		draw_win(params, win, rvd);
-	}});
+	send_out();
 }
 
+base::optional<Box> VectorFieldRenderer::bounding_box() const {
+	return in_field.value()->grid.bounding_box();
+}
 
-void VectorFieldRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
+void VectorFieldRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) {
 	auto f = in_field.value();
 	if (!f)
 		return;

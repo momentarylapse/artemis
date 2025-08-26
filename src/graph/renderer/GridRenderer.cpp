@@ -11,16 +11,17 @@
 namespace artemis::graph {
 
 void GridRenderer::on_process() {
-	if (auto r = regular.value()) {
-		out_draw(RenderData{active(), r->bounding_box(), [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-			draw_win(params, win, rvd);
-		}});
+	if (auto r = in_grid.value()) {
+		send_out();
 	}
 }
 
+base::optional<Box> GridRenderer::bounding_box() const {
+	return in_grid.value()->bounding_box();
+}
 
-void GridRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-	if (auto g = regular.value()) {
+void GridRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) {
+	if (auto g = in_grid.value()) {
 		Array<vec3> points;
 		if (g->type == data::GridType::Regular) {
 			auto r = *g->regular;

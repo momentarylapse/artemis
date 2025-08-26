@@ -239,9 +239,11 @@ add_executable(artemis WIN32
 	src/graph/renderer/Canvas.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
+	src/graph/renderer/LayoutGrid.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp
+	src/graph/renderer/SceneRenderer.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
 	src/graph/value/RandomNumber.cpp
@@ -518,6 +520,7 @@ add_executable(artemis WIN32
 	src/view/dialog/ColorMapDialog.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
+	src/view/Canvas.cpp
 	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
 	src/view/DrawingHelper.cpp
@@ -525,6 +528,7 @@ add_executable(artemis WIN32
 	src/view/Mode.cpp
 	src/view/MultiView.cpp
 	src/view/NodeListPanel.cpp
+	src/view/SceneRenderer.cpp
 	src/y/audio/audio.cpp
 	src/y/audio/AudioBuffer.cpp
 	src/y/audio/AudioStream.cpp
@@ -647,9 +651,11 @@ add_library(moduleartemis SHARED
 	src/graph/renderer/Canvas.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
+	src/graph/renderer/LayoutGrid.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp
+	src/graph/renderer/SceneRenderer.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
 	src/graph/value/RandomNumber.cpp
@@ -926,6 +932,7 @@ add_library(moduleartemis SHARED
 	src/view/dialog/ColorMapDialog.cpp
 	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
+	src/view/Canvas.cpp
 	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
 	src/view/DrawingHelper.cpp
@@ -933,6 +940,7 @@ add_library(moduleartemis SHARED
 	src/view/Mode.cpp
 	src/view/MultiView.cpp
 	src/view/NodeListPanel.cpp
+	src/view/SceneRenderer.cpp
 	src/y/audio/audio.cpp
 	src/y/audio/AudioBuffer.cpp
 	src/y/audio/AudioStream.cpp

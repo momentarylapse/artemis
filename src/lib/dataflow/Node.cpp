@@ -24,6 +24,7 @@ Node::Node(const string& name) {
 	this->name = name;
 	pos = vec2(0, 0);
 	channel = profiler::create_channel(name);
+	state = NodeState::Dirty;
 }
 
 Node::~Node() {
@@ -34,6 +35,16 @@ void Node::process() {
 	profiler::begin(channel);
 	on_process();
 	profiler::end(channel);
+}
+
+void Node::on_settings_changed(SettingBase*) {
+	if (state == NodeState::Complete)
+		state = NodeState::Dirty;
+}
+
+void Node::on_input_changed(InPortBase*) {
+	if (state == NodeState::Complete)
+		state = NodeState::Dirty;
 }
 
 void Node::set(const string& key, const Any& value) {
@@ -57,6 +68,8 @@ Any Node::get(const string& key) const {
 
 
 bool Node::has_necessary_inputs() const {
+	if (state == NodeState::Uninitialized)
+		return false;
 	for (auto p: in_ports)
 		if (!(p->flags & PortFlags::Optional) and !p->has_value())
 			return false;

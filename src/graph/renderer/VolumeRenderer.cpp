@@ -16,12 +16,14 @@
 
 namespace artemis::graph {
 
-VolumeRenderer::VolumeRenderer(Session* s) : RendererNode(s, "VolumeRenderer") {
+VolumeRenderer::VolumeRenderer(Session* s) : RenderEmitterNode(s, "VolumeRenderer") {
 	material = new yrenderer::Material(s->ctx);
 	material->pass0.shader_path = "volume.shader";
 	material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
 	material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
 	material->pass0.destination = ygfx::Alpha::SOURCE_INV_ALPHA;
+	material->pass0.z_buffer = false;
+	material->pass0.z_test = true;
 	material->textures.add(s->ctx->tex_white);
 
 	material_solid = new yrenderer::Material(s->ctx);
@@ -55,13 +57,14 @@ void VolumeRenderer::on_process() {
 	GeometryCube cube({0,0,0}, vec3::EX, vec3::EY, vec3::EZ, 1, 1, 1);
 	cube.build(vertex_buffer.get());
 
-	out_draw(RenderData{active(), f->grid.bounding_box(), nullptr, [this] (const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
-		draw_win(params, win, rvd);
-	}});
+	send_out(!solid());
 }
 
+base::optional<Box> VolumeRenderer::bounding_box() const {
+	return in_field.value()->grid.bounding_box();
+}
 
-void VolumeRenderer::draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {
+void VolumeRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) {
 	auto f = in_field.value();
 	if (!f)
 		return;

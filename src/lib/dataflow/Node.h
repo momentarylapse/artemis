@@ -42,15 +42,26 @@ enum class NodeFlags {
 NodeFlags operator|(NodeFlags a, NodeFlags b);
 bool operator&(NodeFlags a, NodeFlags b);
 
+enum class NodeState {
+	Uninitialized,
+	Dirty,
+	Complete
+};
+
 class Node : public obs::Node<VirtualBase> {
 public:
 	explicit Node(const string& name);
 	~Node() override;
 
+	virtual void additional_init() {}
+
 	virtual void on_process() {}
 	void process();
 
 	virtual xhui::Panel* create_panel();
+
+	void on_settings_changed(SettingBase* s);
+	void on_input_changed(InPortBase* p);
 
 	void set(const string& key, const Any& value);
 	Any get(const string& key) const;
@@ -59,7 +70,7 @@ public:
 	string name;
 	vec2 pos;
 	int channel;
-	bool dirty = true;
+	NodeState state = NodeState::Uninitialized;
 	NodeFlags flags = NodeFlags::None;
 
 	bool has_necessary_inputs() const;

@@ -22,6 +22,8 @@ namespace artemis::graph {
 	class Graph;
 }
 
+namespace artemis::view {
+
 class GraphEditor : public obs::Node<xhui::Panel> {
 public:
 	explicit GraphEditor(Session* s);
@@ -81,4 +83,4 @@ public:
 	vec2 from_screen(const vec2& p) const;
 };
 
-
+}

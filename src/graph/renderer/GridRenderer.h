@@ -12,13 +12,14 @@
 
 namespace artemis::graph {
 
-class GridRenderer : public RendererNode {
+class GridRenderer : public RenderEmitterNode {
 public:
-	explicit GridRenderer(Session* s) : RendererNode(s, "GridRenderer") {}
+	explicit GridRenderer(Session* s) : RenderEmitterNode(s, "GridRenderer") {}
 
 	void on_process() override;
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
+	void on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) override;
+	base::optional<Box> bounding_box() const override;
 
 	enum class RenderMode {
 		Outlines,
@@ -29,7 +30,7 @@ public:
 	dataflow::Setting<color> _color{this, "color", Gray};
 	dataflow::SettingFromSet<RenderMode> mode{this, "mode", RenderMode::Full, {RenderMode::Outlines, RenderMode::Full}, {"Outlines", "Full"}};
 
-	dataflow::InPort<data::Grid> regular{this, "grid"};
+	dataflow::InPort<data::Grid> in_grid{this, "grid"};
 };
 
 } // graph

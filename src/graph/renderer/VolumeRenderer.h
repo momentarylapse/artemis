@@ -8,6 +8,7 @@
 #include <data/util/ColorMap.h>
 #include <lib/base/pointer.h>
 #include <lib/dataflow/Port.h>
+#include <lib/ygraphics/graphics-fwd.h>
 #include "RendererNode.h"
 
 namespace yrenderer {
@@ -16,13 +17,14 @@ namespace yrenderer {
 
 namespace artemis::graph {
 
-class VolumeRenderer : public RendererNode {
+class VolumeRenderer : public RenderEmitterNode {
 public:
 	explicit VolumeRenderer(Session* s);
 
 	void on_process() override;
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
+	void on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) override;
+	base::optional<Box> bounding_box() const override;
 
 	dataflow::InPort<data::ScalarField> in_field{this, "field"};
 	dataflow::Setting<bool> solid{this, "solid", false};

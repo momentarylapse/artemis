@@ -5,6 +5,7 @@
 #ifndef EDWARDWINDOW_H
 #define EDWARDWINDOW_H
 
+#include "GraphEditor.h"
 #include "lib/xhui/xhui.h"
 #include "lib/pattern/Observable.h"
 
@@ -16,7 +17,12 @@ namespace yrenderer {
 }
 class MultiViewRenderer;
 class Session;
-class CodeEditor;
+
+namespace artemis::view {
+	class CodeEditor;
+	class Canvas;
+	class GraphEditor;
+}
 
 class ArtemisWindow : public obs::Node<xhui::Window> {
 public:
@@ -33,7 +39,9 @@ public:
 
 	xhui::Toolbar* toolbar;
 
-	CodeEditor* code_editor;
+	shared<artemis::view::Canvas> canvas;
+	artemis::view::GraphEditor* graph_editor;
+	artemis::view::CodeEditor* code_editor;
 
 	explicit ArtemisWindow(Session* session);
 

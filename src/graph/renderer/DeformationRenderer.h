@@ -8,16 +8,18 @@
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
+#include <lib/ygraphics/graphics-fwd.h>
 
 namespace artemis::graph {
 
-class DeformationRenderer : public RendererNode {
+class DeformationRenderer : public RenderEmitterNode {
 public:
 	explicit DeformationRenderer(Session* s);
 
 	void on_process() override;
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
+	base::optional<Box> bounding_box() const override;
+	void on_emit(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, bool shadow_pass) override;
 
 	dataflow::Setting<double> scale{this, "scale", 1.0};
 	dataflow::Setting<double> radius{this, "radius", 0.1};

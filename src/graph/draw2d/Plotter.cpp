@@ -4,18 +4,35 @@
 
 #include "Plotter.h"
 #include <Session.h>
-#include <lib/os/msg.h>
+#include <view/Canvas.h>
 #include <lib/image/Painter.h>
 #include <lib/math/rect.h>
 #include <lib/xhui/Theme.h>
 
+#include "lib/os/msg.h"
+#include "lib/xhui/xhui.h"
+
 namespace artemis::graph {
+
+class PlotterRenderNode : public view::RenderNode {
+public:
+	Plotter* plotter;
+	explicit PlotterRenderNode(Plotter* _plotter) : RenderNode(_plotter->session) {
+		add_control("DrawingArea", "", 0, 0, "area");
+		plotter = _plotter;
+		event_xp("area", xhui::event_id::Draw, [this] (Painter* p) {
+			plotter->draw_2d(p);
+		});
+	}
+};
+
+Plotter::Plotter(Session* s) : RendererNode(s, "Plotter") {
+	render_node = new PlotterRenderNode(this);
+}
 
 void Plotter::on_process() {
 	RenderData d;
-	d.f_draw_2d = [this] (Painter* p) {
-		draw_2d(p);
-	};
+	d.render_node = render_node.get();
 	out_draw(d);
 }
 
@@ -38,8 +55,6 @@ Array<float> ticks(float x_min, float x_max, float scale) {
 }
 
 void Plotter::draw_2d(Painter* p) {
-	if (!active())
-		return;
 	auto area = p->area();
 
 	float x_scale = area.width() / (float)(x_max() - x_min());
@@ -62,6 +77,7 @@ void Plotter::draw_2d(Painter* p) {
 		if (y0 != y1) {
 			y_min.set(y0 - (y1-y0) * 0.1f);
 			y_max.set(y1 + (y1-y0) * 0.1f);
+			state = dataflow::NodeState::Complete; // don't trigger updates
 		}
 	}
 

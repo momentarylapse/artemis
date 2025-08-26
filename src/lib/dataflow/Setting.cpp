@@ -21,7 +21,7 @@ SettingBase::SettingBase(Node* _owner, const string& _name, const kaba::Class* _
 
 void SettingBase::set_generic(const Any& value) {
 	kaba::unwrap_any(value, generic_value_pointer, type);
-	owner->dirty = true;
+	owner->on_settings_changed(this);
 	if (on_update)
 		on_update();
 }
@@ -32,7 +32,7 @@ Any SettingBase::get_generic() const {
 
 void SettingBase::generic_set(void *p) {
 	generic_value_pointer = p;
-	owner->dirty = true;
+	owner->on_settings_changed(this);
 	if (on_update)
 		on_update();
 }

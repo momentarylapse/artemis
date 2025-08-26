@@ -2,8 +2,7 @@
 // Created by Michael Ankele on 2025-03-17.
 //
 
-#ifndef CANVAS_H
-#define CANVAS_H
+#pragma once
 
 #include "RendererNode.h"
 #include <lib/image/color.h>
@@ -19,17 +18,12 @@ public:
 		flags = dataflow::NodeFlags::Canvas;
 	}
 
-	void draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd);
-	void draw_2d(Painter* p);
+	void on_process() override;
 
-	dataflow::Setting<color> background{this, "background", color(-1,-1,-1,-1)};
-
-	dataflow::InPort<RenderData> in_draw{this, "draw", dataflow::PortFlags::Multi};
+	dataflow::InPort<RenderData> in_draw{this, "draw", dataflow::PortFlags::Optional};
 
 	Session* session;
 	bool camera_defined = false;
 };
 
-} // graph
-
-#endif //CANVAS_H
+}

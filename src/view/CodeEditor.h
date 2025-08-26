@@ -14,6 +14,8 @@ namespace xhui {
 
 class Session;
 
+namespace artemis::view {
+
 class CodeEditor {
 public:
 	CodeEditor(Session* s, xhui::Panel* panel, const string& id, const Path& package_dir);
@@ -28,4 +30,6 @@ public:
 	string id;
 	Path package_dir;
 };
+
+}
 
