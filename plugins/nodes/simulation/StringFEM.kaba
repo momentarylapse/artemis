@@ -30,82 +30,50 @@ class StringFEM extends Node
 		
 		mat = nickel()
 
-	func mut substep(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField, out dt_dt_ux: ScalarField, out dt_dt_uy: ScalarField, out dt_dt_uz: ScalarField)
+
+	func mut substep(dt: f64, out u: VectorField, out dt_u: VectorField, out dt_dt_u: VectorField)
+	#	var (ux, uy, uz) = u.split()
+		var ux = u.get_component(0)
+		var uy = u.get_component(1)
+		var uz = u.get_component(2)
 		let laplace_ux = hessian_x(ux, 0, 0)
 		let laplace_uy = hessian_x(uy, 0, 0)
 		let laplace_uz = hessian_x(uz, 0, 0)
+		let laplace_u = VectorField.merge(laplace_ux, laplace_uy, laplace_uz)
 		
 		let radius = diameter() / 2
 		let A = f64(pi) * radius^2
 		let µ = mat.density * A # [kg/m]
 		let C = tension() / µ / 2 # [m²/s²]
 	
-		dt_dt_ux = laplace_ux * C
-		dt_dt_uy = laplace_uy * C
-		dt_dt_uz = laplace_uz * C
-	
-		dt_ux += dt_dt_ux * dt
-		dt_uy += dt_dt_uy * dt
-		dt_uz += dt_dt_uz * dt
-		ux += dt_ux * dt
-		uy += dt_uy * dt
-		uz += dt_uz * dt
+		dt_dt_u = laplace_u * C
+		dt_u += dt_dt_u * dt
+		u += dt_u * dt
 			
 		# boundary
 		if not fixed_ends()
 			return
 		let n = ux.grid.nx
-		ux._set(0,0,0, 0)
-		uy._set(0,0,0, 0)
-		uz._set(0,0,0, 0)
-		dt_ux._set(0,0,0, 0)
-		dt_uy._set(0,0,0, 0)
-		dt_uz._set(0,0,0, 0)
-		ux._set(n,0,0, 0)
-		uy._set(n,0,0, 0)
-		uz._set(n,0,0, 0)
-		dt_ux._set(n,0,0, 0)
-		dt_uy._set(n,0,0, 0)
-		dt_uz._set(n,0,0, 0)
-	
+		u._set(0,0,0, [0,0,0])
+		dt_u._set(0,0,0, [0,0,0])
+		u._set(n,0,0, [0,0,0])
+		dt_u._set(n,0,0, [0,0,0])
+
+
 	func override on_process()
 		# assume PER_VERTEX
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()
 			
-			#	var (ux, uy, uz) = u.split()
-			#	var (dt_ux, dt_uy, dt_uz) = dt_u.split()
-				var ux = u.get_component(0)
-				var uy = u.get_component(1)
-				var uz = u.get_component(2)
-				var dt_ux = dt_u.get_component(0)
-				var dt_uy = dt_u.get_component(1)
-				var dt_uz = dt_u.get_component(2)
-				var dt_dt_ux = ux # dummy
-				var dt_dt_uy = ux
-				var dt_dt_uz = ux
+				var dt_dt_u = u # dummy
 		
 				let dt = current_session().graph.dt
 				let N = substeps()
 				for i in 0:N
-					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz, dt_dt_ux, dt_dt_uy, dt_dt_uz)
+					substep(dt / N, u, dt_u, dt_dt_u)
 			
-			#	u = VectorField.merge(ux, uy, uy)
-			#	dt_u = VectorField.merge(dt_ux, dt_uy, dt_uy)
-			
-				u.set_component(0, ux)
-				u.set_component(1, uy)
-				u.set_component(2, uz)
-				dt_u.set_component(0, dt_ux)
-				dt_u.set_component(1, dt_uy)
-				dt_u.set_component(2, dt_uz)
 				in_u.mutated()
 				in_dt_u.mutated()
-				
-				var dt_dt_u = u # dummy
-				dt_dt_u.set_component(0, dt_dt_ux)
-				dt_dt_u.set_component(1, dt_dt_uy)
-				dt_dt_u.set_component(2, dt_dt_uz)
 				out_dt_dt_u.set(dt_dt_u)
 	
 		

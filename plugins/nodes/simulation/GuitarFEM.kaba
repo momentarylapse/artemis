@@ -33,10 +33,14 @@ class GuitarFEM extends Node
 		mat_body = maple()
 		mat_string = nickel()
 	
-	func mut substep_body(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+	func mut substep_body(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	print("---------------------")
 	
 	# i: C_ijkl d_j d_k u_l
+	
+		var ux = u.get_component(0)
+		var uy = u.get_component(1)
+		var uz = u.get_component(2)
 	
 		let dx_dx_ux = hessian_x(ux, 0, 0)
 		let dx_dx_uy = hessian_x(uy, 0, 0)
@@ -75,113 +79,77 @@ class GuitarFEM extends Node
 		var fz = dz_dz_uz * C.zzzz
 		fz += (dx_dz_ux + dx_dx_uz) * C.xzxz
 		fz += (dy_dz_uy + dy_dy_uz) * C.yzyz
+		let f = VectorField.merge(fx, fy, fz)
 		
 	
-		dt_ux += fx * (dt / mat_body.density)
-		dt_uy += fy * (dt / mat_body.density)
-		dt_uz += fz * (dt / mat_body.density)
-		ux += dt_ux * dt
-		uy += dt_uy * dt
-		uz += dt_uz * dt
-		#print(dux|>log)
+		dt_u += f * (dt / mat_body.density)
+		u += dt_u * dt
+
 		
-	func mut substep_string(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+	func mut substep_string(dt: f64, out u: VectorField, out dt_u: VectorField)
+	#	var (ux, uy, uz) = u.split()
+		var ux = u.get_component(0)
+		var uy = u.get_component(1)
+		var uz = u.get_component(2)
 		let laplace_ux = hessian_x(ux, 0, 0)
 		let laplace_uy = hessian_x(uy, 0, 0)
 		let laplace_uz = hessian_x(uz, 0, 0)
+		let laplace_u = VectorField.merge(laplace_ux, laplace_uy, laplace_uz)
 		
 		let radius = diameter() / 2
 		let A = f64(pi) * radius^2
 		let µ = mat_string.density * A # [kg/m]
 		let C = tension() / µ / 2 # [m²/s²]
 	
-		let dt_dt_ux = laplace_ux * C
-		let dt_dt_uy = laplace_uy * C
-		let dt_dt_uz = laplace_uz * C
-	
-		dt_ux += dt_dt_ux * dt
-		dt_uy += dt_dt_uy * dt
-		dt_uz += dt_dt_uz * dt
-		ux += dt_ux * dt
-		uy += dt_uy * dt
-		uz += dt_uz * dt
+		let dt_dt_u = laplace_u * C
+		dt_u += dt_dt_u * dt
+		u += dt_u * dt
 
-	func ssync(out s: ScalarField, is: i32, out b: ScalarField, ib: i32, a: f64)
+
+	func ssync(out s: VectorField, is: i32, out b: VectorField, ib: i32, a: f32)
 		let v = (1.0 - a) * s.value(is) + a * b.value(ib)
 		s.set(is, v)
 		b.set(ib, v)
+
 		
-	func sync(out usx: ScalarField, out usy: ScalarField, out usz: ScalarField, out dt_usx: ScalarField, out dt_usy: ScalarField, out dt_usz: ScalarField, out ubx: ScalarField, out uby: ScalarField, out ubz: ScalarField, out dt_ubx: ScalarField, out dt_uby: ScalarField, out dt_ubz: ScalarField)
+	func sync(out us: VectorField, out dt_us: VectorField, out ub: VectorField, out dt_ub: VectorField)
 		let is0 = 0
-		let is1 = usx.grid.nx
+		let is1 = us.grid.nx
 		let ib0 = attach0()
 		let ib1 = attach1()
-		let a = 0.5 as f64
-		ssync(usx, is0, ubx, ib0, a)
-		ssync(usy, is0, uby, ib0, a)
-		ssync(usz, is0, ubz, ib0, a)
-		ssync(dt_usx, is0, dt_ubx, ib0, a)
-		ssync(dt_usy, is0, dt_uby, ib0, a)
-		ssync(dt_usz, is0, dt_ubz, ib0, a)
-		ssync(usx, is1, ubx, ib1, a)
-		ssync(usy, is1, uby, ib1, a)
-		ssync(usz, is1, ubz, ib1, a)
-		ssync(dt_usx, is1, dt_ubx, ib1, a)
-		ssync(dt_usy, is1, dt_uby, ib1, a)
-		ssync(dt_usz, is1, dt_ubz, ib1, a)
-	
+		let a = 0.5 #as f64
+		ssync(us, is0, ub, ib0, a)
+		ssync(dt_us, is0, dt_ub, ib0, a)
+		ssync(us, is1, ub, ib1, a)
+		ssync(dt_us, is1, dt_ub, ib1, a)
+
+
 	func override on_process()
 		# assume PER_VERTEX
 		for ub in in_u_body.value()
 			for dt_ub in in_dt_u_body.value()
 				for us in in_u_string.value()
 					for dt_us in in_dt_u_string.value()
-			
-						var ubx = ub.get_component(0)
-						var uby = ub.get_component(1)
-						var ubz = ub.get_component(2)
-						var dt_ubx = dt_ub.get_component(0)
-						var dt_uby = dt_ub.get_component(1)
-						var dt_ubz = dt_ub.get_component(2)
-						
-						var usx = us.get_component(0)
-						var usy = us.get_component(1)
-						var usz = us.get_component(2)
-						var dt_usx = dt_us.get_component(0)
-						var dt_usy = dt_us.get_component(1)
-						var dt_usz = dt_us.get_component(2)
-		
 		
 						let dt = current_session().graph.dt
 						let N = substeps()
 						for i in 0:N
-							substep_body(dt / N, ubx, uby, ubz, dt_ubx, dt_uby, dt_ubz)
-							substep_string(dt / N, usx, usy, usz, dt_usx, dt_usy, dt_usz)
-							sync(usx, usy, usz, dt_usx, dt_usy, dt_usz, ubx, uby, ubz, dt_ubx, dt_uby, dt_ubz)
+							substep_body(dt / N, ub, dt_ub)
+							substep_string(dt / N, us, dt_us)
+							sync(us, dt_us, ub, dt_ub)
 							
 			
 			
-						ub.set_component(0, ubx)
-						ub.set_component(1, uby)
-						ub.set_component(2, ubz)
 						let d = ub.average()
 						ub -= d
 				
-						dt_ub.set_component(0, dt_ubx)
-						dt_ub.set_component(1, dt_uby)
-						dt_ub.set_component(2, dt_ubz)
 						in_u_body.mutated()
 						in_dt_u_body.mutated()
 						
 	
-						us.set_component(0, usx)
-						us.set_component(1, usy)
-						us.set_component(2, usz)
 						us -= d
 				
-						dt_us.set_component(0, dt_usx)
-						dt_us.set_component(1, dt_usy)
-						dt_us.set_component(2, dt_usz)
+	
 						in_u_string.mutated()
 						in_dt_u_string.mutated()
 						

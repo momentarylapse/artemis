@@ -8,6 +8,8 @@ class Elastic3dFEM extends Node
 	
 	var mat: Material
 	
+	var c1, c2, c3: i32
+	
 	
 	func __init__()
 		super.__init__("Elastic3dFEM")
@@ -15,13 +17,21 @@ class Elastic3dFEM extends Node
 		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
 		substeps.__init__(self, "substeps", 100)
 		flags = NodeFlags.TIME_DEPENDENT
+		c1 = profiler.create_channel("hessian", channel)
+		c2 = profiler.create_channel("force", channel)
+		c3 = profiler.create_channel("update", channel)
 		
 		mat = nickel()
 	
-	func mut substep(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
+	func mut substep(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	print("---------------------")
 	
 	# i: C_ijkl d_j d_k u_l
+	
+		profiler.begin(c1)
+		var ux = u.get_component(0)
+		var uy = u.get_component(1)
+		var uz = u.get_component(2)
 	
 		let dx_dx_ux = hessian_x(ux, 0, 0)
 		let dx_dx_uy = hessian_x(uy, 0, 0)
@@ -46,11 +56,13 @@ class Elastic3dFEM extends Node
 		let dz_dz_ux = hessian_x(ux, 2, 2)
 		let dz_dz_uy = hessian_x(uy, 2, 2)
 		let dz_dz_uz = hessian_x(uz, 2, 2)
+		profiler.end(c1)
 		
 		let C = mat.elastic_modulus()
 	
 		# C.xxyy etc will be ignored for now...
 		
+		profiler.begin(c2)
 		var fx = dx_dx_ux * C.xxxx
 		fx += (dx_dy_uy + dy_dy_ux) * C.xyxy
 		fx += (dx_dz_uz + dz_dz_ux) * C.xzxz
@@ -60,42 +72,26 @@ class Elastic3dFEM extends Node
 		var fz = dz_dz_uz * C.zzzz
 		fz += (dx_dz_ux + dx_dx_uz) * C.xzxz
 		fz += (dy_dz_uy + dy_dy_uz) * C.yzyz
+		let f = VectorField.merge(fx, fy, fz)
+		profiler.begin(c2)
 		
 	
-		dt_ux += fx * (dt / mat.density)
-		dt_uy += fy * (dt / mat.density)
-		dt_uz += fz * (dt / mat.density)
-		ux += dt_ux * dt
-		uy += dt_uy * dt
-		uz += dt_uz * dt
-		#print(dux|>log)
+		profiler.begin(c3)
+		dt_u += f * (dt / mat.density)
+		u += dt_u * dt
+		profiler.end(c3)
 	
 	func override on_process()
 		# assume PER_VERTEX
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()
-			
-				var ux = u.get_component(0)
-				var uy = u.get_component(1)
-				var uz = u.get_component(2)
-				var dt_ux = dt_u.get_component(0)
-				var dt_uy = dt_u.get_component(1)
-				var dt_uz = dt_u.get_component(2)
 		
 				let dt = current_session().graph.dt
 				let N = substeps()
 				for i in 0:N
-					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
+					substep(dt / N, u, dt_u)
 			
-			
-				u.set_component(0, ux)
-				u.set_component(1, uy)
-				u.set_component(2, uz)
 				u -= u.average()
-				
-				dt_u.set_component(0, dt_ux)
-				dt_u.set_component(1, dt_uy)
-				dt_u.set_component(2, dt_uz)
 				in_u.mutated()
 				in_dt_u.mutated()
 	
