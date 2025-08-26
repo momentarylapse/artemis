@@ -21,6 +21,7 @@
 #include "world/World.h"
 
 static string _(const string &s) { return s; }
+string f642s_clean(double f, int dez);
 
 FormatArtemis::FormatArtemis(Session *s) : TypedFormat<artemis::graph::DataGraph>(s, -1, "artemis", _("Artemis workspace"), Flag::CANONICAL_READ_WRITE) {
 }
@@ -43,6 +44,9 @@ void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data,
 
 	xml::Parser p;
 	p.load(filename);
+	if (auto* s = p.elements[0].find("simulation")) {
+		data->graph->dt = s->value("dt", "0.1").f64();
+	}
 	if (auto* g = p.elements[0].find("graph")) {
 		for (auto &e: g->elements) {
 			if (e.tag == "node") {
@@ -74,6 +78,11 @@ void FormatArtemis::_save(const Path &filename, artemis::graph::DataGraph *data)
 	{
 		auto h = xml::Element("header");
 		h.add(xml::Element("version", "1.0"));
+		w.add(h);
+	}
+	{
+		auto h = xml::Element("simulation");
+		h.add(xml::Element("dt", f642s_clean(data->graph->dt, 16)));
 		w.add(h);
 	}
 
