@@ -38,6 +38,7 @@ public:
 	dataflow::Setting<double> x_max{this, "x-max", 10};
 	dataflow::Setting<double> y_min{this, "y-min", -5};
 	dataflow::Setting<double> y_max{this, "y-max", 15};
+	dataflow::Setting<color> background{this, "background", color(-1,-1,-1,-1)};
 
 	dataflow::InPort<PlotData> in_plot{this, "plot", dataflow::PortFlags::Multi};
 

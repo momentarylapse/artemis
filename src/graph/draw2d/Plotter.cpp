@@ -28,6 +28,7 @@ public:
 
 Plotter::Plotter(Session* s) : RendererNode(s, "Plotter") {
 	render_node = new PlotterRenderNode(this);
+	background.set(xhui::Theme::_default.background);
 }
 
 void Plotter::on_process() {
@@ -55,7 +56,12 @@ Array<float> ticks(float x_min, float x_max, float scale) {
 }
 
 void Plotter::draw_2d(Painter* p) {
-	auto area = p->area();
+	const auto area = p->area();
+	const auto c0 = p->clip();
+	p->set_clip(area);
+
+	p->set_color(background());
+	p->draw_rect(area);
 
 	float x_scale = area.width() / (float)(x_max() - x_min());
 	float x_offset = area.x1 - (float)x_min() * x_scale;
@@ -116,6 +122,7 @@ void Plotter::draw_2d(Painter* p) {
 		p->set_line_width((float)d->line_width);
 		p->draw_lines(points);
 	}
+	p->set_clip(c0);
 }
 
 
