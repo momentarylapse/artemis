@@ -13,7 +13,6 @@
 
 Mode::Mode(Session* _session) {
 	session = _session;
-	multi_view = nullptr;
 }
 
 void Mode::draw_info(Painter* p, const string& msg) {

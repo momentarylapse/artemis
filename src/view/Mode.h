@@ -15,11 +15,9 @@ namespace yrenderer {
 	class Renderer;
 	struct RenderParams;
 }
-class MultiView;
 class Session;
 class Painter;
 class Data;
-class MultiViewWindow;
 struct Hover;
 
 namespace xhui {
@@ -48,15 +46,12 @@ public:
 	virtual void on_left_button_up(const vec2&) {}
 	virtual void on_key_down(int key) {}
 	virtual void on_prepare_scene(const yrenderer::RenderParams& params) {}
-	virtual void on_draw_win(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd) {}
-	virtual void on_draw_shadow(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd) {}
 	virtual void on_draw_post(Painter*) {}
 	virtual Mode* get_parent() { return nullptr; }
 
 	void draw_info(Painter* p, const string& msg);
 
 	Session* session = nullptr;
-	MultiView* multi_view = nullptr;
 	Data* generic_data = nullptr;
 	Data* get_data() const { return generic_data; }
 

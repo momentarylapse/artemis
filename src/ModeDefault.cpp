@@ -6,7 +6,6 @@
 #include <Session.h>
 #include <graph/Graph.h>
 #include <graph/renderer/Canvas.h>
-#include <graph/renderer/RendererNode.h>
 #include <lib/dataflow/Node.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/xhui/Theme.h>
@@ -16,12 +15,9 @@
 #include <lib/profiler/Profiler.h>
 #include <view/ArtemisWindow.h>
 #include <view/DrawingHelper.h>
-#include <view/MultiView.h>
 #include <storage/Storage.h>
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {
-	multi_view = new MultiView(session);
-
 	if (xhui::config.get_bool("debug", false))
 		show_profiling = true;
 

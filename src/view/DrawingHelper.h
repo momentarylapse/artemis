@@ -8,12 +8,13 @@
 
 #include <helper/ResourceManager.h>
 #include <lib/ygraphics/graphics-fwd.h>
+#include <lib/base/optional.h>
 #include <lib/image/color.h>
 #include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
 #include <lib/math/mat4.h>
+#include <lib/math/rect.h>
 #include <lib/xhui/Context.h>
-#include "MultiView.h"
 
 namespace yrenderer {
 	class Context;
@@ -21,7 +22,6 @@ namespace yrenderer {
 	struct RenderParams;
 	class Material;
 }
-class MultiViewWindow;
 class Painter;
 
 struct TextLayout {
@@ -58,7 +58,7 @@ public:
 
 	static void draw_boxed_str(Painter* p, const vec2& pos, const string& str, int align = -1);
 
-	static void draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& a, MultiViewType kind, const base::optional<Hover>& hover);
+	//static void draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& a, MultiViewType kind, const base::optional<Hover>& hover);
 	static void draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d);
 
 	static Array<vec2> spline(const vec2& a, const vec2& b, const vec2& c, const vec2& d);
@@ -67,8 +67,9 @@ public:
 
 	xhui::Context* xhui_ctx;
 	yrenderer::Context* ctx;
-	MultiViewWindow* window;
-	void set_window(MultiViewWindow* win);
+
+	rect target_area;
+	mat4 projection, view;
 
 	ygfx::Shader* shader = nullptr;
 #ifdef USING_VULKAN

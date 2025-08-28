@@ -123,10 +123,6 @@ void main() {
 #endif
 }
 
-void DrawingHelper::set_window(MultiViewWindow* win) {
-	window = win;
-}
-
 
 void DrawingHelper::set_color(const color& color) {
 	_color = color;
@@ -138,9 +134,9 @@ void DrawingHelper::set_line_width(float width) {
 
 
 
-static void add_vb_line(Array<ygfx::Vertex1>& vertices, const vec3& a, const vec3& b, MultiViewWindow* win, float line_width) {
-	float w = win->area.width();
-	float h = win->area.height();
+static void add_vb_line(Array<ygfx::Vertex1>& vertices, const vec3& a, const vec3& b, const rect& area, float line_width) {
+	float w = area.width();
+	float h = area.height();
 	vec2 ba_pixel = vec2((b.x - a.x) * w, (b.y - a.y) * h);
 	vec2 dir_pixel = ba_pixel.normalized();
 	vec2 o_pixel = dir_pixel.ortho();
@@ -161,13 +157,13 @@ void DrawingHelper::draw_lines(const Array<vec3>& points, bool contiguous) {
 #ifdef USING_VULKAN
 	auto vb = xhui_ctx->get_line_vb();
 	Array<ygfx::Vertex1> vertices;
-	mat4 m = window->projection * window->view;
+	mat4 m = projection * view;
 	if (contiguous) {
 		for (int i=0; i<points.num-1; i++)
-			add_vb_line(vertices, m.project(points[i]), m.project(points[i+1]), window, _line_width);
+			add_vb_line(vertices, m.project(points[i]), m.project(points[i+1]), target_area, _line_width);
 	} else {
 		for (int i=0; i<points.num-1; i+=2)
-			add_vb_line(vertices, m.project(points[i]), m.project(points[i+1]), window, _line_width);
+			add_vb_line(vertices, m.project(points[i]), m.project(points[i+1]), target_area, _line_width);
 	}
 	vb->update(vertices);
 
@@ -236,7 +232,7 @@ void DrawingHelper::draw_boxed_str(Painter* p, const vec2& _pos, const string& s
 	p->draw_str(pos, str);
 }
 
-void DrawingHelper::draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& _a, MultiViewType kind, const base::optional<Hover>& hover) {
+/*void DrawingHelper::draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& _a, MultiViewType kind, const base::optional<Hover>& hover) {
 	int _hover = -1;
 	if (hover and hover->type == kind)
 		_hover = hover->index;
@@ -250,7 +246,7 @@ void DrawingHelper::draw_data_points(Painter* p, MultiViewWindow* win, const Dyn
 			r = 4;
 		p->draw_rect({p1.x - r,p1.x + r, p1.y - r,p1.y + r});
 	}
-}
+}*/
 
 void DrawingHelper::draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d) {
 	p->draw_lines(spline(a, b, c, d));

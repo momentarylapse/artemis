@@ -117,23 +117,6 @@ mat3 MultiViewWindow::edit_frame() const {
 }
 
 void MultiViewWindow::draw(const yrenderer::RenderParams& params) {
-	projection = multi_view->view_port.cam.projection_matrix(area.width() / area.height());
-
-	scene_renderer->scene_view.main_camera_params = multi_view->view_port.cam;
-	scene_renderer->set_view(params, multi_view->view_port.cam, &projection);
-	view = scene_renderer->rvd.ubo.v;
-	scene_renderer->prepare(params);
-
-	// 3d -> pixel
-	to_pixels = mat4::translation({area.x1, area.y1, 0})
-		* mat4::scale(area.width()/2, area.height()/2, 1)
-		* mat4::translation({1.0f, 1.0f, 0})
-		* projection * view;
-
-	scene_renderer->draw(params);
-	multi_view->session->drawing_helper->set_window(this);
-	// TODO emitter...
-	multi_view->session->cur_mode->on_draw_win(params, this, scene_renderer->rvd);
 }
 
 

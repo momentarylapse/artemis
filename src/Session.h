@@ -5,27 +5,19 @@
  *      Author: michi
  */
 
-#ifndef SRC_SESSION_H_
-#define SRC_SESSION_H_
+#pragma once
 
-#include "lib/base/base.h"
-#include "lib/base/map.h"
-#include "lib/base/future.h"
-#include "lib/os/time.h"
-#include "lib/os/path.h"
-#include "lib/pattern/Observable.h"
+#include <lib/base/base.h>
+#include <lib/base/map.h>
+#include <lib/base/future.h>
+#include <lib/os/time.h>
+#include <lib/os/path.h>
+#include <lib/pattern/Observable.h>
 #include <lib/ygraphics/graphics-fwd.h>
+#include <lib/yrenderer/regions/RegionRenderer.h>
 
-#include "lib/yrenderer/regions/RegionRenderer.h"
 
-
-class MultiView;
 class Mode;
-class ModeModel;
-class ModeMaterial;
-class ModeWorld;
-class ModeFont;
-class ModeAdministration;
 class Storage;
 class Progress;
 class ResourceManager;
@@ -100,11 +92,6 @@ public:
 	ArtemisWindow *win;
 
 	Mode *mode_none;
-	ModeModel* mode_model;
-	ModeMaterial* mode_material;
-	ModeWorld* mode_world;
-	ModeFont* mode_font;
-	ModeAdministration* mode_admin;
 	Mode *cur_mode = nullptr;
 	Array<Mode*> mode_queue;
 	Mode *find_mode_base(const string &name);
@@ -118,8 +105,6 @@ public:
 	DrawingHelper *drawing_helper;
 
 	Storage *storage;
-	MultiView *multi_view_2d;
-	MultiView *multi_view_3d;
 
 	Progress *progress;
 
@@ -138,4 +123,3 @@ public:
 
 Session *create_session();
 
-#endif /* SRC_SESSION_H_ */

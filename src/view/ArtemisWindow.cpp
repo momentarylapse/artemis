@@ -17,20 +17,15 @@
 #include <lib/yrenderer/Context.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <y/EngineData.h>
-
 #include "ActionController.h"
 #include "DrawingHelper.h"
 #include "GraphEditor.h"
-#include "MultiView.h"
 #include "CodeEditor.h"
 #include "Canvas.h"
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/yrenderer/Renderer.h>
-#include <lib/yrenderer/target/XhuiRenderer.h>
-
-#include "SceneRenderer.h"
 #include "Session.h"
 #include "y/helper/ResourceManager.h"
 #include "storage/Storage.h"
@@ -189,8 +184,6 @@ Dialog x x padding=0
 		engine.file_errors_are_critical = false;
 		engine.ignore_missing_files = true;
 		engine.resource_manager = session->resource_manager;
-
-		session->win->renderer = new yrenderer::XhuiRenderer(session->ctx);
 
 		session->promise_started(session);
 	});

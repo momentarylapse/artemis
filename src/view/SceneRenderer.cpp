@@ -10,6 +10,8 @@
 #include <lib/math/Box.h>
 #include <lib/xhui/xhui.h>
 
+#include "DrawingHelper.h"
+
 namespace artemis::view {
 
 rect scale_area(const rect& area, float scale) {

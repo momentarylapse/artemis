@@ -5,7 +5,6 @@
 #include "MeshRenderer.h"
 #include <Session.h>
 #include <view/DrawingHelper.h>
-#include <view/MultiView.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/Context.h>
 

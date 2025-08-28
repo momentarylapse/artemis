@@ -2,20 +2,15 @@
 // Created by michi on 19.01.25.
 //
 
-#ifndef EDWARDWINDOW_H
-#define EDWARDWINDOW_H
+#pragma once
 
 #include "GraphEditor.h"
-#include "lib/xhui/xhui.h"
-#include "lib/pattern/Observable.h"
+#include <lib/xhui/xhui.h>
+#include <lib/pattern/Observable.h>
 
 namespace xhui {
 	class Toolbar;
 }
-namespace yrenderer {
-	class XhuiRenderer;
-}
-class MultiViewRenderer;
 class Session;
 
 namespace artemis::view {
@@ -27,8 +22,6 @@ namespace artemis::view {
 class ArtemisWindow : public obs::Node<xhui::Window> {
 public:
 	Session* session;
-	yrenderer::XhuiRenderer* renderer = nullptr;
-	MultiViewRenderer* multi_view_renderer = nullptr;
 	Array<string> args;
 
 	obs::sink in_redraw;
@@ -49,6 +42,3 @@ public:
 
 	void update_menu();
 };
-
-
-#endif //EDWARDWINDOW_H

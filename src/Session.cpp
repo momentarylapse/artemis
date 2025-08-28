@@ -8,10 +8,6 @@
 #include "Session.h"
 #include "view/ArtemisWindow.h"
 #include "Artemis.h"
-/*#include "mode/font/ModeFont.h"
-#include "stuff/Progress.h"*/
-#include "view/MultiView.h"
-//#include "view/DrawingHelper.h"
 #include "view/Mode.h"
 #include "data/Data.h"
 #include "storage/format/Format.h"
@@ -68,15 +64,6 @@ Session::Session() {
 	cur_mode = mode_none;
 	progress = new Progress;
 #endif
-
-
-	multi_view_2d = nullptr;
-	multi_view_3d = nullptr;
-	mode_model = nullptr;
-	mode_admin = nullptr;
-	mode_font = nullptr;
-	mode_material = nullptr;
-	mode_world = nullptr;
 
 	storage = nullptr;
 	resource_manager = nullptr;
@@ -219,13 +206,7 @@ void Session::set_mode_now(Mode *m) {
 		cur_mode->on_leave();
 		if (cur_mode->get_data()) {
 			cur_mode->get_data()->unsubscribe(win);
-			if (cur_mode->multi_view)
-				cur_mode->get_data()->unsubscribe(cur_mode->multi_view);
 			cur_mode->get_data()->action_manager->unsubscribe(win);
-		}
-		if (cur_mode->multi_view) {
-			cur_mode->multi_view->unsubscribe(win);
-			win->renderer->children.pop();
 		}
 		cur_mode->unsubscribe(win);
 	}
@@ -271,21 +252,14 @@ void Session::set_mode_now(Mode *m) {
 #endif
 
 	cur_mode = m;
-	win->renderer->add_child(cur_mode->multi_view->renderer.get());
 
 	cur_mode->on_enter();
 
 
 	//cur_mode->on_enter(); // ????
 	cur_mode->out_redraw >> win->in_redraw;
-	if (cur_mode->multi_view) {
-		cur_mode->multi_view->out_selection_changed >> win->in_redraw;
-		cur_mode->multi_view->view_port.out_changed >> win->in_data_selection_changed;
-	}
 	if (cur_mode->get_data()) {
 		cur_mode->get_data()->out_changed >> win->in_data_changed;
-		if (cur_mode->multi_view)
-			cur_mode->get_data()->out_changed >> cur_mode->multi_view->in_data_changed;
 		auto *am = cur_mode->get_data()->action_manager;
 		am->out_failed >> win->in_action_failed;
 		am->out_saved >> win->in_saved;
