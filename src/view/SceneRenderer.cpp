@@ -25,15 +25,24 @@ yrenderer::CameraParams ViewPort::params() const {
 
 void ViewPort::move(const vec3& dpos) {
 	pos += ang * (dpos * radius);
+	defined_by_user = true;
 }
 
 void ViewPort::rotate(const quaternion& dq) {
 	ang = ang * dq;
+	defined_by_user = true;
 }
+
+void ViewPort::zoom(float factor) {
+	radius *= factor;
+	defined_by_user = true;
+}
+
 
 void ViewPort::focus_on_box(const Box& box) {
 	pos = box.center();
-	radius = box.size().length() * 3;
+	radius = box.size().length() * 2;
+	defined_by_user = true;
 }
 
 
@@ -100,7 +109,7 @@ Dialog x x padding=0
 		handle_event({Event::Type::RightMouseUp, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
 	});*/
 	event_x("area", xhui::event_id::MouseWheel, [this] {
-		view_port.radius *= expf(-0.1f * get_window()->state.scroll.y);
+		view_port.zoom(expf(-0.1f * get_window()->state.scroll.y));
 		request_redraw();
 	});
 
@@ -152,6 +161,12 @@ bool SceneRenderer::build() {
 	}
 	return true;
 }
+
+void SceneRenderer::set_content_bounding_box(const Box &b) {
+	if (!view_port.defined_by_user)
+		view_port.focus_on_box(b);
+}
+
 
 void SceneRenderer::set_drawing_helper() {
 	session->drawing_helper->target_area = _area;

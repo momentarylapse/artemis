@@ -23,9 +23,11 @@ struct ViewPort {
 	quaternion ang;
 	float radius;
 	float fov;
+	bool defined_by_user = false;
 
 	void move(const vec3& dpos);
 	void rotate(const quaternion& dq);
+	void zoom(float factor);
 	void focus_on_box(const Box& box);
 
 	yrenderer::CameraParams params() const;
@@ -41,6 +43,7 @@ public:
 	void on_pre_draw(Painter *p);
 	void on_draw(Painter *p);
 
+	void set_content_bounding_box(const Box& b);
 	void set_drawing_helper();
 
 	Session* session;
