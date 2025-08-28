@@ -33,7 +33,7 @@ void Canvas::set_child(RenderNode* c) {
 
 
 LayoutGrid::LayoutGrid(Session *s) : RenderNode(s) {
-	add_control("Grid", "", 0, 0, "grid"); // not sure we even need this...
+	add_control("Grid", "", 0, 0, "grid");
 	set_options("grid", "spacing=0");
 }
 
@@ -48,6 +48,26 @@ void LayoutGrid::set_children(const Array<RenderNode*>& _children, bool _horizon
 	for (const auto& [i, c]: enumerate(children))
 		if (c)
 			embed("grid", horizontal ? i : 0, horizontal ? 0 : i, c);
+}
+
+void LayoutGrid::configure(int spacing, int padding) {
+	set_options("grid", format("spacing=%d,padding=%d", spacing, padding));
+}
+
+LayoutOverlay::LayoutOverlay(Session *s) : RenderNode(s) {
+	add_control("Overlay", "", 0, 0, "overlay");
+}
+
+void LayoutOverlay::set_children(const Array<RenderNode*>& _children) {
+	if (_children == children)
+		return;
+	for (auto c: children)
+		if (c)
+			unembed(c);
+	children = _children;
+	for (const auto& [i, c]: enumerate(children))
+		if (c)
+			embed("overlay", i, 0, c);
 }
 
 }

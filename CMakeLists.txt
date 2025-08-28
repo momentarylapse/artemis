@@ -218,6 +218,9 @@ add_executable(artemis WIN32
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
+	src/graph/canvas/Canvas.cpp
+	src/graph/canvas/LayoutGrid.cpp
+	src/graph/canvas/LayoutOverlay.cpp
 	src/graph/draw2d/FunctionPlot.cpp
 	src/graph/draw2d/ListPlot.cpp
 	src/graph/draw2d/Plotter.cpp
@@ -236,10 +239,8 @@ add_executable(artemis WIN32
 	src/graph/list/ListToVectors.cpp
 	src/graph/mesh/SphereMesh.cpp
 	src/graph/mesh/TeapotMesh.cpp
-	src/graph/renderer/Canvas.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
-	src/graph/renderer/LayoutGrid.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp
@@ -630,6 +631,9 @@ add_library(moduleartemis SHARED
 	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
+	src/graph/canvas/Canvas.cpp
+	src/graph/canvas/LayoutGrid.cpp
+	src/graph/canvas/LayoutOverlay.cpp
 	src/graph/draw2d/FunctionPlot.cpp
 	src/graph/draw2d/ListPlot.cpp
 	src/graph/draw2d/Plotter.cpp
@@ -648,10 +652,8 @@ add_library(moduleartemis SHARED
 	src/graph/list/ListToVectors.cpp
 	src/graph/mesh/SphereMesh.cpp
 	src/graph/mesh/TeapotMesh.cpp
-	src/graph/renderer/Canvas.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
-	src/graph/renderer/LayoutGrid.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp

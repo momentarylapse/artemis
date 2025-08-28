@@ -39,9 +39,4 @@ void RenderEmitterNode::send_out(bool transparent) {
 	out_draw(c);
 }
 
-RendererNode::RendererNode(Session* s, const string& name) : Node(name) {
-	session = s;
-	flags = dataflow::NodeFlags::Renderer;
-}
-
 } // graph

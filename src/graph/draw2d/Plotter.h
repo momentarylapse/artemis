@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../renderer/RendererNode.h"
+#include "../canvas/Canvas.h"
 #include <lib/dataflow/Setting.h>
 #include <lib/image/color.h>
 #include <lib/base/pointer.h>

@@ -5,7 +5,7 @@
 #include "ModeDefault.h"
 #include <Session.h>
 #include <graph/Graph.h>
-#include <graph/renderer/Canvas.h>
+#include <graph/canvas/Canvas.h>
 #include <lib/dataflow/Node.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/xhui/Theme.h>

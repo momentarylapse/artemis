@@ -18,10 +18,11 @@
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
-#include "renderer/Canvas.h"
+#include "canvas/Canvas.h"
+#include "canvas/LayoutGrid.h"
+#include "canvas/LayoutOverlay.h"
 #include "renderer/DeformationRenderer.h"
 #include "renderer/GridRenderer.h"
-#include "renderer/LayoutGrid.h"
 #include "renderer/SceneRenderer.h"
 #include "renderer/MeshRenderer.h"
 #include "renderer/PointListRenderer.h"
@@ -96,6 +97,8 @@ void init_factory() {
 
 	register_node_class_p<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<LayoutGrid>("LayoutGrid", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<LayoutOverlay>("LayoutOverlay", {dataflow::NodeCategory::Renderer});
+
 	register_node_class_p<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<MeshRenderer>("MeshRenderer", {dataflow::NodeCategory::Renderer});

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "RendererNode.h"
+#include "../canvas/Canvas.h"
 #include <lib/base/pointer.h>
 #include <lib/image/color.h>
 

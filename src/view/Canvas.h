@@ -37,11 +37,20 @@ private:
 class LayoutGrid : public RenderNode {
 public:
 	explicit LayoutGrid(Session* s);
-
 	void set_children(const Array<RenderNode*>& c, bool horizontal);
+	void configure(int spacing, int padding);
 
 private:
 	bool horizontal = false;
+	Array<RenderNode*> children;
+};
+
+class LayoutOverlay : public RenderNode {
+public:
+	explicit LayoutOverlay(Session* s);
+	void set_children(const Array<RenderNode*>& c);
+
+private:
 	Array<RenderNode*> children;
 };
 

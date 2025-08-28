@@ -34,15 +34,6 @@ struct DrawCall {
 	bool transparent = false;
 };
 
-struct RenderData {
-	// TODO
-	bool active;
-	base::optional<Box> bounding_box;
-	std::function<void(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd)> f_draw_3d;
-	std::function<void(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd)> f_draw_3d_transparent;
-	view::RenderNode* render_node = nullptr;
-};
-
 class RenderEmitterNode : public dataflow::Node {
 public:
 	explicit RenderEmitterNode(Session* s, const string& name);
@@ -60,15 +51,6 @@ public:
 
 	class Emitter;
 	shared<Emitter> emitter;
-};
-
-class RendererNode : public dataflow::Node {
-public:
-	explicit RendererNode(Session* s, const string& name);
-
-	dataflow::OutPort<RenderData> out_draw{this, "draw"};
-
-	Session* session;
 };
 
 } // graph

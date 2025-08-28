@@ -25,6 +25,7 @@ void LayoutGrid::on_process() {
 	if (in_d.has_value())
 		children[3] = in_d.value()->render_node;
 	layout_grid->set_children(children, horizontal());
+	layout_grid->configure(spacing(), padding());
 	d.render_node = layout_grid.get();
 	out_draw(d);
 }

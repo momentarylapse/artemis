@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "RendererNode.h"
+#include "Canvas.h"
 #include <lib/base/pointer.h>
 
 namespace artemis::view {
@@ -20,6 +20,8 @@ public:
 	void on_process() override;
 
 	dataflow::Setting<bool> horizontal{this, "horizontal", false};
+	dataflow::Setting<int> spacing{this, "spacing", 0};
+	dataflow::Setting<int> padding{this, "padding", 0};
 	dataflow::InPort<RenderData> in_a{this, "a", dataflow::PortFlags::Optional};
 	dataflow::InPort<RenderData> in_b{this, "b", dataflow::PortFlags::Optional};
 	dataflow::InPort<RenderData> in_c{this, "c", dataflow::PortFlags::Optional};
