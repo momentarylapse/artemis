@@ -413,7 +413,8 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 }
 
 void GraphEditor::open_node_panel(dataflow::Node* n) {
-	if (n == _node_panel_node)
+	if (n == _node_panel_node and n)
+		// force reset when list panel is open
 		return;
 
 	if (node_panel) {
@@ -456,7 +457,8 @@ void GraphEditor::on_mouse_leave(const vec2& m) {
 }
 
 void GraphEditor::open_node_list_panel() {
-	node_panel = new artemis::view::NodeListPanel();
+	open_node_panel(nullptr);
+	node_panel = new NodeListPanel();
 	node_panel->min_width_user = PANEL_WIDTH;
 	embed("dock", 0, 0, node_panel);
 }
@@ -475,6 +477,7 @@ void GraphEditor::on_key_down(int key) {
 			selected_nodes.clear();
 			selection = base::None;
 			hover = base::None;
+			open_node_panel(nullptr);
 		}
 	}
 	if (key == xhui::KEY_TAB)
