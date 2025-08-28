@@ -21,11 +21,13 @@ func main()
 	
 	var vfr = g.add_node("VectorFieldRenderer", [550, 550])
 	
-	var canvas = g.add_node("Canvas", [300, 700])
+	var scene = g.add_node("SceneRenderer", [300, 700])
+	var canvas = g.add_node("Canvas", [300, 850])
 	
 	g.connect(grid, 0, gr, 0)
 	g.connect(grid, 0, field, 0)
 	g.connect(field, 0, vfr, 0)
-	g.connect(vfr, 0, canvas, 0)
+	g.connect(vfr, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

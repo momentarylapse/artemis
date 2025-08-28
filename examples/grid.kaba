@@ -23,15 +23,17 @@ func main()
 	d.set("radius", 0.2)
 	d.set("color", dyn([1,1,1,1]))
 	
-	var canvas = g.add_node("Canvas", [300, 600])
+	var scene = g.add_node("SceneRenderer", [300, 600])
+	var canvas = g.add_node("Canvas", [300, 750])
 
 	g.connect(grid, 0, b, 0)
 	g.connect(grid, 0, vertices, 0)
 	g.connect(grid, 0, cells, 0)
 	g.connect(vertices, 0, c, 0)
 	g.connect(cells, 0, d, 0)
-	g.connect(b, 0, canvas, 0)
-	g.connect(c, 0, canvas, 0)
-	g.connect(d, 0, canvas, 0)
+	g.connect(b, 0, scene, 0)
+	g.connect(c, 0, scene, 0)
+	g.connect(d, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

@@ -34,7 +34,8 @@ func main()
 	dr.set("show-balls", true)
 	dr.set("show-grid", true)
 
-	var canvas = g.add_node("Canvas", [200,650])
+	var scene = g.add_node("SceneRenderer", [200,650])
+	var canvas = g.add_node("Canvas", [200,800])
 
 	g.connect(grid, 0, u, 0)
 	g.connect(grid, 0, dt_u, 0)
@@ -42,8 +43,9 @@ func main()
 	g.connect(dt_u, 0, sim, 1)
 	
 	g.connect(grid, 0, gr, 0)
-	g.connect(gr, 0, canvas, 0)
+	g.connect(gr, 0, scene, 0)
 	g.connect(u, 0, dr, 0)
-	g.connect(dr, 0, canvas, 0)
+	g.connect(dr, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

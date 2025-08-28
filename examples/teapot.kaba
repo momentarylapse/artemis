@@ -9,9 +9,11 @@ func main()
 	var renderer = g.add_node("MeshRenderer", [300,300])
 	#renderer.set("emission", dyn([1,0,0,1]))
 
-	var canvas = g.add_node("Canvas", [300,500])
+	var scene = g.add_node("SceneRenderer", [300,500])
+	var canvas = g.add_node("Canvas", [300,650])
 
 	g.connect(teapot, 0, renderer, 0)
-	g.connect(renderer, 0, canvas, 0)
+	g.connect(renderer, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

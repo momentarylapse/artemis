@@ -20,7 +20,8 @@ func main()
 	var plr = g.add_node("PointListRenderer", [300, 550])
 	plr.set("trail-length", 1000)
 	
-	var canvas = g.add_node("Canvas", [300, 700])
+	var scene = g.add_node("SceneRenderer", [300, 700])
+	var canvas = g.add_node("Canvas", [300, 850])
 	
 	g.connect(mass, 0, sim, 0)
 	g.connect(pos, 0, sim, 1)
@@ -28,6 +29,7 @@ func main()
 	
 	g.connect(pos, 0, l2v, 0)
 	g.connect(l2v, 0, plr, 0)
-	g.connect(plr, 0, canvas, 0)
+	g.connect(plr, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

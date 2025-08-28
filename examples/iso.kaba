@@ -31,7 +31,8 @@ func main()
 	var grad = g.add_node("Gradient", [650, 400])
 	var vec = g.add_node("VectorFieldRenderer", [650, 550])
 	
-	var canvas = g.add_node("Canvas", [300, 700])
+	var scene = g.add_node("SceneRenderer", [300, 700])
+	var canvas = g.add_node("Canvas", [300, 850])
 
 	g.connect(grid, 0, gr, 0)
 	g.connect(grid, 0, field, 0)
@@ -42,9 +43,10 @@ func main()
 	g.connect(field, 0, iso, 0)
 	g.connect(iso, 0, mr, 0)
 	
-	g.connect(gr, 0, canvas, 0)
-	g.connect(vol, 0, canvas, 0)
-	g.connect(vec, 0, canvas, 0)
-	g.connect(mr, 0, canvas, 0)
+	g.connect(gr, 0, scene, 0)
+	g.connect(vol, 0, scene, 0)
+	g.connect(vec, 0, scene, 0)
+	g.connect(mr, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

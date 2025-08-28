@@ -38,7 +38,8 @@ func main()
 	
 	var mw = g.add_node("MaxwellFDTD:Maxwell", [500, 400])
 	
-	var canvas = g.add_node("Canvas", [300, 700])
+	var scene = g.add_node("SceneRenderer", [300, 700])
+	var canvas = g.add_node("Canvas", [300, 850])
 	
 	g.connect(grid, 0, gr, 0)
 	g.connect(grid, 0, E, 0)
@@ -51,9 +52,10 @@ func main()
 	g.connect(B, 0, mw, 1)
 	g.connect(j, 0, mw, 2)
 	
-	g.connect(gr, 0, canvas, 0)
-	g.connect(rE, 0, canvas, 0)
-	g.connect(rB, 0, canvas, 0)
-	g.connect(rj, 0, canvas, 0)
+	g.connect(gr, 0, scene, 0)
+	g.connect(rE, 0, scene, 0)
+	g.connect(rB, 0, scene, 0)
+	g.connect(rj, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 

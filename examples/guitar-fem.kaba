@@ -63,8 +63,8 @@ func main()
 	string_dr.set("show-grid", true)
 	
 	
-
-	var canvas = g.add_node("Canvas", [200,650])
+	var scene = g.add_node("SceneRenderer", [200,650])
+	var canvas = g.add_node("Canvas", [200,800])
 
 	g.connect(body_grid, 0, body_u, 0)
 	g.connect(body_grid, 0, body_dt_u, 0)
@@ -77,13 +77,15 @@ func main()
 	g.connect(string_dt_u, 0, sim, 3)
 	
 	g.connect(body_grid, 0, body_gr, 0)
-	g.connect(body_gr, 0, canvas, 0)
+	g.connect(body_gr, 0, scene, 0)
 	g.connect(body_u, 0, body_dr, 0)
-	g.connect(body_dr, 0, canvas, 0)
+	g.connect(body_dr, 0, scene, 0)
 	
 	g.connect(string_grid, 0, string_gr, 0)
-	g.connect(string_gr, 0, canvas, 0)
+	g.connect(string_gr, 0, scene, 0)
 	g.connect(string_u, 0, string_dr, 0)
-	g.connect(string_dr, 0, canvas, 0)
+	g.connect(string_dr, 0, scene, 0)
+	
+	g.connect(scene, 0, canvas, 0)
 
 

@@ -3,9 +3,9 @@ use plugins.artemis.*
 func main()
 	var g = weak(current_session().graph)
 
-	var a = g.add_node("RegularGrid", [300,100])
-	a.set("nz", 30)
-	a.set("lz", 30)
+	var grid = g.add_node("RegularGrid", [300,100])
+	grid.set("nz", 30)
+	grid.set("lz", 30)
 
 	var b = g.add_node("GridRenderer", [150,400])
 	b.set("line-width", 2.0)
@@ -19,15 +19,17 @@ func main()
 	var e = g.add_node("Gradient", [550, 400])
 	var f = g.add_node("VectorFieldRenderer", [550, 550])
 	
-	var canvas = g.add_node("Canvas", [400, 700])
+	var scene = g.add_node("SceneRenderer", [400, 700])
+	var canvas = g.add_node("Canvas", [400, 850])
 
-	g.connect(a, 0, b, 0)
-	g.connect(a, 0, c, 0)
+	g.connect(grid, 0, b, 0)
+	g.connect(grid, 0, c, 0)
 	g.connect(c, 0, d, 0)
 	g.connect(c, 0, e, 0)
 	g.connect(e, 0, f, 0)
-	g.connect(b, 0, canvas, 0)
-	g.connect(d, 0, canvas, 0)
-	g.connect(f, 0, canvas, 0)
+	g.connect(b, 0, scene, 0)
+	g.connect(d, 0, scene, 0)
+	g.connect(f, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
 
 
