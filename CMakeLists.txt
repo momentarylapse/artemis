@@ -220,6 +220,7 @@ add_executable(artemis WIN32
 	src/data/Data.cpp
 	src/graph/canvas/Canvas.cpp
 	src/graph/canvas/LayoutGrid.cpp
+	src/graph/canvas/LayoutNested.cpp
 	src/graph/canvas/LayoutOverlay.cpp
 	src/graph/draw2d/FunctionPlot.cpp
 	src/graph/draw2d/ListPlot.cpp
@@ -633,6 +634,7 @@ add_library(moduleartemis SHARED
 	src/data/Data.cpp
 	src/graph/canvas/Canvas.cpp
 	src/graph/canvas/LayoutGrid.cpp
+	src/graph/canvas/LayoutNested.cpp
 	src/graph/canvas/LayoutOverlay.cpp
 	src/graph/draw2d/FunctionPlot.cpp
 	src/graph/draw2d/ListPlot.cpp

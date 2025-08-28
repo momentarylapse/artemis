@@ -38,7 +38,7 @@ class LayoutGrid : public RenderNode {
 public:
 	explicit LayoutGrid(Session* s);
 	void set_children(const Array<RenderNode*>& c, bool horizontal);
-	void configure(int spacing, int padding);
+	void configure(int spacing, int margin);
 
 private:
 	bool horizontal = false;
@@ -52,6 +52,17 @@ public:
 
 private:
 	Array<RenderNode*> children;
+};
+
+class LayoutNested : public RenderNode {
+public:
+	explicit LayoutNested(Session* s);
+	void set_children(RenderNode* main, const Array<RenderNode*>& c, int mode);
+
+private:
+	RenderNode* _main = nullptr;
+	Array<RenderNode*> children;
+	Array<xhui::Panel*> dummies;
 };
 
 }
