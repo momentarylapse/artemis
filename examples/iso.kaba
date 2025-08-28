@@ -16,7 +16,7 @@ func main()
 	gr.set("color", dyn([0.5,0.5,0.5,1]))
 	
 	var field = g.add_node("ScalarField", [370,250])
-	field.set("formula", "sin(0.8 * len(p-vec3(4,4,15)) + t)")
+	field.set("formula", "sin(0.8 * len(p-vec3(4.5,4.5,15)) + t)")
 	field.set("time-dependent", true)
 	
 	var vol = g.add_node("VolumeRenderer", [250, 550])

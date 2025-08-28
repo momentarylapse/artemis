@@ -148,11 +148,13 @@ void ModeDefault::on_command(const string& id) {
 			session->info("saved");
 		});
 	}
+	if (id == "show-profiling") {
+		show_profiling = !show_profiling;
+		session->win->request_redraw();
+	}
 }
 
 void ModeDefault::on_key_down(int key) {
-	if (key == xhui::KEY_CONTROL | key == xhui::KEY_T)
-		show_profiling = !show_profiling;
 }
 
 

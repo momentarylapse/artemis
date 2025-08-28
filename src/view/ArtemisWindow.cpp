@@ -101,9 +101,9 @@ Dialog x x padding=0
 						---|
 						Grid overlay-button-grid-code-bottom '' spacing=20
 							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-			Overlay ? ''
-				Grid canvas-grid '' grabfocus width=400 greedfactorx=1.6 expandx
-				DrawingArea canvas-overlay '' ignorehover
+			Overlay ? '' width=400 greedfactorx=1.6 expandx
+				Grid canvas-grid '' grabfocus
+				DrawingArea canvas-overlay '' ignorehover expandx
 				Grid overlay-main-grid '' margin=25
 					Label ? '' ignorehover expandy
 					---|
@@ -140,6 +140,7 @@ Dialog x x padding=0
 	set_key_code("exit", mod + xhui::KEY_Q);
 	set_key_code("undo", mod + xhui::KEY_Z);
 	set_key_code("redo", mod + xhui::KEY_Y);
+	set_key_code("show-profiling", mod + xhui::KEY_T);
 	event("open", [this] {
 		session->cur_mode->on_command("open");
 	});
@@ -157,6 +158,9 @@ Dialog x x padding=0
 	});
 	event("redo", [this] {
 		session->cur_mode->on_command("redo");
+	});
+	event("show-profiling", [this] {
+		session->cur_mode->on_command("show-profiling");
 	});
 
 	event_xp("canvas-overlay", xhui::event_id::Initialize, [this] (Painter* p) {

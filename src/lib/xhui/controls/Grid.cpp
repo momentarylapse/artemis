@@ -88,11 +88,11 @@ vec2 Grid::get_greed_factor() const {
 	get_grid_greed_factors(xx, yy);
 	vec2 f = {0, 0};
 	if (size_mode_x == SizeMode::Expand)
-		f.x = 1;
+		f.x = greed_factor.x;
 	else if (size_mode_x == SizeMode::ForwardChild)
 		f.x = sum(xx);
 	if (size_mode_y == SizeMode::Expand)
-		f.y = 1;
+		f.y = greed_factor.y;
 	else if (size_mode_y == SizeMode::ForwardChild)
 		f.y = sum(yy);
 	return f;
