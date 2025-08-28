@@ -346,9 +346,10 @@ void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 			if (node_area(n).overlaps(r))
 				selected_nodes.add(n);
 		if (selected_nodes.num == 1) {
-			// TODO check if already open...
 			selection = Hover{HoverType::Node, selected_nodes[0], -1};
 			open_node_panel(selected_nodes[0]);
+		} else {
+			open_node_panel(nullptr);
 		}
 	} else if (mode == Mode::MovingNodes) {
 		vec2 cur_pos = from_screen(m);
@@ -393,13 +394,11 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 	}
 	mode = Mode::Default;
 
-	if (node_panel) {
-		unembed(node_panel);
-		node_panel = nullptr;
-	}
+	open_node_panel(nullptr);
 
 	if (selection and selection->type == HoverType::Node) {
-		open_node_panel(selection->node);
+		if (selected_nodes.num == 1)
+			open_node_panel(selection->node);
 
 		mode = Mode::MovingNodes;
 		moving_last_pos = from_screen(m);
@@ -414,9 +413,21 @@ void GraphEditor::on_left_button_down(const vec2& m) {
 }
 
 void GraphEditor::open_node_panel(dataflow::Node* n) {
-	node_panel = n->create_panel();
-	node_panel->min_width_user = PANEL_WIDTH;
-	embed("dock", 0, 0, node_panel);
+	if (n == _node_panel_node)
+		return;
+
+	if (node_panel) {
+		unembed(node_panel);
+		node_panel = nullptr;
+	}
+
+	_node_panel_node = n;
+
+	if (n) {
+		node_panel = n->create_panel();
+		node_panel->min_width_user = PANEL_WIDTH;
+		embed("dock", 0, 0, node_panel);
+	}
 }
 
 void GraphEditor::on_left_button_up(const vec2& m) {
@@ -459,7 +470,9 @@ void GraphEditor::on_key_down(int key) {
 			hover = base::None;
 		}
 		if (selection and selection->type == HoverType::Node) {
-			graph->remove_node(selection->node);
+			for (auto n: selected_nodes)
+				graph->remove_node(n);
+			selected_nodes.clear();
 			selection = base::None;
 			hover = base::None;
 		}

@@ -50,6 +50,7 @@ public:
 	Session* session;
 	artemis::graph::Graph* graph;
 	xhui::Panel* node_panel = nullptr;
+	dataflow::Node* _node_panel_node = nullptr;
 
 	enum class HoverType {
 		Node,
