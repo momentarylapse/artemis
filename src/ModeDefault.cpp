@@ -75,13 +75,13 @@ string nice_time(double t, double dt) {
 
 	if (t >= 60) {
 		if (t >= 3600)
-			s.add(format("%03d min", (int)(t / 60) % 60));
+			s.add(format("%02d min", (int)(t / 60) % 60));
 		else
 			s.add(format("%d min", (int)(t / 60) % 60));
 	}
 	if (t >= 1) {
 		if (t >= 60)
-			s.add(format("%03d s", (int)t % 60));
+			s.add(format("%02d s", (int)t % 60));
 		else
 			s.add(format("%d s", (int)t % 60));
 	}

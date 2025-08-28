@@ -102,8 +102,8 @@ Dialog x x padding=0
 						Grid overlay-button-grid-code-bottom '' spacing=20
 							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
 			Overlay ? ''
-				DrawingArea canvas-fake '' grabfocus width=400 greedfactorx=1.6 expandx
-				Grid canvas-grid ''
+				Grid canvas-grid '' grabfocus width=400 greedfactorx=1.6 expandx
+				DrawingArea canvas-overlay '' ignorehover
 				Grid overlay-main-grid '' margin=25
 					Label ? '' ignorehover expandy
 					---|
@@ -159,7 +159,7 @@ Dialog x x padding=0
 		session->cur_mode->on_command("redo");
 	});
 
-	event_xp("canvas-fake", xhui::event_id::Initialize, [this] (Painter* p) {
+	event_xp("canvas-overlay", xhui::event_id::Initialize, [this] (Painter* p) {
 		auto pp = (xhui::Painter*)p;
 		session->ctx = yrenderer::api_init_xhui(pp);
 		session->resource_manager = new ResourceManager(session->ctx, "", "", "");
@@ -186,6 +186,10 @@ Dialog x x padding=0
 		engine.resource_manager = session->resource_manager;
 
 		session->promise_started(session);
+	});
+	event_xp("canvas-overlay", xhui::event_id::Draw, [this] (Painter* p) {
+		if (session->cur_mode)
+			session->cur_mode->on_draw_post(p);
 	});
 
 
