@@ -7,7 +7,6 @@
 
 #include <Session.h>
 #include <view/DrawingHelper.h>
-#include <view/MultiView.h>
 #include "view/ArtemisWindow.h"
 
 namespace artemis::graph {

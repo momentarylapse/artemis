@@ -20,7 +20,6 @@ namespace yrenderer {
 	struct RenderParams;
 	class MeshEmitter;
 }
-class MultiViewWindow;
 class Session;
 class Painter;
 
@@ -35,8 +34,6 @@ struct RenderData {
 	// TODO
 	bool active;
 	base::optional<Box> bounding_box;
-	std::function<void(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd)> f_draw_3d;
-	std::function<void(const yrenderer::RenderParams& params, MultiViewWindow* win, yrenderer::RenderViewData& rvd)> f_draw_3d_transparent;
 	view::RenderNode* render_node = nullptr;
 };
 

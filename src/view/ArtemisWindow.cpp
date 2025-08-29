@@ -17,7 +17,6 @@
 #include <lib/yrenderer/Context.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <y/EngineData.h>
-#include "ActionController.h"
 #include "DrawingHelper.h"
 #include "GraphEditor.h"
 #include "CodeEditor.h"

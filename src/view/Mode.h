@@ -18,7 +18,6 @@ namespace yrenderer {
 class Session;
 class Painter;
 class Data;
-struct Hover;
 
 namespace xhui {
 	class Panel;

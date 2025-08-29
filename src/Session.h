@@ -25,31 +25,6 @@ class DrawingHelper;
 class ArtemisWindow;
 
 
-
-// multiview data
-enum class MultiViewType {
-	MODEL_SURFACE,
-	MODEL_VERTEX,
-	MODEL_SKIN_VERTEX,
-	MODEL_POLYGON,
-	MODEL_EDGE,
-	MODEL_BALL,
-	MODEL_CYLINDER,
-	MODEL_POLYHEDRON,
-	SKELETON_BONE,
-	WORLD_ENTITY,
-	WORLD_OBJECT,
-	WORLD_TERRAIN,
-	WORLD_TERRAIN_VERTEX,
-	WORLD_LIGHT,
-	WORLD_LINK,
-	WORLD_SCRIPT,
-	WORLD_CAMERA,
-	WORLD_CAM_POINT,
-	WORLD_CAM_POINT_VEL,
-	ACTION_MANAGER
-};
-
 namespace artemis::graph {
 	class Graph;
 	class DataGraph;

@@ -6,16 +6,14 @@
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/MaterialManager.h>
 #include <lib/yrenderer/Context.h>
+#include <lib/yrenderer/scene/RenderViewData.h>
 #include <lib/math/mat4.h>
 #include <lib/math/vec2.h>
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/draw/font.h>
-
-#include "MultiView.h"
-#include "../multiview/SingleData.h"
-#include "lib/math/interpolation.h"
+#include <lib/math/interpolation.h>
 
 
 static float ui_scale = 1.0f;

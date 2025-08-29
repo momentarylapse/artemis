@@ -512,7 +512,6 @@ add_executable(artemis WIN32
 	src/lib/yrenderer/Renderer.cpp
 	src/lib/yrenderer/ShaderManager.cpp
 	src/lib/yrenderer/TextureManager.cpp
-	src/multiview/SingleData.cpp
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp
@@ -521,7 +520,6 @@ add_executable(artemis WIN32
 	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp
 	src/view/dialog/ColorMapDialog.cpp
-	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
 	src/view/Canvas.cpp
 	src/view/CodeEditor.cpp
@@ -529,7 +527,6 @@ add_executable(artemis WIN32
 	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
-	src/view/MultiView.cpp
 	src/view/NodeListPanel.cpp
 	src/view/SceneRenderer.cpp
 	src/y/audio/audio.cpp
@@ -927,7 +924,6 @@ add_library(moduleartemis SHARED
 	src/lib/yrenderer/Renderer.cpp
 	src/lib/yrenderer/ShaderManager.cpp
 	src/lib/yrenderer/TextureManager.cpp
-	src/multiview/SingleData.cpp
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp
@@ -936,7 +932,6 @@ add_library(moduleartemis SHARED
 	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp
 	src/view/dialog/ColorMapDialog.cpp
-	src/view/ActionController.cpp
 	src/view/ArtemisWindow.cpp
 	src/view/Canvas.cpp
 	src/view/CodeEditor.cpp
@@ -944,7 +939,6 @@ add_library(moduleartemis SHARED
 	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
-	src/view/MultiView.cpp
 	src/view/NodeListPanel.cpp
 	src/view/SceneRenderer.cpp
 	src/y/audio/audio.cpp
