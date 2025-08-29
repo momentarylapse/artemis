@@ -146,7 +146,7 @@ PolygonMesh iso_surface(const data::ScalarField& f, float t0) {
 			for (int j=0; j<f.grid.ny-1; j++)
 				for (int k=0; k<f.grid.nz-1; k++)
 					iso_cell_approx(f, mesh, i, j, k, t0);
-		mesh.transform(mat4::translation(f.grid.cell_center(0,0,0)));
+		mesh = mesh.transform(mat4::translation(f.grid.cell_center(0,0,0) - f.grid.offset));
 	} else if (f.sampling_mode == artemis::data::SamplingMode::PerVertex) {
 		for (int i=0; i<f.grid.nx; i++)
 			for (int j=0; j<f.grid.ny; j++)
