@@ -7,15 +7,19 @@
 
 #include "PolygonMesh.h"
 #include "Polygon.h"
+#include "MeshEdit.h"
 #include "VertexStagingBuffer.h"
-#include "SkinGenerator.h"
-#include <view/MultiView.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include <y/world/Model.h>
 #include <lib/base/iter.h>
+#include <lib/base/sort.h>
 #include <lib/math/mat4.h>
 #include <lib/math/vec2.h>
 #include <lib/math/plane.h>
+#include <lib/math/Box.h>
+#include "SkinGenerator.h"
+#if __has_include(<view/MultiView.h>)
+#include <view/MultiView.h>
+#endif
 
 class GeometryException : public Exception {
 public:
@@ -38,7 +42,7 @@ static float Bernstein3(int i, float t) {
 MeshVertex::MeshVertex(const vec3 &_pos) {
 	pos = _pos;
 	ref_count = 0;
-	normal_mode = NORMAL_MODE_ANGULAR;
+	normal_mode = 3;//NORMAL_MODE_ANGULAR;
 	bone_index = {-1,-1,-1,-1};
 	bone_weight = {1,0,0,0};
 	normal_dirty = false;
@@ -46,11 +50,33 @@ MeshVertex::MeshVertex(const vec3 &_pos) {
 
 MeshVertex::MeshVertex() : MeshVertex(v_0) {}
 
+base::optional<int> Edge::find_other_vertex(int vertex) const {
+	if (vertex == index[0])
+		return index[1];
+	if (vertex == index[1])
+		return index[0];
+	return base::None;
+}
+
+
+bool Edge::operator==(const Edge& o) {
+	return index[0] == o.index[0] and index[1] == o.index[1];
+}
+
+bool Edge::operator>(const Edge& o) {
+	if (index[0] == o.index[0])
+		return index[1] > o.index[1];
+	return index[0] > o.index[0];
+}
+
+
 
 
 void PolygonMesh::clear() {
 	polygons.clear();
 	vertices.clear();
+	spheres.clear();
+	cylinders.clear();
 }
 
 bool PolygonMesh::is_empty() const {
@@ -231,33 +257,64 @@ void PolygonMesh::smoothen()
 	}
 }
 
-void PolygonMesh::transform(const mat4 &mat)
-{
-	for (auto &v: vertices)
+PolygonMesh PolygonMesh::transform(const mat4 &mat) const {
+	PolygonMesh mesh = *this;
+	for (auto &v: mesh.vertices)
 		v.pos = mat * v.pos;
 	//matrix mat2 = mat * (float)pow(mat.determinant(), - 1.0f / 3.0f);
-	for (auto &p: polygons){
+	for (auto &p: mesh.polygons){
 		/*p.temp_normal = mat2.transform_normal(p.temp_normal);
 		for (int k=0;k<p.side.num;k++)
 			p.side[k].normal = mat2.transform_normal(p.side[k].normal);*/
-		p.temp_normal = p.get_normal(vertices);
+		p.temp_normal = p.get_normal(mesh.vertices);
 		for (int k=0;k<p.side.num;k++)
 			p.side[k].normal = p.temp_normal;
 	}
+	return mesh;
 }
 
-void PolygonMesh::get_bounding_box(vec3 &min, vec3 &max)
-{
-	if (vertices.num > 0){
-		min = max = vertices[0].pos;
-		for (auto &v: vertices){
-			min._min(v.pos);
-			max._max(v.pos);
-		}
-	}else{
-		min = max = v_0;
-	}
+MeshEdit PolygonMesh::edit_inplace(const MeshEdit& edit) {
+	return edit.apply_inplace(*this);
 }
+
+PolygonMesh PolygonMesh::edit(const MeshEdit& edit, MeshEdit* inv) const {
+	return edit.apply(*this, inv);
+}
+
+
+base::set<Edge> PolygonMesh::edges() const {
+	base::set<Edge> _edges;
+	for (const auto& p: polygons)
+		for (int k=0; k<p.side.num; k++) {
+			int a = p.side[k].vertex;
+			int b = p.side[(k+1)%p.side.num].vertex;
+			_edges.add(Edge{min(a, b), max(a, b)});
+		}
+	return _edges;
+}
+
+Array<PolygonCorner> PolygonMesh::get_polygons_around_vertex(int index) const {
+	Array<PolygonCorner> corners;
+
+	// unsorted
+	for (const auto& p: polygons)
+		for (int k=0; k<p.side.num; k++)
+			if (p.side[k].vertex == index)
+				corners.add({&p, k});
+
+	return corners;
+}
+
+int PolygonMesh::next_edge_at_vertex(int index0, int index1) const {
+	for (const auto& p: polygons)
+		for (int k=0; k<p.side.num; k++)
+			if (p.side[k].vertex == index0)
+				if (p.side[(k+p.side.num-1)%p.side.num].vertex == index1)
+					return p.side[(k+1)%p.side.num].vertex;
+	return -1;
+}
+
+
 
 void PolygonMesh::build(ygfx::VertexBuffer *vb) const {
 	VertexStagingBuffer vbs;
@@ -332,9 +389,11 @@ bool PolygonMesh::is_inside(const vec3 &p) const {
 	return ((n % 2) == 1);
 }
 
-void PolygonMesh::invert() {
-	for (auto &p: polygons)
+PolygonMesh PolygonMesh::invert() const {
+	PolygonMesh mesh = *this;
+	for (auto &p: mesh.polygons)
 		p.invert();
+	return mesh;
 }
 
 void PolygonMesh::remove_unused_vertices() {
@@ -354,6 +413,22 @@ void PolygonMesh::remove_unused_vertices() {
 		}
 }
 
+Box PolygonMesh::bounding_box() const {
+	Box box = {v_0, v_0};
+	if (vertices.num > 0)
+		box = {vertices[0].pos, vertices[0].pos};
+
+	for (const auto &v: vertices)
+		box = box or Box{v.pos, v.pos};
+
+	for (const auto &b: spheres)
+		box = box or Box{
+			vertices[b.index].pos - vec3(1,1,1) * b.radius,
+			vertices[b.index].pos + vec3(1,1,1) * b.radius};
+	return box;
+}
+
+#if __has_include(<view/MultiView.h>)
 bool PolygonMesh::is_mouse_over(MultiViewWindow* win, const mat4 &mat, const vec2& m, vec3 &tp, int& index, bool any_hit) {
 	vec3 M = vec3(m, 0);
 	float zmin = 1;
@@ -403,6 +478,7 @@ bool PolygonMesh::is_mouse_over(MultiViewWindow* win, const mat4 &mat, const vec
 	}
 	return zmin < 1;
 }
+#endif
 
 void geo_poly_find_connected(const PolygonMesh &g, int p0, base::set<int> &polys) {
 	base::set<int> verts;

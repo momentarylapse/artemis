@@ -3,7 +3,7 @@
 //
 
 #include "SphereMesh.h"
-#include <data/mesh/GeometrySphere.h>
+#include <lib/mesh/GeometrySphere.h>
 
 namespace artemis::graph {
 

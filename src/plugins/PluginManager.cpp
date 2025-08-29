@@ -21,7 +21,7 @@
 #include <data/field/MultiComponentField.h>
 #include <data/grid/Grid.h>
 #include <data/grid/RegularGrid.h>
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 #include <data/util/ColorMap.h>
 #include <graph/Graph.h>
 #include <graph/NodeFactory.h>

@@ -2,13 +2,12 @@
 // Created by michi on 09.03.25.
 //
 
-#ifndef TEAPOTMESH_H
-#define TEAPOTMESH_H
+#pragma once
 
 #include <lib/dataflow/ResourceNode.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 
 namespace artemis::graph {
 
@@ -24,4 +23,3 @@ public:
 
 } // graph
 
-#endif //TEAPOTMESH_H

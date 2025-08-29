@@ -3,12 +3,12 @@
 //
 
 #include "TeapotMesh.h"
-#include <data/mesh/GeometryTeapot.h>
+#include <lib/mesh/GeometryTeapot.h>
 
 namespace artemis::graph {
 
 void TeapotMesh::on_process() {
-	GeometryTeapot geo(v_0, (float)radius(), samples());
+	auto geo = GeometryTeapot::create(v_0, (float)radius(), samples());
 	geo.smoothen();
 	out(geo);
 }

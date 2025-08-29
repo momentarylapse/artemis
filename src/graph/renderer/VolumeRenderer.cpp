@@ -4,8 +4,8 @@
 
 #include "VolumeRenderer.h"
 #include <Session.h>
-#include <data/mesh/GeometrySphere.h>
-#include <data/mesh/GeometryCube.h>
+#include <lib/mesh/GeometrySphere.h>
+#include <lib/mesh/GeometryCube.h>
 #include <view/DrawingHelper.h>
 #include <lib/any/conversion.h>
 #include <lib/ygraphics/graphics-impl.h>

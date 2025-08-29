@@ -202,20 +202,6 @@ add_executable(artemis WIN32
 	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
 	src/data/grid/UnstructuredGrid.cpp
-	src/data/mesh/GeometryBall.cpp
-	src/data/mesh/GeometryCube.cpp
-	src/data/mesh/GeometryCylinder.cpp
-	src/data/mesh/GeometryPlane.cpp
-	src/data/mesh/GeometryPlatonic.cpp
-	src/data/mesh/GeometrySphere.cpp
-	src/data/mesh/GeometrySubtract.cpp
-	src/data/mesh/GeometryTeapot.cpp
-	src/data/mesh/GeometryTorus.cpp
-	src/data/mesh/GeometryTorusKnot.cpp
-	src/data/mesh/Polygon.cpp
-	src/data/mesh/PolygonMesh.cpp
-	src/data/mesh/SkinGenerator.cpp
-	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
 	src/graph/canvas/Canvas.cpp
@@ -358,6 +344,21 @@ add_executable(artemis WIN32
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/mesh/GeometryBall.cpp
+	src/lib/mesh/GeometryCube.cpp
+	src/lib/mesh/GeometryCylinder.cpp
+	src/lib/mesh/GeometryPlane.cpp
+	src/lib/mesh/GeometryPlatonic.cpp
+	src/lib/mesh/GeometrySphere.cpp
+	src/lib/mesh/GeometrySubtract.cpp
+	src/lib/mesh/GeometryTeapot.cpp
+	src/lib/mesh/GeometryTorus.cpp
+	src/lib/mesh/GeometryTorusKnot.cpp
+	src/lib/mesh/MeshEdit.cpp
+	src/lib/mesh/Polygon.cpp
+	src/lib/mesh/PolygonMesh.cpp
+	src/lib/mesh/SkinGenerator.cpp
+	src/lib/mesh/VertexStagingBuffer.cpp
 	src/lib/net/_kaba_export.cpp
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
@@ -616,20 +617,6 @@ add_library(moduleartemis SHARED
 	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
 	src/data/grid/UnstructuredGrid.cpp
-	src/data/mesh/GeometryBall.cpp
-	src/data/mesh/GeometryCube.cpp
-	src/data/mesh/GeometryCylinder.cpp
-	src/data/mesh/GeometryPlane.cpp
-	src/data/mesh/GeometryPlatonic.cpp
-	src/data/mesh/GeometrySphere.cpp
-	src/data/mesh/GeometrySubtract.cpp
-	src/data/mesh/GeometryTeapot.cpp
-	src/data/mesh/GeometryTorus.cpp
-	src/data/mesh/GeometryTorusKnot.cpp
-	src/data/mesh/Polygon.cpp
-	src/data/mesh/PolygonMesh.cpp
-	src/data/mesh/SkinGenerator.cpp
-	src/data/mesh/VertexStagingBuffer.cpp
 	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
 	src/graph/canvas/Canvas.cpp
@@ -772,6 +759,21 @@ add_library(moduleartemis SHARED
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/mesh/GeometryBall.cpp
+	src/lib/mesh/GeometryCube.cpp
+	src/lib/mesh/GeometryCylinder.cpp
+	src/lib/mesh/GeometryPlane.cpp
+	src/lib/mesh/GeometryPlatonic.cpp
+	src/lib/mesh/GeometrySphere.cpp
+	src/lib/mesh/GeometrySubtract.cpp
+	src/lib/mesh/GeometryTeapot.cpp
+	src/lib/mesh/GeometryTorus.cpp
+	src/lib/mesh/GeometryTorusKnot.cpp
+	src/lib/mesh/MeshEdit.cpp
+	src/lib/mesh/Polygon.cpp
+	src/lib/mesh/PolygonMesh.cpp
+	src/lib/mesh/SkinGenerator.cpp
+	src/lib/mesh/VertexStagingBuffer.cpp
 	src/lib/net/_kaba_export.cpp
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp

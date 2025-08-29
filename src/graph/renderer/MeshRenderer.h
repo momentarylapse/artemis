@@ -8,7 +8,7 @@
 #include "RendererNode.h"
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 #include <lib/ygraphics/graphics-fwd.h>
 
 namespace artemis::graph {

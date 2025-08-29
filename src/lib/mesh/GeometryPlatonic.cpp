@@ -7,12 +7,13 @@
 
 #include "GeometryPlatonic.h"
 #include "GeometryCube.h"
+#include <lib/math/Box.h>
 
 GeometryPlatonic::GeometryPlatonic(const vec3 &pos, float radius, int type) {
 	if (type == 4)
 		AddTetrahedron(pos, radius);
 	else if (type == 6)
-		add(GeometryCube(pos - vec3(radius, radius, radius), {radius*2, 0, 0}, {0, radius*2, 0}, {0, 0, radius*2}, 1, 1, 1));
+		add(GeometryCube::create({pos - vec3(radius, radius, radius), pos + vec3(radius, radius, radius)}, {1, 1, 1}));
 	else if (type == 8)
 		AddOctahedron(pos, radius);
 	else if (type == 12)
@@ -22,8 +23,7 @@ GeometryPlatonic::GeometryPlatonic(const vec3 &pos, float radius, int type) {
 }
 
 
-void GeometryPlatonic::AddTetrahedron(const vec3 &pos, float radius)
-{
+void GeometryPlatonic::AddTetrahedron(const vec3 &pos, float radius) {
 	int nv = vertices.num;
 
 	float r = radius / sqrt(3.0f/2);
@@ -37,8 +37,7 @@ void GeometryPlatonic::AddTetrahedron(const vec3 &pos, float radius)
 	add_easy(nv, {1, 3, 2});
 }
 
-void GeometryPlatonic::AddOctahedron(const vec3 &pos, float radius)
-{
+void GeometryPlatonic::AddOctahedron(const vec3 &pos, float radius) {
 	int nv = vertices.num;
 
 	float r = radius;
@@ -58,8 +57,7 @@ void GeometryPlatonic::AddOctahedron(const vec3 &pos, float radius)
 	add_easy(nv, {1, 3, 4});
 }
 
-void GeometryPlatonic::AddDodecahedron(const vec3 &pos, float radius)
-{
+void GeometryPlatonic::AddDodecahedron(const vec3 &pos, float radius) {
 	int nv = vertices.num;
 
 	float phi = (1 + sqrt(5.0f))/2;
@@ -98,13 +96,7 @@ void GeometryPlatonic::AddDodecahedron(const vec3 &pos, float radius)
 	add_easy(nv, {8, 10, 2, 16, 0});
 }
 
-void GeometryPlatonic::__init__(const vec3& pos, float radius, int type)
-{
-	new (this) GeometryPlatonic(pos, radius, type);
-}
-
-void GeometryPlatonic::AddIcosahedron(const vec3 &pos, float radius)
-{
+void GeometryPlatonic::AddIcosahedron(const vec3 &pos, float radius) {
 	int nv = vertices.num;
 
 	float phi = (1 + sqrt(5.0f))/2;

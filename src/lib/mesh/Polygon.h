@@ -2,10 +2,8 @@
 // Created by Michael Ankele on 2025-02-19.
 //
 
-#ifndef POLYGON_H
-#define POLYGON_H
+#pragma once
 
-#include <multiview/SingleData.h>
 #include <lib/base/base.h>
 #include <lib/math/vec3.h>
 #include <lib/math/vec4.h>
@@ -13,9 +11,10 @@
 
 class MultiViewWindow;
 class VertexStagingBuffer;
-class vec3;
-class mat4;
+struct vec3;
+struct mat4;
 struct MeshVertex;
+struct Edge;
 
 struct PolygonSide {
 	int vertex;
@@ -26,7 +25,7 @@ struct PolygonSide {
 	unsigned char triangulation[3];
 };
 
-struct Polygon: multiview::SingleData {
+struct Polygon {
 	Array<PolygonSide> side;
 	vec3 temp_normal;
 	bool normal_dirty = true;
@@ -44,10 +43,14 @@ struct Polygon: multiview::SingleData {
 	vec3 get_normal(const Array<MeshVertex> &vertex) const;
 	vec3 get_area_vector(const Array<MeshVertex> &vertex) const;
 	Array<int> get_vertices() const;
+	Array<Edge> get_edges() const;
 	Array<vec3> get_skin_vertices() const;
+	int next_vertex(int index) const;
+	int previous_vertex(int index) const;
+	Edge get_side_edge_in(int side_no) const;
+	Edge get_side_edge_out(int side_no) const;
 	void invert();
 	void add_to_vertex_buffer(const Array<MeshVertex> &vertex, VertexStagingBuffer &vbs, int num_textures);
 };
 
 
-#endif //POLYGON_H

@@ -2,12 +2,11 @@
 // Created by Michael Ankele on 2025-02-19.
 //
 
-#ifndef VERTEXSTAGINGBUFFER_H
-#define VERTEXSTAGINGBUFFER_H
+#pragma once
 
 #include <lib/yrenderer/Material.h>
 
-class vec3;
+struct vec3;
 
 class VertexStagingBuffer {
 public:
@@ -17,5 +16,3 @@ public:
 	void clear();
 };
 
-
-#endif //VERTEXSTAGINGBUFFER_H

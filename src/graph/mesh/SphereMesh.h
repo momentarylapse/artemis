@@ -2,13 +2,12 @@
 // Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef SPHEREMESH_H
-#define SPHEREMESH_H
+#pragma once
 
 #include <lib/dataflow/ResourceNode.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 
 namespace artemis::graph {
 
@@ -23,5 +22,3 @@ public:
 };
 
 } // graph
-
-#endif //SPHEREMESH_H

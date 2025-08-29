@@ -25,18 +25,7 @@ vec3 Polygon::get_area_vector(const Array<MeshVertex> &vertex) const {
 }
 
 vec3 Polygon::get_normal(const Array<MeshVertex> &vertex) const {
-	// Newell's method
-	vec3 n = v_0;
-	vec3 p1 = vertex[side.back().vertex].pos;
-	for (int i=0; i<side.num; i++) {
-		vec3 p0 = p1;
-		p1 = vertex[side[i].vertex].pos;
-		n.x += (p0.y - p1.y) * (p0.z + p1.z);
-		n.y += (p0.z - p1.z) * (p0.x + p1.x);
-		n.z += (p0.x - p1.x) * (p0.y + p1.y);
-	}
-	n.normalize();
-	return n;
+	return get_area_vector(vertex).normalized();
 }
 
 Array<int> Polygon::get_vertices() const {
@@ -47,6 +36,18 @@ Array<int> Polygon::get_vertices() const {
 	return v;
 }
 
+Array<Edge> Polygon::get_edges() const {
+	Array<Edge> edges;
+	edges.resize(side.num);
+	for (int i=0; i<side.num; i++) {
+		int a = side[i].vertex;
+		int b = side[(i+1)%side.num].vertex;
+		edges[i] = {min(a, b), max(a, b)};
+	}
+	return edges;
+}
+
+
 Array<vec3> Polygon::get_skin_vertices() const {
 	Array<vec3> sv;
 	sv.resize(side.num * MATERIAL_MAX_TEXTURES);
@@ -56,6 +57,31 @@ Array<vec3> Polygon::get_skin_vertices() const {
 			sv[n ++] = side[i].skin_vertex[l];
 	return sv;
 }
+
+int Polygon::next_vertex(int index) const {
+	for (int k=0; k<side.num; k++)
+		if (side[k].vertex == index)
+			return side[(k+1) % side.num].vertex;
+	return -1;
+}
+
+int Polygon::previous_vertex(int index) const {
+	for (int k=0; k<side.num; k++)
+		if (side[k].vertex == index)
+			return side[(k+side.num-1) % side.num].vertex;
+	return -1;
+}
+
+Edge Polygon::get_side_edge_out(int side_no) const {
+	int a = side[side_no].vertex;
+	int b = side[(side_no + 1) % side.num].vertex;
+	return Edge{min(a, b), max(a, b)};
+}
+
+Edge Polygon::get_side_edge_in(int side_no) const {
+	return get_side_edge_out(side_no == 0 ? side.num - 1 : side_no - 1);
+}
+
 
 
 static float get_ang(const Array<MeshVertex> &vertex, int a, int b, int c, const vec3 &flat_n) {

@@ -2,13 +2,12 @@
 // Created by Michael Ankele on 2025-03-10.
 //
 
-#ifndef POINTLISTRENDERER_H
-#define POINTLISTRENDERER_H
+#pragma once
 
 #include "RendererNode.h"
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 #include <lib/image/color.h>
 
 namespace yrenderer {
@@ -42,4 +41,3 @@ public:
 
 } // graph
 
-#endif //POINTLISTRENDERER_H

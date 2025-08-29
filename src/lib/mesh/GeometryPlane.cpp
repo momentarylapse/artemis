@@ -7,6 +7,8 @@
 
 #include "GeometryPlane.h"
 #include <assert.h>
+#include <lib/math/rect.h>
+#include <lib/math/vec2.h>
 
 GeometryPlane::GeometryPlane(const vec3 &pos, const vec3 &dv1, const vec3 &dv2, int num_x, int num_y)
 {
@@ -36,7 +38,7 @@ GeometryPlane::GeometryPlane(const vec3 &pos, const vec3 &dv1, const vec3 &dv2, 
 		}
 }
 
-void GeometryPlane::__init__(const vec3& pos, const vec3& dv1, const vec3& dv2, int num_x, int num_y)
-{
-	new (this) GeometryPlane(pos, dv1, dv2, num_x, num_y);
+PolygonMesh GeometryPlane::create(const rect& r, const ivec2& slices) {
+	return GeometryPlane({r.x1, r.y1, 0}, {r.width(), 0, 0}, {0, r.height(), 0}, slices.i, slices.j);
 }
+

@@ -8,7 +8,7 @@
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <data/field/ScalarField.h>
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 
 namespace artemis::graph {
 

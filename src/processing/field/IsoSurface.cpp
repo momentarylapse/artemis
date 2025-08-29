@@ -3,7 +3,7 @@
 //
 
 #include "IsoSurface.h"
-#include <data/mesh/PolygonMesh.h>
+#include <lib/mesh/PolygonMesh.h>
 #include <data/field/ScalarField.h>
 #include <lib/base/sort.h>
 #include <lib/math/mat4.h>

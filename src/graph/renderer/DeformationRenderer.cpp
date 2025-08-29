@@ -1,6 +1,6 @@
 #include "DeformationRenderer.h"
 #include <Session.h>
-#include <data/mesh/GeometrySphere.h>
+#include <lib/mesh/GeometrySphere.h>
 #include <view/DrawingHelper.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/base/iter.h>
