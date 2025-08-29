@@ -52,6 +52,12 @@ public:
 	Array<yrenderer::Light> lights;
 
 	ViewPort view_port;
+
+	enum class MouseMode {
+		None,
+		Rotate,
+		Move
+	} mode = MouseMode::None;
 };
 
 }

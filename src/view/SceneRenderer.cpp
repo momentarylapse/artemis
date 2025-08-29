@@ -11,6 +11,7 @@
 #include <lib/xhui/xhui.h>
 
 #include "DrawingHelper.h"
+#include "lib/os/msg.h"
 
 namespace artemis::view {
 
@@ -90,24 +91,36 @@ Dialog x x padding=0
 		on_draw(p);
 	});
 
-	/*panel->event_x(id, xhui::event_id::MouseMove, [this] {
-		handle_event({Event::Type::MouseMove, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
+	event_x("area", xhui::event_id::MouseMove, [this] {
+		if (auto w = get_window()) {
+			vec2 d = w->state.m - w->state_prev.m;
+			if (mode == MouseMode::Rotate) {
+				view_port.rotate(quaternion::rotation(vec3(d.y, d.x, 0.0f) * 0.003f));
+				request_redraw();
+			} else if (mode == MouseMode::Move) {
+				view_port.move(vec3(-d.x, d.y, 0.0f) * 0.001f);
+				request_redraw();
+			}
+		}
 	});
-	panel->event_x(id, xhui::event_id::LeftButtonDown, [this] {
-		handle_event({Event::Type::LeftMouseDown, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
+	event_x("area", xhui::event_id::LeftButtonDown, [this] {
+		//mode = MouseMode::Rotate;
 	});
-	panel->event_x(id, xhui::event_id::LeftButtonUp, [this] {
-		handle_event({Event::Type::LeftMouseUp, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
+	event_x("area", xhui::event_id::LeftButtonUp, [this] {
+		mode = MouseMode::None;
 	});
-	panel->event_x(id, xhui::event_id::MiddleButtonDown, [this] {
-		handle_event({Event::Type::MiddleMouseUp, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
+	event_x("area", xhui::event_id::MiddleButtonDown, [this] {
+		mode = MouseMode::Move;
 	});
-	panel->event_x(id, xhui::event_id::RightButtonDown, [this] {
-		handle_event({Event::Type::RightMouseUp, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
+	event_x("area", xhui::event_id::MiddleButtonUp, [this] {
+		mode = MouseMode::None;
 	});
-	panel->event_x(id, xhui::event_id::RightButtonDown, [this] {
-		handle_event({Event::Type::RightMouseUp, panel->get_window()->mouse_position(), {0,0}, {0,0}, 0});
-	});*/
+	event_x("area", xhui::event_id::RightButtonDown, [this] {
+		mode = MouseMode::Rotate;
+	});
+	event_x("area", xhui::event_id::RightButtonUp, [this] {
+		mode = MouseMode::None;
+	});
 	event_x("area", xhui::event_id::MouseWheel, [this] {
 		view_port.zoom(expf(-0.1f * get_window()->state.scroll.y));
 		request_redraw();
