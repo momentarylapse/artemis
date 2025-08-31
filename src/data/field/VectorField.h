@@ -86,6 +86,8 @@ struct VectorField {
 	dvec3 average() const;
 	vec3 average32() const;
 
+	void operator=(const dvec3& o);
+	void operator=(const vec3& o);
 	void operator+=(const VectorField& o);
 //	void operator+=(const dvec3& o);
 	void iadd_single(const dvec3& o);

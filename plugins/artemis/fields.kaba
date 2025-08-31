@@ -4,6 +4,7 @@ use grid.*
 
 struct ScalarField
 	var grid: RegularGrid
+	var sampling_mode: SamplingMode
 #	var v32: f32[]
 #	var v64: f64[]
 	func extern __init__()
@@ -17,17 +18,25 @@ struct ScalarField
 	func extern min() -> f64
 	func extern max() -> f64
 	func extern mut __assign__(o: ScalarField)
+	func extern mut __assign__(o: f64)
 	func extern mut __iadd__(o: ScalarField)
+	func extern mut __iadd__(o: f64)
 	func extern __add__(o: ScalarField) -> ScalarField
+	func extern __add__(o: f64) -> ScalarField
 	func extern mut __isub__(o: ScalarField)
+	func extern mut __isub__(o: f64)
 	func extern __sub__(o: ScalarField) -> ScalarField
+	func extern __sub__(o: f64) -> ScalarField
+	func extern mut __imul__(o: ScalarField)
 	func extern mut __imul__(o: f64)
+	func extern __mul__(o: ScalarField) -> ScalarField
 	func extern __mul__(o: f64) -> ScalarField
 	
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> ScalarField
 
 struct VectorField
 	var grid: RegularGrid
+	var sampling_mode: SamplingMode
 #	var v32: vec3[]
 	func extern __init__()
 	func extern __delete__()
@@ -38,6 +47,7 @@ struct VectorField
 	func extern type() -> kaba.Class&
 	func extern average() -> vec3
 	func extern mut __assign__(o: VectorField)
+	func extern mut __assign__(o: vec3)
 	func extern mut __iadd__(o: VectorField)
 	func extern mut __iadd__(o: vec3)
 	func extern __add__(o: VectorField) -> VectorField
@@ -56,11 +66,16 @@ struct VectorField
 
 struct MultiComponentField
 	var grid: RegularGrid
+	var sampling_mode: SamplingMode
+	var components: i32
 #	var v32: vec3[]
 	func extern __init__()
 	func extern __delete__()
-	func extern mut set(i: i32, j: i32, k: i32, n: i32, v: vec3)
-	func extern value(i: i32, j: i32, k: i32, n: i32) -> f64
+	func extern mut set(index: i32, n: i32, v: f64)
+	func extern value(index: i32, n: i32) -> f64
+	func extern values(index: i32) -> f64[]
+	func extern mut _set(i: i32, j: i32, k: i32, n: i32, v: f64)
+	func extern _value(i: i32, j: i32, k: i32, n: i32) -> f64
 	func extern type() -> kaba.Class&
 	func extern mut __assign__(o: MultiComponentField)
 	func extern mut __iadd__(o: MultiComponentField)
@@ -68,7 +83,7 @@ struct MultiComponentField
 	func extern mut __isub__(o: MultiComponentField)
 	func extern __sub__(o: MultiComponentField) -> MultiComponentField
 	func extern mut __imul__(o: f64)
-	func extern __mul__(o: f32) -> MultiComponentField
+	func extern __mul__(o: f64) -> MultiComponentField
 	func extern cwise_product(o: MultiComponentField) -> MultiComponentField
 	
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiComponentField

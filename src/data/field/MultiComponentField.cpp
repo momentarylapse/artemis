@@ -28,11 +28,34 @@ double MultiComponentField::value(int index, int n) const {
 	return 0;
 }
 
+Array<double> MultiComponentField::values(int index) const {
+	Array<double> r;
+	for (int i=0; i<components; i++)
+		r.add(value(index, i));
+	return r;
+}
+
+
 void MultiComponentField::set(int index, int n, double vv) {
 	if (type == ScalarType::Float32)
 		v32._at(index)[n] = (float)vv;
 	else if (type == ScalarType::Float64)
 		v64._at(index)[n] = vv;
+}
+
+double MultiComponentField::_value(int i, int j, int k, int n) const {
+	if (type == ScalarType::Float32)
+		return (double)v32.at(grid, sampling_mode, i, j, k)[n];
+	if (type == ScalarType::Float64)
+		return v64.at(grid, sampling_mode, i, j, k)[n];
+	return 0;
+}
+
+void MultiComponentField::_set(int i, int j, int k, int n, double vv) {
+	if (type == ScalarType::Float32)
+		v32.at(grid, sampling_mode, i, j, k)[n] = (float)vv;
+	else if (type == ScalarType::Float64)
+		v64.at(grid, sampling_mode, i, j, k)[n] = vv;
 }
 
 template<class T>

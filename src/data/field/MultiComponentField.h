@@ -22,7 +22,10 @@ namespace artemis::data {
 		SampledData<double> v64;
 
 		double value(int index, int n) const;
+		Array<double> values(int index) const;
 		void set(int index, int n, double v);
+		double _value(int i, int j, int k, int n) const;
+		void _set(int i, int j, int k, int n, double v);
 
 		void operator+=(const MultiComponentField& o);
 		MultiComponentField operator+(const MultiComponentField& o) const;

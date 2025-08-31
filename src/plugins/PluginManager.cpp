@@ -181,6 +181,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
+	ext->declare_class_element("ScalarField.sampling_mode", &data::ScalarField::sampling_mode);
 	ext->declare_class_element("ScalarField.v32", &data::ScalarField::v32);
 	ext->declare_class_element("ScalarField.v64", &data::ScalarField::v64);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
@@ -193,19 +194,27 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("ScalarField.min", &data::ScalarField::min);
 	ext->link_class_func("ScalarField.max", &data::ScalarField::max);
 	ext->link_class_func("ScalarField.type", &field_get_type<data::ScalarField>);
-	ext->link_class_func("ScalarField.__assign__", &kaba::generic_assign<data::ScalarField>);
-	ext->link_class_func("ScalarField.__add__", &data::ScalarField::operator+);
-	ext->link_class_func("ScalarField.__iadd__", &data::ScalarField::operator+=);
-	ext->link_class_func("ScalarField.__sub__", &data::ScalarField::operator-);
-	ext->link_class_func("ScalarField.__isub__", &data::ScalarField::operator-=);
-	ext->link_class_func("ScalarField.__mul__", &data::ScalarField::operator*);
-	ext->link_class_func("ScalarField.__imul__", &data::ScalarField::operator*=);
+	ext->link_class_func("ScalarField.__assign__:ScalarField:ScalarField", &kaba::generic_assign<data::ScalarField>);
+	ext->link_class_func("ScalarField.__assign__:ScalarField:f64", &kaba::generic_assign<data::ScalarField, double>);
+	ext->link_class_func("ScalarField.__add__:ScalarField:ScalarField", &kaba::generic_add<data::ScalarField>);
+	ext->link_class_func("ScalarField.__add__:ScalarField:f64", &kaba::generic_add<data::ScalarField, double>);
+	ext->link_class_func("ScalarField.__iadd__:ScalarField:ScalarField", &kaba::generic_iadd<data::ScalarField>);
+	ext->link_class_func("ScalarField.__iadd__:ScalarField:f64", &kaba::generic_iadd<data::ScalarField, double>);
+	ext->link_class_func("ScalarField.__sub__:ScalarField:ScalarField", &kaba::generic_sub<data::ScalarField>);
+	ext->link_class_func("ScalarField.__sub__:ScalarField:f64", &kaba::generic_sub<data::ScalarField, double>);
+	ext->link_class_func("ScalarField.__isub__:ScalarField:ScalarField", &kaba::generic_isub<data::ScalarField>);
+	ext->link_class_func("ScalarField.__isub__:ScalarField:f64", &kaba::generic_isub<data::ScalarField, double>);
+	ext->link_class_func("ScalarField.__mul__:ScalarField:ScalarField", &kaba::generic_mul<data::ScalarField>);
+	ext->link_class_func("ScalarField.__mul__:ScalarField:f64", &kaba::generic_mul<data::ScalarField, double>);
+	ext->link_class_func("ScalarField.__imul__:ScalarField:ScalarField", &kaba::generic_imul<data::ScalarField>);
+	ext->link_class_func("ScalarField.__imul__:ScalarField:f64", &kaba::generic_imul<data::ScalarField, double>);
 	ext->link_func("ScalarField.create", &create_scalar_field);
 
 	ext->declare_class_size("VectorField", sizeof(data::VectorField));
 	ext->link_class_func("VectorField.__init__", &kaba::generic_init<data::VectorField>);
 	ext->link_class_func("VectorField.__delete__", &kaba::generic_delete<data::VectorField>);
 	ext->declare_class_element("VectorField.grid", &data::VectorField::grid);
+	ext->declare_class_element("VectorField.sampling_mode", &data::VectorField::sampling_mode);
 	ext->declare_class_element("VectorField.v32", &data::VectorField::v32);
 	ext->declare_class_element("VectorField.v64", &data::VectorField::v64);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
@@ -214,7 +223,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("VectorField._value", &data::VectorField::_value32);
 	ext->link_class_func("VectorField.average", &data::VectorField::average32);
 	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);
-	ext->link_class_func("VectorField.__assign__", &kaba::generic_assign<data::VectorField>);
+	ext->link_class_func("VectorField.__assign__:VectorField:VectorField", &kaba::generic_assign<data::VectorField>);
+	ext->link_class_func("VectorField.__assign__:VectorField:math.vec3", &kaba::generic_assign<data::VectorField, const vec3&>);
 	ext->link_class_func("VectorField.__add__", &data::VectorField::operator+);
 	ext->link_class_func("VectorField.__iadd__:VectorField:VectorField", &data::VectorField::operator+=);
 	ext->link_class_func("VectorField.__iadd__:VectorField:math.vec3", &data::VectorField::iadd_single32);
@@ -234,10 +244,15 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("MultiComponentField.__init__", &kaba::generic_init<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__delete__", &kaba::generic_delete<data::MultiComponentField>);
 	ext->declare_class_element("MultiComponentField.grid", &data::MultiComponentField::grid);
+	ext->declare_class_element("MultiComponentField.sampling_mode", &data::MultiComponentField::sampling_mode);
+	ext->declare_class_element("MultiComponentField.components", &data::MultiComponentField::components);
 	ext->declare_class_element("MultiComponentField.v32", &data::MultiComponentField::v32);
 	ext->declare_class_element("MultiComponentField.v64", &data::MultiComponentField::v64);
 	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set);
 	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value);
+	ext->link_class_func("MultiComponentField.values", &data::MultiComponentField::values);
+	ext->link_class_func("MultiComponentField._set", &data::MultiComponentField::_set);
+	ext->link_class_func("MultiComponentField._value", &data::MultiComponentField::_value);
 	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__assign__", &kaba::generic_assign<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
@@ -259,11 +274,13 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("RegularGrid.dz", &data::RegularGrid::dz);
 	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<data::RegularGrid>);
 	ext->link_class_func("RegularGrid.points", &data::RegularGrid::points);
+	ext->link_class_func("RegularGrid.count", &data::RegularGrid::count);
 
 	ext->declare_class_size("Grid", sizeof(data::Grid));
 	ext->declare_class_element("Grid.regular", &data::Grid::regular);
 	ext->link_class_func("Grid.__init__", &kaba::generic_init<data::Grid>);
 	ext->link_class_func("Grid.points", &data::Grid::points);
+	ext->link_class_func("Grid.count", &data::Grid::count);
 
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);

@@ -15,6 +15,7 @@
 #include "field/VectorField.h"
 #include "field/VectorFieldComponent.h"
 #include "field/VectorFieldLength.h"
+#include "field/MultiComponentField.h"
 #include "grid/RegularGrid.h"
 #include "mesh/SphereMesh.h"
 #include "mesh/TeapotMesh.h"
@@ -89,6 +90,7 @@ void init_factory() {
 
 	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});
 	register_node_class<VectorField>("VectorField", {dataflow::NodeCategory::Field});
+	register_node_class<MultiComponentField>("MultiComponentField", {dataflow::NodeCategory::Field});
 	register_node_class<Gradient>("Gradient", {dataflow::NodeCategory::Field});
 	register_node_class<Divergence>("Divergence", {dataflow::NodeCategory::Field});
 	register_node_class<Rotation>("Rotation", {dataflow::NodeCategory::Field});

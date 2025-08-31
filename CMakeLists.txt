@@ -215,6 +215,7 @@ add_executable(artemis WIN32
 	src/graph/field/Gradient.cpp
 	src/graph/field/IsoSurface.cpp
 	src/graph/field/Laplace.cpp
+	src/graph/field/MultiComponentField.cpp
 	src/graph/field/Rotation.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
@@ -627,6 +628,7 @@ add_library(moduleartemis SHARED
 	src/graph/field/Gradient.cpp
 	src/graph/field/IsoSurface.cpp
 	src/graph/field/Laplace.cpp
+	src/graph/field/MultiComponentField.cpp
 	src/graph/field/Rotation.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp

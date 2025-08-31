@@ -80,6 +80,13 @@ vec3 VectorField::average32() const {
 	return average().to32();
 }
 
+template<class T, class V>
+void v_list_assign_single(T& a, const V& b) {
+	processing::pool::run(a.v.num / a.components, [&a, &b] (int i) {
+		*(V*)a._at(i) = b;
+	}, 1000);
+}
+
 template<class T>
 void v_list_add(T& a, const T& b) {
 	processing::pool::run(a.num, [&a, &b] (int i) {
@@ -106,6 +113,17 @@ void v_list_mul_single(T& a, double s) {
 	processing::pool::run(a.num, [&a, s] (int i) {
 		a[i] *= s;
 	}, 1000);
+}
+
+void VectorField::operator=(const dvec3& o) {
+	if (type == ScalarType::Float32)
+		v_list_assign_single(v32, o.to32());
+	else if (type == ScalarType::Float64)
+		v_list_assign_single(v64, o);
+}
+
+void VectorField::operator=(const vec3& o) {
+	*this = dvec3(o);
 }
 
 void VectorField::operator+=(const VectorField& o) {

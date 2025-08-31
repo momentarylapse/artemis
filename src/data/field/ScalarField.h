@@ -30,11 +30,18 @@ struct ScalarField {
 	double min() const;
 	double max() const;
 
+	void operator=(double o);
 	void operator+=(const ScalarField& o);
+	void operator+=(double o);
 	ScalarField operator+(const ScalarField& o) const;
+	ScalarField operator+(double o) const;
 	void operator-=(const ScalarField& o);
+	void operator-=(double o);
 	ScalarField operator-(const ScalarField& o) const;
+	ScalarField operator-(double o) const;
+	void operator*=(const ScalarField& o);
 	void operator*=(double o);
+	ScalarField operator*(const ScalarField& o) const;
 	ScalarField operator*(double o) const;
 };
 

@@ -9,9 +9,11 @@ struct RegularGrid
 	var dx, dy, dz: vec3
 	var offset: vec3
 	func extern points(mode: SamplingMode) -> vec3[]
+	func extern count(mode: SamplingMode) -> i32
 
 struct Grid
 	var regular: RegularGrid?
 	func extern __init__()
 	func extern points(mode: SamplingMode) -> vec3[]
+	func extern count(mode: SamplingMode) -> i32
 
