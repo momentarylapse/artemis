@@ -1,0 +1,45 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var grid = g.add_node("RegularGrid", [300,100])
+	grid.set("nx", 200)
+	grid.set("ny", 100)
+	grid.set("nz", 1)
+	grid.set("lx", 100)
+	grid.set("ly", 50)
+	grid.set("lz", 1)
+
+	var gr = g.add_node("GridRenderer", [150,550])
+	gr.set("line-width", 2.0)
+	gr.set("color", dyn([0.5,0.5,0.5,1]))
+	gr.set("mode", 0)
+	
+	var f = g.add_node("MultiComponentField", [370,250])
+	f.set("formula", "[sin(z*0.5), 0, 0, 0, 0, 0, 0, 0, 0]")
+	
+	var sim = g.add_node("Flow2dLB", [370, 400])
+	sim.set("tau", 0.6)
+	
+	var volren = g.add_node("VolumeRenderer", [380, 550])
+	volren.set("scale", 5.0)
+	
+	var vecren = g.add_node("VectorFieldRenderer", [550, 550])
+	vecren.set("scale", 4)
+	vecren.set("color", dyn([1,1,1,1]))
+	
+	var scene = g.add_node("SceneRenderer", [400, 700])
+	var canvas = g.add_node("Canvas", [400, 850])
+
+	g.connect(grid, 0, f, 0)
+	g.connect(grid, 0, gr, 0)
+	g.connect(f, 0, sim, 0)
+	g.connect(sim, 0, volren, 0)
+	g.connect(sim, 1, vecren, 0)
+	g.connect(gr, 0, scene, 0)
+	g.connect(volren, 0, scene, 0)
+	g.connect(vecren, 0, scene, 0)
+	g.connect(scene, 0, canvas, 0)
+
+

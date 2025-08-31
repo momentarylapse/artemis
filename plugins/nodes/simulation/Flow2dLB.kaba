@@ -1,0 +1,197 @@
+use artemis.*
+use fem.material.*
+
+let NK = 9
+
+#let h = 1.0
+
+let RHO0 = 10.0 as f64
+#let TAU = 0.6
+
+#let CYLINDER_R = 20.0
+#let CYLINDER_X = NX / 3
+#let CYLINDER_Y = NY / 2
+
+let RDX = [0,0,1,1,1,0,-1,-1,-1]
+let RDY = [0,1,1,0,-1,-1,-1,0,1]
+let WEIGHTS = [4.0/9, 1.0/9, 1.0/36, 1.0/9, 1.0/36, 1.0/9, 1.0/36, 1.0/9, 1.0/36]
+
+#func swap(out a: f32, out b: f32)
+#	let x = a
+#	a = b
+#	b = x
+
+func swap(out f: MultiComponentField, i: i32, n1: i32, n2: i32)
+	let x = f.value(i, n1)
+	let y = f.value(i, n2)
+	f.set(i, n1, y)
+	f.set(i, n2, x)
+
+
+func get_rho(f: MultiComponentField) -> ScalarField
+	var r = Ret.create(f.grid, f32, f.sampling_mode)
+	let N = f.grid.count(f.sampling_mode)
+	for i in 0:N
+		var rr = 0.0 as f64
+		for k in 0:NK
+			rr += f.value(i, k)
+		r.set(i, rr)
+	return r
+
+	
+func get_velocity(f: MultiComponentField, rho: ScalarField) -> VectorField
+	var u = Ret.create(f.grid, f32, f.sampling_mode)
+	let N = u.grid.count(u.sampling_mode)
+	for i in 0:N
+		# (mean) velocity
+		var _u = vec3.0
+		for k in 0:NK
+			let ff = f.value(i, k) as f32
+			_u.x += ff * RDX[k]
+			_u.y += ff * RDY[k]
+		u.set(i, _u / rho.value(i) as f32)
+	return u
+
+
+func equilibrium(u: VectorField, rho: ScalarField) -> MultiComponentField
+	var f = Ret.create(u.grid, f32, u.sampling_mode, NK)
+	let N = u.grid.count(u.sampling_mode)
+	for i in 0:N
+		let _rho = rho.value(i) as f32
+		let _u = u.value(i)
+		let uu = vec3.dot(_u, _u)
+		for k in 0:NK
+			let uv = vec3.dot(_u, vec3(RDX[k], RDY[k], 0))
+			f.set(i, k, _rho * WEIGHTS[k] * (1 + 3*uv + 4.5*(uv^2) - 1.5*uu))
+	return f
+
+
+func drifted(f: MultiComponentField) -> MultiComponentField
+	var r = Ret.create(f.grid, f32, f.sampling_mode, NK)
+	#let N = f.grid.count(u.sampling_mode)
+	let NX = f.grid.nx
+	let NY = f.grid.ny
+	for i in 0:NX
+		for j in 0:NY
+			for k in 0:NK
+				var ii = (i + RDX[k])
+				if ii < 0
+					ii += NX
+				else if ii >= NX
+					ii -= NX
+				var jj = (j + RDY[k])
+				if jj < 0
+					jj += NY
+				else if jj >= NY
+					jj -= NY
+				r._set(ii, jj, 0, k, f._value(i, j, 0, k))
+	return r
+
+
+
+struct Obstacle
+	var p: i32[]
+	
+	func mut set_circle(f: MultiComponentField, c: vec2, R: f32)
+		for i=>q in f.grid.points(f.sampling_mode)
+			let r = len(c - q._xy)
+			if r < R
+				p.add(i)
+	func mut set_plane(f: MultiComponentField, c: vec2, phi: f32, l: f32, thickness: f32)
+		let t = vec2(cos(phi), sin(phi))
+		for i=>q in f.grid.points(f.sampling_mode)
+			let p0 = q._xy - c
+			let r2 = vec2.dot(p0, p0)
+			let z = p0.x * t.y - p0.y * t.x
+			if r2 < l^2 and abs(z) < thickness/2
+				p.add(i)
+
+	func apply(out f: MultiComponentField)
+		for i in p
+			swap(f, i, 1, 5)
+			swap(f, i, 2, 6)
+			swap(f, i, 3, 7)
+			swap(f, i, 4, 8)
+
+
+func apply_boundary(out f: MultiComponentField, state0: MultiComponentField, D: i32)
+	let NX = f.grid.nx
+	let NY = f.grid.ny
+	for i in 0:NX
+		for j in 0:NY
+			let d = min(min(i, j), min(NX-i-1, NY-j-1))
+			if d > D
+				continue
+			let t = exp(-f64(d) / D)
+			for k in 0:NK
+				f._set(i, j, 0, k, (1-t) * f._value(i, j, 0, k) + t * state0._value(i, j, 0, k))
+		
+
+
+class Flow2dLB extends Node
+	var in_f: InPortMultiComponentField
+	var out_rho: OutPortScalarField
+	var out_v: OutPortVectorField
+	var tau: SettingFloat
+	
+	var c1, c2, c3: i32
+	
+	var first = true
+	
+	var state0: MultiComponentField
+	var obstacle: Obstacle
+	
+	
+	func __init__()
+		super.__init__("Flow2dLB")
+		in_f.__init__(self, "f", PortFlags.MUTABLE)
+		out_rho.__init__(self, "rho")
+		out_v.__init__(self, "v")
+		tau.__init__(self, "tau", 0.5)
+		flags = NodeFlags.TIME_DEPENDENT
+	#	c1 = profiler.create_channel("hessian", channel)
+	#	c2 = profiler.create_channel("force", channel)
+	#	c3 = profiler.create_channel("update", channel)
+	
+	
+	func override on_process()
+		# assume PER_CELL
+		for f in in_f.value()
+		
+			#let dt = current_session().graph.dt
+			
+			if first
+				var rho0 = ScalarField.create(f.grid, f32, f.sampling_mode)
+			
+				rho0 = RHO0 as f64
+				var u0 = VectorField.create(f.grid, f32, f.sampling_mode)
+				u0 = vec3(0.1, 0, 0)
+				state0 = equilibrium(u0, rho0)
+				
+				#obstacle.set_circle(state0, [30,25], 5)
+				
+				obstacle.set_plane(state0, [30,25], pi/6, 10, 2)
+		
+				f = state0
+				
+				first = false
+			
+			f = drifted(f)
+			
+			let rho = get_rho(f)
+			let u = get_velocity(f, rho)
+			
+			let eq = equilibrium(u, rho)
+			f += (eq - f) * (1.0/tau())
+			
+			
+			obstacle.apply(f)
+			
+			apply_boundary(f, state0, 5)
+			
+			
+			in_f.mutated()
+			out_rho.set(rho - RHO0)
+			out_v.set(u)
+	
+		
