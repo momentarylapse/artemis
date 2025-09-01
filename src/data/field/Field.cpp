@@ -3,8 +3,12 @@
 //
 
 #include "Field.h"
+#include <lib/ygraphics/graphics-impl.h>
 
 namespace artemis::data {
+
+Field::Field() = default;
+Field::~Field() = default;
 
 
 void Field::init(const RegularGrid& _grid, ScalarType _type, int _components, SamplingMode mode) {
@@ -15,7 +19,55 @@ void Field::init(const RegularGrid& _grid, ScalarType _type, int _components, Sa
 	sampling_mode = mode;
 	n = grid.count(sampling_mode);
 	data.resize(n * stride);
+	location = Location::CPU;
 }
+
+void Field::_copy_cpu_to_gpu() const {
+	if (!buffer)
+		buffer = new ygfx::ShaderStorageBuffer(stride * n);
+	buffer->update_array(data);
+}
+
+void Field::_copy_gpu_to_cpu() const {
+	data.resize(n * stride);
+	buffer->read_array(data);
+}
+
+
+void Field::begin_edit_gpu() {
+	if (location == Location::Both) {
+		location = Location::GPU;
+	} else if (location == Location::CPU) {
+		_copy_cpu_to_gpu();
+		location = Location::GPU;
+	}
+}
+
+void Field::begin_edit_cpu() {
+	if (location == Location::Both) {
+		location = Location::CPU;
+	} else if (location == Location::GPU) {
+		_copy_gpu_to_cpu();
+		location = Location::CPU;
+	}
+}
+
+void Field::begin_read_cpu() const {
+	if (location == Location::GPU) {
+		_copy_gpu_to_cpu();
+		location = Location::CPU;
+	}
+}
+
+void Field::begin_read_gpu() const {
+	if (location == Location::CPU) {
+		_copy_cpu_to_gpu();
+		location = Location::Both;
+	}
+}
+
+
+
 
 double Field::value(int index, int n) const {
 	if (type == ScalarType::Float32)
@@ -48,7 +100,8 @@ void Field::_set(int i, int j, int k, int n, double vv) {
 		((double*)at(i, j, k))[n] = vv;
 }
 
-/*void Field::operator=(const Field &o) {
+Field& Field::operator=(const Field &o) {
+	o.begin_read_cpu();
 	grid = o.grid;
 	type = o.type;
 	components = o.components;
@@ -57,8 +110,12 @@ void Field::_set(int i, int j, int k, int n, double vv) {
 	n = grid.count(sampling_mode);
 	//data.resize(n * stride);
 	data = o.data;
-	msg_write(format("=   FIELD %d  %d  %d  %d", n, components, stride, data.num));
-}*/
+	location = Location::CPU;
+	/*if (o.buffer) {
+		buffer = new ygfx::ShaderStorageBuffer(stride * n);
+	}*/
+	return *this;
+}
 
 
 }

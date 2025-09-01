@@ -13,6 +13,14 @@ MultiComponentField::MultiComponentField(const RegularGrid& g, ScalarType t, Sam
 
 MultiComponentField::MultiComponentField() : MultiComponentField(RegularGrid(), ScalarType::None, SamplingMode::PerCell, 1) {}
 
+MultiComponentField::MultiComponentField(const MultiComponentField &other) {
+	*this = other;
+}
+
+MultiComponentField::~MultiComponentField() = default;
+
+
+
 Array<double> MultiComponentField::values(int index) const {
 	Array<double> r;
 	for (int i=0; i<components; i++)
@@ -60,9 +68,16 @@ void list_mul(Field& r, const Field& a, const Field& b) {
 	}, 1024);
 }
 
+void MultiComponentField::operator=(const MultiComponentField &o) {
+	this->Field::operator=(o);
+}
+
+
 void MultiComponentField::operator+=(const MultiComponentField& o) {
 	if (o.type != type or o.n != n or o.components != components)
 		return;
+	o.begin_read_cpu();
+	begin_edit_cpu();
 	if (type == ScalarType::Float32)
 		list_iadd<float>(*this, o);
 	else if (type == ScalarType::Float64)
@@ -78,6 +93,8 @@ MultiComponentField MultiComponentField::operator+(const MultiComponentField& o)
 void MultiComponentField::operator-=(const MultiComponentField& o) {
 	if (o.type != type or o.n != n or o.components != components)
 		return;
+	o.begin_read_cpu();
+	begin_edit_cpu();
 	if (type == ScalarType::Float32)
 		list_isub<float>(*this, o);
 	else if (type == ScalarType::Float64)
@@ -91,6 +108,7 @@ MultiComponentField MultiComponentField::operator-(const MultiComponentField& o)
 }
 
 void MultiComponentField::operator*=(double o) {
+	begin_edit_cpu();
 	if (type == ScalarType::Float32)
 		list_imul_single<float>(*this, o);
 	else if (type == ScalarType::Float64)
@@ -107,6 +125,8 @@ MultiComponentField MultiComponentField::componentwise_product(const MultiCompon
 	auto r = MultiComponentField(grid, type, sampling_mode, min(components, o.components));
 	if (type != o.type or sampling_mode != o.sampling_mode or n != o.n or components != o.components)
 		return r;
+	o.begin_read_cpu();
+	begin_read_cpu();
 	if (type == ScalarType::Float32)
 		list_mul<float>(r, *this, o);
 	else if (type == ScalarType::Float64)

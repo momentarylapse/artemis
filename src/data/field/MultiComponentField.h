@@ -13,9 +13,12 @@ namespace artemis::data {
 	struct MultiComponentField : Field {
 		MultiComponentField();
 		explicit MultiComponentField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode, int components);
+		MultiComponentField(const MultiComponentField& other);
+		~MultiComponentField();
 
 		Array<double> values(int index) const;
 
+		void operator=(const MultiComponentField& o);
 		void operator+=(const MultiComponentField& o);
 		MultiComponentField operator+(const MultiComponentField& o) const;
 		void operator-=(const MultiComponentField& o);
