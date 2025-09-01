@@ -1,5 +1,6 @@
 use artemis.*
 use fem.material.*
+use yrenderer.gfx
 
 let NK = 9
 
@@ -134,12 +135,14 @@ class Flow2dLB extends Node
 	var out_v: OutPortVectorField
 	var tau: SettingFloat
 	
-	var c1, c2, c3: i32
+	var c1, c2, c3, c4, c5, c6, c7: i32
 	
 	var first = true
 	
 	var state0: MultiComponentField
 	var obstacle: Obstacle
+	
+	var buffer: owned[gfx.ShaderStorageBuffer]
 	
 	
 	func __init__()
@@ -149,9 +152,13 @@ class Flow2dLB extends Node
 		out_v.__init__(self, "v")
 		tau.__init__(self, "tau", 0.5)
 		flags = NodeFlags.TIME_DEPENDENT
-	#	c1 = profiler.create_channel("hessian", channel)
-	#	c2 = profiler.create_channel("force", channel)
-	#	c3 = profiler.create_channel("update", channel)
+		c1 = profiler.create_channel("drift", channel)
+		c2 = profiler.create_channel("rho", channel)
+		c3 = profiler.create_channel("v", channel)
+		c4 = profiler.create_channel("eq", channel)
+		c5 = profiler.create_channel("eq'", channel)
+		c6 = profiler.create_channel("bnd", channel)
+		c7 = profiler.create_channel("x", channel)
 	
 	
 	func override on_process()
@@ -174,20 +181,40 @@ class Flow2dLB extends Node
 		
 				f = state0
 				
+				buffer = new gfx.ShaderStorageBuffer(f.grid.count(f.sampling_mode) * sizeof(f32) * NK)
+				
 				first = false
 			
+			profiler.begin(c1)
 			f = drifted(f)
+			profiler.end(c1)
 			
+			profiler.begin(c2)
 			let rho = get_rho(f)
+			profiler.end(c2)
+			profiler.begin(c3)
 			let u = get_velocity(f, rho)
+			profiler.end(c3)
 			
+			profiler.begin(c4)
 			let eq = equilibrium(u, rho)
+			profiler.end(c4)
+			profiler.begin(c5)
 			f += (eq - f) * (1.0/tau())
+			profiler.end(c5)
 			
-			
+			profiler.begin(c6)
 			obstacle.apply(f)
 			
 			apply_boundary(f, state0, 5)
+			profiler.end(c6)
+			
+			var xx: f32[]
+			xx.resize(f.grid.count(f.sampling_mode) * NK)
+			#print(len(xx))
+			profiler.begin(c7)
+			buffer!.update(xx)
+			profiler.end(c7)
 			
 			
 			in_f.mutated()
