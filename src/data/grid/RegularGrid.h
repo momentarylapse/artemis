@@ -21,6 +21,7 @@ struct RegularGrid {
 
 	int cell_index(int i, int j, int k) const;
 	int vertex_index(int i, int j, int k) const;
+	int sample_index(int i, int j, int k, SamplingMode mode) const;
 	vec3 index_to_pos(float i, float j, float k) const;
 	vec3 vertex(int i, int j, int k) const;
 	vec3 cell_center(int i, int j, int k) const;

@@ -43,6 +43,14 @@ int RegularGrid::vertex_index(int i, int j, int k) const {
 	return i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
 }
 
+int RegularGrid::sample_index(int i, int j, int k, SamplingMode m) const {
+	if (m == SamplingMode::PerCell)
+		return cell_index(i, j, k);
+	if (m == SamplingMode::PerVertex)
+		return vertex_index(i, j, k);
+	return 0;
+}
+
 
 vec3 RegularGrid::index_to_pos(float i, float j, float k) const {
 	return offset + i * dx + j * dy + k * dz;

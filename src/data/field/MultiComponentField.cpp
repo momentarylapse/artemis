@@ -8,25 +8,10 @@
 namespace artemis::data {
 
 MultiComponentField::MultiComponentField(const RegularGrid& g, ScalarType t, SamplingMode s, int n) {
-	grid = g;
-	type = t;
-	sampling_mode = s;
-	components = n;
-	if (type == ScalarType::Float32)
-		v32.init(grid, components, sampling_mode);
-	else if (type == ScalarType::Float64)
-		v64.init(grid, components, sampling_mode);
+	init(g, t, n, s);
 }
 
 MultiComponentField::MultiComponentField() : MultiComponentField(RegularGrid(), ScalarType::None, SamplingMode::PerCell, 1) {}
-
-double MultiComponentField::value(int index, int n) const {
-	if (type == ScalarType::Float32)
-		return (double)v32._at(index)[n];
-	if (type == ScalarType::Float64)
-		return v64._at(index)[n];
-	return 0;
-}
 
 Array<double> MultiComponentField::values(int index) const {
 	Array<double> r;
@@ -35,57 +20,53 @@ Array<double> MultiComponentField::values(int index) const {
 	return r;
 }
 
-
-void MultiComponentField::set(int index, int n, double vv) {
-	if (type == ScalarType::Float32)
-		v32._at(index)[n] = (float)vv;
-	else if (type == ScalarType::Float64)
-		v64._at(index)[n] = vv;
-}
-
-double MultiComponentField::_value(int i, int j, int k, int n) const {
-	if (type == ScalarType::Float32)
-		return (double)v32.at(grid, sampling_mode, i, j, k)[n];
-	if (type == ScalarType::Float64)
-		return v64.at(grid, sampling_mode, i, j, k)[n];
-	return 0;
-}
-
-void MultiComponentField::_set(int i, int j, int k, int n, double vv) {
-	if (type == ScalarType::Float32)
-		v32.at(grid, sampling_mode, i, j, k)[n] = (float)vv;
-	else if (type == ScalarType::Float64)
-		v64.at(grid, sampling_mode, i, j, k)[n] = vv;
+template<class T>
+void list_iadd(Field& a, const Field& b) {
+	processing::pool::run(a.n, [&a, &b] (int i) {
+		auto pa = (T*)a.at(i);
+		auto pb = (T*)b.at(i);
+		for (int k=0; k<a.components; k++)
+			pa[k] += pb[k];
+	}, 1024);
 }
 
 template<class T>
-void list_add(T& a, const T& b) {
-	processing::pool::run(a.num, [&a, &b] (int i) {
-		a[i] += b[i];
-	}, 1000);
+void list_isub(Field& a, const Field& b) {
+	processing::pool::run(a.n, [&a, &b] (int i) {
+		auto pa = (T*)a.at(i);
+		auto pb = (T*)b.at(i);
+		for (int k=0; k<a.components; k++)
+			pa[k] -= pb[k];
+	}, 1024);
 }
 
 template<class T>
-void list_sub(T& a, const T& b) {
-	processing::pool::run(a.num, [&a, &b] (int i) {
-		a[i] -= b[i];
-	}, 1000);
+void list_imul_single(Field& a, double s) {
+	processing::pool::run(a.n, [&a, s] (int i) {
+		auto pa = (T*)a.at(i);
+		for (int k=0; k<a.components; k++)
+			pa[k] *= s;
+	}, 1024);
 }
 
 template<class T>
-void list_mul_single(T& a, double s) {
-	processing::pool::run(a.num, [&a, s] (int i) {
-		a[i] *= s;
-	}, 1000);
+void list_mul(Field& r, const Field& a, const Field& b) {
+	processing::pool::run(a.n, [&r, &a, &b] (int i) {
+		auto pr = (T*)r.at(i);
+		auto pa = (T*)a.at(i);
+		auto pb = (T*)b.at(i);
+		for (int k=0; k<a.components; k++)
+			pr[k] = pa[k] * pb[k];
+	}, 1024);
 }
 
 void MultiComponentField::operator+=(const MultiComponentField& o) {
-	if (o.type != type or sampling_mode != o.sampling_mode)
+	if (o.type != type or o.n != n or o.components != components)
 		return;
 	if (type == ScalarType::Float32)
-		list_add(v32.v, o.v32.v);
+		list_iadd<float>(*this, o);
 	else if (type == ScalarType::Float64)
-		list_add(v64.v, o.v64.v);
+		list_iadd<double>(*this, o);
 }
 
 MultiComponentField MultiComponentField::operator+(const MultiComponentField& o) const {
@@ -95,12 +76,12 @@ MultiComponentField MultiComponentField::operator+(const MultiComponentField& o)
 }
 
 void MultiComponentField::operator-=(const MultiComponentField& o) {
-	if (o.type != type or sampling_mode != o.sampling_mode)
+	if (o.type != type or o.n != n or o.components != components)
 		return;
 	if (type == ScalarType::Float32)
-		list_sub(v32.v, o.v32.v);
+		list_isub<float>(*this, o);
 	else if (type == ScalarType::Float64)
-		list_sub(v64.v, o.v64.v);
+		list_isub<double>(*this, o);
 }
 
 MultiComponentField MultiComponentField::operator-(const MultiComponentField& o) const {
@@ -111,9 +92,9 @@ MultiComponentField MultiComponentField::operator-(const MultiComponentField& o)
 
 void MultiComponentField::operator*=(double o) {
 	if (type == ScalarType::Float32)
-		list_mul_single(v32.v, o);
+		list_imul_single<float>(*this, o);
 	else if (type == ScalarType::Float64)
-		list_mul_single(v64.v, o);
+		list_imul_single<double>(*this, o);
 }
 
 MultiComponentField MultiComponentField::operator*(double o) const {
@@ -124,13 +105,12 @@ MultiComponentField MultiComponentField::operator*(double o) const {
 
 MultiComponentField MultiComponentField::componentwise_product(const MultiComponentField& o) const {
 	auto r = MultiComponentField(grid, type, sampling_mode, min(components, o.components));
-	if (type != o.type or sampling_mode != o.sampling_mode or components != o.components)
+	if (type != o.type or sampling_mode != o.sampling_mode or n != o.n or components != o.components)
 		return r;
-	if (type == ScalarType::Float32) {
-		r.v32.cwise_product(v32, o.v32);
-	} else if (type == ScalarType::Float64) {
-		r.v64.cwise_product(v64, o.v64);
-	}
+	if (type == ScalarType::Float32)
+		list_mul<float>(r, *this, o);
+	else if (type == ScalarType::Float64)
+		list_mul<double>(r, *this, o);
 	return r;
 }
 

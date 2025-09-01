@@ -17,6 +17,17 @@ enum class ScalarType {
 	Float64
 };
 
+inline int scalar_size(ScalarType type) {
+	switch (type) {
+		case ScalarType::Float32:
+			return 4;
+		case ScalarType::Float64:
+			return 8;
+		default:
+			return 1;
+	}
+}
+
 // also basis functions
 enum class SamplingMode {
 	PerCell,

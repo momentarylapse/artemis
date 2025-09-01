@@ -248,8 +248,6 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("MultiComponentField.grid", &data::MultiComponentField::grid);
 	ext->declare_class_element("MultiComponentField.sampling_mode", &data::MultiComponentField::sampling_mode);
 	ext->declare_class_element("MultiComponentField.components", &data::MultiComponentField::components);
-	ext->declare_class_element("MultiComponentField.v32", &data::MultiComponentField::v32);
-	ext->declare_class_element("MultiComponentField.v64", &data::MultiComponentField::v64);
 	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set);
 	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value);
 	ext->link_class_func("MultiComponentField.values", &data::MultiComponentField::values);

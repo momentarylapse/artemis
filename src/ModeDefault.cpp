@@ -50,6 +50,11 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 		session->graph->reset_state();
 		update_menu();
 	});
+	win->event("simulation-step", [this] {
+		simulation_active = false;
+		graph->iterate_simulation();
+		update_menu();
+	});
 
 	update_menu();
 }
