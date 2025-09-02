@@ -8,6 +8,57 @@
 #include "ScalarField.h"
 #include "lib/os/msg.h"
 
+#include <cmath> // dvec3
+
+
+	dvec3::dvec3(double x, double y, double z) : x(x), y(y), z(z) {}
+	dvec3::dvec3() : x(0), y(0), z(0) {}
+	//vec3d(const vec3d& v) : x(v.x), y(v.y), z(v.z) {}
+	dvec3::dvec3(const vec3& v) : dvec3(v.x, v.y, v.z) {}
+	void dvec3::operator=(const dvec3& v) {
+		x = v.x;
+		y = v.y;
+		z = v.z;
+	}
+	void dvec3::operator+=(const dvec3& v) {
+		x += v.x;
+		y += v.y;
+		z += v.z;
+	}
+	void dvec3::operator-=(const dvec3& v) {
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+	}
+	void dvec3::operator*=(double s) {
+		x *= s;
+		y *= s;
+		z *= s;
+	}
+	void dvec3::operator/=(double s) {
+		x /= s;
+		y /= s;
+		z /= s;
+	}
+	dvec3 dvec3::operator+(const dvec3& v) const {
+		return dvec3(x + v.x, y + v.y, z + v.z);
+	}
+	dvec3 dvec3::operator-(const dvec3& v) const {
+		return dvec3(x - v.x, y - v.y, z - v.z);
+	}
+	dvec3 dvec3::operator*(double s) const {
+		return dvec3(x * s, y * s, z * s);
+	}
+	dvec3 dvec3::operator/(double s) const {
+		return dvec3(x / s, y / s, z / s);
+	}
+	vec3 dvec3::to32() const {
+		return vec3((float)x, (float)y, (float)z);
+	}
+	double dvec3::length() const {
+		return sqrt(x * x + y * y + z * z);
+	}
+
 namespace artemis::data {
 
 VectorField::VectorField(const RegularGrid& g, ScalarType t, SamplingMode s) {

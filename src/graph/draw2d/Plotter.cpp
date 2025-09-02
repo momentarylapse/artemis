@@ -8,9 +8,7 @@
 #include <lib/image/Painter.h>
 #include <lib/math/rect.h>
 #include <lib/xhui/Theme.h>
-
-#include "lib/os/msg.h"
-#include "lib/xhui/xhui.h"
+#include <lib/xhui/xhui.h>
 
 namespace artemis::graph {
 
