@@ -68,7 +68,6 @@ void Field::begin_read_gpu() const {
 
 
 
-
 double Field::value(int index, int n) const {
 	if (type == ScalarType::Float32)
 		return ((float*)at(index))[n];

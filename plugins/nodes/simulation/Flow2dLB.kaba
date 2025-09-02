@@ -209,11 +209,9 @@ class Flow2dLB extends Node
 			apply_boundary(f, state0, 5)
 			profiler.end(c6)
 			
-			var xx: f32[]
-			xx.resize(f.grid.count(f.sampling_mode) * NK)
-			#print(len(xx))
 			profiler.begin(c7)
-			buffer!.update(xx)
+		#	f.begin_edit_gpu()
+		#	f.begin_edit_cpu()
 			profiler.end(c7)
 			
 			

@@ -4,6 +4,7 @@
 #include "draw/font.h"
 #include <lib/image/ImagePainter.h>
 #include <lib/math/vec2.h>
+#include <lib/math/mat4.h>
 #include <lib/ygraphics/graphics-fwd.h>
 
 
@@ -27,11 +28,9 @@ struct XImage;
 
 class Painter : public ::Painter {
 public:
-	explicit Painter(Window *w);
+	explicit Painter(Window *w, const rect& native_area, const rect& area);
 	//virtual ~Painter();
 
-
-	void end();
 	void set_color(const color &c) override;
 	void set_font(const string &font, float size, bool bold, bool italic) override;
 	void set_font_size(float size) override;
@@ -73,6 +72,7 @@ public:
 	color _color = White;;
 	string font_name;
 	rect _clip;
+	mat4 mat_pixel_to_rel;
 	//Array<float> dash;
 	//float dash_offset;
 	float line_width = 1;

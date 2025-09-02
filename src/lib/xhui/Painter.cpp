@@ -11,6 +11,31 @@
 
 namespace xhui {
 
+
+Painter::Painter(Window *w, const rect& native_area, const rect& area) {
+	window = w;
+	this->_area = area;
+	this->native_area = native_area;
+	this->native_area_window = native_area;
+	width = (int)area.width();
+	height = (int)area.height();
+	_clip = _area;
+	mat_pixel_to_rel = mat4::translation({- 1,- 1, 0}) *  mat4::scale(2.0f / (float)width, 2.0f / (float)height, 1);
+
+	if (window) {
+		ui_scale = window->ui_scale;
+		context = window->context;
+		face = default_font_regular;
+
+		Painter::set_color(Theme::_default.text);
+		Painter::set_font(Theme::_default.font_name /*"CAC Champagne"*/, Theme::_default.font_size, false, false);
+
+#ifdef USING_VULKAN
+		cb = context->current_command_buffer();
+#endif
+	}
+}
+
 void Painter::set_color(const color &c) {
 	_color = c;
 }

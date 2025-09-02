@@ -248,12 +248,17 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_element("MultiComponentField.grid", &data::MultiComponentField::grid);
 	ext->declare_class_element("MultiComponentField.sampling_mode", &data::MultiComponentField::sampling_mode);
 	ext->declare_class_element("MultiComponentField.components", &data::MultiComponentField::components);
+	ext->declare_class_element("MultiComponentField.buffer", &data::MultiComponentField::buffer);
 	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set);
 	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value);
 	ext->link_class_func("MultiComponentField.values", &data::MultiComponentField::values);
 	ext->link_class_func("MultiComponentField._set", &data::MultiComponentField::_set);
 	ext->link_class_func("MultiComponentField._value", &data::MultiComponentField::_value);
 	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
+	ext->link_class_func("MultiComponentField.begin_edit_cpu", &data::MultiComponentField::begin_edit_cpu);
+	ext->link_class_func("MultiComponentField.begin_edit_gpu", &data::MultiComponentField::begin_edit_gpu);
+	ext->link_class_func("MultiComponentField.begin_read_cpu", &data::MultiComponentField::begin_read_cpu);
+	ext->link_class_func("MultiComponentField.begin_read_gpu", &data::MultiComponentField::begin_read_gpu);
 	ext->link_class_func("MultiComponentField.__assign__", &kaba::generic_assign<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
 	ext->link_class_func("MultiComponentField.__iadd__", &data::MultiComponentField::operator+=);

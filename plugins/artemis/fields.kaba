@@ -1,5 +1,6 @@
 use kaba
 use grid.*
+use yrenderer.gfx.ShaderStorageBuffer
 
 
 struct ScalarField
@@ -68,6 +69,7 @@ struct MultiComponentField
 	var grid: RegularGrid
 	var sampling_mode: SamplingMode
 	var components: i32
+	var buffer: owned[ShaderStorageBuffer]
 #	var v32: vec3[]
 	func extern __init__()
 	func extern __delete__()
@@ -77,6 +79,10 @@ struct MultiComponentField
 	func extern mut _set(i: i32, j: i32, k: i32, n: i32, v: f64)
 	func extern _value(i: i32, j: i32, k: i32, n: i32) -> f64
 	func extern type() -> kaba.Class&
+	func extern mut begin_edit_cpu()
+	func extern mut begin_edit_gpu()
+	func extern begin_read_cpu()
+	func extern begin_read_gpu()
 	func extern mut __assign__(o: MultiComponentField)
 	func extern mut __iadd__(o: MultiComponentField)
 	func extern __add__(o: MultiComponentField) -> MultiComponentField

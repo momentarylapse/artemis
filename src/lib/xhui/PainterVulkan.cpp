@@ -17,23 +17,7 @@ using namespace vulkan;
 
 namespace xhui {
 
-mat4 mat_pixel_to_rel;
-
-Array<DescriptorSet*> descriptor_sets;
-int descriptor_sets_used = 0;
-
-DescriptorSet* get_descriptor_set(Context* context, Texture* texture) {
-	DescriptorSet* dset = nullptr;
-	if (descriptor_sets_used < descriptor_sets.num) {
-		dset = descriptor_sets[descriptor_sets_used ++];
-	} else {
-		dset = context->pool->create_set(context->shader);
-		descriptor_sets.add(dset);
-	}
-	dset->set_texture(0, texture);
-	dset->update();
-	return dset;
-}
+DescriptorSet* get_descriptor_set(Context* context, Texture* texture);
 
 struct Parameters {
 	mat4 matrix;
@@ -41,60 +25,6 @@ struct Parameters {
 	vec2 size;
 	float radius, softness;
 };
-
-Painter::Painter(Window *w) {
-	window = w;
-	if (window) {
-		ui_scale = window->ui_scale;
-		context = window->context;
-		face = default_font_regular;
-
-		context->start();
-
-		Painter::set_color(Theme::_default.text);
-		Painter::set_font(Theme::_default.font_name /*"CAC Champagne"*/, Theme::_default.font_size, false, false);
-
-		cb = context->current_command_buffer();
-		auto fb = context->current_frame_buffer();
-
-
-		cb->begin();
-
-		width = (int)((float)context->swap_chain->width / ui_scale);
-		height = (int)((float)context->swap_chain->height / ui_scale);
-		mat_pixel_to_rel = mat4::translation({- 1,- 1, 0}) *  mat4::scale(2.0f / (float)width, 2.0f / (float)height, 1);
-
-		_area = {0, (float)width, 0, (float)height};
-		native_area = {0, (float)context->swap_chain->width, 0, (float)context->swap_chain->height};
-		native_area_window = native_area;
-		_clip = _area;
-
-		window->handle_event_p(window->id, event_id::JustBeforeDraw, this);
-
-		cb->set_viewport(native_area);
-		cb->begin_render_pass(context->render_pass, fb);
-		cb->set_scissor(native_area);
-		cb->clear(native_area, {Black}, 1);
-	}
-}
-
-void Painter::end() {
-
-	cb->end_render_pass();
-	cb->end();
-
-
-	auto f = context->wait_for_frame_fences[context->image_index];
-	context->device->present_queue.submit(cb, {context->image_available_semaphore}, {context->render_finished_semaphore}, f);
-
-	context->swap_chain->present(context->image_index, {context->render_finished_semaphore});
-
-	context->device->wait_idle();
-
-	descriptor_sets_used = 0;
-
-	iterate_text_caches();
-}
 
 void Painter::clear(const color &c) {
 	cb->clear(native_area, {c}, 1);
@@ -125,27 +55,27 @@ void Painter::draw_str(const vec2 &p, const string &str) {
 }
 
 
-void fill_rect(Context* context, const rect& r, const color& _color, float radius, float softness) {
+void fill_rect(Painter* p, const rect& r, const color& _color, float radius, float softness) {
 	Parameters params;
-	params.matrix = mat_pixel_to_rel * mat4::translation({r.x1, r.y1, 0}) *  mat4::scale(r.width(), r.height(), 1);
+	params.matrix = p->mat_pixel_to_rel * mat4::translation({r.x1, r.y1, 0}) *  mat4::scale(r.width(), r.height(), 1);
 	params.col = _color;
 	params.size = {r.width(), r.height()};
 	params.radius = radius;
 	params.softness = softness;
 
-	auto cb = context->current_command_buffer();
+	auto cb = p->context->current_command_buffer();
 	if (radius > 0 or softness > 0 or _color.a < 1)
-		cb->bind_pipeline(context->pipeline_alpha);
+		cb->bind_pipeline(p->context->pipeline_alpha);
 	else
-		cb->bind_pipeline(context->pipeline);
+		cb->bind_pipeline(p->context->pipeline);
 	cb->push_constant(0, sizeof(params), &params);
-	cb->bind_descriptor_set(0, context->dset);
-	cb->draw(context->vb);
+	cb->bind_descriptor_set(0, p->context->dset);
+	cb->draw(p->context->vb);
 }
 
 void Painter::draw_rect(const rect &r) {
 	if (fill) {
-		fill_rect(context, r, _color, corner_radius, softness);
+		fill_rect(this, r, _color, corner_radius, softness);
 	} else {
 		draw_line({r.x1, r.y1}, {r.x2, r.y1});
 		draw_line({r.x1, r.y2}, {r.x2, r.y2});

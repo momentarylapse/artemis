@@ -468,6 +468,9 @@ add_executable(artemis WIN32
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
+	src/lib/ygraphics/Context.cpp
+	src/lib/ygraphics/ContextGL.cpp
+	src/lib/ygraphics/ContextVulkan.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
@@ -882,6 +885,9 @@ add_library(moduleartemis SHARED
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
+	src/lib/ygraphics/Context.cpp
+	src/lib/ygraphics/ContextGL.cpp
+	src/lib/ygraphics/ContextVulkan.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp

@@ -10,25 +10,24 @@ class Window;
 
 class Context {
 public:
-	explicit Context(Window* window);
+	explicit Context(Window* window, ygfx::Context* ctx);
+	static Context* create(Window* window);
 
 #if HAS_LIB_VULKAN
 	void _create_swap_chain_and_stuff();
 #endif
-	void api_init();
 	void rebuild_default_stuff();
 	void resize(int w, int h);
 
-	bool start();
-	void end();
+	Painter* prepare_draw();
+	void begin_draw(Painter* p);
+	void end_draw(Painter* p);
 
 	Window* window = nullptr;
+	ygfx::Context* context = nullptr;
 #if HAS_LIB_VULKAN
-	vulkan::Instance* instance = nullptr;
 	vulkan::DescriptorPool* pool = nullptr;
 	vulkan::Device* device = nullptr;
-#else
-	nix::Context* ctx = nullptr;
 #endif
 	ygfx::Texture* tex_white = nullptr;
 	ygfx::Texture* tex_black = nullptr;
@@ -67,9 +66,12 @@ public:
 	vulkan::DepthBuffer* depth_buffer = nullptr;
 	Array<vulkan::FrameBuffer*> frame_buffers;
 	int image_index = 0;
+#else
+	ygfx::Texture* tex_text = nullptr;
+	ygfx::Texture* tex_xxx = nullptr;
+	ygfx::Shader* shader_round = nullptr;
 #endif
 	bool framebuffer_resized = true;
-
 };
 
 }

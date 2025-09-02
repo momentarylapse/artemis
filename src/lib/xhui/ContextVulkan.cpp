@@ -4,30 +4,85 @@
 #include "Window.h"
 #include "Painter.h"
 #include "../os/msg.h"
-#include "../image/image.h"
-#include "../ygraphics/graphics-impl.h"
+#include <lib/ygraphics/graphics-impl.h>
+#include <lib/ygraphics/Context.h>
 
 namespace xhui {
 
-Context::Context(Window* w) {
-	window = w;
+Array<vulkan::DescriptorSet*> descriptor_sets;
+int descriptor_sets_used = 0;
 
-	glfwMakeContextCurrent(w->window);
-	api_init();
+vulkan::DescriptorSet* get_descriptor_set(Context* context, ygfx::Texture* texture) {
+	vulkan::DescriptorSet* dset = nullptr;
+	if (descriptor_sets_used < descriptor_sets.num) {
+		dset = descriptor_sets[descriptor_sets_used ++];
+	} else {
+		dset = context->pool->create_set(context->shader);
+		descriptor_sets.add(dset);
+	}
+	dset->set_texture(0, texture);
+	dset->update();
+	return dset;
 }
 
-bool Context::start() {
+Context::Context(Window* w, ygfx::Context* ctx) {
+	window = w;
+	context = ctx;
+	device = context->device;
+}
+
+Painter* Context::prepare_draw() {
 	if (!swap_chain->acquire_image(&image_index, image_available_semaphore)) {
 		rebuild_default_stuff();
-		return false;
+		return nullptr;
 	}
 
 	auto f = wait_for_frame_fences[image_index];
 	f->wait();
 	f->reset();
 	num_line_vbs_used = 0;
-	return true;
+
+
+	auto cb = current_command_buffer();
+	cb->begin();
+
+	int width = (int)((float)swap_chain->width / window->ui_scale);
+	int height = (int)((float)swap_chain->height / window->ui_scale);
+	const rect area = {0, (float)width, 0, (float)height};
+	const rect native_area = {0, (float)swap_chain->width, 0, (float)swap_chain->height};
+
+	auto p = new Painter(window, native_area, area);
+	p->cb = cb;
+	return p;
 }
+
+void Context::begin_draw(Painter* p) {
+	auto cb = current_command_buffer();
+	auto fb = current_frame_buffer();
+
+	cb->set_viewport(p->native_area);
+	cb->begin_render_pass(render_pass, fb);
+	cb->set_scissor(p->native_area);
+	cb->clear(p->native_area, {Black}, 1);
+}
+
+void Context::end_draw(Painter *p) {
+	auto cb = current_command_buffer();
+	cb->end_render_pass();
+	cb->end();
+
+
+	auto f = wait_for_frame_fences[image_index];
+	context->device->present_queue.submit(cb, {image_available_semaphore}, {render_finished_semaphore}, f);
+
+	swap_chain->present(image_index, {render_finished_semaphore});
+	device->wait_idle();
+
+	descriptor_sets_used = 0;
+	iterate_text_caches();
+	delete p;
+}
+
 
 
 void Context::_create_swap_chain_and_stuff() {
@@ -70,35 +125,37 @@ void Context::_create_swap_chain_and_stuff() {
 	pipeline_lines->rebuild();
 }
 
-void Context::api_init() {
-	instance = vulkan::init({"glfw", "validation", "api=1.2", "verbosity=1"});
+Context* Context::create(Window* window) {
+
+	glfwMakeContextCurrent(window->window);
+	auto instance = vulkan::init({"glfw", "validation", "api=1.2", "verbosity=1"});
 	auto surface = instance->create_glfw_surface(window->window);
-	device = vulkan::Device::create_simple(instance, surface, {"graphics", "present", "swapchain", "anisotropy", "validation"});
+	auto device = vulkan::Device::create_simple(instance, surface, {"graphics", "present", "swapchain", "anisotropy", "validation"});
+	auto ctx = new Context(window, new ygfx::Context(instance, device));
 	//msg_write("device found");
 
 	//device->create_query_pool(MAX_TIMESTAMP_QUERIES);
-	pool = new vulkan::DescriptorPool("buffer:4096,sampler:4096", 65536);
+	ctx->pool = new vulkan::DescriptorPool("buffer:4096,sampler:4096", 65536);
 
 
-	image_available_semaphore = new vulkan::Semaphore(device);
-	render_finished_semaphore = new vulkan::Semaphore(device);
+	ctx->image_available_semaphore = new vulkan::Semaphore(device);
+	ctx->render_finished_semaphore = new vulkan::Semaphore(device);
 
 
-	framebuffer_resized = false;
+	ctx->framebuffer_resized = false;
 
 
-	tex_white = new vulkan::Texture();
-	tex_black = new vulkan::Texture();
-	tex_white->write(Image(16, 16, White));
-	tex_black->write(Image(16, 16, Black));
+	ctx->context->_create_default_textures();
+	ctx->tex_white = ctx->context->tex_white;
+	ctx->tex_black = ctx->context->tex_black;
 
-	vb = new vulkan::VertexBuffer("3f,3f,2f");
-	vb->create_quad(rect::ID, rect::ID);
+	ctx->vb = new vulkan::VertexBuffer("3f,3f,2f");
+	ctx->vb->create_quad(rect::ID, rect::ID);
 
 	//return new Context;
 
 	try {
-		shader = vulkan::Shader::create(
+		ctx->shader = vulkan::Shader::create(
 			R"foodelim(
 <Layout>
 	version = 430
@@ -169,12 +226,12 @@ void main() {
 }
 </FragmentShader>
 )foodelim");
-		dset = pool->create_set(shader);
-		dset->set_texture(0, tex_white);
-		dset->update();
+		ctx->dset = ctx->pool->create_set(ctx->shader);
+		ctx->dset->set_texture(0, ctx->tex_white);
+		ctx->dset->update();
 
 
-		shader_lines = vulkan::Shader::create(
+		ctx->shader_lines = vulkan::Shader::create(
 			R"foodelim(
 <Layout>
 	version = 430
@@ -293,9 +350,9 @@ void main() {
 }
 </FragmentShader>
 )foodelim");
-		dset_lines = pool->create_set(shader_lines);
-		dset_lines->set_texture(0, tex_white);
-		dset_lines->update();
+		ctx->dset_lines = ctx->pool->create_set(ctx->shader_lines);
+		ctx->dset_lines->set_texture(0, ctx->tex_white);
+		ctx->dset_lines->update();
 
 	} catch (Exception& e) {
 		msg_error(e.message());
@@ -304,7 +361,8 @@ void main() {
 
 
 
-	_create_swap_chain_and_stuff();
+	ctx->_create_swap_chain_and_stuff();
+	return ctx;
 }
 
 
