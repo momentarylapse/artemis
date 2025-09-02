@@ -26,33 +26,13 @@ public:
 	Window* window = nullptr;
 	ygfx::Context* context = nullptr;
 #if HAS_LIB_VULKAN
-	vulkan::DescriptorPool* pool = nullptr;
 	vulkan::Device* device = nullptr;
 #endif
 	ygfx::Texture* tex_white = nullptr;
 	ygfx::Texture* tex_black = nullptr;
-	ygfx::Shader* shader = nullptr;
-	ygfx::Shader* shader_lines = nullptr;
-#if HAS_LIB_VULKAN
-	vulkan::GraphicsPipeline* pipeline = nullptr;
-	vulkan::GraphicsPipeline* pipeline_alpha = nullptr;
-	vulkan::GraphicsPipeline* pipeline_lines = nullptr;
-#endif
-	ygfx::VertexBuffer* vb = nullptr;
 
 
 #if HAS_LIB_VULKAN
-	vulkan::DescriptorSet* dset = nullptr;
-	vulkan::DescriptorSet* dset_lines = nullptr;
-
-
-	Array<vulkan::VertexBuffer*> line_vbs;
-	int num_line_vbs_used = 0;
-	Array<vulkan::VertexBuffer*> line_vbs_with_color;
-	int num_line_vbs_with_color_used = 0;
-	vulkan::VertexBuffer* get_line_vb(bool with_color = false);
-
-
 	vulkan::Fence* in_flight_fence = nullptr;
 	Array<vulkan::Fence*> wait_for_frame_fences;
 	vulkan::Semaphore *image_available_semaphore = nullptr, *render_finished_semaphore = nullptr;
@@ -67,9 +47,6 @@ public:
 	Array<vulkan::FrameBuffer*> frame_buffers;
 	int image_index = 0;
 #else
-	ygfx::Texture* tex_text = nullptr;
-	ygfx::Texture* tex_xxx = nullptr;
-	ygfx::Shader* shader_round = nullptr;
 #endif
 	bool framebuffer_resized = true;
 };

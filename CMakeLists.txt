@@ -471,6 +471,9 @@ add_executable(artemis WIN32
 	src/lib/ygraphics/ContextGL.cpp
 	src/lib/ygraphics/ContextVulkan.cpp
 	src/lib/ygraphics/font.cpp
+	src/lib/ygraphics/Painter.cpp
+	src/lib/ygraphics/PainterGL.cpp
+	src/lib/ygraphics/PainterVulkan.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
@@ -888,6 +891,9 @@ add_library(moduleartemis SHARED
 	src/lib/ygraphics/ContextGL.cpp
 	src/lib/ygraphics/ContextVulkan.cpp
 	src/lib/ygraphics/font.cpp
+	src/lib/ygraphics/Painter.cpp
+	src/lib/ygraphics/PainterGL.cpp
+	src/lib/ygraphics/PainterVulkan.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
