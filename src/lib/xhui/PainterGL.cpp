@@ -2,10 +2,10 @@
 
 #include "Painter.h"
 #include "Theme.h"
-#include "draw/font.h"
 #include "Context.h"
 #include <lib/ygraphics/Context.h>
 #include <lib/ygraphics/graphics-impl.h>
+#include <lib/ygraphics/font.h>
 #include "../image/image.h"
 
 
@@ -19,7 +19,7 @@ void Painter::draw_str(const vec2 &p, const string &str) {
 	if (str.num == 0)
 		return;
 	Image im;
-	face->render_text(str, Align::LEFT, im);
+	face->render_text(str, font::Align::LEFT, im);
 	context->tex_text->write(im);
 	context->tex_text->set_options("minfilter=nearest");
 	float w = im.width / ui_scale;

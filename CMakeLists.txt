@@ -452,7 +452,6 @@ add_executable(artemis WIN32
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp
 	src/lib/xhui/dialogs/QuestionDialog.cpp
-	src/lib/xhui/draw/font.cpp
 	src/lib/xhui/_kaba_export.cpp
 	src/lib/xhui/Application.cpp
 	src/lib/xhui/ContextGL.cpp
@@ -471,6 +470,7 @@ add_executable(artemis WIN32
 	src/lib/ygraphics/Context.cpp
 	src/lib/ygraphics/ContextGL.cpp
 	src/lib/ygraphics/ContextVulkan.cpp
+	src/lib/ygraphics/font.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
@@ -869,7 +869,6 @@ add_library(moduleartemis SHARED
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp
 	src/lib/xhui/dialogs/QuestionDialog.cpp
-	src/lib/xhui/draw/font.cpp
 	src/lib/xhui/_kaba_export.cpp
 	src/lib/xhui/Application.cpp
 	src/lib/xhui/ContextGL.cpp
@@ -888,6 +887,7 @@ add_library(moduleartemis SHARED
 	src/lib/ygraphics/Context.cpp
 	src/lib/ygraphics/ContextGL.cpp
 	src/lib/ygraphics/ContextVulkan.cpp
+	src/lib/ygraphics/font.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp

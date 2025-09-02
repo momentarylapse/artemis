@@ -4,6 +4,7 @@
 
 #include "DrawingHelper.h"
 #include <lib/ygraphics/graphics-impl.h>
+#include <lib/ygraphics/font.h>
 #include <lib/yrenderer/MaterialManager.h>
 #include <lib/yrenderer/Context.h>
 #include <lib/yrenderer/scene/RenderViewData.h>
@@ -12,7 +13,6 @@
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/xhui.h>
-#include <lib/xhui/draw/font.h>
 #include <lib/math/interpolation.h>
 #include <cmath>
 

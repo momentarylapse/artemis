@@ -2,11 +2,11 @@
 #include "Painter.h"
 #include "Context.h"
 #include "Theme.h"
-#include "draw/font.h"
 #include <lib/image/image.h>
 #include <lib/math/mat4.h>
 #include <lib/base/algo.h>
 #include <lib/ygraphics/graphics-impl.h>
+#include <lib/ygraphics/font.h>
 #include <cmath>
 
 namespace xhui {
@@ -133,7 +133,7 @@ TextCache& get_text_cache(Context* context, const string& text, font::Face* face
 	tc->face = face;
 	tc->age = 0;
 	Image im;
-	face->render_text(text, Align::LEFT, im);
+	face->render_text(text, font::Align::LEFT, im);
 	tc->texture->write(im);
 	tc->texture->set_options("minfilter=nearest,wrap=clamp");
 	// fractional coordinates (especially with ui_scale)... not sure what to do m(-_-)m

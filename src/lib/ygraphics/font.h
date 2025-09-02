@@ -1,19 +1,22 @@
 #pragma once
 
-#include "../../base/base.h"
+#include <lib/base/base.h>
 
 class Image;
 struct rect;
 struct vec2;
 
-namespace xhui {
-enum class Align;
-}
-
 
 typedef struct FT_FaceRec_*  FT_Face;
 
 namespace font {
+
+
+enum class Align {
+	RIGHT = 1,
+	CENTER_H = 2,
+	LEFT = 4
+};
 
 void init();
 
@@ -42,7 +45,7 @@ struct Face {
 	float units_to_pixel(float units) const;
 	float get_text_width(const string &text);
 	TextDimensions get_text_dimensions(const string &text);
-	void render_text(const string &text, xhui::Align align, Image &im);
+	void render_text(const string &text, Align align, Image &im);
 };
 
 Face* load_face(const string& name, bool bold, bool italic);
