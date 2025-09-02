@@ -21,8 +21,8 @@ public:
 	nix::Context* ctx = nullptr;
 #endif
 
-	Texture* tex_white;
-	Texture* tex_black;
+	Texture* tex_white = nullptr;
+	Texture* tex_black = nullptr;
 	void _create_default_textures();
 };
 

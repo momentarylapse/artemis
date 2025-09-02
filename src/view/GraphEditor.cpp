@@ -21,6 +21,7 @@
 #include "DrawingHelper.h"
 #include "plugins/PluginManager.h"
 #include "storage/Storage.h"
+#include <cmath>
 
 namespace artemis::view {
 

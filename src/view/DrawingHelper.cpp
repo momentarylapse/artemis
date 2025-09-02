@@ -14,6 +14,7 @@
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/draw/font.h>
 #include <lib/math/interpolation.h>
+#include <cmath>
 
 
 static float ui_scale = 1.0f;

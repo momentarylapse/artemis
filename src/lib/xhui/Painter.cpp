@@ -7,7 +7,7 @@
 #include <lib/math/mat4.h>
 #include <lib/base/algo.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include <lib/os/msg.h>
+#include <cmath>
 
 namespace xhui {
 

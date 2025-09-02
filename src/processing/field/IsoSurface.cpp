@@ -7,6 +7,7 @@
 #include <data/field/ScalarField.h>
 #include <lib/base/sort.h>
 #include <lib/math/mat4.h>
+#include <cmath>
 
 namespace artemis::processing {
 

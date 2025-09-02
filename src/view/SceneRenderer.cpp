@@ -9,9 +9,8 @@
 #include <lib/yrenderer/target/XhuiRenderer.h>
 #include <lib/math/Box.h>
 #include <lib/xhui/xhui.h>
-
 #include "DrawingHelper.h"
-#include "lib/os/msg.h"
+#include <cmath>
 
 namespace artemis::view {
 

@@ -9,6 +9,7 @@
 #include "../draw/font.h"
 #include "../../base/iter.h"
 #include "../../os/msg.h"
+#include <cmath>
 
 namespace xhui {
 

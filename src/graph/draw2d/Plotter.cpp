@@ -9,6 +9,7 @@
 #include <lib/math/rect.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/xhui.h>
+#include <cmath>
 
 namespace artemis::graph {
 
