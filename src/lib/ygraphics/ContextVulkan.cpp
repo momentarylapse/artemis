@@ -285,15 +285,15 @@ Context::Context(vulkan::Instance* _instance, vulkan::Device* _device) {
 }
 
 Context::~Context() {
-	drawing_helper_data = nullptr;
 	delete device;
 	delete instance;
 }
 
-void Context::_create_auxiliary_stuff() {
+DrawingHelperData* Context::_create_auxiliary_stuff() {
 	//device->create_query_pool(MAX_TIMESTAMP_QUERIES);
-	drawing_helper_data = new DrawingHelperData(this);
-	drawing_helper_data->create_basic();
+	auto aux = new DrawingHelperData(this);
+	aux->create_basic();
+	return aux;
 }
 
 

@@ -12,16 +12,17 @@
 namespace ygfx {
 
 
-Painter::Painter(Context* c, const rect& native_area, const rect& area, float _ui_scale, font::Face* _face) {
-	context = c;
-	aux = context->drawing_helper_data.get();
+Painter::Painter(DrawingHelperData* _aux, const rect& native_area, const rect& area, float _ui_scale, font::Face* _face) {
+	aux = _aux;
+	if (aux)
+		context = aux->context;
 	this->_area = area;
 	this->native_area = native_area;
 	this->native_area_window = native_area;
 	width = (int)area.width();
 	height = (int)area.height();
 	_clip = _area;
-	mat_pixel_to_rel = mat4::translation({- 1,- 1, 0}) *  mat4::scale(2.0f / (float)width, 2.0f / (float)height, 1);
+	mat_pixel_to_rel = mat4::translation({- 1,- 1, 0}) *  mat4::scale(2.0f / area.width(), 2.0f / area.height(), 1);
 
 	ui_scale = _ui_scale;
 	face = _face;
@@ -59,12 +60,14 @@ void Painter::set_font(const string &font, float size, bool bold, bool italic) {
 	if (font_size > 0)
 		font_size = size;
 	//face = pick_font(font_name, bold, italic);
-	face->set_size(font_size * ui_scale);
+	if (face)
+		face->set_size(font_size * ui_scale);
 }
 
 void Painter::set_font_size(float size) {
 	font_size = size;
-	face->set_size(size * ui_scale);
+	if (face)
+		face->set_size(size * ui_scale);
 }
 
 vec2 Painter::get_str_size(const string &str) {
@@ -106,7 +109,7 @@ void Painter::draw_circle(const vec2& p, float radius) {
 
 Array<TextCache> text_caches;
 
-TextCache& get_text_cache(Context* context, const string& text, font::Face* face, float font_size, float ui_scale) {
+TextCache& get_text_cache(DrawingHelperData* aux, const string& text, font::Face* face, float font_size, float ui_scale) {
 	for (auto& tc: text_caches)
 		if (tc.text == text and tc.face == face and tc.font_size == font_size) {
 			tc.age = 0;
@@ -121,7 +124,7 @@ TextCache& get_text_cache(Context* context, const string& text, font::Face* face
 		text_caches.add({});
 		tc = &text_caches.back();
 #if HAS_LIB_VULKAN
-		tc->dset = context->drawing_helper_data->pool->create_set(context->drawing_helper_data->shader);
+		tc->dset = aux->pool->create_set(aux->shader);
 #endif
 		tc->texture = new ygfx::Texture();
 	}

@@ -43,8 +43,8 @@ struct Face {
 
 	void set_size(float size);
 	float units_to_pixel(float units) const;
-	float get_text_width(const string &text);
-	TextDimensions get_text_dimensions(const string &text);
+	float get_text_width(const string &text) const;
+	TextDimensions get_text_dimensions(const string &text) const;
 	void render_text(const string &text, Align align, Image &im);
 };
 

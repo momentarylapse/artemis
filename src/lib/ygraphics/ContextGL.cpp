@@ -150,9 +150,10 @@ Context::Context(nix::Context* _ctx) {
 	ctx = _ctx;
 }
 
-void Context::_create_auxiliary_stuff() {
-	drawing_helper_data = new DrawingHelperData(this);
-	drawing_helper_data->create_basic();
+DrawingHelperData* Context::_create_auxiliary_stuff() {
+	auto aux = new DrawingHelperData(this);
+	aux->create_basic();
+	return aux;
 }
 
 

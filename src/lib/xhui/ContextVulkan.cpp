@@ -25,9 +25,12 @@ Painter* Context::prepare_draw() {
 	f->wait();
 	f->reset();
 
+	if (!aux) {
+		aux = context->_create_auxiliary_stuff();
+	}
 
 	auto cb = current_command_buffer();
-	context->drawing_helper_data->cb = cb;
+	aux->cb = cb;
 	cb->begin();
 
 	int width = (int)((float)swap_chain->width / window->ui_scale);
@@ -62,7 +65,7 @@ void Context::end_draw(Painter *p) {
 	swap_chain->present(image_index, {render_finished_semaphore});
 	device->wait_idle();
 
-	context->drawing_helper_data->descriptor_sets_used = 0;
+	aux->descriptor_sets_used = 0;
 	iterate_text_caches();
 	delete p;
 }
@@ -88,7 +91,8 @@ void Context::_create_swap_chain_and_stuff() {
 	render_pass = swap_chain->create_render_pass(depth_buffer);
 	frame_buffers = swap_chain->create_frame_buffers(render_pass, depth_buffer);
 
-	context->drawing_helper_data->rebuild(render_pass);
+	aux = context->_create_auxiliary_stuff();
+	aux->rebuild(render_pass);
 }
 
 Context* Context::create(Window* window) {

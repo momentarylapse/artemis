@@ -3,6 +3,10 @@
 #include <lib/base/base.h>
 #include <lib/ygraphics/graphics-fwd.h>
 
+namespace ygfx {
+	struct DrawingHelperData;
+}
+
 namespace xhui {
 
 class Painter;
@@ -25,6 +29,7 @@ public:
 
 	Window* window = nullptr;
 	ygfx::Context* context = nullptr;
+	ygfx::DrawingHelperData* aux = nullptr;
 #if HAS_LIB_VULKAN
 	vulkan::Device* device = nullptr;
 #endif

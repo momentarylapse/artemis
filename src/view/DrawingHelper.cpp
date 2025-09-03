@@ -117,7 +117,7 @@ void main() {
 	dset->set_texture(0, ctx->tex_white);
 	dset->update();
 
-	pipeline = new vulkan::GraphicsPipeline(shader, xhui_ctx->render_pass, 0, ygfx::PrimitiveTopology::TRIANGLES, xhui_ctx->context->drawing_helper_data->vb);
+	pipeline = new vulkan::GraphicsPipeline(shader, xhui_ctx->render_pass, 0, ygfx::PrimitiveTopology::TRIANGLES, xhui_ctx->aux->vb);
 	//pipeline->set_z(false, false);
 	pipeline->set_culling(ygfx::CullMode::NONE);
 	pipeline->rebuild();
@@ -156,7 +156,7 @@ static void add_vb_line(Array<ygfx::Vertex1>& vertices, const vec3& a, const vec
 
 void DrawingHelper::draw_lines(const Array<vec3>& points, bool contiguous) {
 #ifdef USING_VULKAN
-	auto vb = xhui_ctx->context->drawing_helper_data->get_line_vb();
+	auto vb = xhui_ctx->aux->get_line_vb();
 	Array<ygfx::Vertex1> vertices;
 	mat4 m = projection * view;
 	if (contiguous) {

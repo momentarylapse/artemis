@@ -12,7 +12,7 @@
 
 namespace xhui {
 
-Painter::Painter(Context* c, Window* window, const rect& native_area, const rect& area) : ygfx::Painter(c ? c->context : nullptr, native_area, area, 1.0f, default_font_regular) {
+Painter::Painter(Context* c, Window* window, const rect& native_area, const rect& area) : ygfx::Painter(c ? c->aux : nullptr, native_area, area, 1.0f, default_font_regular) {
 	this->context = c;
 	this->_area = area;
 	this->native_area = native_area;
@@ -83,7 +83,7 @@ TextCache& get_text_cache(Context* context, const string& text, font::Face* face
 		text_caches.add({});
 		tc = &text_caches.back();
 #if HAS_LIB_VULKAN
-		tc->dset = context->context->drawing_helper_data->pool->create_set(context->context->drawing_helper_data->shader);
+		tc->dset = context->aux->pool->create_set(context->aux->shader);
 #endif
 		tc->texture = new ygfx::Texture();
 	}

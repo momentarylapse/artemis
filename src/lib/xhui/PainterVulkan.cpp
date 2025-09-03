@@ -23,7 +23,7 @@ struct Parameters {
 
 
 void Painter::draw_ximage(const rect& r, const XImage* image) {
-	auto dset = context->context->drawing_helper_data->get_descriptor_set(image->texture.get());
+	auto dset = aux->get_descriptor_set(image->texture.get());
 	Parameters params;
 	params.matrix = mat_pixel_to_rel * mat4::translation(vec3(offset_x + r.x1, offset_y + r.y1, 0)) * mat4::scale(r.width(), r.height(), 1);
 	params.col = _color;

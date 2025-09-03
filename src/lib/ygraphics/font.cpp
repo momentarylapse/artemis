@@ -116,7 +116,7 @@ float Face::units_to_pixel(float units) const {
 #endif
 }
 
-TextDimensions Face::get_text_dimensions(const string &text) {
+TextDimensions Face::get_text_dimensions(const string &text) const {
 #if HAS_LIB_FREETYPE2
 	auto utf32 = text.utf8_to_utf32();
 	TextDimensions dim;
@@ -177,7 +177,7 @@ rect TextDimensions::inner_box(const vec2& p0) const {
 }
 
 
-float Face::get_text_width(const string &text) {
+float Face::get_text_width(const string &text) const {
 	auto dim = get_text_dimensions(text);
 	return dim.bounding_width;
 }

@@ -61,9 +61,7 @@ public:
 	nix::Context* ctx = nullptr;
 #endif
 
-	// auxiliary stuff
-	owned<DrawingHelperData> drawing_helper_data;
-	void _create_auxiliary_stuff();
+	DrawingHelperData* _create_auxiliary_stuff();
 
 	Texture* tex_white = nullptr;
 	Texture* tex_black = nullptr;

@@ -27,6 +27,9 @@ Painter* Context::prepare_draw() {
 	int ww, hh;
 	glfwGetFramebufferSize(window->window, &ww, &hh);
 
+	if (!aux)
+		aux = context->_create_auxiliary_stuff();
+
 	const rect area = {0, (float)width, 0, (float)height};
 	const rect native_area = {0, (float)ww, 0, (float)hh};
 	return new Painter(this, window, native_area, area);

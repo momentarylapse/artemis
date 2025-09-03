@@ -26,7 +26,7 @@ class Context;
 
 class Painter : public ::Painter {
 public:
-	explicit Painter(Context* c, const rect& native_area, const rect& area, float ui_scale, font::Face* _face);
+	explicit Painter(DrawingHelperData* aux, const rect& native_area, const rect& area, float ui_scale, font::Face* _face);
 	//virtual ~Painter();
 
 	void set_color(const color &c) override;
@@ -95,14 +95,14 @@ struct TextCache {
 	font::Face* face;
 	float font_size;
 	int age;
-	ygfx::Texture* texture;
+	Texture* texture;
 #if HAS_LIB_VULKAN
 	vulkan::DescriptorSet* dset;
 #endif
 	font::TextDimensions dimensions;
 };
 
-TextCache& get_text_cache(Context* context, const string& text, font::Face* face, float font_size, float ui_scale);
+TextCache& get_text_cache(DrawingHelperData* aux, const string& text, font::Face* face, float font_size, float ui_scale);
 void iterate_text_caches();
 font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face* face, float font_size, float ui_scale);
 
