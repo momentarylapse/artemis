@@ -43,6 +43,7 @@ struct DrawingHelperData {
 	Texture* tex_xxx = nullptr;
 	Shader* shader_round = nullptr;
 #endif
+	void reset_frame();
 };
 
 class Context {

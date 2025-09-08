@@ -65,7 +65,7 @@ void Context::end_draw(Painter *p) {
 	swap_chain->present(image_index, {render_finished_semaphore});
 	device->wait_idle();
 
-	aux->descriptor_sets_used = 0;
+	aux->reset_frame();
 	iterate_text_caches();
 	delete p;
 }

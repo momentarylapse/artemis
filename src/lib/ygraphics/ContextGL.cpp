@@ -10,6 +10,10 @@ DrawingHelperData::DrawingHelperData(Context* c) {
 }
 
 
+void DrawingHelperData::reset_frame() {
+	descriptor_sets_used = 0;
+}
+
 void DrawingHelperData::create_basic() {
 
 	vb = new VertexBuffer("3f,3f,2f");

@@ -11,6 +11,13 @@ DrawingHelperData::DrawingHelperData(Context* c) {
 	context = c;
 }
 
+void DrawingHelperData::reset_frame() {
+	descriptor_sets_used = 0;
+	num_line_vbs_used = 0;
+	num_line_vbs_with_color_used = 0;
+}
+
+
 vulkan::DescriptorSet* DrawingHelperData::get_descriptor_set(Texture* texture) {
 	vulkan::DescriptorSet* dset = nullptr;
 	if (descriptor_sets_used < descriptor_sets.num) {

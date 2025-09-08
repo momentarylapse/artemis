@@ -48,6 +48,7 @@ void Context::begin_draw(Painter *p) {
 
 void Context::end_draw(Painter *p) {
 	nix::end_frame_glfw();
+	aux->reset_frame();
 	iterate_text_caches();
 }
 
