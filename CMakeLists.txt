@@ -548,6 +548,7 @@ add_executable(artemis WIN32
 	src/y/fx/Particle.cpp
 	src/y/fx/ParticleEmitter.cpp
 	src/y/fx/ParticleManager.cpp
+	src/y/gui/Canvas.cpp
 	src/y/gui/Font.cpp
 	src/y/gui/gui.cpp
 	src/y/gui/Node.cpp
@@ -969,6 +970,7 @@ add_library(moduleartemis SHARED
 	src/y/fx/Particle.cpp
 	src/y/fx/ParticleEmitter.cpp
 	src/y/fx/ParticleManager.cpp
+	src/y/gui/Canvas.cpp
 	src/y/gui/Font.cpp
 	src/y/gui/gui.cpp
 	src/y/gui/Node.cpp

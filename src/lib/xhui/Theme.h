@@ -8,6 +8,8 @@ class Theme {
 public:
 	string font_name;
 	float font_size;
+	float font_size_small;
+	float font_size_big;
 
 	float spacing, window_margin;
 	float label_margin_x;
@@ -23,6 +25,7 @@ public:
 
 	color background, background_button;
 	color background_button_primary, background_button_primary_hover, background_button_primary_active;
+	color background_button_danger, background_button_danger_hover, background_button_danger_active;
 	color background_header, background_header_button;
 	color background_hover, background_active;
 	color background_low, background_low_hover, background_low_selected;
