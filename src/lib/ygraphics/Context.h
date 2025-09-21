@@ -79,6 +79,8 @@ public:
 	nix::Context* ctx = nullptr;
 #endif
 
+	void make_current();
+
 	DrawingHelperData* _create_auxiliary_stuff();
 
 	Texture* tex_white = nullptr;

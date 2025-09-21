@@ -42,7 +42,6 @@ namespace yrenderer {
 	class Material;
 }
 class TraceData;
-class TemplateDataScriptVariable;
 class ModelTemplate;
 class MeshCollider;
 class SolidBody;
@@ -50,11 +49,16 @@ class Animator;
 
 
 
-class Mesh;
+struct ModelRef : Component {
+	Path filename;
+	Model* model = nullptr;
+	static const kaba::Class* _class;
+};
+
+struct Mesh;
 
 
-class SubMesh {
-public:
+struct SubMesh {
 	SubMesh();
 	void create_vb(bool animated);
 	void update_vb(Mesh *mesh, bool animated);
@@ -77,8 +81,7 @@ public:
 };
 
 // visual skin
-class Mesh : public Sharable<base::Empty> {
-public:
+struct Mesh : Sharable<base::Empty> {
 	void create_vb(bool animated);
 	void update_vb(bool animated);
 	void post_process(bool animated);
@@ -152,11 +155,6 @@ public:
 	} prop;
 
 	bool is_copy;
-
-	// script data (own)
-	struct ScriptData {
-		string name;
-	} script_data;
 
 	bool visible;
 

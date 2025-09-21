@@ -200,7 +200,7 @@ public:
 	}
 	void read(Stream *f) override {
 		// Object Data
-		me->script_data.name = f->read_str();
+		/*me->script_data.name =*/ f->read_str();
 		/*me->script_data.description =*/ f->read_str();
 
 		// Inventary
@@ -401,7 +401,8 @@ public:
 		sk->dpos.resize(n);
 		sk->pos0.resize(n);
 		sk->filename.resize(n);
-		foreachi ([[maybe_unused]] auto &b, sk->bones, i) {
+		foreachi ([[maybe_unused]] auto& b, sk->bones, i) {
+			b = new Entity;
 			f->read_vector(&sk->dpos[i]);
 			sk->parents[i] = f->read_int();
 			sk->filename[i] = f->read_str();
@@ -574,7 +575,7 @@ public:
 
 		n = f->read_int();
 		for (int i=0; i<n; i++) {
-			TemplateDataScriptVariable v;
+			ScriptInstanceDataVariable v;
 			v.name = f->read_str().lower().replace("_", "");
 			v.value = f->read_str();
 		}

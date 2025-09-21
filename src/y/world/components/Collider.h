@@ -87,7 +87,7 @@ public:
 // physical skin, but in world coordinates
 class PhysicalMeshAbsolute {
 public:
-	bool is_ok;
+	bool is_ok = true;
 	Array<vec3> p;
 	Array<plane> pl;
 };
@@ -98,13 +98,14 @@ public:
 class Collider : public Component {
 public:
 	Collider();
-	virtual ~Collider();
+	~Collider() override;
 
 	btCollisionShape* col_shape;
 
 	static const kaba::Class *_class;
 };
 
+// requires an already attached Model component
 class MeshCollider : public Collider {
 public:
 	MeshCollider();
@@ -131,6 +132,7 @@ public:
 	static const kaba::Class *_class;
 };
 
+// requires an already attached Terrain component
 class TerrainCollider : public Collider {
 public:
 	TerrainCollider();

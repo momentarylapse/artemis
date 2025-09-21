@@ -35,7 +35,8 @@
 
 #define DynamicNormalCorrect
 
-const kaba::Class *Model::_class = nullptr;
+const kaba::Class* ModelRef::_class = nullptr;
+const kaba::Class* Model::_class = nullptr;
 
 
 
@@ -262,7 +263,6 @@ Model *Model::copy(Model *pre_allocated) {
 
 	m->prop = prop;
 	m->_template = _template;
-	m->script_data = script_data;
 
 	for (auto mat: material)
 		m->material.add(mat->copy());

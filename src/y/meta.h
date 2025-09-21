@@ -20,15 +20,4 @@ class Light;
 
 
 
-class TemplateDataScriptVariable {
-public:
-	string name, value;
-};
-
-class TemplateDataScript {
-public:
-	Path filename;
-	Array<TemplateDataScriptVariable> variables;
-};
-
 

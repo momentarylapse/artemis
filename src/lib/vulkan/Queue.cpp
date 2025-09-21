@@ -63,7 +63,7 @@ Array<VkQueueFamilyProperties> get_queue_families(VkPhysicalDevice device) {
 }
 
 
-base::optional<QueueFamilyIndices> QueueFamilyIndices::query(VkPhysicalDevice device, VkSurfaceKHR surface, Requirements req) {
+QueueFamilyIndices QueueFamilyIndices::query(VkPhysicalDevice device, VkSurfaceKHR surface) {
 	auto queue_families = get_queue_families(device);
 
 	QueueFamilyIndices indices;
@@ -71,35 +71,28 @@ base::optional<QueueFamilyIndices> QueueFamilyIndices::query(VkPhysicalDevice de
 		if (family.queueCount == 0)
 			continue;
 
-		if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT and !indices.graphics_family)
 			indices.graphics_family = i;
 
-		if (family.queueFlags & VK_QUEUE_COMPUTE_BIT)
+		if (family.queueFlags & VK_QUEUE_COMPUTE_BIT and !indices.compute_family)
 			indices.compute_family = i;
 
 		if (surface) {
 			VkBool32 present_support = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &present_support);
-			if (present_support)
+			if (present_support and !indices.present_family)
 				indices.present_family = i;
 		}
-
-		if (indices.is_complete(req))
-			return indices;
 	}
-
-	return base::None;
+	return indices;
 }
-bool QueueFamilyIndices::is_complete(Requirements req) const {
-	if (req & Requirements::GRAPHICS)
-		if (!graphics_family)
-			return false;
-	if (req & Requirements::COMPUTE)
-		if (!compute_family)
-			return false;
-	if (req & Requirements::PRESENT)
-		if (!present_family)
-			return false;
+bool QueueFamilyIndices::is_complete(const Requirements& req) const {
+	if (req.required.contains(Feature::GRAPHICS) and !graphics_family)
+		return false;
+	if (req.required.contains(Feature::COMPUTE) and !compute_family)
+		return false;
+	if (req.required.contains(Feature::PRESENT) and !present_family)
+		return false;
 	return true;
 }
 

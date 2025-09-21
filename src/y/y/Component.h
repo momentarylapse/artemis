@@ -11,6 +11,7 @@
 
 class Entity;
 class CollisionData;
+struct ScriptInstanceDataVariable;
 namespace kaba {
 	class Class;
 }
@@ -23,14 +24,17 @@ public:
 	virtual void on_delete() {}
 	virtual void on_iterate(float dt) {}
 
-	virtual void on_collide(const CollisionData &col) {}
+	virtual void on_collide(const CollisionData& col) {}
 
-	void set_variables(const string &var);
+	void set_variables(const Array<ScriptInstanceDataVariable>& variables);
 
-	Entity *owner;
-	const kaba::Class *component_type;
+	Entity* owner;
+	const kaba::Class* component_type;
+};
 
-	/*template<class Owner>
-	Owner *get_owner() const { return (Owner*)owner; };*/
+class NameTag : public Component {
+public:
+	string name;
+	static const kaba::Class* _class;
 };
 

@@ -592,6 +592,7 @@ add_executable(artemis WIN32
 	src/y/y/ComponentManager.cpp
 	src/y/y/EngineData.cpp
 	src/y/y/Entity.cpp
+	src/y/y/EntityManager.cpp
 	src/y/y/System.cpp
 	src/y/y/SystemManager.cpp
 	src/y/Config.cpp
@@ -1014,6 +1015,7 @@ add_library(moduleartemis SHARED
 	src/y/y/ComponentManager.cpp
 	src/y/y/EngineData.cpp
 	src/y/y/Entity.cpp
+	src/y/y/EntityManager.cpp
 	src/y/y/System.cpp
 	src/y/y/SystemManager.cpp
 	src/y/Config.cpp

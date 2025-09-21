@@ -71,7 +71,7 @@ Dialog x x padding=0
 	view_port.fov = pi / 4;
 
 	lights.resize(1);
-	lights[0].init(White, -1, -1);
+	lights[0].init(yrenderer::LightType::DIRECTIONAL, White);
 	lights[0]._ang = quaternion::ID;
 
 

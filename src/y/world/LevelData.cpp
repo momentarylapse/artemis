@@ -8,10 +8,9 @@
 #include "LevelData.h"
 #include "Link.h"
 #include "World.h"
-#include <lib/os/file.h>
+#include "../plugins/PluginManager.h"
 #include <lib/doc/xml.h>
-#include "../y/EngineData.h"
-#include "../meta.h"
+#include <lib/yrenderer/scene/Light.h>
 
 
 LevelData::LevelData() {
@@ -24,35 +23,11 @@ LevelData::LevelData() {
 	physics_mode = PhysicsMode::FULL_EXTERNAL;
 }
 
-/*color ReadColor3(Formatter *f) {
-	int c[3];
-	for (int i=0;i<3;i++)
-		c[i] = f->read_float();
-	return color::from_int_rgb(c);
-}
-
-color ReadColor4(File *f) {
-	int c[4];
-	for (int i=0;i<4;i++)
-		c[i] = f->read_float();
-	return color::from_int_argb(c);
-}*/
-
-
-
-static vec3 s2v(const string &s) {
-	auto x = s.explode(" ");
-	return vec3(x[0]._float(), x[1]._float(), x[2]._float());
-}
-
-// RGBA
-static color s2c(const string &s) {
-	auto x = s.explode(" ");
-	return color(x[3]._float(), x[0]._float(), x[1]._float(), x[2]._float());
-}
 
 bool LevelData::load(const Path &filename) {
 	world_filename = filename;
+
+	using namespace PluginManager;
 
 	xml::Parser p;
 	p.load(filename);
@@ -81,13 +56,18 @@ bool LevelData::load(const Path &filename) {
 				fog.distance = 1.0f / e.value("density")._float();
 				fog._color = s2c(e.value("color"));
 			} else if (e.tag == "script" or e.tag == "system") {
-				ScriptData s;
+				ScriptInstanceData s;
 				s.filename = e.value("file");
 				s.class_name = e.value("class");
-				s.var = e.value("var");
+
+				// deprecated
+				const string var = e.value("var");
+				if (var.num > 0)
+					s.variables = parse_variables(var);
+
 				for (auto &ee: e.elements) {
-					TemplateDataScriptVariable v;
-					v.name = ee.value("name").lower().replace("_", "");
+					ScriptInstanceDataVariable v;
+					v.name = ee.value("name");//.lower().replace("_", "");
 					v.value = ee.value("value");
 					s.variables.add(v);
 				}
@@ -95,6 +75,25 @@ bool LevelData::load(const Path &filename) {
 			}
 		}
 	}
+
+	auto read_components = [] (Array<ScriptInstanceData>& components, xml::Element &e) {
+		for (const auto &ee: e.elements)
+			if (ee.tag == "component") {
+				ScriptInstanceData sd;
+				sd.filename = ee.value("script");
+				sd.class_name = ee.value("class");
+
+				// deprecated...
+				const string var = ee.value("var");
+				if (var.num > 0)
+					sd.variables = PluginManager::parse_variables(var);
+
+				for (const auto& a: ee.attributes)
+					if (a.key != "script" and a.key != "class" and a.key != "var")
+						sd.variables.add({a.key, "", a.value});
+				components.add(sd);
+			}
+	};
 
 
 	if (auto cont = p.elements[0].find("3d")) {
@@ -108,14 +107,7 @@ bool LevelData::load(const Path &filename) {
 				c.max_depth = e.value("maxDepth", "10000")._float();
 				c.exposure = e.value("exposure", "1")._float();
 				c.bloom_factor = e.value("bloomFactor", "0.15")._float();
-				for (auto &ee: e.elements)
-					if (ee.tag == "component") {
-						ScriptData sd;
-						sd.filename = ee.value("script");
-						sd.class_name = ee.value("class");
-						sd.var = ee.value("var");
-						c.components.add(sd);
-					}
+				read_components(c.components, e);
 				cameras.add(c);
 			} else if (e.tag == "light") {
 				Light l;
@@ -124,12 +116,15 @@ bool LevelData::load(const Path &filename) {
 				l.radius = -1;
 				l.theta = -1;
 				if (e.value("type") == "directional") {
+					l.type = yrenderer::LightType::DIRECTIONAL;
 					l.ang = s2v(e.value("ang"));
 				} else if (e.value("type") == "point") {
+					l.type = yrenderer::LightType::POINT;
 					l.pos= s2v(e.value("pos"));
 					l.radius = e.value("radius")._float();
 					l._color *= l.radius * l.radius / 100;
 				} else if (e.value("type") == "cone") {
+					l.type = yrenderer::LightType::CONE;
 					l.pos= s2v(e.value("pos"));
 					l.ang = s2v(e.value("ang"));
 					l.radius = e.value("radius")._float();
@@ -137,27 +132,13 @@ bool LevelData::load(const Path &filename) {
 					l._color *= l.radius * l.radius / 100;
 				}
 				l.enabled = e.value("enabled", "true")._bool();
-				for (auto &ee: e.elements)
-					if (ee.tag == "component") {
-						ScriptData sd;
-						sd.filename = ee.value("script");
-						sd.class_name = ee.value("class");
-						sd.var = ee.value("var");
-						l.components.add(sd);
-					}
+				read_components(l.components, e);
 				lights.add(l);
 			} else if (e.tag == "terrain") {
 				Terrain t;
 				t.filename = e.value("file");
 				t.pos = s2v(e.value("pos"));
-				for (auto &ee: e.elements)
-					if (ee.tag == "component") {
-						ScriptData sd;
-						sd.filename = ee.value("script");
-						sd.class_name = ee.value("class");
-						sd.var = ee.value("var");
-						t.components.add(sd);
-					}
+				read_components(t.components, e);
 				terrains.add(t);
 			} else if (e.tag == "object") {
 				Object o;
@@ -167,27 +148,13 @@ bool LevelData::load(const Path &filename) {
 				o.ang = s2v(e.value("ang"));
 				if (e.value("role") == "ego")
 					ego_index = objects.num;
-				for (auto &ee: e.elements)
-					if (ee.tag == "component") {
-						ScriptData sd;
-						sd.filename = ee.value("script");
-						sd.class_name = ee.value("class");
-						sd.var = ee.value("var");
-						o.components.add(sd);
-					}
+				read_components(o.components, e);
 				objects.add(o);
 			} else if (e.tag == "entity") {
 				Entity o;
 				o.pos = s2v(e.value("pos"));
-				o.ang = s2v(e.value("ang"));
-				for (auto &ee: e.elements)
-					if (ee.tag == "component") {
-						ScriptData sd;
-						sd.filename = ee.value("script");
-						sd.class_name = ee.value("class");
-						sd.var = ee.value("var");
-						o.components.add(sd);
-					}
+				o.ang = quaternion::rotation(s2v(e.value("ang")));
+				read_components(o.components, e);
 				entities.add(o);
 			} else if (e.tag == "link") {
 				Link l;
