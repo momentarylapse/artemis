@@ -17,7 +17,10 @@ namespace xhui {
 void init(const Array<string> &arg, const string& app_name);
 void run();
 
-extern float global_ui_scale;
+	extern float global_ui_scale;
+	extern ColorSpace color_space_display;
+	extern ColorSpace color_space_shaders;
+	extern ColorSpace color_space_input;
 
 
 enum class Flags {
@@ -185,6 +188,7 @@ struct XImage {
 	Path filename;
 	owned<::Image> image;
 	shared<ygfx::Texture> texture;
+	bool dirty = true;
 	vec2 size() const;
 };
 

@@ -487,7 +487,7 @@ Edit::Index Edit::xy_to_index(const vec2& pos) const {
 	float dy = pos.y - cache.line_y0[0];
 
 	face->set_size(font_size * ui_scale);
-	int line_no = min((int)(dy / cache.line_height[0]), cache.lines.num - 1);
+	int line_no = clamp((int)(dy / cache.line_height[0]), 0, cache.lines.num - 1);
 	const auto& l = cache.lines[line_no];
 
 	if (dx > cache.line_width[line_no])
@@ -546,7 +546,7 @@ void Edit::_draw(Painter *p) {
 		line_number_area_width = DEFAULT_LINE_NUMBER_WIDTH;//p->get_str_width(str(cache.lines.num));
 
 
-		p->set_color(alt_background ? Theme::_default.background : color::interpolate(Theme::_default.background_active, bg, 0.7f));
+		p->set_color(alt_background ? Theme::_default.background : color::mix(Theme::_default.background_active, bg, 0.7f));
 		p->draw_rect({_area.x1, _area.x1 + line_number_area_width, _area.y1, _area.y2});
 
 		int cursor_line = index_to_line_pos(cursor_pos).line;

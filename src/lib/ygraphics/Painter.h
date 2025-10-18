@@ -65,7 +65,7 @@ public:
 	rect native_area;
 	rect native_area_window;
 
-	color _color = White;;
+	color _color = White; // shaders color space
 	string font_name;
 	rect _clip;
 	mat4 mat_pixel_to_rel;

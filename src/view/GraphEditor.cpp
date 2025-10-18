@@ -159,8 +159,8 @@ void GraphEditor::draw_grid(Painter* p) {
 	p->set_contiguous(false);
 
 	rect view_area = rect(from_screen(_area.p00()), from_screen(_area.p11()));
-	color c0 = color::interpolate(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.07f * min(view_scale, 1.0f));
-	color c1 = color::interpolate(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.15f * min(view_scale, 1.0f));
+	color c0 = color::mix(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.07f * min(view_scale, 1.0f));
+	color c1 = color::mix(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.15f * min(view_scale, 1.0f));
 	const float D = 20.0f;
 	Array<vec2> points;
 	for (int i=(int)floorf(view_area.y1 / D); i<(int)ceilf(view_area.y2 / D); i++) {
@@ -210,7 +210,7 @@ void GraphEditor::on_draw(Painter* p) {
 			p->set_color(White);
 			p->set_line_width(4 * view_scale);
 		} else if (hover and hover->type == HoverType::Cable and hover->index == i) {
-			p->set_color(color::interpolate(Gray, White, 0.3f));
+			p->set_color(color::mix(Gray, White, 0.3f));
 			p->set_line_width(3 * view_scale);
 		}
 		p->draw_lines(cable_spline(c));
@@ -267,15 +267,15 @@ void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
 		p->set_roundness(14 * view_scale);
 		p->draw_rect(node_area(n).grow(4 * view_scale));
 	}
-	color bg = color::interpolate(Orange, xhui::Theme::_default.background_low, 0.3f);
+	color bg = color::mix(Orange, xhui::Theme::_default.background_low, 0.3f);
 	if (n->flags & dataflow::NodeFlags::Resource)
-		bg = color::interpolate(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
+		bg = color::mix(color(1, 0.3f, 0.4f, 1), xhui::Theme::_default.background_low, 0.3f);
 	else if (n->flags & dataflow::NodeFlags::TimeDependent)
-		bg = color::interpolate(color(1, 0, 0.7f, 0), xhui::Theme::_default.background_low, 0.3f);
+		bg = color::mix(color(1, 0, 0.7f, 0), xhui::Theme::_default.background_low, 0.3f);
 	else if (n->flags & dataflow::NodeFlags::Meta)
-		bg = color::interpolate(color(1, 0.5f, 0.5f, 0.5f), xhui::Theme::_default.background_low, 0.3f);
+		bg = color::mix(color(1, 0.5f, 0.5f, 0.5f), xhui::Theme::_default.background_low, 0.3f);
 	if (hover and hover->type == HoverType::Node and hover->node == n)
-		bg = color::interpolate(bg, White, 0.2f);
+		bg = color::mix(bg, White, 0.2f);
 	p->set_color(bg);
 	p->set_roundness(10 * view_scale);
 	p->draw_rect(node_area(n));

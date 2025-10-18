@@ -22,18 +22,36 @@ namespace vulkan {
 
 
 
-VkSurfaceFormatKHR choose_swap_surface_format(const Array<VkSurfaceFormatKHR>& available_formats) {
+VkSurfaceFormatKHR choose_swap_surface_format(const Array<VkSurfaceFormatKHR>& available_formats, bool gamma_correction) {
 	if (available_formats.num == 1 and available_formats[0].format == VK_FORMAT_UNDEFINED)
 		return {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
 
-	for (const auto& format: available_formats)
-		if (format.format == VK_FORMAT_B8G8R8A8_UNORM and format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-			return format;
+	auto best = available_formats[0];
+	int best_rating = 0;
+	for (const auto& format: available_formats) {
+		int rating = 0;
+		if (format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			rating += 100;
 
-	return available_formats[0];
+		if (format.format == VK_FORMAT_B8G8R8A8_UNORM)
+			rating += 2;
+		if (format.format == VK_FORMAT_R8G8B8A8_UNORM)
+			rating += 1;
+		if (format.format == VK_FORMAT_B8G8R8A8_SRGB and gamma_correction)
+			rating += 12;
+		if (format.format == VK_FORMAT_R8G8B8A8_SRGB and gamma_correction)
+			rating += 11;
+
+		if (rating > best_rating) {
+			best = format;
+			best_rating = rating;
+		}
+	}
+
+	return best;
 }
 
-VkPresentModeKHR choose_swap_present_mode(const Array<VkPresentModeKHR> available_present_modes) {
+VkPresentModeKHR choose_swap_present_mode(const Array<VkPresentModeKHR>& available_present_modes) {
 	VkPresentModeKHR best_mode = VK_PRESENT_MODE_FIFO_KHR;
 
 	for (const auto& mode: available_present_modes) {
@@ -88,11 +106,11 @@ Array<xfer<Texture>> SwapChain::create_textures() {
 }
 
 
-Array<xfer<FrameBuffer>> SwapChain::create_frame_buffers(RenderPass *render_pass, DepthBuffer *depth_buffer) {
+Array<xfer<FrameBuffer>> SwapChain::create_frame_buffers(RenderPass* render_pass, DepthBuffer* depth_buffer) {
 	Array<xfer<FrameBuffer>> frame_buffers;
 	auto textures = create_textures();
 
-	for (size_t i=0; i<image_count; i++)
+	for (int i=0; i<image_count; i++)
 		frame_buffers.add(new FrameBuffer(render_pass, {textures[i], depth_buffer}));
 
 	return frame_buffers;
@@ -107,7 +125,7 @@ SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice device, VkSurf
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &format_count, nullptr);
 
 	if (format_count != 0) {
-		details.formats.resize(format_count);
+		details.formats.resize((int)format_count);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &format_count, &details.formats[0]);
 	}
 
@@ -115,14 +133,14 @@ SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice device, VkSurf
 	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_mode_count, nullptr);
 
 	if (present_mode_count != 0) {
-		details.present_modes.resize(present_mode_count);
+		details.present_modes.resize((int)present_mode_count);
 		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_mode_count, &details.present_modes[0]);
 	}
 
 	return details;
 }
 
-xfer<DepthBuffer> SwapChain::create_depth_buffer() {
+xfer<DepthBuffer> SwapChain::create_depth_buffer() const {
 	return new DepthBuffer(width, height, device->find_depth_format(), false);
 }
 
@@ -133,13 +151,18 @@ xfer<RenderPass> SwapChain::create_render_pass(DepthBuffer *depth_buffer, const 
 }
 
 
-void SwapChain::rebuild(int w, int h) {
+void SwapChain::rebuild(int w, int h, bool gamma_correction) {
 	width = w;
 	height = h;
 
 	const SwapChainSupportDetails swap_chain_support = query_swap_chain_support(device->physical_device, device->surface);
 
-	const VkSurfaceFormatKHR surface_format = choose_swap_surface_format(swap_chain_support.formats);
+	/*msg_write("-----SWAPCHAIN----");
+	for (auto f: swap_chain_support.formats)
+		msg_write(format("%d  %d", (int)f.format, (int)f.colorSpace));
+	msg_write("-----");*/
+
+	const VkSurfaceFormatKHR surface_format = choose_swap_surface_format(swap_chain_support.formats, gamma_correction);
 	const VkPresentModeKHR present_mode = choose_swap_present_mode(swap_chain_support.present_modes);
 	const VkExtent2D extent = {(uint32_t)width, (uint32_t)height};
 
@@ -180,20 +203,21 @@ void SwapChain::rebuild(int w, int h) {
 		throw Exception("failed to create swap chain!  " + result2str(r));
 
 	image_format = surface_format.format;
+	color_space = surface_format.colorSpace;
 }
 
 
-xfer<SwapChain> SwapChain::create(Device *device, int width, int height) {
+xfer<SwapChain> SwapChain::create(Device *device, int width, int height, bool gamma_correction) {
 	auto swap_chain = new SwapChain(device);
-	swap_chain->rebuild(width, height);
+	swap_chain->rebuild(width, height, gamma_correction);
 	return swap_chain;
 }
 
 #ifdef HAS_LIB_GLFW
-xfer<SwapChain> SwapChain::create_for_glfw(Device *device, GLFWwindow* window) {
+xfer<SwapChain> SwapChain::create_for_glfw(Device *device, GLFWwindow* window, bool gamma_correction) {
 	const SwapChainSupportDetails swap_chain_support = query_swap_chain_support(device->physical_device, device->surface);
 	auto extent = choose_swap_extent(swap_chain_support.capabilities, window);
-	return create(device, (int)extent.width, (int)extent.height);
+	return create(device, (int)extent.width, (int)extent.height, gamma_correction);
 }
 #endif
 

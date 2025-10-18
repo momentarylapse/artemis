@@ -11,6 +11,7 @@
 #include "../plugins/PluginManager.h"
 #include <lib/doc/xml.h>
 #include <lib/yrenderer/scene/Light.h>
+#include <lib/os/file.h>
 
 
 LevelData::LevelData() {
@@ -24,13 +25,13 @@ LevelData::LevelData() {
 }
 
 
-bool LevelData::load(const Path &filename) {
+bool LevelData::load(const Path& filename) {
 	world_filename = filename;
 
 	using namespace PluginManager;
 
 	xml::Parser p;
-	p.load(filename);
+	p.load(world_filename);
 	if (auto meta = p.elements[0].find("meta")) {
 		for (auto &e: meta->elements) {
 			if (e.tag == "background") {
@@ -122,14 +123,12 @@ bool LevelData::load(const Path &filename) {
 					l.type = yrenderer::LightType::POINT;
 					l.pos= s2v(e.value("pos"));
 					l.radius = e.value("radius")._float();
-					l._color *= l.radius * l.radius / 100;
 				} else if (e.value("type") == "cone") {
 					l.type = yrenderer::LightType::CONE;
 					l.pos= s2v(e.value("pos"));
 					l.ang = s2v(e.value("ang"));
 					l.radius = e.value("radius")._float();
 					l.theta = e.value("theta")._float();
-					l._color *= l.radius * l.radius / 100;
 				}
 				l.enabled = e.value("enabled", "true")._bool();
 				read_components(l.components, e);
@@ -147,13 +146,15 @@ bool LevelData::load(const Path &filename) {
 				o.pos = s2v(e.value("pos"));
 				o.ang = s2v(e.value("ang"));
 				if (e.value("role") == "ego")
-					ego_index = objects.num;
+					ego_index = objects.num + 1000000000; // :P
 				read_components(o.components, e);
 				objects.add(o);
 			} else if (e.tag == "entity") {
 				Entity o;
 				o.pos = s2v(e.value("pos"));
 				o.ang = quaternion::rotation(s2v(e.value("ang")));
+				if (e.value("role") == "ego")
+					ego_index = entities.num;
 				read_components(o.components, e);
 				entities.add(o);
 			} else if (e.tag == "link") {
@@ -320,3 +321,53 @@ void LevelData::save(const Path &filename) {
 	p.save(filename);
 #endif
 }
+
+LevelData::Template LevelData::load_template(const Path& filename) {
+    Template t;
+    ScriptInstanceData* current = nullptr;
+    const auto s = os::fs::read_text(filename);
+    for (const auto& l: s.explode("\n")) {
+        if (l.num == 0)
+            continue;
+        if (l[0] == '\t') {
+            if (current) {
+                const auto xx = l.sub_ref(1).explode("=");
+                if (xx.num >= 2) {
+                    current->variables.add({xx[0], "", xx[1]});
+                }
+            }
+        } else {
+        	int p = l.find(" ");
+            if (p >= 0) {
+                t.components.add({l.sub_ref(0, p), l.sub_ref(p + 1)});
+            } else {
+                t.components.add({l});
+            }
+            current = &t.components.back();
+        }
+    }
+    return t;
+}
+
+void LevelData::save_template(const Template& t, const Path& filename) {
+    string o;
+    for (const auto& c: t.components) {
+        if (c.filename and !c.filename.is_in("y"))
+            o += format("%s %s\n", c.class_name, c.filename);
+        else
+            o += c.class_name + "\n";
+        for (const auto& v: c.variables)
+            o += format("\t%s=%s\n", v.name, v.value);
+    }
+
+    os::fs::write_text(filename, o);
+}
+
+Array<ScriptInstanceData> LevelData::auto_terrain_components() {
+	return {{"TerrainCollider", "", {{}}},
+		{"SolidBody", "", {{"physics_active", "", "false"}}}};
+}
+
+
+
+

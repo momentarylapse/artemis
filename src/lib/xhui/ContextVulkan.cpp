@@ -74,12 +74,13 @@ void Context::end_draw(Painter *p) {
 
 
 void Context::_create_swap_chain_and_stuff() {
+	bool gamma_correction = (color_space_shaders == ColorSpace::Linear) and (color_space_display == ColorSpace::SRGB);
 	if (swap_chain) {
 		int w, h;
 		glfwGetFramebufferSize(window->window, &w, &h);
-		swap_chain->rebuild(w, h);
+		swap_chain->rebuild(w, h, gamma_correction);
 	} else {
-		swap_chain = vulkan::SwapChain::create_for_glfw(device, window->window);
+		swap_chain = vulkan::SwapChain::create_for_glfw(device, window->window, gamma_correction);
 	}
 	auto swap_images = swap_chain->create_textures();
 	for (auto t: swap_images)
@@ -108,6 +109,9 @@ Context* Context::create(Window* window) {
 	auto device = vulkan::Device::create_simple(instance, surface, {"graphics", "present", "swapchain", "anisotropy", "validation"});
 	auto ctx = new Context(window, new ygfx::Context(instance, device));
 	//msg_write("device found");
+
+	ctx->context->color_space_shaders = color_space_shaders;
+	ctx->context->color_space_input = color_space_input;
 
 	ctx->context->_create_default_textures();
 	ctx->tex_white = ctx->context->tex_white;

@@ -93,7 +93,7 @@ void Plotter::draw_2d(Painter* p) {
 		return vec2(x_offset + v.x * x_scale, y_offset + v.y * y_scale);
 	};
 
-	p->set_color(color::interpolate(xhui::Theme::_default.text_disabled, xhui::Theme::_default.background_low, 0.75f));
+	p->set_color(color::mix(xhui::Theme::_default.text_disabled, xhui::Theme::_default.background_low, 0.75f));
 	p->set_line_width(1);
 	for (float x: ticks((float)x_min(), (float)x_max(), x_scale))
 		p->draw_line(project({x, (float)y_min()}), project({x, (float)y_max()}));

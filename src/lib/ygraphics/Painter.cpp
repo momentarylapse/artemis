@@ -11,7 +11,6 @@
 
 namespace ygfx {
 
-
 Painter::Painter(DrawingHelperData* _aux, const rect& native_area, const rect& area, float _ui_scale, font::Face* _face) {
 	aux = _aux;
 	if (aux)
@@ -27,16 +26,19 @@ Painter::Painter(DrawingHelperData* _aux, const rect& native_area, const rect& a
 	ui_scale = _ui_scale;
 	face = _face;
 
-	Painter::set_color(White);
-	Painter::set_font("", 16, false, false);
+	if (aux) {
+		Painter::set_color(White);
+		Painter::set_font("", 16, false, false);
+	}
 
 #ifdef USING_VULKAN
-	cb = aux->cb;
+	if (aux)
+		cb = aux->cb;
 #endif
 }
 
 void Painter::set_color(const color &c) {
-	_color = c;
+	_color = context->color_input_to_shaders(c);
 }
 
 /*font::Face* pick_font(const string &font, bool bold, bool italic) {

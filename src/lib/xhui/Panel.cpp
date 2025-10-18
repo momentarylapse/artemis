@@ -477,6 +477,7 @@ void Panel::embed(const string& target, int x, int y, shared<Panel> p) {
 }
 
 void Panel::unembed(Panel* p) {
+	shared<Panel> tmp = p; // prevent deletion
 	remove_control(p);
 	p->owner = nullptr;
 }
@@ -575,7 +576,7 @@ base::future<void> Panel::open_dialog(shared<Dialog> dialog) {
 	dialog->owner = this;
 	if (auto w = get_window()) {
 		w->dialogs.add(dialog.get());
-		w->hover_control = nullptr;
+		w->_clear_hover();
 	}
 	request_redraw();
 	return dialog->basic_promise.get_future();
@@ -590,7 +591,7 @@ void Panel::close_dialog(Dialog* dialog) {
 		}
 	if (auto w = get_window()) {
 		w->dialogs.pop();
-		w->hover_control = nullptr;
+		w->_clear_hover();
 		w->focus_control = nullptr;
 	}
 	dialog->basic_promise();

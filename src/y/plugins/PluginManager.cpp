@@ -26,6 +26,7 @@
 #include <lib/yrenderer/_kaba_export.h>
 #include <lib/profiler/_kaba_export.h>
 #include "../helper/Scheduler.h"
+#include "lib/any/conversion.h"
 #if __has_include("../input/InputManager.h")
 #include "../input/InputManager.h"
 #include "../input/Gamepad.h"
@@ -446,11 +447,11 @@ void export_world(kaba::Exporter* ext) {
 	ext->declare_class_element("World.physics_mode", &World::physics_mode);
 	ext->declare_class_element("World.msg_data", &World::msg_data);
 	ext->link_class_func("World.load_soon", &World::load_soon);
+	ext->link_class_func("World.load_template", &World::load_template);
 	ext->link_class_func("World.create_object", &_create_object);
 	ext->link_class_func("World.create_object_multi", &_create_object_multi);
 	ext->link_class_func("World.create_terrain", &World::create_terrain);
 	ext->link_class_func("World.create_entity", &World::create_entity);
-	ext->link_class_func("World.register_entity", &World::register_entity);
 	ext->link_class_func("World.set_active_physics", &World::set_active_physics);
 	ext->link_class_func("World.create_light_parallel", &World::create_light_parallel);
 	ext->link_class_func("World.create_light_point", &World::create_light_point);
@@ -463,7 +464,6 @@ void export_world(kaba::Exporter* ext) {
 	ext->link_class_func("World.shift_all", &World::shift_all);
 	ext->link_class_func("World.get_g", &World::get_g);
 	ext->link_class_func("World.trace", &World::trace);
-	ext->link_class_func("World.unregister", &World::unregister);
 	ext->link_class_func("World.delete_entity", &World::delete_entity);
 	ext->link_class_func("World.delete_link", &World::delete_link);
 	ext->link_class_func("World.subscribe", &World::subscribe);
@@ -483,11 +483,10 @@ void export_world(kaba::Exporter* ext) {
 	Light light(yrenderer::LightType::DIRECTIONAL, Black);
 	ext->declare_class_size("Light", sizeof(Light));
 	ext->declare_class_element("Light.type", _OFFSET(light, light.type));
-	ext->declare_class_element("Light.dir", _OFFSET(light, light.light.dir));
-	ext->declare_class_element("Light.color", _OFFSET(light, light.light.col));
-	ext->declare_class_element("Light.radius", _OFFSET(light, light.light.radius));
-	ext->declare_class_element("Light.theta", _OFFSET(light, light.light.theta));
-	ext->declare_class_element("Light.harshness", _OFFSET(light, light.light.harshness));
+	ext->declare_class_element("Light.color", _OFFSET(light, light.col));
+	ext->declare_class_element("Light.power", _OFFSET(light, light.power));
+	ext->declare_class_element("Light.theta", _OFFSET(light, light.theta));
+	ext->declare_class_element("Light.harshness", _OFFSET(light, light.harshness));
 	ext->declare_class_element("Light.enabled", _OFFSET(light, light.enabled));
 	ext->declare_class_element("Light.allow_shadow", _OFFSET(light, light.allow_shadow));
 	ext->declare_class_element("Light.user_shadow_control", _OFFSET(light, light.user_shadow_control));
@@ -942,6 +941,8 @@ void import_kaba() {
 	import_component_class<Camera>(m_world, "Camera");
 	import_component_class<::CubeMapSource>(m_world, "CubeMapSource");
 	import_component_class<NameTag>(m_world, "NameTag");
+	import_component_class<ModelRef>(m_world, "ModelRef");
+	import_component_class<TerrainRef>(m_world, "TerrainRef");
 
 	auto m_fx = kaba::default_context->load_module("y/fx.kaba");
 	import_component_class<ParticleGroup>(m_fx, "ParticleGroup");
@@ -985,6 +986,15 @@ color s2c(const string &s) {
 	return color(x[3]._float(), x[0]._float(), x[1]._float(), x[2]._float());
 }
 
+mat3 s2mat3(const string &s) {
+	const auto a = Any::parse(s);
+	mat3 m = mat3::ZERO;
+	if (a.is_list())
+		for (int i=0; i<min(9, a.length()); i++)
+			m.e[i] = a[i].to_f32();
+	return m;
+}
+
 string whatever_to_string(const void* instance, int offset, const kaba::Class* c) {
 	if (!instance)
 		return "";
@@ -997,6 +1007,8 @@ string whatever_to_string(const void* instance, int offset, const kaba::Class* c
 		return f2s(*(const float*)p, 3);
 	if (c == kaba::TypeInt32 or c->is_enum())
 		return str(*(const int*)p);
+	if (c == kaba::TypeBool)
+		return b2s(*(const bool*)p);
 	if (c == kaba::TypeVec3) {
 		const auto v = *(const vec3*)p;
 		return format("%.3f %.3f %.3f", v.x, v.y, v.z);
@@ -1005,6 +1017,8 @@ string whatever_to_string(const void* instance, int offset, const kaba::Class* c
 		const auto v = *(const color*)p;
 		return format("%.3f %.3f %.3f %.3f", v.r, v.g, v.b, v.a);
 	}
+	if (c->name == "mat3")
+		return mat3_to_any(*(const mat3*)p).str();
 	return "???";
 }
 
@@ -1023,6 +1037,8 @@ void whatever_from_string(void* p, const kaba::Class* type, const string& value)
 		*(vec3*)p = s2v(value);
 	if (type == kaba::TypeColor)
 		*(color*)p = s2c(value);
+	if (type->name == "mat3")
+		*(mat3*)p = s2mat3(value);
 }
 
 void assign_variables(void* p, const kaba::Class* c, const Array<ScriptInstanceDataVariable>& variables) {
@@ -1053,6 +1069,30 @@ const kaba::Class *find_class_derived(const Path &filename, const string &base_c
 
 const kaba::Class *find_class(const Path &filename, const string &name) {
 	//msg_write(format("INSTANCE  %s:   %s", filename, base_class));
+	if (filename.is_empty()) {
+		if (name == "Camera")
+			return Camera::_class;
+		if (name == "Light")
+			return Light::_class;
+		if (name == "ModelRef")
+			return ModelRef::_class;
+		if (name == "TerrainRef")
+			return TerrainRef::_class;
+		if (name == "SolidBody")
+			return SolidBody::_class;
+		if (name == "Skeleton")
+			return Skeleton::_class;
+		if (name == "Animator")
+			return Animator::_class;
+		if (name == "MeshCollider")
+			return MeshCollider::_class;
+		if (name == "TerrainCollider")
+			return TerrainCollider::_class;
+		if (name == "BoxCollider")
+			return BoxCollider::_class;
+		if (name == "SphereCollider")
+			return SphereCollider::_class;
+	}
 	try {
 		auto s = kaba::default_context->load_module(filename);
 		for (auto c: s->classes()) {

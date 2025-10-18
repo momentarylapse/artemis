@@ -26,7 +26,7 @@ color ColorMap::get(float f) const {
 		return colors[0];
 	for (int i=0; i<values.num-1; i++)
 		if (f >= values[i] and f <= values[i+1])
-			return color::interpolate(colors[i], colors[i+1], (f - values[i]) / (values[i+1] - values[i]));
+			return color::mix(colors[i], colors[i+1], (f - values[i]) / (values[i+1] - values[i]));
 	if (values.num >= 1)
 		return colors[1];
 	return Black;

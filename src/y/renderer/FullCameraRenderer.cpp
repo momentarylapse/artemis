@@ -98,7 +98,11 @@ FullCameraRenderer::FullCameraRenderer(Context* ctx, Camera* _cam, RenderPathTyp
 FullCameraRenderer::~FullCameraRenderer() = default;
 
 void FullCameraRenderer::check_terrains(const vec3& cam_pos) {
-	auto& terrains = EntityManager::global->get_component_list<Terrain>();
+	auto terrains = EntityManager::global->get_component_list<Terrain>();
+	for (auto t: EntityManager::global->get_component_list<TerrainRef>())
+		if (t->terrain)
+			terrains.add(t->terrain);
+
 	if (terrains.num == 0)
 		return;
 
@@ -240,7 +244,7 @@ void FullCameraRenderer::prepare(const yrenderer::RenderParams& params) {
 	Array<yrenderer::Light*> lights;
 	for (auto l: all_lights) {
 		l->light._ang = l->owner->ang;
-		l->light.light.pos = l->owner->pos;
+		l->light.pos = l->owner->pos;
 		lights.add(&l->light);
 	}
 	render_path->set_lights(lights);

@@ -22,8 +22,12 @@ VkFormat parse_format(const string &s) {
 		return VK_FORMAT_B8G8R8A8_UNORM;
 	if (s == "rgb:i8")
 		return VK_FORMAT_R8G8B8_UNORM;
+	if (s == "rg:i8")
+		return VK_FORMAT_R8G8_UNORM;
 	if (s == "r:i8")
 		return VK_FORMAT_R8_UNORM;
+	if (s == "srgba:i8")
+		return VK_FORMAT_R8G8B8A8_SRGB;
 	if (s == "argb:i10")
 		return VK_FORMAT_A2R10G10B10_SNORM_PACK32;
 	if (s == "rgba:f32")
@@ -56,11 +60,13 @@ VkFormat parse_format(const string &s) {
 
 int format_size(VkFormat f) {
 	// i8
-	if (f == VK_FORMAT_R8G8B8A8_UNORM)
+	if (f == VK_FORMAT_R8G8B8A8_UNORM or f == VK_FORMAT_R8G8B8A8_SRGB)
 		return 4;
-	if (f == VK_FORMAT_R8G8B8_UNORM)
+	if (f == VK_FORMAT_R8G8B8_UNORM or f == VK_FORMAT_R8G8B8_SRGB)
 		return 3;
-	if (f == VK_FORMAT_R8_UNORM)
+	if (f == VK_FORMAT_R8G8_UNORM or f == VK_FORMAT_R8G8_SRGB)
+		return 2;
+	if (f == VK_FORMAT_R8_UNORM or f == VK_FORMAT_R8_SRGB)
 		return 1;
 	// weird
 	if (f == VK_FORMAT_A2R10G10B10_SNORM_PACK32)
@@ -203,7 +209,13 @@ void Texture::_load(const Path &filename) {
 }
 
 void Texture::write(const Image &im) {
-	writex(im.data.data, im.width, im.height, 1, "rgba:i8");
+	writex(im.data.data, im.width, im.height, 1, im.color_space == ColorSpace::SRGB ? "srgba:i8" : "rgba:i8");
+}
+
+void Texture::write_with_color_space(const Image &im, ColorSpace color_space) {
+	if (color_space == ColorSpace::Undefined)
+		color_space = im.color_space;;
+	writex(im.data.data, im.width, im.height, 1, color_space == ColorSpace::SRGB ? "srgba:i8" : "rgba:i8");
 }
 
 void Texture::writex(const void *data, int nx, int ny, int nz, const string &format) {

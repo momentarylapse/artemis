@@ -23,6 +23,9 @@ namespace xhui {
 	extern Array<Window*> _windows_;
 
 	float global_ui_scale = 1;
+	ColorSpace color_space_display = ColorSpace::SRGB;
+	ColorSpace color_space_shaders = ColorSpace::SRGB;
+	ColorSpace color_space_input = ColorSpace::SRGB;
 	string separator = "\\";
 
 
@@ -64,7 +67,7 @@ void init(const Array<string> &arg, const string& app_name) {
 
 	font::init();
 
-	Array<string> font_names = {"FreeSans", "Cantarell", "OpenSans", "Helvetica", "NotoSans"};
+	Array<string> font_names = {"Cantarell", "FreeSans", "OpenSans", "Helvetica", "NotoSans"};
 
 	for (const string& name: font_names) {
 		if (!default_font_regular)
@@ -77,7 +80,7 @@ void init(const Array<string> &arg, const string& app_name) {
 	if (!default_font_regular)
 		msg_error("no font found...");
 
-	Array<string> font_names_mono = {"Menlo", "Courier New", "FreeMono", "NotoSansMono", "AdwaitaMono"};
+	Array<string> font_names_mono = {"DejaVuSansMono", "Menlo", "NotoSansMono", "AdwaitaMono", "Courier New", "FreeMono"};
 	for (const string& name: font_names_mono) {
 		if (!default_font_mono_regular)
 			default_font_mono_regular = font::load_face(name, false, false);
@@ -188,7 +191,8 @@ void cancel_runner(int id) {
 }
 
 void iterate_runners(float dt) {
-	for (auto r: runners)
+	for (int i=0; i<runners.num; i++) {
+		auto r = runners[i]; // in case a new runner is added
 		if (r->used) {
 			r->t += dt;
 			if (r->t >= r->dt) {
@@ -199,6 +203,7 @@ void iterate_runners(float dt) {
 					r->used = false;
 			}
 		}
+	}
 }
 
 void run() {
@@ -293,10 +298,7 @@ XImage* load_image(const string& name) {
 	auto im = new XImage;
 	im->filename = path;
 	im->uid = name;
-#if HAS_LIB_VULKAN
-	if (vulkan::default_device)
-		im->texture = vulkan::Texture::load(path);
-#endif
+	im->dirty = true;
 	_images_.add(im);
 	return im;
 }
@@ -322,6 +324,7 @@ void set_image(const string& uid, const Image& _im) {
 	if (!im->image)
 		im->image = new Image(8,8,White);
 	*im->image = _im;
+	im->dirty = true;
 }
 
 
@@ -344,19 +347,25 @@ void delete_image(const string& name) {
 }
 
 void prepare_image(XImage* image) {
-	if (!image->texture)
+	if (!image->dirty)
+		return;
+
+	if (!image->image)
+		image->image = Image::load(image->filename);
+
 #ifdef USING_VULKAN
-		if (vulkan::default_device) {
-#else
-		{
+	if (!vulkan::default_device)
+		return;
 #endif
-			if (image->image) {
-				image->texture = new ygfx::Texture();
-				image->texture->write(*image->image);
-			} else {
-				image->texture = ygfx::Texture::load(image->filename);
-			}
-		}
+
+	if (!image->texture)
+		image->texture = new ygfx::Texture();
+
+	ColorSpace cs = image->image->color_space;
+	if (color_space_shaders == ColorSpace::SRGB)
+		cs = ColorSpace::Linear;
+	image->texture->write_with_color_space(*image->image, cs);
+	image->dirty = false;
 }
 
 vec2 XImage::size() const {

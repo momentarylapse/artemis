@@ -2,8 +2,7 @@
 // Created by Michael Ankele on 2025-02-03.
 //
 
-#ifndef COLORBUTTON_H
-#define COLORBUTTON_H
+#pragma once
 
 #include "Button.h"
 #include "../../image/color.h"
@@ -22,9 +21,11 @@ public:
 	color get_color() override;
 
 	bool with_alpha = false;
+	ColorSpace color_space_user;
 	void set_option(const string& key, const string& value) override;
+
+	color color_to_user(const color &c) const;
+	color color_from_user(const color &c) const;
 };
 
 } // xhui
-
-#endif //COLORBUTTON_H

@@ -36,6 +36,9 @@ Painter* Context::prepare_draw() {
 }
 
 void Context::begin_draw(Painter *p) {
+	bool gamma_correction = (color_space_display == ColorSpace::SRGB) and (color_space_shaders == ColorSpace::Linear);
+	nix::set_srgb(gamma_correction);
+
 	// in case the event_id::JustBeforeDraw triggers off-screen rendering...
 	nix::bind_frame_buffer(context->ctx->default_framebuffer);
 
@@ -48,6 +51,7 @@ void Context::begin_draw(Painter *p) {
 
 void Context::end_draw(Painter *p) {
 	nix::end_frame_glfw();
+	nix::set_srgb(false);
 	aux->reset_frame();
 	iterate_text_caches();
 }
@@ -59,6 +63,9 @@ Context* Context::create(Window* window) {
 	nix::allow_separate_vertex_arrays = true;
 	nix::default_shader_bindings = false;
 	auto ctx = new Context(window, new ygfx::Context(nix::init()));
+
+	ctx->context->color_space_shaders = color_space_shaders;
+	ctx->context->color_space_input = color_space_input;
 
 	ctx->context->_create_default_textures();
 	ctx->tex_white = ctx->context->tex_white;
