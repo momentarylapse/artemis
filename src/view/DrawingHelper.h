@@ -6,7 +6,6 @@
 #define DRAWINGHELPER_H
 
 
-#include <helper/ResourceManager.h>
 #include <lib/ygraphics/graphics-fwd.h>
 #include <lib/base/optional.h>
 #include <lib/image/color.h>

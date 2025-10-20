@@ -16,13 +16,18 @@
 #include <lib/ygraphics/graphics-fwd.h>
 #include <lib/yrenderer/regions/RegionRenderer.h>
 
+#include "lib/yrenderer/MaterialManager.h"
+
 
 class Mode;
 class Storage;
 class Progress;
-class ResourceManager;
 class DrawingHelper;
 class ArtemisWindow;
+namespace yrenderer {
+	class TextureManager;
+	class ShaderManager;
+}
 
 
 namespace artemis::graph {
@@ -75,9 +80,11 @@ public:
 		return static_cast<M*>(find_mode_base(name));
 	}
 
-	yrenderer::Context *ctx;
-	ResourceManager *resource_manager;
-	DrawingHelper *drawing_helper;
+	yrenderer::Context* ctx;
+	yrenderer::ShaderManager* shader_manager;
+	yrenderer::TextureManager* texture_manager;
+	yrenderer::MaterialManager* material_manager;
+	DrawingHelper* drawing_helper;
 
 	Storage *storage;
 

@@ -18,7 +18,6 @@
 #include "lib/dataflow/Port.h"
 #include "lib/dataflow/Setting.h"
 #include "lib/kaba/syntax/Class.h"
-#include "world/World.h"
 
 static string _(const string &s) { return s; }
 string f642s_clean(double f, int dez);

@@ -538,65 +538,6 @@ add_executable(artemis WIN32
 	src/view/Mode.cpp
 	src/view/NodeListPanel.cpp
 	src/view/SceneRenderer.cpp
-	src/y/audio/audio.cpp
-	src/y/audio/AudioBuffer.cpp
-	src/y/audio/AudioStream.cpp
-	src/y/audio/Listener.cpp
-	src/y/audio/Loading.cpp
-	src/y/audio/SoundSource.cpp
-	src/y/ecs/BaseClass.cpp
-	src/y/ecs/Component.cpp
-	src/y/ecs/ComponentManager.cpp
-	src/y/ecs/Entity.cpp
-	src/y/ecs/EntityManager.cpp
-	src/y/ecs/System.cpp
-	src/y/ecs/SystemManager.cpp
-	src/y/fx/Beam.cpp
-	src/y/fx/Particle.cpp
-	src/y/fx/ParticleEmitter.cpp
-	src/y/fx/ParticleManager.cpp
-	src/y/gui/Canvas.cpp
-	src/y/gui/Font.cpp
-	src/y/gui/gui.cpp
-	src/y/gui/Node.cpp
-	src/y/gui/Picture.cpp
-	src/y/gui/Text.cpp
-	src/y/helper/DeletionQueue.cpp
-	src/y/helper/ErrorHandler.cpp
-	src/y/helper/ResourceManager.cpp
-	src/y/helper/Scheduler.cpp
-	src/y/net/NetworkManager.cpp
-	src/y/plugins/PluginManager.cpp
-	src/y/renderer/gui/GuiRendererGL.cpp
-	src/y/renderer/gui/GuiRendererVulkan.cpp
-	src/y/renderer/helper/Raytracing.cpp
-	src/y/renderer/helper/RendererFactory.cpp
-	src/y/renderer/world/emitter/WorldInstancedEmitter.cpp
-	src/y/renderer/world/emitter/WorldModelsEmitter.cpp
-	src/y/renderer/world/emitter/WorldParticlesEmitter.cpp
-	src/y/renderer/world/emitter/WorldSkyboxEmitter.cpp
-	src/y/renderer/world/emitter/WorldTerrainsEmitter.cpp
-	src/y/renderer/world/emitter/WorldUserMeshesEmitter.cpp
-	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
-	src/y/renderer/FullCameraRenderer.cpp
-	src/y/world/components/Animator.cpp
-	src/y/world/components/Camera.cpp
-	src/y/world/components/Collider.cpp
-	src/y/world/components/CubeMapSource.cpp
-	src/y/world/components/Light.cpp
-	src/y/world/components/MultiInstance.cpp
-	src/y/world/components/Skeleton.cpp
-	src/y/world/components/SolidBody.cpp
-	src/y/world/components/UserMesh.cpp
-	src/y/world/LevelData.cpp
-	src/y/world/Link.cpp
-	src/y/world/Model.cpp
-	src/y/world/ModelManager.cpp
-	src/y/world/Physics.cpp
-	src/y/world/Terrain.cpp
-	src/y/world/World.cpp
-	src/y/Config.cpp
-	src/y/EngineData.cpp
 	src/Artemis.cpp
 	src/ModeDefault.cpp
 	src/Session.cpp)
@@ -962,65 +903,6 @@ add_library(moduleartemis SHARED
 	src/view/Mode.cpp
 	src/view/NodeListPanel.cpp
 	src/view/SceneRenderer.cpp
-	src/y/audio/audio.cpp
-	src/y/audio/AudioBuffer.cpp
-	src/y/audio/AudioStream.cpp
-	src/y/audio/Listener.cpp
-	src/y/audio/Loading.cpp
-	src/y/audio/SoundSource.cpp
-	src/y/ecs/BaseClass.cpp
-	src/y/ecs/Component.cpp
-	src/y/ecs/ComponentManager.cpp
-	src/y/ecs/Entity.cpp
-	src/y/ecs/EntityManager.cpp
-	src/y/ecs/System.cpp
-	src/y/ecs/SystemManager.cpp
-	src/y/fx/Beam.cpp
-	src/y/fx/Particle.cpp
-	src/y/fx/ParticleEmitter.cpp
-	src/y/fx/ParticleManager.cpp
-	src/y/gui/Canvas.cpp
-	src/y/gui/Font.cpp
-	src/y/gui/gui.cpp
-	src/y/gui/Node.cpp
-	src/y/gui/Picture.cpp
-	src/y/gui/Text.cpp
-	src/y/helper/DeletionQueue.cpp
-	src/y/helper/ErrorHandler.cpp
-	src/y/helper/ResourceManager.cpp
-	src/y/helper/Scheduler.cpp
-	src/y/net/NetworkManager.cpp
-	src/y/plugins/PluginManager.cpp
-	src/y/renderer/gui/GuiRendererGL.cpp
-	src/y/renderer/gui/GuiRendererVulkan.cpp
-	src/y/renderer/helper/Raytracing.cpp
-	src/y/renderer/helper/RendererFactory.cpp
-	src/y/renderer/world/emitter/WorldInstancedEmitter.cpp
-	src/y/renderer/world/emitter/WorldModelsEmitter.cpp
-	src/y/renderer/world/emitter/WorldParticlesEmitter.cpp
-	src/y/renderer/world/emitter/WorldSkyboxEmitter.cpp
-	src/y/renderer/world/emitter/WorldTerrainsEmitter.cpp
-	src/y/renderer/world/emitter/WorldUserMeshesEmitter.cpp
-	src/y/renderer/world/WorldRendererVulkanRayTracing.cpp
-	src/y/renderer/FullCameraRenderer.cpp
-	src/y/world/components/Animator.cpp
-	src/y/world/components/Camera.cpp
-	src/y/world/components/Collider.cpp
-	src/y/world/components/CubeMapSource.cpp
-	src/y/world/components/Light.cpp
-	src/y/world/components/MultiInstance.cpp
-	src/y/world/components/Skeleton.cpp
-	src/y/world/components/SolidBody.cpp
-	src/y/world/components/UserMesh.cpp
-	src/y/world/LevelData.cpp
-	src/y/world/Link.cpp
-	src/y/world/Model.cpp
-	src/y/world/ModelManager.cpp
-	src/y/world/Physics.cpp
-	src/y/world/Terrain.cpp
-	src/y/world/World.cpp
-	src/y/Config.cpp
-	src/y/EngineData.cpp
 	src/Artemis.cpp
 	src/LibExport.cpp
 	src/ModeDefault.cpp

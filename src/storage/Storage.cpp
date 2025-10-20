@@ -12,7 +12,6 @@
 #include "../lib/os/filesystem.h"
 #include "../lib/os/msg.h"
 #include "../lib/xhui/xhui.h"
-#include <y/EngineData.h>
 #include "../Session.h"
 #include "../view/ArtemisWindow.h"
 
@@ -204,14 +203,6 @@ void Storage::set_root_directory(const Path &_directory) {
 			root_dir_kind[i] = root_dir | CANONICAL_SUB_DIR[i];
 		last_dir[i] = root_dir_kind[i];
 	}
-
-	engine.set_dirs(root_dir_kind[FD_TEXTURE],
-			root_dir_kind[FD_WORLD],
-			root_dir_kind[FD_MODEL],
-			root_dir_kind[FD_SOUND],
-			root_dir_kind[FD_SCRIPT],
-			root_dir_kind[FD_MATERIAL],
-			root_dir_kind[FD_FONT]);
 }
 
 

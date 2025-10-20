@@ -16,10 +16,6 @@
 #include <lib/xhui/config.h>
 #include <lib/image/image.h>
 #include <lib/os/msg.h>
-#include <y/EngineData.h>
-#include <y/helper/ResourceManager.h>
-#include <y/world/components/Camera.h>
-#include <y/world/World.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>
 #include "graph/Graph.h"
@@ -66,7 +62,9 @@ Session::Session() {
 #endif
 
 	storage = nullptr;
-	resource_manager = nullptr;
+	shader_manager = nullptr;
+	texture_manager = nullptr;
+	material_manager = nullptr;
 	win = nullptr;
 	drawing_helper = nullptr;
 }
