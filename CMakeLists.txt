@@ -390,6 +390,7 @@ add_executable(artemis WIN32
 	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
+	src/lib/syntaxhighlight/AutoComplete.cpp
 	src/lib/syntaxhighlight/BaseParser.cpp
 	src/lib/syntaxhighlight/ParserC.cpp
 	src/lib/syntaxhighlight/ParserCmake.cpp
@@ -448,6 +449,7 @@ add_executable(artemis WIN32
 	src/lib/xhui/controls/ToggleButton.cpp
 	src/lib/xhui/controls/Toolbar.cpp
 	src/lib/xhui/controls/Viewport.cpp
+	src/lib/xhui/dialogs/AboutDialog.cpp
 	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp
@@ -755,6 +757,7 @@ add_library(moduleartemis SHARED
 	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
+	src/lib/syntaxhighlight/AutoComplete.cpp
 	src/lib/syntaxhighlight/BaseParser.cpp
 	src/lib/syntaxhighlight/ParserC.cpp
 	src/lib/syntaxhighlight/ParserCmake.cpp
@@ -813,6 +816,7 @@ add_library(moduleartemis SHARED
 	src/lib/xhui/controls/ToggleButton.cpp
 	src/lib/xhui/controls/Toolbar.cpp
 	src/lib/xhui/controls/Viewport.cpp
+	src/lib/xhui/dialogs/AboutDialog.cpp
 	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp

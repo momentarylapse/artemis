@@ -133,6 +133,7 @@ void create_default_images() {
 		auto p = im.start_draw();
 		p->set_color(White);
 		p->set_line_width(2);
+		m.y -= r * 0.2f;
 		p->draw_line(m - vec2(r, 0), m + vec2(r, 0));
 		p->draw_line(m - vec2(r, 0), m + vec2(0, r));
 		p->draw_line(m + vec2(0, r), m + vec2(r, 0));
@@ -276,13 +277,15 @@ static owned_array<XImage> _images_;
 
 Path find_image(const string& name) {
 	Array<Path> paths;
+	paths.add(name);
+	paths.add(os::app::directory_static | name);
 	paths.add(os::app::directory_static | "icons" | "hicolor" | "64x64" | "actions" | (name + ".png"));
 	paths.add(os::app::directory_static | "icons" | "hicolor" | "64x64" | "actions" | (name + ".symbolic.png"));
 	paths.add(os::app::directory_static | "icons" | "hicolor" | "24x24" | "actions" | (name + ".png"));
 	paths.add(os::app::directory_static | "icons" | "hicolor" | "24x24" | "actions" | (name + ".symbolic.png"));
 	for (const Path& p: paths)
-	if (os::fs::exists(p))
-		return p;
+		if (os::fs::exists(p))
+			return p;
 	return "";
 }
 
