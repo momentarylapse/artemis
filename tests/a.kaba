@@ -1,0 +1,19 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var a = g.add_node("Number", [300,100])
+	a.set("number", 1.0)
+	
+	var b = g.add_node("GenericPrint", [300,650])
+
+	g.connect(a, 0, b, 0)
+	
+	print(">>>>")
+	
+	g.iterate()
+	
+	test_done()
+
+

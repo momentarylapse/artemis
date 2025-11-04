@@ -23,3 +23,4 @@ namespace profiler
 func extern create_session() -> Session*
 func extern start() -> Session*
 func extern run()
+func extern test_done()

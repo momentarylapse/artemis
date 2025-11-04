@@ -71,6 +71,18 @@ dataflow::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, c
 	return n;
 }
 
+graph::Graph* graph_group_nodes(graph::Graph* g, const Array<dataflow::Node*>& nodes) {
+	base::set<dataflow::Node*> _nodes;
+	for (auto n: nodes)
+		_nodes.add(n);
+	return g->group_nodes(_nodes);
+}
+
+void test_done() {
+	msg_write("DONE");
+	exit(0);
+}
+
 bool graph_connect(dataflow::Graph* g, dataflow::Node* source, int source_port, dataflow::Node* sink, int sink_port) {
 	auto r = g->connect({source, source_port, sink, sink_port});
 	if (!r)
@@ -164,6 +176,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_func("create_session", &create_session);
 	ext->link_func("start", &export_start);
 	ext->link_func("run", &export_run);
+	ext->link_func("test_done", &test_done);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);
 	ext->link_func("rotation_fw", &processing::rotation_fw);
@@ -344,6 +357,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
 	ext->link_class_func("Graph.clear", &graph::Graph::clear);
+	ext->link_class_func("Graph.iterate", &graph::Graph::iterate);
+	ext->link_class_func("Graph.group_nodes", &graph_group_nodes);
 
 }
 

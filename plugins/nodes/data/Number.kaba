@@ -1,0 +1,15 @@
+use artemis.*
+
+class Number extends Node
+	var out_float: OutPortFloat
+	var number: SettingFloat
+	
+	func __init__()
+		super.__init__("Number")
+		out_float.__init__(self, "out")
+		number.__init__(self, "number", 1)
+	
+	func override on_process()
+		out_float.set(number())
+		
+	

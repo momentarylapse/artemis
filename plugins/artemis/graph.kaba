@@ -124,8 +124,10 @@ class SettingColor
 	func extern mut set(value: Color)
 
 class Graph
-	func extern clear()
-	func extern add_node(name: string, pos: vec2) -> Node&
-	func extern connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
+	func extern mut clear()
+	func extern mut add_node(name: string, pos: vec2) -> Node&
+	func extern mut connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
+	func extern mut iterate()
+	func extern mut group_nodes(nodes: Node&[]) -> Graph&
 	var t: f64
 	var dt: f64
