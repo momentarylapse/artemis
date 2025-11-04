@@ -11,9 +11,22 @@
 #include <lib/kaba/syntax/Class.h>
 #include <lib/profiler/Profiler.h>
 
+#if 0
+#define db_out msg_write
+#define db_right msg_right
+#define db_left msg_left
+#else
+#define db_out(x)
+#define db_right(x)
+#define db_left(x)
+#endif
+
+
 namespace dataflow {
 
 Graph::Graph() : Node("graph") {
+	_hidden_in_forwarder = new Node("in-forwarder");
+	_hidden_out_forwarder = new Node("out-forwarder");
 }
 
 void Graph::clear() {
@@ -38,12 +51,26 @@ void Graph::remove_node(Node* node) {
 	//delete node;
 }
 
-void Graph::add_in_port_forward(InPortBase *target) {
-	_in_ports_forward.add(new InPortForward(this, target));
+InPortBase* Graph::add_in_port_forward(InPortBase *target) {
+	auto p = new InPortBase(this, format("%s:%s", target->owner->name, target->name), target->type, target->flags | PortFlags::Forwarding);
+	auto pp = new OutPortBase(_hidden_in_forwarder.get(), ":fw:", target->type, nullptr, target->flags | PortFlags::Forwarding);
+	p->link_partner = pp;
+	pp->link_partner = p;
+	_in_ports_forward.add(p);
+
+	connect(*pp, *target);
+
+	return p;
 }
 
-void Graph::add_out_port_forward(OutPortBase *target) {
-	_out_ports_forward.add(new OutPortForward(this, target));
+OutPortBase* Graph::add_out_port_forward(OutPortBase *target) {
+	auto p = new OutPortBase(this, format("%s:%s", target->owner->name, target->name), target->type, target->generic_value_pointer, target->flags | PortFlags::Forwarding);
+	auto pp = new InPortBase(_hidden_out_forwarder.get(), target->name, target->type, target->flags | PortFlags::Forwarding);
+	p->link_partner = pp;
+	pp->link_partner = p;
+	_out_ports_forward.add(p);
+	connect(*target, *pp);
+	return p;
 }
 
 
@@ -88,31 +115,64 @@ Array<CableInfo> Graph::cables() const {
 	Array<CableInfo> r;
 	for (auto n: nodes)
 		for (int i=0; i<n->in_ports.num; i++)
-			for (auto source: n->in_ports[i]->sources)
-				r.add({source->owner, source->port_index, n, i});
+			for (auto source: n->in_ports[i]->sources) {
+				r.add({source->owner, source->owner->out_ports.find(source), n, i});
+				//r.add({source->owner, source->port_index, n, i});
+			}
 	return r;
+}
+
+static string state2str(NodeState s) {
+	switch (s) {
+	case NodeState::Dirty:
+		return "dirty";
+	case NodeState::Uninitialized:
+		return "uninit";
+	case NodeState::Complete:
+		return "complete";
+	}
+	return "?";
 }
 
 
 bool Graph::iterate() {
 	profiler::begin(channel);
+	db_out("<<<iter " + name);
+	db_right();
+
+	for (auto n: nodes) {
+		db_out(format("%s   %s  input=%d", n->name, state2str(n->state), (int)n->has_necessary_inputs()));
+		for (auto p: n->in_ports)
+			db_out(format("   %s  %d", p->name, p->generic_values().num));
+	}
 
 	// TODO DAG
 	bool updated_any = false;
 	for (auto n: nodes)
 		if (n->state == NodeState::Uninitialized) {
+			db_out("  INIT " + n->name);
 			n->additional_init();
 			updated_any = true;
 		}
 
-	for (auto n: nodes)
-		if (n->state == NodeState::Dirty and n->has_necessary_inputs()) {
+	for (auto n: nodes) {
+		if (n->flags & NodeFlags::Meta) {
+			updated_any |= static_cast<Graph*>(n)->iterate();
+		} else if (n->state == NodeState::Dirty and n->has_necessary_inputs()) {
+			db_out("  PROC " + n->name);
 			n->process();
 			n->state = NodeState::Complete;
 			updated_any = true;
 		}
+	}
+
+	if (!updated_any)
+		state = NodeState::Complete;
+
 
 	profiler::end(channel);
+	db_left();
+	db_out("iter>>>");
 	return updated_any;
 }
 

@@ -1,0 +1,28 @@
+use plugins.artemis.*
+
+func main()
+	var g = weak(current_session().graph)
+
+	var a = g.add_node("Number", [300,100])
+	a.set("number", 5.0)
+
+	var b = g.add_node("ScaleNumber", [300,300])
+	b.set("factor", 2.0)
+	
+	var c = g.add_node("GenericPrint", [300,650])
+
+	g.connect(a, 0, b, 0)
+	g.connect(b, 0, c, 0)
+	
+	g.group_nodes([b])
+	
+	print("----<<START>>----")
+	
+	g.iterate()
+	g.iterate()
+#	g.iterate()
+#	g.iterate()
+	
+	test_done()
+
+

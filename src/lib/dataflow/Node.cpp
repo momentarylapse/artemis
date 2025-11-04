@@ -42,9 +42,12 @@ void Node::on_settings_changed(SettingBase*) {
 		state = NodeState::Dirty;
 }
 
-void Node::on_input_changed(InPortBase*) {
+void Node::on_input_changed(InPortBase* port) {
+	//msg_write("  <" + name + "  INPUT CHANGED>");
 	if (state == NodeState::Complete)
 		state = NodeState::Dirty;
+	if (port->link_partner)
+		port->link_partner->mutated();
 }
 
 void Node::set(const string& key, const Any& value) {
@@ -81,6 +84,4 @@ xhui::Panel* Node::create_panel() {
 	return new DefaultNodePanel(this);
 }
 
-
-
-} // graph
+}

@@ -31,6 +31,7 @@ Graph* Graph::group_nodes(const base::set<Node*>& selected_nodes) {
 	auto group = new Graph(session);
 	group->flags = dataflow::NodeFlags::Meta;
 	group->name = "Group";
+	group->state = dataflow::NodeState::Dirty;
 	add_node(group);
 
 	// center

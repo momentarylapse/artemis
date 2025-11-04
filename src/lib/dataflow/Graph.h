@@ -5,6 +5,7 @@
 #pragma once
 
 #include <lib/base/base.h>
+#include <lib/base/pointer.h>
 #include <lib/base/error.h>
 #include "Node.h"
 #include "Port.h"
@@ -28,16 +29,18 @@ public:
 	Graph();
 
 	Array<Node*> nodes;
-	Array<InPortForward*> _in_ports_forward;
-	Array<OutPortForward*> _out_ports_forward;
+	owned_array<InPortBase> _in_ports_forward;
+	owned_array<OutPortBase> _out_ports_forward;
+	owned<Node> _hidden_in_forwarder;
+	owned<Node> _hidden_out_forwarder;
 
 	void clear();
 
 	void add_node(Node* node);
 	void remove_node(Node* node);
 
-	void add_in_port_forward(InPortBase* target);
-	void add_out_port_forward(OutPortBase* target);
+	InPortBase* add_in_port_forward(InPortBase* target);
+	OutPortBase* add_out_port_forward(OutPortBase* target);
 
 	base::expected<int> connect(OutPortBase& source, InPortBase& sink);
 	base::expected<int> connect(const CableInfo& c);

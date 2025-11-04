@@ -9,7 +9,6 @@
 
 namespace dataflow {
 
-
 template<class T>
 class ResourceNode : public Node {
 public:
