@@ -86,7 +86,7 @@ class Elastic3dFEM extends Node
 		for u in in_u.value()
 			for dt_u in in_dt_u.value()
 		
-				let dt = current_session().graph.dt
+				let dt = current_session().dt
 				let N = substeps()
 				for i in 0:N
 					substep(dt / N, u, dt_u)

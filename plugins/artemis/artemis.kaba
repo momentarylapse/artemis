@@ -10,6 +10,8 @@ let EXPORT_IMPORTS = true
 
 class Session
 	var graph: owned![Graph]
+	var t: f64
+	var dt: f64
 
 func extern current_session() -> Session&
 

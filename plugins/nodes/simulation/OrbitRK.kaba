@@ -152,7 +152,7 @@ class OrbitRK extends Node
 				for vel in in_vel.value()
 					state_in(mass, pos, vel)
 		
-					state.iterate(current_session().graph.dt)
+					state.iterate(current_session().dt)
 		
 					state_out(pos, vel)
 					in_pos.mutated()

@@ -67,7 +67,7 @@ class StringFEM extends Node
 			
 				var dt_dt_u = u # dummy
 		
-				let dt = current_session().graph.dt
+				let dt = current_session().dt
 				let N = substeps()
 				for i in 0:N
 					substep(dt / N, u, dt_u, dt_dt_u)

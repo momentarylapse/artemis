@@ -65,7 +65,7 @@ Session* current_session() {
 }
 
 dataflow::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, const vec2& pos) {
-	auto n = graph::create_node(g->session, _class);
+	auto n = graph::create_node(current_session(), _class);
 	n->pos = pos;
 	g->add_node(n);
 	return n;
@@ -302,6 +302,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
+	ext->declare_class_element("Session.t", &Session::t);
+	ext->declare_class_element("Session.dt", &Session::dt);
 
 
 	{
@@ -352,8 +354,6 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_setting<color>(ext, "Color");
 
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
-	ext->declare_class_element("Graph.t", &graph::Graph::t);
-	ext->declare_class_element("Graph.dt", &graph::Graph::dt);
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
 	ext->link_class_func("Graph.clear", &graph::Graph::clear);

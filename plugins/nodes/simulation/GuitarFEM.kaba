@@ -131,7 +131,7 @@ class GuitarFEM extends Node
 				for us in in_u_string.value()
 					for dt_us in in_dt_u_string.value()
 		
-						let dt = current_session().graph.dt
+						let dt = current_session().dt
 						let N = substeps()
 						for i in 0:N
 							substep_body(dt / N, ub, dt_ub)

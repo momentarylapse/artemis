@@ -129,5 +129,3 @@ class Graph
 	func extern mut connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
 	func extern mut iterate()
 	func extern mut group_nodes(nodes: Node&[]) -> Graph&
-	var t: f64
-	var dt: f64

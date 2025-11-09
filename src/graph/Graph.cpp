@@ -3,21 +3,21 @@
 //
 
 #include "Graph.h"
+#include <Session.h>
 #include <lib/dataflow/Node.h>
 
-#include "lib/os/msg.h"
+namespace artemis {
+	Session* current_session();
+}
 
 namespace artemis::graph {
 
 Graph::Graph(Session* s) {
-	session = s;
-	t = 0;
-	dt = 0.1f;
 }
 
 
 void Graph::iterate_simulation() {
-	t += dt;
+	current_session()->t += current_session()->dt;
 	for (auto n: nodes)
 		if (n->flags & dataflow::NodeFlags::TimeDependent and n->has_necessary_inputs()) {
 			n->process();
@@ -28,7 +28,7 @@ void Graph::iterate_simulation() {
 Graph* Graph::group_nodes(const base::set<Node*>& selected_nodes) {
 	auto _cables = cables();
 
-	auto group = new Graph(session);
+	auto group = new Graph(nullptr);
 	group->flags = dataflow::NodeFlags::Meta;
 	group->name = "Group";
 	group->state = dataflow::NodeState::Dirty;

@@ -73,7 +73,7 @@ class Elastic2dFEM extends Node
 				var dt_uy = dt_u.get_component(1)
 				var dt_uz = dt_u.get_component(2)
 		
-				let dt = current_session().graph.dt
+				let dt = current_session().dt
 				let N = substeps()
 				for i in 0:N
 					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)

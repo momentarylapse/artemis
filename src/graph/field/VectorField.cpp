@@ -3,12 +3,16 @@
 //
 
 #include "VectorField.h"
-#include "../Graph.h"
+#include <Session.h>
 #include <processing/helper/GlobalThreadPool.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
 #include <lib/base/iter.h>
 
+
+namespace artemis {
+	Session* current_session();
+}
 
 namespace artemis::graph {
 
@@ -50,7 +54,7 @@ func f(p: vec3, t: f32) -> vec3
 				return;
 			}
 		}
-		float t = static_cast<Graph*>(graph)->t;
+		float t = current_session()->t;
 
 		if (auto f = f_p) {
 			data::VectorField s(rg,

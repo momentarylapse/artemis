@@ -17,9 +17,6 @@ public:
 	void iterate_simulation();
 
 	Graph* group_nodes(const base::set<Node*>& selected_nodes);
-
-	Session* session;
-	double t, dt;
 };
 
 

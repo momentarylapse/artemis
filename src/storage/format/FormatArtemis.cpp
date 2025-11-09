@@ -44,7 +44,7 @@ void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data,
 	xml::Parser p;
 	p.load(filename);
 	if (auto* s = p.elements[0].find("simulation")) {
-		data->graph->dt = s->value("dt", "0.1").f64();
+		data->session->dt = s->value("dt", "0.1").f64();
 	}
 	if (auto* g = p.elements[0].find("graph")) {
 		for (auto &e: g->elements) {
@@ -81,7 +81,7 @@ void FormatArtemis::_save(const Path &filename, artemis::graph::DataGraph *data)
 	}
 	{
 		auto h = xml::Element("simulation");
-		h.add(xml::Element("dt", f642s_clean(data->graph->dt, 16)));
+		h.add(xml::Element("dt", f642s_clean(data->session->dt, 16)));
 		w.add(h);
 	}
 

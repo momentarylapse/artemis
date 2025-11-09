@@ -12,7 +12,7 @@ class Test extends Node
 		flags = NodeFlags.TIME_DEPENDENT
 	
 	func override on_process()
-		let t = current_session().graph.t
+		let t = current_session().t
 		for f in in_x.value()
 			for i in 0:f.grid.nx
 				for j in 0:f.grid.ny

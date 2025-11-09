@@ -94,6 +94,7 @@ public:
 	string get_tex_image(ygfx::Texture *tex);
 
 	os::Timer timer;
+	double t, dt;
 
 	base::promise<Session*> promise_started;
 

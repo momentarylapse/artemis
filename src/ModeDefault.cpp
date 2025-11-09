@@ -46,7 +46,7 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	});
 	win->event("simulation-stop", [this] {
 		simulation_active = false;
-		session->graph->t = 0;
+		session->t = 0;
 		session->graph->reset_state();
 		update_menu();
 	});
@@ -62,8 +62,8 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 void ModeDefault::update_menu() {
 	auto win = session->win;
 	win->enable("simulation-start", !simulation_active);
-	win->enable("simulation-pause", simulation_active or session->graph->t > 0);
-	win->enable("simulation-stop", simulation_active or session->graph->t > 0);
+	win->enable("simulation-pause", simulation_active or session->t > 0);
+	win->enable("simulation-stop", simulation_active or session->t > 0);
 }
 
 artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
@@ -121,7 +121,7 @@ void ModeDefault::on_draw_post(Painter* p) {
 
 	p->set_color(xhui::Theme::_default.text_label);
 	p->set_font_size(xhui::Theme::_default.font_size * 1.3f);
-	draw_str_right(p->area().p11() - vec2(320, 55), format("t = %s", nice_time(session->graph->t, session->graph->dt)));
+	draw_str_right(p->area().p11() - vec2(320, 55), format("t = %s", nice_time(session->t, session->dt)));
 	p->set_font_size(xhui::Theme::_default.font_size);
 
 	if (show_profiling) {

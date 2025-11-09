@@ -27,7 +27,7 @@ class MaxwellFDTD extends Node
 	func override on_process()
 	
 		let N = 5
-		let dt = current_session().graph.dt / N * 2
+		let dt = current_session().dt / N * 2
 		for E in in_e.value()
 			for B in in_b.value()
 				for step in 0:N

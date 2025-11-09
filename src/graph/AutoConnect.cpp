@@ -11,13 +11,17 @@
 #include <lib/dataflow/Port.h>
 #include <lib/kaba/syntax/Class.h>
 
+namespace artemis {
+	Session* current_session();
+}
+
 namespace artemis::graph {
 
 base::expected<int> connect_through(Graph* g, const dataflow::CableInfo& c, const Array<string>& glue_nodes) {
 	dataflow::Node* source = c.source;
 	int source_port = c.source_port;
 	for (const auto& [i, glue]: enumerate(glue_nodes)) {
-		auto n = create_node(g->session, glue);
+		auto n = create_node(current_session(), glue);
 		n->pos = c.source->pos + (c.sink->pos - c.source->pos) / (float)(glue_nodes.num + 1) * (float)(i + 1);
 		g->add_node(n);
 		auto r = g->connect({source, source_port, n, 0});

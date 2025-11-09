@@ -67,6 +67,8 @@ Session::Session() {
 	material_manager = nullptr;
 	win = nullptr;
 	drawing_helper = nullptr;
+	t = 0;
+	dt = 0.1;
 }
 
 Session::~Session() {
