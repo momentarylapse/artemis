@@ -15,11 +15,8 @@ class Session;
 
 namespace dataflow {
 	class Node;
-	struct CableInfo;
-}
-
-namespace artemis::graph {
 	class Graph;
+	struct CableInfo;
 }
 
 namespace artemis::view {
@@ -48,7 +45,7 @@ public:
 	Array<vec2> cable_spline(const dataflow::CableInfo& c);
 
 	Session* session;
-	artemis::graph::Graph* graph;
+	dataflow::Graph* graph;
 	xhui::Panel* node_panel = nullptr;
 	dataflow::Node* _node_panel_node = nullptr;
 

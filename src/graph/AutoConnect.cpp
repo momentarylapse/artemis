@@ -17,7 +17,7 @@ namespace artemis {
 
 namespace artemis::graph {
 
-base::expected<int> connect_through(Graph* g, const dataflow::CableInfo& c, const Array<string>& glue_nodes) {
+base::expected<int> connect_through(dataflow::Graph* g, const dataflow::CableInfo& c, const Array<string>& glue_nodes) {
 	dataflow::Node* source = c.source;
 	int source_port = c.source_port;
 	for (const auto& [i, glue]: enumerate(glue_nodes)) {
@@ -33,7 +33,7 @@ base::expected<int> connect_through(Graph* g, const dataflow::CableInfo& c, cons
 	return g->connect({source, source_port, c.sink, c.sink_port});
 }
 
-base::expected<int> auto_connect(Graph* g, const dataflow::CableInfo& c) {
+base::expected<int> auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {
 	auto source = c.source->out_ports[c.source_port];
 	auto sink = c.sink->in_ports[c.sink_port];
 	if (dataflow::port_type_match(*source, *sink))

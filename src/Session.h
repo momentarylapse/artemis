@@ -29,9 +29,11 @@ namespace yrenderer {
 	class ShaderManager;
 }
 
+namespace dataflow {
+	class Graph;
+}
 
 namespace artemis::graph {
-	class Graph;
 	class DataGraph;
 }
 
@@ -99,7 +101,7 @@ public:
 	base::promise<Session*> promise_started;
 
 	owned<artemis::graph::DataGraph> data;
-	artemis::graph::Graph* graph;
+	dataflow::Graph* graph;
 
 	float simulation_update_dt = 0.1f; // "outside" / how often to perform steps
 };

@@ -10,14 +10,7 @@
 
 namespace artemis::graph {
 
-class Graph : public dataflow::Graph {
-public:
-	explicit Graph(Session* session);
-
-	void iterate_simulation();
-
-	Graph* group_nodes(const base::set<Node*>& selected_nodes);
-};
+void iterate_simulation(Session* s);
 
 
 class DataGraph : public Data {
@@ -25,7 +18,7 @@ public:
 	explicit DataGraph(Session* session);
 	void reset() override;
 
-	owned<Graph> graph;
+	owned<dataflow::Graph> graph;
 };
 
 }

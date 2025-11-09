@@ -8,8 +8,11 @@
 #include "view/Mode.h"
 #include <lib/base/pointer.h>
 
-namespace artemis::graph {
+namespace dataflow {
 	class Graph;
+}
+
+namespace artemis::graph {
 	class DataGraph;
 }
 
@@ -23,7 +26,7 @@ public:
 	void on_key_down(int key) override;
 
 	artemis::graph::DataGraph* data;
-	artemis::graph::Graph* graph;
+	dataflow::Graph* graph;
 
 	bool simulation_active = false;
 	bool show_profiling = false;

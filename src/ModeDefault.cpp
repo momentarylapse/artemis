@@ -26,7 +26,7 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 
 	xhui::run_repeated(session->simulation_update_dt, [this] {
 		if (simulation_active)
-			graph->iterate_simulation();
+			artemis::graph::iterate_simulation(session);
 		if (graph->iterate())
 			session->win->request_redraw();
 	});
@@ -52,7 +52,7 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	});
 	win->event("simulation-step", [this] {
 		simulation_active = false;
-		graph->iterate_simulation();
+		artemis::graph::iterate_simulation(session);
 		update_menu();
 	});
 

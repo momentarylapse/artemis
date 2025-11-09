@@ -49,6 +49,8 @@ public:
 
 	Array<CableInfo> cables() const;
 
+	Graph* group_nodes(const base::set<Node*>& selected_nodes);
+
 	bool iterate();
 	void on_process() override;
 

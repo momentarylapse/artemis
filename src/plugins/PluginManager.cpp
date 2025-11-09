@@ -64,14 +64,14 @@ Session* current_session() {
 	return _current_session_;
 }
 
-dataflow::Node* graph_add_node_by_class(graph::Graph* g, const string& _class, const vec2& pos) {
+dataflow::Node* graph_add_node_by_class(dataflow::Graph* g, const string& _class, const vec2& pos) {
 	auto n = graph::create_node(current_session(), _class);
 	n->pos = pos;
 	g->add_node(n);
 	return n;
 }
 
-graph::Graph* graph_group_nodes(graph::Graph* g, const Array<dataflow::Node*>& nodes) {
+dataflow::Graph* graph_group_nodes(dataflow::Graph* g, const Array<dataflow::Node*>& nodes) {
 	base::set<dataflow::Node*> _nodes;
 	for (auto n: nodes)
 		_nodes.add(n);
@@ -356,8 +356,8 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
-	ext->link_class_func("Graph.clear", &graph::Graph::clear);
-	ext->link_class_func("Graph.iterate", &graph::Graph::iterate);
+	ext->link_class_func("Graph.clear", &dataflow::Graph::clear);
+	ext->link_class_func("Graph.iterate", &dataflow::Graph::iterate);
 	ext->link_class_func("Graph.group_nodes", &graph_group_nodes);
 
 }
