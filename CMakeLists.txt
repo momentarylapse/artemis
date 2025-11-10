@@ -191,6 +191,11 @@ list(APPEND DEPS Threads::Threads)
 #=======================================================================================
 
 add_executable(artemis WIN32
+	src/action/graph/ActionGraphAddNode.cpp
+	src/action/graph/ActionGraphConnect.cpp
+	src/action/graph/ActionGraphRemoveNode.cpp
+	src/action/graph/ActionGraphUnconnect.cpp
+	src/action/graph/ActionNodeSetSetting.cpp
 	src/action/Action.cpp
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
@@ -558,6 +563,11 @@ target_include_directories(artemis PUBLIC src/y)
 #=======================================================================================
 
 add_library(moduleartemis SHARED
+	src/action/graph/ActionGraphAddNode.cpp
+	src/action/graph/ActionGraphConnect.cpp
+	src/action/graph/ActionGraphRemoveNode.cpp
+	src/action/graph/ActionGraphUnconnect.cpp
+	src/action/graph/ActionNodeSetSetting.cpp
 	src/action/Action.cpp
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp

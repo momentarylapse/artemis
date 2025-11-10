@@ -5,10 +5,16 @@
 #include "Node.h"
 #include "Setting.h"
 #include "Port.h"
-#include <view/DefaultNodePanel.h>
 #include <lib/any/any.h>
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
+
+// TODO remove dependency
+#include <view/DefaultNodePanel.h>
+
+namespace artemis {
+	Session* current_session();
+}
 
 namespace dataflow {
 
@@ -81,7 +87,7 @@ bool Node::has_necessary_inputs() const {
 
 
 xhui::Panel* Node::create_panel() {
-	return new DefaultNodePanel(this);
+	return new DefaultNodePanel(artemis::current_session(), this);
 }
 
 }

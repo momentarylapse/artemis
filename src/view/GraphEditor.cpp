@@ -466,9 +466,25 @@ void GraphEditor::open_node_list_panel() {
 
 
 void GraphEditor::on_key_down(int key) {
+	if (key == xhui::KEY_CONTROL + xhui::KEY_Z) {
+		if (session->data->action_manager->undoable()) {
+			session->data->undo();
+			session->info("undo");
+		} else {
+			session->info("nothing to undo");
+		}
+	}
+	if (key == xhui::KEY_CONTROL + xhui::KEY_Y) {
+		if (session->data->action_manager->redoable()) {
+			session->data->redo();
+			session->info("redo");
+		} else {
+			session->info("nothing to redo");
+		}
+	}
 	if (key == xhui::KEY_DELETE or key == xhui::KEY_BACKSPACE) {
 		if (selection and selection->type == HoverType::Cable) {
-			graph->unconnect(graph->cables()[selection->index]);
+			session->data->unconnect(graph->cables()[selection->index]);
 			selection = base::None;
 			hover = base::None;
 		}

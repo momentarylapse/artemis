@@ -66,7 +66,7 @@ void *ActionManager::execute(Action *a) {
 	error_message = "";
 
 	if (cur_group)
-		return cur_group->addSubAction(a, data);
+		return cur_group->add_sub_action(a, data);
 
 	try {
 		void *p = a->execute_logged(data);

@@ -66,8 +66,7 @@ void CodeEditor::run() {
 		kaba::config.default_filename = package_dir | "from-code-editor.kaba";
 		auto m = kaba::default_context->create_module_for_source(source);
 		typedef void t_f();
-		auto f = (t_f*)m->match_function("main", "void", {});
-		if (f)
+		if (auto f = (t_f*)m->match_function("main", "void", {}))
 			(*f)();
 	} catch (kaba::Exception& e) {
 		session->error(e.message());

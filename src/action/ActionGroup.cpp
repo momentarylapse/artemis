@@ -7,25 +7,21 @@
 
 #include "ActionGroup.h"
 
-ActionGroup::ActionGroup()
-{
-}
+ActionGroup::ActionGroup() = default;
 
-ActionGroup::~ActionGroup()
-{
+ActionGroup::~ActionGroup() {
 	for (Action *a: action)
 		delete(a);
 	action.clear();
 }
 
-void *ActionGroup::addSubAction(Action *a, Data *d)
-{
-	void *r = NULL;
-	try{
+void *ActionGroup::add_sub_action(Action* a, Data* d) {
+	void *r = nullptr;
+	try {
 		r = a->execute_logged(d);
 		if (!a->was_trivial())
 			action.add(a);
-	}catch(ActionException &e){
+	} catch(ActionException& e) {
 		e.add_parent(a->name());
 		a->abort(d);
 		throw;
@@ -34,9 +30,8 @@ void *ActionGroup::addSubAction(Action *a, Data *d)
 }
 
 
-void *ActionGroup::execute(Data *d)
-{
-	void *r = compose(d);
+void *ActionGroup::execute(Data* d) {
+	void* r = compose(d);
 
 	// no need to execute sub actions ... done during compose()
 	/*for (action, a)
@@ -46,28 +41,24 @@ void *ActionGroup::execute(Data *d)
 
 
 
-void ActionGroup::undo(Data *d)
-{
-	foreachb(Action *a, action)
+void ActionGroup::undo(Data* d) {
+	foreachb(Action* a, action)
 		a->undo_logged(d);
 }
 
 
 
-void ActionGroup::redo(Data *d)
-{
-	for (Action *a: action)
+void ActionGroup::redo(Data* d) {
+	for (Action* a: action)
 		a->redo_logged(d);
 }
 
-void ActionGroup::abort(Data *d)
-{
-	foreachb(Action *a, action)
+void ActionGroup::abort(Data* d) {
+	foreachb(Action* a, action)
 		a->undo_logged(d);
 }
 
-bool ActionGroup::was_trivial()
-{
+bool ActionGroup::was_trivial() const {
 	return action.num == 0;
 }
 

@@ -6,6 +6,11 @@
 #include <Session.h>
 #include <lib/dataflow/Graph.h>
 #include <lib/dataflow/Node.h>
+#include <action/graph/ActionGraphAddNode.h>
+#include <action/graph/ActionGraphRemoveNode.h>
+#include <action/graph/ActionGraphConnect.h>
+#include <action/graph/ActionGraphUnconnect.h>
+#include <action/graph/ActionNodeSetSetting.h>
 
 namespace artemis {
 	Session* current_session();
@@ -31,5 +36,22 @@ DataGraph::DataGraph(Session* session) : Data(session, -1) {
 void DataGraph::reset() {
 	graph->clear();
 }
+
+void DataGraph::add_node(dataflow::Node* node) {
+	execute(new ActionGraphAddNode(node));
+}
+
+void DataGraph::remove_node(dataflow::Node* node) {
+	execute(new ActionGraphRemoveNode(node));
+}
+
+void DataGraph::node_set_setting(dataflow::Node* node, const string& key, const Any& value) {
+	execute(new ActionNodeSetSetting(node, key, value));
+}
+
+void DataGraph::unconnect(const dataflow::CableInfo& cable) {
+	execute(new ActionGraphUnconnect(cable.source->out_ports[cable.source_port], cable.sink->in_ports[cable.sink_port]));
+}
+
 
 }

@@ -8,10 +8,14 @@
 #include <lib/dataflow/Setting.h>
 #include <lib/base/iter.h>
 #include <lib/kaba/syntax/Class.h>
+#include <lib/any/conversion.h>
 #include <lib/os/msg.h>
 #include <lib/xhui/xhui.h>
 
+#include "Session.h"
 #include "dialog/ColorMapDialog.h"
+#include "graph/Graph.h"
+#include "lib/kaba/dynamic/dynamic.h"
 
 namespace kaba {
 	extern const Class* TypeFloat64List;
@@ -19,7 +23,8 @@ namespace kaba {
 
 void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
 
-DefaultNodePanel::DefaultNodePanel(dataflow::Node* n) : xhui::Panel("node-panel") {
+DefaultNodePanel::DefaultNodePanel(Session* s, dataflow::Node* n) : xhui::Panel("node-panel") {
+	session = s;
 	node = n;
 	from_source(R"foodelim(
 Dialog x ''
@@ -44,7 +49,8 @@ Dialog x ''
 				set_options(id, "range=::0.001");
 			set_float(id, (float)(*ss)());
 			event(id, [this, id, ss] {
-				ss->set((double)get_float(id));
+				session->data->node_set_setting(node, ss->name, get_float(id));
+				//ss->set((double)get_float(id));
 			});
 		} else if (s->type == kaba::TypeInt32) {
 			auto ss = node->settings[i]->as<int>();
@@ -61,7 +67,8 @@ Dialog x ''
 				if (index >= 0)
 					set_int(id, index);
 				event(id, [this, id, ss, values] {
-					ss->set(values[get_int(id)]);
+					session->data->node_set_setting(node, ss->name, values[get_int(id)]);
+					//ss->set(values[get_int(id)]);
 				});
 			} else {
 				add_control("SpinButton", "", 1, i, id);
@@ -70,7 +77,8 @@ Dialog x ''
 					set_options(id, s->options);
 				set_int(id, (*ss)());
 				event(id, [this, id, ss] {
-					ss->set(get_int(id));
+					session->data->node_set_setting(node, ss->name, get_int(id));
+					//ss->set(get_int(id));
 				});
 			}
 		} else if (s->type == kaba::TypeString) {
@@ -79,7 +87,8 @@ Dialog x ''
 			set_options(id, "expandx");
 			set_string(id, (*ss)());
 			event(id, [this, id, ss] {
-				ss->set(get_string(id));
+				session->data->node_set_setting(node, ss->name, get_string(id));
+				//ss->set(get_string(id));
 			});
 		} else if (s->type == kaba::TypeBool) {
 			auto ss = node->settings[i]->as<bool>();
@@ -87,7 +96,8 @@ Dialog x ''
 			set_options(id, "expandx");
 			check(id, (*ss)());
 			event(id, [this, id, ss] {
-				ss->set(is_checked(id));
+				session->data->node_set_setting(node, ss->name, is_checked(id));
+				//ss->set(is_checked(id));
 			});
 		} else if (s->type == kaba::TypeColor) {
 			auto ss = node->settings[i]->as<color>();
@@ -95,7 +105,8 @@ Dialog x ''
 			set_options(id, "expandx");
 			set_color(id, (*ss)());
 			event(id, [this, id, ss] {
-				ss->set(get_color(id));
+				session->data->node_set_setting(node, ss->name, color_to_any(get_color(id)));
+				//ss->set(get_color(id));
 			});
 		} else if (s->type->name == "ColorMap") {
 			auto ss = node->settings[i]->as<artemis::data::ColorMap>();
@@ -106,8 +117,9 @@ Dialog x ''
 				draw_color_map_background(p, cm, cm.min(), cm.max(), p->area());
 			});
 			event_x(id, xhui::event_id::LeftButtonUp, [this, ss] {
-				ColorMapDialog::ask(this, (*ss)()).then([ss] (const artemis::data::ColorMap& cm) {
-					ss->set(cm);
+				ColorMapDialog::ask(this, (*ss)()).then([this, ss] (const artemis::data::ColorMap& cm) {
+					session->data->node_set_setting(node, ss->name, kaba::dynify(&cm, dataflow::get_class<artemis::data::ColorMap>()));
+					//ss->set(cm);
 				});
 			});
 		} else if (s->type == kaba::TypeFloat64List) {

@@ -2,8 +2,7 @@
 // Created by michi on 03.06.25.
 //
 
-#ifndef COLORMAP_H
-#define COLORMAP_H
+#pragma once
 
 #include <lib/base/base.h>
 #include <lib/image/color.h>
@@ -24,5 +23,3 @@ struct ColorMap {
 };
 
 }
-
-#endif //COLORMAP_H

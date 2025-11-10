@@ -5,48 +5,47 @@
  *      Author: michi
  */
 
-#ifndef ACTIONGROUP_H_
-#define ACTIONGROUP_H_
+#pragma once
 
 #include "Action.h"
 
 class Data;
 class ActionManager;
 
-class ActionGroup: public Action
-{
+class ActionGroup: public Action {
 	friend class ActionManager;
 public:
 	ActionGroup();
-	virtual ~ActionGroup();
+	~ActionGroup() override;
 
-	virtual string name() = 0;
+	virtual void* compose(Data* d) {
+		return nullptr;
+	}
 
-	virtual void *compose(Data *d){	return NULL;	}
+	void *execute(Data* d) override;
+	void undo(Data* d) override;
+	void redo(Data* d) override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
-	virtual void redo(Data *d);
-
-	virtual void abort(Data *d);
-	virtual bool was_trivial();
+	void abort(Data* d) override;
+	bool was_trivial() const override;
 
 protected:
-	void *addSubAction(Action *a, Data *d);
+	void* add_sub_action(Action* a, Data* d);
 
 private:
 	Array<Action*> action;
 };
 
-class ActionGroupManual : public ActionGroup
-{
+class ActionGroupManual : public ActionGroup {
 	friend class ActionManager;
 public:
-	ActionGroupManual(const string &name){	_name_ = name;	}
+	explicit ActionGroupManual(const string &name) {
+		_name_ = name;
+	}
 
-	virtual string name(){	return _name_;	}
+	virtual string name() const {
+		return _name_;
+	}
 private:
 	string _name_;
 };
-
-#endif /* ACTIONGROUP_H_ */
