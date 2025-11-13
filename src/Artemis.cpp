@@ -45,9 +45,9 @@ void start_session_empty(Session* parent) {
 			auto canvas = artemis::graph::create_node(s, "Canvas");
 			canvas->pos = {300, 650};
 			s->graph->add_node(canvas);
-			s->graph->connect({teapot, 0, renderer, 0});
-			s->graph->connect({renderer, 0, scene, 0});
-			s->graph->connect({scene, 0, canvas, 0});
+			s->graph->connect(teapot, 0, renderer, 0);
+			s->graph->connect(renderer, 0, scene, 0);
+			s->graph->connect(scene, 0, canvas, 0);
 		}
 		s->set_mode(new ModeDefault(s));
 	});

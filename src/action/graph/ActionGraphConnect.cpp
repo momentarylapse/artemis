@@ -15,13 +15,13 @@ ActionGraphConnect::ActionGraphConnect(dataflow::OutPortBase* source, dataflow::
 
 void* ActionGraphConnect::execute(Data* d) {
 	auto g = dynamic_cast<graph::DataGraph*>(d);
-	g->graph->connect(*source, *sink);
+	g->graph->connect({source, sink});
 	return nullptr;
 }
 
 void ActionGraphConnect::undo(Data* d) {
 	auto g = dynamic_cast<graph::DataGraph*>(d);
-	g->graph->unconnect(*source, *sink);
+	g->graph->unconnect({source, sink});
 }
 
 }

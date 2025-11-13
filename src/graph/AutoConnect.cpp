@@ -18,24 +18,26 @@ namespace artemis {
 namespace artemis::graph {
 
 base::expected<int> connect_through(dataflow::Graph* g, const dataflow::CableInfo& c, const Array<string>& glue_nodes) {
-	dataflow::Node* source = c.source;
-	int source_port = c.source_port;
+	dataflow::Node* source = c.source->owner;
+	vec2 pos0 = c.source->owner->pos;
+	vec2 pos1 = c.sink->owner->pos;
+	int source_port = c.source_port_no();
 	for (const auto& [i, glue]: enumerate(glue_nodes)) {
 		auto n = create_node(current_session(), glue);
-		n->pos = c.source->pos + (c.sink->pos - c.source->pos) / (float)(glue_nodes.num + 1) * (float)(i + 1);
+		n->pos = pos0 + (pos1 - pos0) / (float)(glue_nodes.num + 1) * (float)(i + 1);
 		g->add_node(n);
-		auto r = g->connect({source, source_port, n, 0});
+		auto r = g->connect({source->out_ports[source_port], n->in_ports[0]});
 		if (!r)
 			return r;
 		source = n;
 		source_port = 0;
 	}
-	return g->connect({source, source_port, c.sink, c.sink_port});
+	return g->connect({source->out_ports[source_port], c.sink});
 }
 
 base::expected<int> auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {
-	auto source = c.source->out_ports[c.source_port];
-	auto sink = c.sink->in_ports[c.sink_port];
+	auto source = c.source;
+	auto sink = c.sink;
 	if (dataflow::port_type_match(*source, *sink))
 		return g->connect(c);
 	// TODO recursive "solver"

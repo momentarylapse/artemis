@@ -84,7 +84,7 @@ void test_done() {
 }
 
 bool graph_connect(dataflow::Graph* g, dataflow::Node* source, int source_port, dataflow::Node* sink, int sink_port) {
-	auto r = g->connect({source, source_port, sink, sink_port});
+	auto r = g->connect(source, source_port, sink, sink_port);
 	if (!r)
 		msg_error("connect failed: " + r.error().msg);
 	return r.has_value();

@@ -50,7 +50,7 @@ void DataGraph::node_set_setting(dataflow::Node* node, const string& key, const 
 }
 
 void DataGraph::unconnect(const dataflow::CableInfo& cable) {
-	execute(new ActionGraphUnconnect(cable.source->out_ports[cable.source_port], cable.sink->in_ports[cable.sink_port]));
+	execute(new ActionGraphUnconnect(cable.source, cable.sink));
 }
 
 

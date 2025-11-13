@@ -83,14 +83,18 @@ Dialog x ''
 			n->pos = from_screen(m);
 			graph->add_node(n);
 			if (hover and hover->type == HoverType::OutPort and n->in_ports.num > 0) {
-				if (dataflow::port_type_match(*hover->node->out_ports[hover->index], *n->in_ports[0])) {
+				auto source = hover->node->out_ports[hover->index];
+				auto sink = n->in_ports[0];
+				if (dataflow::port_type_match(*source, *n->in_ports[0])) {
 					n->pos.y += 50;
-					graph->connect(dataflow::CableInfo{hover->node, hover->index, n, 0});
+					graph->connect(dataflow::CableInfo{source, sink});
 				}
 			} else if (hover and hover->type == HoverType::InPort and n->out_ports.num > 0) {
-				if (dataflow::port_type_match(*n->out_ports[0], *hover->node->in_ports[hover->index])) {
+				auto source = n->out_ports[0];
+				auto sink = hover->node->in_ports[hover->index];
+				if (dataflow::port_type_match(*source, *sink)) {
 					n->pos.y -= 100;
-					graph->connect(dataflow::CableInfo{n, 0, hover->node, hover->index});
+					graph->connect(dataflow::CableInfo{source, sink});
 				}
 			}
 		}
@@ -147,8 +151,8 @@ vec2 GraphEditor::from_screen(const vec2 &p) const {
 
 
 Array<vec2> GraphEditor::cable_spline(const dataflow::CableInfo& c) {
-	vec2 A = node_out_port_pos(c.source, c.source_port);
-	vec2 B = node_in_port_pos(c.sink, c.sink_port);
+	vec2 A = node_out_port_pos(c.source->owner, c.source_port_no());
+	vec2 B = node_in_port_pos(c.sink->owner, c.sink_port_no());
 	return DrawingHelper::spline(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B);
 }
 
@@ -248,7 +252,7 @@ void GraphEditor::on_draw(Painter* p) {
 		tip = format("input %s", port_description(hover->node->in_ports[hover->index]));
 	if (hover and hover->type == HoverType::Cable) {
 		const auto c = graph->cables()[hover->index];
-		tip = format("cable, type <b>%s</b>", c.source->out_ports[c.source_port]->type->name);
+		tip = format("cable, type <b>%s</b>", c.source->type->name);
 	}
 
 	if (tip != "") {
@@ -436,14 +440,14 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 	if (mode == Mode::CreatingNewCable) {
 		if (selection and selection->type == HoverType::OutPort) {
 			if (hover and hover->type == HoverType::InPort) {
-				auto r = artemis::graph::auto_connect(graph, {selection->node, selection->index, hover->node, hover->index});
+				auto r = artemis::graph::auto_connect(graph, {selection->node->out_ports[selection->index], hover->node->in_ports[hover->index]});
 				if (!r)
 					session->error(r.error().msg);
 			}
 		}
 		if (selection and selection->type == HoverType::InPort) {
 			if (hover and hover->type == HoverType::OutPort) {
-				auto r = artemis::graph::auto_connect(graph, {hover->node, hover->index, selection->node, selection->index});
+				auto r = artemis::graph::auto_connect(graph, {hover->node->out_ports[hover->index], selection->node->in_ports[selection->index]});
 				if (!r)
 					session->error(r.error().msg);
 			}

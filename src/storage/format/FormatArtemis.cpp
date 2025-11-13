@@ -60,7 +60,9 @@ void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data,
 				if (id0 >= 0 and id1 >= 0 and id0 < data->graph->nodes.num and id1 < data->graph->nodes.num) {
 					auto source = data->graph->nodes[id0];
 					auto sink = data->graph->nodes[id1];
-					data->graph->connect({source, e.value("source_port")._int(), sink, e.value("sink_port")._int()});
+					int source_no = e.value("source_port")._int();
+					int sink_no = e.value("sink_port")._int();
+					data->graph->connect({source->out_ports[source_no], sink->in_ports[sink_no]});
 				}
 			}
 		}
@@ -96,11 +98,11 @@ void FormatArtemis::_save(const Path &filename, artemis::graph::DataGraph *data)
 		}
 
 		for (const auto& c: data->graph->cables()) {
-			int id0 = data->graph->nodes.find(c.source);
-			int id1 = data->graph->nodes.find(c.sink);
+			int id0 = data->graph->nodes.find(c.source->owner);
+			int id1 = data->graph->nodes.find(c.sink->owner);
 			if (id0 < 0 or id1 < 0) // we might be a group with exterior connections...
 				continue;
-			auto cc = xml::Element("cable").witha("source", str(id0)).witha("source_port", str(c.source_port)).witha("sink", str(id1)).witha("sink_port", str(c.sink_port));
+			auto cc = xml::Element("cable").witha("source", str(id0)).witha("source_port", str(c.source_port_no())).witha("sink", str(id1)).witha("sink_port", str(c.sink_port_no()));
 			g.add(cc);
 		}
 		for (auto p: data->graph->out_ports) {

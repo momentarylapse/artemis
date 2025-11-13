@@ -18,10 +18,10 @@ class InPortBase;
 class OutPortBase;
 
 struct CableInfo {
-	Node* source;
-	int source_port;
-	Node* sink;
-	int sink_port;
+	OutPortBase* source;
+	InPortBase* sink;
+	int source_port_no() const;
+	int sink_port_no() const;
 };
 
 class Graph : public Node {
@@ -42,7 +42,7 @@ public:
 	InPortBase* add_in_port_forward(InPortBase* target);
 	OutPortBase* add_out_port_forward(OutPortBase* target);
 
-	base::expected<int> connect(OutPortBase& source, InPortBase& sink);
+	base::expected<int> connect(Node* source, int source_port, Node* sink, int sink_port);
 	base::expected<int> connect(const CableInfo& c);
 	void unconnect(OutPortBase& source, InPortBase& sink);
 	void unconnect(const CableInfo& c);
