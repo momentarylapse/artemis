@@ -21,10 +21,11 @@ public:
 
 	// actions
 	void add_node(dataflow::Node* node);
-	void remove_node(dataflow::Node* node);
+	void remove_nodes(const Array<dataflow::Node*>& nodes);
 	void node_set_setting(dataflow::Node* node, const string& key, const Any& value);
-	void connect(const dataflow::CableInfo& cable);
+	base::expected<int> connect(const dataflow::CableInfo& cable);
 	void unconnect(const dataflow::CableInfo& cable);
+	base::expected<int> auto_connect(const dataflow::CableInfo& c);
 };
 
 }

@@ -79,22 +79,22 @@ Dialog x ''
 	event_x("graph", xhui::event_id::DragDrop, [this] {
 		if (get_window()->drag.payload.match("add-node:*")) {
 			const auto m = get_window()->mouse_position();
-			auto n = artemis::graph::create_node(session, get_window()->drag.payload.sub(9));
+			auto n = graph::create_node(session, get_window()->drag.payload.sub(9));
 			n->pos = from_screen(m);
-			graph->add_node(n);
+			session->data->add_node(n);
 			if (hover and hover->type == HoverType::OutPort and n->in_ports.num > 0) {
 				auto source = hover->node->out_ports[hover->index];
 				auto sink = n->in_ports[0];
 				if (dataflow::port_type_match(*source, *n->in_ports[0])) {
 					n->pos.y += 50;
-					graph->connect(dataflow::CableInfo{source, sink});
+					session->data->connect(dataflow::CableInfo{source, sink});
 				}
 			} else if (hover and hover->type == HoverType::InPort and n->out_ports.num > 0) {
 				auto source = n->out_ports[0];
 				auto sink = hover->node->in_ports[hover->index];
 				if (dataflow::port_type_match(*source, *sink)) {
 					n->pos.y -= 100;
-					graph->connect(dataflow::CableInfo{source, sink});
+					session->data->connect(dataflow::CableInfo{source, sink});
 				}
 			}
 		}
@@ -440,14 +440,14 @@ void GraphEditor::on_left_button_up(const vec2& m) {
 	if (mode == Mode::CreatingNewCable) {
 		if (selection and selection->type == HoverType::OutPort) {
 			if (hover and hover->type == HoverType::InPort) {
-				auto r = artemis::graph::auto_connect(graph, {selection->node->out_ports[selection->index], hover->node->in_ports[hover->index]});
+				auto r = session->data->auto_connect({selection->node->out_ports[selection->index], hover->node->in_ports[hover->index]});
 				if (!r)
 					session->error(r.error().msg);
 			}
 		}
 		if (selection and selection->type == HoverType::InPort) {
 			if (hover and hover->type == HoverType::OutPort) {
-				auto r = artemis::graph::auto_connect(graph, {hover->node->out_ports[hover->index], selection->node->in_ports[selection->index]});
+				auto r = session->data->auto_connect({hover->node->out_ports[hover->index], selection->node->in_ports[selection->index]});
 				if (!r)
 					session->error(r.error().msg);
 			}
@@ -493,8 +493,7 @@ void GraphEditor::on_key_down(int key) {
 			hover = base::None;
 		}
 		if (selection and selection->type == HoverType::Node) {
-			for (auto n: selected_nodes)
-				graph->remove_node(n);
+			session->data->remove_nodes(selected_nodes);
 			selected_nodes.clear();
 			selection = base::None;
 			hover = base::None;

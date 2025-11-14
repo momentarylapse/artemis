@@ -8,11 +8,18 @@
 
 namespace dataflow {
 	struct CableInfo;
+	class Node;
 	class Graph;
 }
 
 namespace artemis::graph {
 
+struct GraphUpdate {
+	Array<dataflow::Node*> nodes;
+	Array<dataflow::CableInfo> cables;
+};
+
+base::expected<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c);
 base::expected<int> auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c);
 
 } // graph
