@@ -196,10 +196,12 @@ add_executable(artemis WIN32
 	src/action/graph/ActionGraphRemoveNode.cpp
 	src/action/graph/ActionGraphUnconnect.cpp
 	src/action/graph/ActionNodeSetSetting.cpp
+	src/action/graph/ActionNodesMove.cpp
 	src/action/Action.cpp
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
 	src/action/ActionMultiView.cpp
+	src/action/MergableAction.cpp
 	src/data/field/BasisFields.cpp
 	src/data/field/Field.cpp
 	src/data/field/MultiComponentField.cpp
@@ -568,10 +570,12 @@ add_library(moduleartemis SHARED
 	src/action/graph/ActionGraphRemoveNode.cpp
 	src/action/graph/ActionGraphUnconnect.cpp
 	src/action/graph/ActionNodeSetSetting.cpp
+	src/action/graph/ActionNodesMove.cpp
 	src/action/Action.cpp
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
 	src/action/ActionMultiView.cpp
+	src/action/MergableAction.cpp
 	src/data/field/BasisFields.cpp
 	src/data/field/Field.cpp
 	src/data/field/MultiComponentField.cpp

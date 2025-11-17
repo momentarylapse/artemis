@@ -5,12 +5,12 @@
  *      Author: michi
  */
 
-#ifndef ACTIONMANAGER_H_
-#define ACTIONMANAGER_H_
+#pragma once
 
 #include "Action.h"
 #include "../data/Data.h"
-#include "../lib/pattern/Observable.h"
+#include <lib/pattern/Observable.h>
+#include <lib/base/pointer.h>
 
 class Data;
 class Action;
@@ -19,25 +19,23 @@ class ActionGroup;
 class ActionManager : public obs::Node<VirtualBase> {
 	friend class Action;
 public:
-	ActionManager(Data *_data);
-	virtual ~ActionManager();
+	explicit ActionManager(Data *_data);
+	~ActionManager() override;
 
-	static const string MESSAGE_FAILED;
-	static const string MESSAGE_SAVED;
 	obs::source out_failed{this, "failed"};
 	obs::source out_saved{this, "saved"};
 
 	void reset();
 	void enable(bool _enabled);
 
-	void *execute(Action *a);
+	void* execute(xfer<Action> a);
 	void undo();
 	void redo();
 
-	void begin_group(const string &name);
+	void begin_group(const string& name);
 	void end_group();
 
-	bool preview(Action *a);
+	bool preview(Action* a);
 	void clear_preview();
 
 	bool undoable();
@@ -49,9 +47,9 @@ public:
 	string error_location;
 
 private:
-	void add(Action *a);
-	Data *data;
-	Array<Action*> action;
+	void add(Action* a);
+	Data* data;
+	owned_array<Action> history;
 	int cur_pos;
 	int save_pos;
 
@@ -60,10 +58,8 @@ private:
 
 	// group
 	int cur_group_level;
-	ActionGroup *cur_group;
+	ActionGroup* cur_group;
 
 	// preview
-	Action *_preview;
+	Action* _preview;
 };
-
-#endif /* ACTIONMANAGER_H_ */

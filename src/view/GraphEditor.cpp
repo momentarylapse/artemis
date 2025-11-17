@@ -9,6 +9,7 @@
 #include <graph/Graph.h>
 #include <lib/dataflow/Node.h>
 #include <graph/NodeFactory.h>
+#include <action/graph/ActionNodesMove.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Type.h>
 #include <lib/base/iter.h>
@@ -358,9 +359,7 @@ void GraphEditor::on_mouse_move(const vec2& m, const vec2& d) {
 		}
 	} else if (mode == Mode::MovingNodes) {
 		vec2 cur_pos = from_screen(m);
-		for (auto n: graph->nodes)
-			if (selected_nodes.contains(n))
-				n->pos += cur_pos - moving_last_pos;
+		session->data->execute(new ActionNodesMove(selected_nodes, cur_pos - moving_last_pos));
 		moving_last_pos = cur_pos;
 	} else if (mode == Mode::CreatingNewCable) {
 		hover = get_hover(m);
