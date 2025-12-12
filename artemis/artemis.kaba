@@ -1,0 +1,33 @@
+use kaba
+use data.*
+use grid.*
+use fields.*
+use graph.*
+
+let EXPORT_IMPORTS = true
+
+
+
+class Session
+	var graph: owned![Graph]
+	var t: f64
+	var dt: f64
+
+func extern current_session() -> Session&
+
+
+namespace profiler
+	func extern static create_channel(name: string, parent: i32) -> i32
+	func extern static begin(channel: i32)
+	func extern static end(channel: i32)
+
+
+func extern create_session() -> Session*
+func extern start() -> Session*
+func extern run()
+func extern test_done()
+
+func main()
+	print("hi")
+	var s = start()
+	run()

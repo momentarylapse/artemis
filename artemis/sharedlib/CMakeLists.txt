@@ -1,0 +1,558 @@
+# created by xmake
+
+cmake_minimum_required(VERSION 3.21)
+project(artemis)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE Debug)
+
+if(WIN32)
+	list(APPEND COMPILE_OPTIONS /permissive-)
+endif()
+
+
+#=======================================================================================
+#    libraries
+#=======================================================================================
+
+find_package(PkgConfig REQUIRED)
+
+
+
+# lib: zlib (mandatory)
+find_package(ZLIB REQUIRED)
+list(APPEND DEPS ZLIB::ZLIB)
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
+
+
+# lib: vulkan or gl (mandatory)
+set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
+find_package(Vulkan COMPONENTS shaderc_combined)
+if(VULKAN_FOUND)
+	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
+endif()
+find_package(OpenGL)
+if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
+	list(APPEND VULKAN_OR_GL_FOUND "gl")
+endif()
+if(VULKAN_OR_GL_FOUND)
+	if(NOT ${VULKAN_OR_GL} IN_LIST VULKAN_OR_GL_FOUND)
+		list(GET VULKAN_OR_GL_FOUND 0 X)
+		set(VULKAN_OR_GL ${X} CACHE STRING "choose" FORCE)
+		message(WARNING "Choice for VULKAN_OR_GL invalid, using ${VULKAN_OR_GL} instead")
+	endif()
+else()
+	message(SEND_ERROR "Neither vulkan or gl found") #  or/nor..
+	set(VULKAN_OR_GL "")
+endif()
+if(VULKAN_OR_GL STREQUAL "vulkan")
+	list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
+endif()
+if(VULKAN_OR_GL STREQUAL "gl")
+	list(APPEND DEPS OpenGL::OpenGL)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
+endif()
+
+
+# lib: glew (optional)
+set(LIB_GLEW_ENABLED true CACHE BOOL "Use glew library?")
+pkg_check_modules(GLEW glew)
+if(GLEW_FOUND)
+else()
+	set(LIB_GLEW_ENABLED false CACHE BOOL "glew library not found" FORCE)
+endif()
+if(${LIB_GLEW_ENABLED})
+	list(APPEND INCLUDE_DIRECTORIES ${GLEW_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${GLEW_LIBRARY_DIRS})
+	list(APPEND DEPS ${GLEW_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${GLEW_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLEW=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLEW=0)
+endif()
+
+
+# lib: glfw (optional)
+set(LIB_GLFW_ENABLED true CACHE BOOL "Use glfw library?")
+find_package(glfw3)
+if(glfw3_FOUND)
+else()
+	set(LIB_GLFW_ENABLED false CACHE BOOL "glfw library not found" FORCE)
+endif()
+if(${LIB_GLFW_ENABLED})
+	list(APPEND DEPS glfw)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=0)
+endif()
+
+
+# lib: spirv (optional)
+set(LIB_SPIRV_ENABLED true CACHE BOOL "Use spirv library?")
+pkg_check_modules(SPIRV spirv)
+if(SPIRV_FOUND)
+else()
+	set(LIB_SPIRV_ENABLED false CACHE BOOL "spirv library not found" FORCE)
+endif()
+if(${LIB_SPIRV_ENABLED})
+	list(APPEND INCLUDE_DIRECTORIES ${SPIRV_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${SPIRV_LIBRARY_DIRS})
+	list(APPEND DEPS ${SPIRV_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${SPIRV_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SPIRV=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SPIRV=0)
+endif()
+
+
+# lib: unwind (optional)
+set(LIB_UNWIND_ENABLED true CACHE BOOL "Use unwind library?")
+pkg_check_modules(LIBUNWIND libunwind)
+if(LIBUNWIND_FOUND)
+else()
+	set(LIB_UNWIND_ENABLED false CACHE BOOL "unwind library not found" FORCE)
+endif()
+if(${LIB_UNWIND_ENABLED})
+	list(APPEND INCLUDE_DIRECTORIES ${LIBUNWIND_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${LIBUNWIND_LIBRARY_DIRS})
+	list(APPEND DEPS ${LIBUNWIND_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${LIBUNWIND_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_UNWIND=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_UNWIND=0)
+endif()
+
+
+# lib: dl (optional)
+if(WIN32)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_DL=0)
+else()
+	list(APPEND DEPS ${CMAKE_DL_LIBS})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_DL=1)
+endif()
+
+
+
+# lib: freetype2 (mandatory)
+find_package(Freetype REQUIRED)
+list(APPEND DEPS Freetype::Freetype)
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_FREETYPE2=1)
+
+
+# lib: armadillo (mandatory)
+find_package(Armadillo REQUIRED)
+list(APPEND DEPS ${ARMADILLO_LIBRARIES})
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_ARMADILLO=1)
+
+
+# lib: fftw3 (optional)
+set(LIB_FFTW3_ENABLED true CACHE BOOL "Use fftw3 library?")
+pkg_check_modules(FFTW3F fftw3f)
+if(FFTW3F_FOUND)
+else()
+	set(LIB_FFTW3_ENABLED false CACHE BOOL "fftw3 library not found" FORCE)
+endif()
+if(${LIB_FFTW3_ENABLED})
+	list(APPEND INCLUDE_DIRECTORIES ${FFTW3F_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${FFTW3F_LIBRARY_DIRS})
+	list(APPEND DEPS ${FFTW3F_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${FFTW3F_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_FFTW3=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_FFTW3=0)
+endif()
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+list(APPEND DEPS Threads::Threads)
+
+
+#=======================================================================================
+#    target moduleartemis
+#=======================================================================================
+
+add_library(moduleartemis SHARED
+	src/action/graph/ActionGraphAddNode.cpp
+	src/action/graph/ActionGraphConnect.cpp
+	src/action/graph/ActionGraphRemoveNode.cpp
+	src/action/graph/ActionGraphUnconnect.cpp
+	src/action/graph/ActionNodeSetSetting.cpp
+	src/action/graph/ActionNodesMove.cpp
+	src/action/Action.cpp
+	src/action/ActionGroup.cpp
+	src/action/ActionManager.cpp
+	src/action/ActionMultiView.cpp
+	src/action/MergableAction.cpp
+	src/data/field/BasisFields.cpp
+	src/data/field/Field.cpp
+	src/data/field/MultiComponentField.cpp
+	src/data/field/ScalarField.cpp
+	src/data/field/VectorField.cpp
+	src/data/grid/Grid.cpp
+	src/data/grid/RegularGrid.cpp
+	src/data/grid/UnstructuredGrid.cpp
+	src/data/util/ColorMap.cpp
+	src/data/Data.cpp
+	src/graph/canvas/Canvas.cpp
+	src/graph/canvas/LayoutGrid.cpp
+	src/graph/canvas/LayoutNested.cpp
+	src/graph/canvas/LayoutOverlay.cpp
+	src/graph/draw2d/FunctionPlot.cpp
+	src/graph/draw2d/ListPlot.cpp
+	src/graph/draw2d/Plotter.cpp
+	src/graph/field/Divergence.cpp
+	src/graph/field/Gradient.cpp
+	src/graph/field/IsoSurface.cpp
+	src/graph/field/Laplace.cpp
+	src/graph/field/MultiComponentField.cpp
+	src/graph/field/Rotation.cpp
+	src/graph/field/ScalarField.cpp
+	src/graph/field/VectorField.cpp
+	src/graph/field/VectorFieldComponent.cpp
+	src/graph/field/VectorFieldLength.cpp
+	src/graph/grid/RegularGrid.cpp
+	src/graph/list/List.cpp
+	src/graph/list/ListAccumulator.cpp
+	src/graph/list/ListToVectors.cpp
+	src/graph/mesh/SphereMesh.cpp
+	src/graph/mesh/TeapotMesh.cpp
+	src/graph/renderer/DeformationRenderer.cpp
+	src/graph/renderer/GridRenderer.cpp
+	src/graph/renderer/MeshRenderer.cpp
+	src/graph/renderer/PointListRenderer.cpp
+	src/graph/renderer/RendererNode.cpp
+	src/graph/renderer/SceneRenderer.cpp
+	src/graph/renderer/VectorFieldRenderer.cpp
+	src/graph/renderer/VolumeRenderer.cpp
+	src/graph/value/RandomNumber.cpp
+	src/graph/AutoConnect.cpp
+	src/graph/Graph.cpp
+	src/graph/NodeFactory.cpp
+	src/lib/any/any.cpp
+	src/lib/any/conversion.cpp
+	src/lib/base/array.cpp
+	src/lib/base/pointer.cpp
+	src/lib/base/strings.cpp
+	src/lib/dataflow/Graph.cpp
+	src/lib/dataflow/Node.cpp
+	src/lib/dataflow/Port.cpp
+	src/lib/dataflow/ResourceNode.cpp
+	src/lib/dataflow/Setting.cpp
+	src/lib/dataflow/Type.cpp
+	src/lib/doc/_kaba_export.cpp
+	src/lib/doc/chunked.cpp
+	src/lib/doc/pdf.cpp
+	src/lib/doc/ttf.cpp
+	src/lib/doc/xml.cpp
+	src/lib/fft/_kaba_export.cpp
+	src/lib/fft/fft.cpp
+	src/lib/image/color.cpp
+	src/lib/image/image.cpp
+	src/lib/image/image_bmp.cpp
+	src/lib/image/image_jpg.cpp
+	src/lib/image/image_png.cpp
+	src/lib/image/image_tga.cpp
+	src/lib/image/ImagePainter.cpp
+	src/lib/kaba/asm/asm.cpp
+	src/lib/kaba/asm/asm_arm.cpp
+	src/lib/kaba/asm/asm_x86.cpp
+	src/lib/kaba/compiler/Backend.cpp
+	src/lib/kaba/compiler/BackendAmd64.cpp
+	src/lib/kaba/compiler/BackendARM.cpp
+	src/lib/kaba/compiler/BackendArm64.cpp
+	src/lib/kaba/compiler/BackendX86.cpp
+	src/lib/kaba/compiler/CommandList.cpp
+	src/lib/kaba/compiler/Compiler.cpp
+	src/lib/kaba/compiler/mapper.cpp
+	src/lib/kaba/compiler/Serializer.cpp
+	src/lib/kaba/compiler/SerialNode.cpp
+	src/lib/kaba/dynamic/call.cpp
+	src/lib/kaba/dynamic/dynamic.cpp
+	src/lib/kaba/dynamic/exception.cpp
+	src/lib/kaba/dynamic/sorting.cpp
+	src/lib/kaba/lib/dict.cpp
+	src/lib/kaba/lib/extern.cpp
+	src/lib/kaba/lib/lib.cpp
+	src/lib/kaba/lib/lib_async.cpp
+	src/lib/kaba/lib/lib_base.cpp
+	src/lib/kaba/lib/lib_image.cpp
+	src/lib/kaba/lib/lib_kaba.cpp
+	src/lib/kaba/lib/lib_math.cpp
+	src/lib/kaba/lib/lib_os.cpp
+	src/lib/kaba/lib/lib_threads.cpp
+	src/lib/kaba/lib/lib_time.cpp
+	src/lib/kaba/lib/list.cpp
+	src/lib/kaba/parser/abstract.cpp
+	src/lib/kaba/parser/Concretifier.cpp
+	src/lib/kaba/parser/import.cpp
+	src/lib/kaba/parser/lexical.cpp
+	src/lib/kaba/parser/macros.cpp
+	src/lib/kaba/parser/Parser.cpp
+	src/lib/kaba/parser/Transformer.cpp
+	src/lib/kaba/parser/type_matching.cpp
+	src/lib/kaba/syntax/Block.cpp
+	src/lib/kaba/syntax/Class.cpp
+	src/lib/kaba/syntax/Constant.cpp
+	src/lib/kaba/syntax/Function.cpp
+	src/lib/kaba/syntax/Identifier.cpp
+	src/lib/kaba/syntax/Node.cpp
+	src/lib/kaba/syntax/Operator.cpp
+	src/lib/kaba/syntax/preprocessor.cpp
+	src/lib/kaba/syntax/Statement.cpp
+	src/lib/kaba/syntax/SyntaxTree.cpp
+	src/lib/kaba/syntax/Variable.cpp
+	src/lib/kaba/template/implicit.cpp
+	src/lib/kaba/template/implicit_array.cpp
+	src/lib/kaba/template/implicit_callable.cpp
+	src/lib/kaba/template/implicit_dict.cpp
+	src/lib/kaba/template/implicit_enum.cpp
+	src/lib/kaba/template/implicit_future.cpp
+	src/lib/kaba/template/implicit_list.cpp
+	src/lib/kaba/template/implicit_optional.cpp
+	src/lib/kaba/template/implicit_pointer.cpp
+	src/lib/kaba/template/implicit_product.cpp
+	src/lib/kaba/template/implicit_regular.cpp
+	src/lib/kaba/template/template.cpp
+	src/lib/kaba/CompilerConfiguration.cpp
+	src/lib/kaba/Context.cpp
+	src/lib/kaba/Interpreter.cpp
+	src/lib/kaba/kaba.cpp
+	src/lib/kaba/Module.cpp
+	src/lib/linalg/_kaba_export.cpp
+	src/lib/linalg/Matrix.cpp
+	src/lib/math/Box.cpp
+	src/lib/math/complex.cpp
+	src/lib/math/interpolation.cpp
+	src/lib/math/mat3.cpp
+	src/lib/math/mat4.cpp
+	src/lib/math/math.cpp
+	src/lib/math/plane.cpp
+	src/lib/math/quaternion.cpp
+	src/lib/math/random.cpp
+	src/lib/math/ray.cpp
+	src/lib/math/rect.cpp
+	src/lib/math/vec2.cpp
+	src/lib/math/vec3.cpp
+	src/lib/math/vec4.cpp
+	src/lib/mesh/GeometryBall.cpp
+	src/lib/mesh/GeometryCube.cpp
+	src/lib/mesh/GeometryCylinder.cpp
+	src/lib/mesh/GeometryPlane.cpp
+	src/lib/mesh/GeometryPlatonic.cpp
+	src/lib/mesh/GeometrySphere.cpp
+	src/lib/mesh/GeometrySubtract.cpp
+	src/lib/mesh/GeometryTeapot.cpp
+	src/lib/mesh/GeometryTorus.cpp
+	src/lib/mesh/GeometryTorusKnot.cpp
+	src/lib/mesh/MeshEdit.cpp
+	src/lib/mesh/Polygon.cpp
+	src/lib/mesh/PolygonMesh.cpp
+	src/lib/mesh/SkinGenerator.cpp
+	src/lib/mesh/VertexStagingBuffer.cpp
+	src/lib/net/_kaba_export.cpp
+	src/lib/net/BinaryBuffer.cpp
+	src/lib/net/net.cpp
+	src/lib/net/Socket.cpp
+	src/lib/nix/_kaba_export.cpp
+	src/lib/nix/nix.cpp
+	src/lib/nix/nix_buffer.cpp
+	src/lib/nix/nix_draw.cpp
+	src/lib/nix/nix_framebuffer.cpp
+	src/lib/nix/nix_light.cpp
+	src/lib/nix/nix_shader.cpp
+	src/lib/nix/nix_textures.cpp
+	src/lib/nix/nix_vertexbuffer.cpp
+	src/lib/nix/nix_view.cpp
+	src/lib/os/app.cpp
+	src/lib/os/CommandLineParser.cpp
+	src/lib/os/config.cpp
+	src/lib/os/date.cpp
+	src/lib/os/file.cpp
+	src/lib/os/filesystem.cpp
+	src/lib/os/formatter.cpp
+	src/lib/os/msg.cpp
+	src/lib/os/path.cpp
+	src/lib/os/stream.cpp
+	src/lib/os/terminal.cpp
+	src/lib/os/time.cpp
+	src/lib/pattern/Observable.cpp
+	src/lib/profiler/_kaba_export.cpp
+	src/lib/profiler/Profiler.cpp
+	src/lib/syntaxhighlight/AutoComplete.cpp
+	src/lib/syntaxhighlight/BaseParser.cpp
+	src/lib/syntaxhighlight/ParserC.cpp
+	src/lib/syntaxhighlight/ParserCmake.cpp
+	src/lib/syntaxhighlight/ParserHui.cpp
+	src/lib/syntaxhighlight/ParserIni.cpp
+	src/lib/syntaxhighlight/ParserKaba.cpp
+	src/lib/syntaxhighlight/ParserPython.cpp
+	src/lib/syntaxhighlight/ParserShader.cpp
+	src/lib/syntaxhighlight/ParserText.cpp
+	src/lib/syntaxhighlight/Theme.cpp
+	src/lib/threads/Mutex.cpp
+	src/lib/threads/Thread.cpp
+	src/lib/threads/ThreadedWork.cpp
+	src/lib/threads/ThreadPool.cpp
+	src/lib/vulkan/_kaba_export.cpp
+	src/lib/vulkan/AccelerationStructure.cpp
+	src/lib/vulkan/Buffer.cpp
+	src/lib/vulkan/CommandBuffer.cpp
+	src/lib/vulkan/DescriptorSet.cpp
+	src/lib/vulkan/Device.cpp
+	src/lib/vulkan/FrameBuffer.cpp
+	src/lib/vulkan/helper.cpp
+	src/lib/vulkan/Instance.cpp
+	src/lib/vulkan/Pipeline.cpp
+	src/lib/vulkan/Queue.cpp
+	src/lib/vulkan/RenderPass.cpp
+	src/lib/vulkan/Semaphore.cpp
+	src/lib/vulkan/Shader.cpp
+	src/lib/vulkan/SwapChain.cpp
+	src/lib/vulkan/Texture.cpp
+	src/lib/vulkan/VertexBuffer.cpp
+	src/lib/vulkan/vulkan.cpp
+	src/lib/xhui/controls/Button.cpp
+	src/lib/xhui/controls/CheckBox.cpp
+	src/lib/xhui/controls/ColorButton.cpp
+	src/lib/xhui/controls/ComboBox.cpp
+	src/lib/xhui/controls/Control.cpp
+	src/lib/xhui/controls/DrawingArea.cpp
+	src/lib/xhui/controls/Edit.cpp
+	src/lib/xhui/controls/Expander.cpp
+	src/lib/xhui/controls/FileSelector.cpp
+	src/lib/xhui/controls/Grid.cpp
+	src/lib/xhui/controls/Group.cpp
+	src/lib/xhui/controls/HeaderBar.cpp
+	src/lib/xhui/controls/Image.cpp
+	src/lib/xhui/controls/Label.cpp
+	src/lib/xhui/controls/ListView.cpp
+	src/lib/xhui/controls/MenuBar.cpp
+	src/lib/xhui/controls/MultilineEdit.cpp
+	src/lib/xhui/controls/Overlay.cpp
+	src/lib/xhui/controls/RadioButton.cpp
+	src/lib/xhui/controls/Separator.cpp
+	src/lib/xhui/controls/Slider.cpp
+	src/lib/xhui/controls/SpinButton.cpp
+	src/lib/xhui/controls/TabControl.cpp
+	src/lib/xhui/controls/ToggleButton.cpp
+	src/lib/xhui/controls/Toolbar.cpp
+	src/lib/xhui/controls/Viewport.cpp
+	src/lib/xhui/dialogs/AboutDialog.cpp
+	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
+	src/lib/xhui/dialogs/FileSelectionDialog.cpp
+	src/lib/xhui/dialogs/MenuPopup.cpp
+	src/lib/xhui/dialogs/QuestionDialog.cpp
+	src/lib/xhui/_kaba_export.cpp
+	src/lib/xhui/Animator.cpp
+	src/lib/xhui/Application.cpp
+	src/lib/xhui/ContextGL.cpp
+	src/lib/xhui/ContextVulkan.cpp
+	src/lib/xhui/Dialog.cpp
+	src/lib/xhui/language.cpp
+	src/lib/xhui/Menu.cpp
+	src/lib/xhui/Painter.cpp
+	src/lib/xhui/PainterGL.cpp
+	src/lib/xhui/PainterVulkan.cpp
+	src/lib/xhui/Panel.cpp
+	src/lib/xhui/Resource.cpp
+	src/lib/xhui/Theme.cpp
+	src/lib/xhui/Window.cpp
+	src/lib/xhui/xhui.cpp
+	src/lib/ygraphics/Context.cpp
+	src/lib/ygraphics/ContextGL.cpp
+	src/lib/ygraphics/ContextVulkan.cpp
+	src/lib/ygraphics/font.cpp
+	src/lib/ygraphics/Painter.cpp
+	src/lib/ygraphics/PainterGL.cpp
+	src/lib/ygraphics/PainterVulkan.cpp
+	src/lib/yrenderer/helper/Bindable.cpp
+	src/lib/yrenderer/helper/ComputeTask.cpp
+	src/lib/yrenderer/helper/CubeMapSource.cpp
+	src/lib/yrenderer/helper/jitter.cpp
+	src/lib/yrenderer/helper/LightMeter.cpp
+	src/lib/yrenderer/helper/Pipeline.cpp
+	src/lib/yrenderer/helper/PipelineManager.cpp
+	src/lib/yrenderer/post/HDRResolver.cpp
+	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/PostProcessor.cpp
+	src/lib/yrenderer/post/PostProcessorGL.cpp
+	src/lib/yrenderer/post/PostProcessorVulkan.cpp
+	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
+	src/lib/yrenderer/regions/RegionRenderer.cpp
+	src/lib/yrenderer/regions/RegionRendererGL.cpp
+	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
+	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/CubeMapRenderer.cpp
+	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/path/RenderPath.cpp
+	src/lib/yrenderer/scene/path/RenderPathDeferred.cpp
+	src/lib/yrenderer/scene/path/RenderPathForward.cpp
+	src/lib/yrenderer/scene/CameraParams.cpp
+	src/lib/yrenderer/scene/Light.cpp
+	src/lib/yrenderer/scene/MeshEmitter.cpp
+	src/lib/yrenderer/scene/RenderViewData.cpp
+	src/lib/yrenderer/scene/SceneRenderer.cpp
+	src/lib/yrenderer/scene/SceneView.cpp
+	src/lib/yrenderer/target/HeadlessRendererVulkan.cpp
+	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
+	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
+	src/lib/yrenderer/target/TargetRenderer.cpp
+	src/lib/yrenderer/target/TextureRendererGL.cpp
+	src/lib/yrenderer/target/TextureRendererVulkan.cpp
+	src/lib/yrenderer/target/WindowRendererGL.cpp
+	src/lib/yrenderer/target/WindowRendererVulkan.cpp
+	src/lib/yrenderer/target/XhuiRenderer.cpp
+	src/lib/yrenderer/_kaba_export.cpp
+	src/lib/yrenderer/Context.cpp
+	src/lib/yrenderer/ContextGL.cpp
+	src/lib/yrenderer/ContextVulkan.cpp
+	src/lib/yrenderer/Material.cpp
+	src/lib/yrenderer/MaterialManager.cpp
+	src/lib/yrenderer/Renderer.cpp
+	src/lib/yrenderer/ShaderManager.cpp
+	src/lib/yrenderer/TextureManager.cpp
+	src/plugins/PluginManager.cpp
+	src/processing/field/Calculus.cpp
+	src/processing/field/IsoSurface.cpp
+	src/processing/helper/GlobalThreadPool.cpp
+	src/storage/format/Format.cpp
+	src/storage/format/FormatArtemis.cpp
+	src/storage/Storage.cpp
+	src/view/dialog/ColorMapDialog.cpp
+	src/view/ArtemisWindow.cpp
+	src/view/Canvas.cpp
+	src/view/CodeEditor.cpp
+	src/view/DefaultNodePanel.cpp
+	src/view/DrawingHelper.cpp
+	src/view/GraphEditor.cpp
+	src/view/Mode.cpp
+	src/view/NodeListPanel.cpp
+	src/view/SceneRenderer.cpp
+	src/Artemis.cpp
+	src/LibExport.cpp
+	src/ModeDefault.cpp
+	src/Session.cpp)
+target_include_directories(moduleartemis PUBLIC ${INCLUDE_DIRECTORIES})
+target_link_directories(moduleartemis PUBLIC ${LINK_DIRECTORIES})
+target_compile_options(moduleartemis PUBLIC ${COMPILE_OPTIONS})
+target_compile_definitions(moduleartemis PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_link_libraries(moduleartemis PUBLIC ${DEPS})
+if (NOT WIN32)
+	target_compile_options(moduleartemis PUBLIC -fvisibility=hidden)
+endif()
+target_include_directories(moduleartemis PUBLIC src/)
+target_include_directories(moduleartemis PUBLIC src)
+target_include_directories(moduleartemis PUBLIC src/y)
+
+
+#=======================================================================================
+#    install
+#=======================================================================================
+
+set(RESOURCE_DESTINATION share/artemis)
+
+# binaries	
+
+# resources
+install(FILES "plugins/" DESTINATION ${RESOURCE_DESTINATION})

@@ -1,4 +1,3 @@
-package plugins/artemis
-package plugins/fem
-package plugins/yrenderer
+version 1
+package artemis
 
