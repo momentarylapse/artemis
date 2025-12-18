@@ -136,14 +136,9 @@ public:
 };
 
 data::ScalarType type_kaba_to_data(const kaba::Class* type) {
-	if (type == kaba::TypeFloat32)
+	if (type == kaba::common_types.f32)
 		return data::ScalarType::Float32;
-	if (type == kaba::TypeFloat64)
-		return data::ScalarType::Float64;
-	// in case type comes from an external kaba context...
-	if (type->name == "f32")
-		return data::ScalarType::Float32;
-	if (type->name == "f64")
+	if (type == kaba::common_types.f64)
 		return data::ScalarType::Float64;
 	return data::ScalarType::None;
 }
@@ -151,10 +146,10 @@ data::ScalarType type_kaba_to_data(const kaba::Class* type) {
 // FIXME will fail for external bindings :(
 const kaba::Class* type_data_to_kaba(data::ScalarType type) {
 	if (type == data::ScalarType::Float32)
-		return kaba::TypeFloat32;
+		return kaba::common_types.f32;
 	if (type == data::ScalarType::Float64)
-		return kaba::TypeFloat64;
-	return kaba::TypeUnknown;
+		return kaba::common_types.f64;
+	return kaba::common_types.unknown;
 }
 
 data::ScalarField create_scalar_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode) {

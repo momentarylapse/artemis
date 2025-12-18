@@ -17,10 +17,6 @@
 #include "graph/Graph.h"
 #include "lib/kaba/dynamic/dynamic.h"
 
-namespace kaba {
-	extern const Class* TypeFloat64List;
-}
-
 void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
 
 DefaultNodePanel::DefaultNodePanel(Session* s, dataflow::Node* n) : xhui::Panel("node-panel") {
@@ -39,7 +35,7 @@ Dialog x ''
 		set_target("settings-grid");
 		add_control("Label", s->name, 0, i, "");
 		string id = format("setting-%d", i);
-		if (s->type == kaba::TypeFloat64) {
+		if (s->type == kaba::common_types.f64) {
 			auto ss = node->settings[i]->as<double>();
 			add_control("SpinButton", "", 1, i, id);
 			set_options(id, "expandx");
@@ -52,7 +48,7 @@ Dialog x ''
 				session->data->node_set_setting(node, ss->name, get_float(id));
 				//ss->set((double)get_float(id));
 			});
-		} else if (s->type == kaba::TypeInt32) {
+		} else if (s->type == kaba::common_types.i32) {
 			auto ss = node->settings[i]->as<int>();
 			if (s->options.head(4) == "set=") {
 				auto xx = s->options.sub(5, -1).parse_tokens(":,");
@@ -81,7 +77,7 @@ Dialog x ''
 					//ss->set(get_int(id));
 				});
 			}
-		} else if (s->type == kaba::TypeString) {
+		} else if (s->type == kaba::common_types.string) {
 			auto ss = node->settings[i]->as<string>();
 			add_control("Edit", "", 1, i, id);
 			set_options(id, "expandx");
@@ -90,7 +86,7 @@ Dialog x ''
 				session->data->node_set_setting(node, ss->name, get_string(id));
 				//ss->set(get_string(id));
 			});
-		} else if (s->type == kaba::TypeBool) {
+		} else if (s->type == kaba::common_types._bool) {
 			auto ss = node->settings[i]->as<bool>();
 			add_control("CheckBox", "", 1, i, id);
 			set_options(id, "expandx");
@@ -99,7 +95,7 @@ Dialog x ''
 				session->data->node_set_setting(node, ss->name, is_checked(id));
 				//ss->set(is_checked(id));
 			});
-		} else if (s->type == kaba::TypeColor) {
+		} else if (s->type == kaba::common_types.color) {
 			auto ss = node->settings[i]->as<color>();
 			add_control("ColorButton", "", 1, i, id);
 			set_options(id, "expandx");
@@ -122,7 +118,7 @@ Dialog x ''
 					//ss->set(cm);
 				});
 			});
-		} else if (s->type == kaba::TypeFloat64List) {
+		} else if (s->type == kaba::common_types.f64_list) {
 			auto ss = node->settings[i]->as<Array<double>>();
 			add_control("Edit", "", 1, i, id);
 			set_options(id, "expandx");
