@@ -31,10 +31,11 @@ void ScalarField::on_process() {
 
 		if (formula() != cached_formula or !f_p) {
 			cached_formula = formula();
-			ctx = kaba::Context::create();
+			// use kaba.Context dll API
+			ctx = kaba::default_context->f_create_new_context();
 
 			try {
-				module = ctx->create_module_for_source(format(R"foodelim(
+				module = ctx->dll_create_module_for_source(format(R"foodelim(
 func f(p: vec3, t: f32) -> f32
 	let x = p.x
 	let y = p.y

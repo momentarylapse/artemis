@@ -1,4 +1,4 @@
-use plugins.artemis.*
+use artemis.*
 
 func main()
 	var g = weak(current_session().graph)

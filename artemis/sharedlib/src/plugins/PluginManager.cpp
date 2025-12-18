@@ -32,8 +32,10 @@
 
 extern Session* _current_session_;
 
-Session* export_start();
-void export_run();
+void start_session_load_file(Session* s, const Path& filename);
+void start_session_empty(Session* s);
+bool app_init();
+void app_run();
 
 namespace artemis {
 
@@ -173,8 +175,10 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	ext->link_func("current_session", &current_session);
 	ext->link_func("create_session", &create_session);
-	ext->link_func("start", &export_start);
-	ext->link_func("run", &export_run);
+	ext->link_func("start_session_load_file", &start_session_load_file);
+	ext->link_func("start_session_empty", &start_session_empty);
+	ext->link_func("app_init", &app_init);
+	ext->link_func("app_run", &app_run);
 	ext->link_func("test_done", &test_done);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);
@@ -376,11 +380,11 @@ void PluginManager::import_kaba() {
 
 	const auto dir = package->directory;
 
-	auto m = kaba::default_context->load_module(dir | "artemis.kaba");
-	auto mdata = kaba::default_context->load_module(dir | "data.kaba");
-	auto mgrid = kaba::default_context->load_module(dir | "grid.kaba");
-	auto mfields = kaba::default_context->load_module(dir | "fields.kaba");
-	auto mgraph = kaba::default_context->load_module(dir | "graph.kaba");
+	auto m = kaba::default_context->dll_load_module(dir | "artemis.kaba");
+	auto mdata = kaba::default_context->dll_load_module(dir | "data.kaba");
+	auto mgrid = kaba::default_context->dll_load_module(dir | "grid.kaba");
+	auto mfields = kaba::default_context->dll_load_module(dir | "fields.kaba");
+	auto mgraph = kaba::default_context->dll_load_module(dir | "graph.kaba");
 	import_component_class<PolygonMesh>(mdata, "Mesh");
 	import_component_class<data::Grid>(mgrid, "Grid");
 	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
@@ -405,7 +409,7 @@ void PluginManager::find_plugins() {
 void* PluginManager::create_instance(const string& name) {
 	for (const auto& [n, f] : plugin_classes)
 		if (name == n) {
-			auto m = kaba::default_context->load_module(f);
+			auto m = kaba::default_context->dll_load_module(f);
 			for (const auto c: m->classes())
 				if (c->name == name)
 					return c->create_instance();

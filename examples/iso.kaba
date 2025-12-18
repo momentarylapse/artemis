@@ -1,6 +1,7 @@
-use plugins.artemis.*
+use artemis.*
 
 func main()
+	print("hi")
 	var g = weak(current_session().graph)
 
 	var grid = g.add_node("RegularGrid", [300,100])

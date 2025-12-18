@@ -1,4 +1,5 @@
 use kaba
+use os.Path
 use data.*
 use grid.*
 use fields.*
@@ -22,12 +23,18 @@ namespace profiler
 	func extern static end(channel: i32)
 
 
-func extern create_session() -> Session*
-func extern start() -> Session*
-func extern run()
+func extern create_session() -> Session&
+func extern start_session_empty(s: Session&)
+func extern start_session_load_file(s: Session&, filename: Path)
+func extern app_init() -> bool#Session*
+func extern app_run()
 func extern test_done()
 
-func main()
-	print("hi")
-	var s = start()
-	run()
+func main(args: string[])
+	app_init()
+	var s = create_session()
+	if len(args) >= 1
+		start_session_load_file(s, args[0])
+	else
+		start_session_empty(s)
+	app_run()

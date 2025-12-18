@@ -61,7 +61,7 @@ void start_session_load_file(Session* parent, const Path& filename) {
 		if (ext == "artemis") {
 			s->storage->load(filename, s->data.get());
 		} else if (ext == "kaba") {
-			auto m = kaba::default_context->load_module(filename.absolute());
+			auto m = kaba::default_context->dll_load_module(filename.absolute());
 			typedef void (*f_p)();
 			if (auto f = (f_p)m->match_function("main", "void", {})) {
 				f();
@@ -74,12 +74,12 @@ void start_session_load_file(Session* parent, const Path& filename) {
 	});
 }
 
-Session* export_start() {
+bool app_init() {
 	try {
 		xhui::init({}, "artemis");
 	} catch (Exception &e) {
 		msg_error(e.message());
-		return nullptr;
+		return false;
 	}
 
 	//kaba::init();
@@ -89,13 +89,11 @@ Session* export_start() {
 	} catch (Exception &e) {
 		msg_error(e.message());
 	}
-
-	auto s = create_session();
 	artemis::graph::init_factory();
-	start_session_empty(s);
-	return s;
+	return true;
 }
-void export_run() {
+
+void app_run() {
 	try {
 		xhui::run();
 	} catch (Exception& e) {
@@ -119,20 +117,16 @@ namespace os::app {
 		} catch (Exception &e) {
 			msg_error(e.message());
 		}
+		artemis::graph::init_factory();
 
 		auto s = create_session();
-		artemis::graph::init_factory();
 		if (args.num >= 2) {
 			start_session_load_file(s, args[1]);
 		} else {
 			start_session_empty(s);
 		}
 
-		try {
-			xhui::run();
-		} catch (Exception& e) {
-			msg_error(e.message());
-		}
+		app_run();
 		return 0;
 	}
 }
