@@ -1,5 +1,5 @@
 .idea
-/artemis
+libmoduleartemis.*
 build
 cmake-build*
 
