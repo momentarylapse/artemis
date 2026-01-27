@@ -172,6 +172,7 @@ const kaba::Class* field_get_type(const T& field) {
 }
 
 void PluginManager::export_kaba(kaba::Exporter* ext) {
+	ext->package_info("artemis", "0.5");
 
 	ext->link_func("current_session", &current_session);
 	ext->link_func("create_session", &create_session);

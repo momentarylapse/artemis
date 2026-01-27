@@ -76,7 +76,7 @@ Package* get_current_package() {
 }
 
 void SIAddPackageKaba(Context *c) {
-	add_internal_package(c, "kaba");
+	add_internal_package(c, "kaba", "1");
 
 
 	common_types._class = add_type  ("Class", sizeof(Class));
