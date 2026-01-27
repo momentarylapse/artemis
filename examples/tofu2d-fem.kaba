@@ -1,8 +1,9 @@
 use artemis.*
 
 func main()
-	var g = weak(current_session().graph)
-	g.dt = 0.0000001
+	var session = current_session()
+	var g = weak(session.graph)
+	session.dt = 0.0000001
 
 	var grid = g.add_node("RegularGrid", [100,50])
 	grid.set("nx", 12)
