@@ -283,7 +283,7 @@ add_library(moduleartemis SHARED
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
 	src/lib/kaba/lib/list.cpp
-	src/lib/kaba/parser/abstract.cpp
+	src/lib/kaba/parser/AbstractParser.cpp
 	src/lib/kaba/parser/Concretifier.cpp
 	src/lib/kaba/parser/import.cpp
 	src/lib/kaba/parser/lexical.cpp
@@ -555,4 +555,13 @@ set(RESOURCE_DESTINATION share/artemis)
 # binaries	
 
 # resources
+install(FILES "static/icons" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/shader" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/default.theme" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/hui_resources.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/icon.svg" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/keys.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/license.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/license_small.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/OpenSans-Regular.ttf" DESTINATION ${RESOURCE_DESTINATION})
 install(FILES "plugins/" DESTINATION ${RESOURCE_DESTINATION})

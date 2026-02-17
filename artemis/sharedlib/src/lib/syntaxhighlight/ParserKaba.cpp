@@ -90,6 +90,7 @@ ParserKaba::ParserKaba() : Parser("Kaba") {
 	modifiers.add(kaba::Identifier::Virtual);
 	modifiers.add(kaba::Identifier::Override);
 	modifiers.add(kaba::Identifier::Static);
+	modifiers.add(kaba::Identifier::Pure);
 	keywords.add(kaba::Identifier::Const);
 	modifiers.add(kaba::Identifier::Mutable);
 	modifiers.add(kaba::Identifier::Selfref);
@@ -310,23 +311,6 @@ const kaba::Class *node_namespace(shared<kaba::Node> n) {
 }
 
 
-void _ParseFunctionBody(SyntaxTree *syntax, Function *f) {
-	syntax->parser->Exp.cur_line = syntax->parser->Exp.token_logical_line(f->token_id);
-
-	int indent0 = syntax->parser->Exp.cur_line->indent;
-	bool more_to_parse = true;
-
-	syntax->parser->parser_loop_depth = 0;
-
-// instructions
-	try {
-		while (more_to_parse) {
-			more_to_parse = syntax->parser->parse_abstract_indented_command_into_block(f->block.get(), indent0);
-		}
-	} catch (...) {}
-}
-
-
 bool allow(const string &name) {
 	if (name.head(1) == "-")
 		return false;
@@ -396,7 +380,7 @@ autocomplete::Data find_top_level(SyntaxTree *syntax, Function *f, const string 
 
 // get deep "tail" block
 Block* guess_block(SyntaxTree *syntax, Function *f) {
-	Block *b = f->block.get();
+	Block *b = f->block;
 	/*while (true){
 		Block *b_next = nullptr;
 		for (auto *n: b->nodes){
@@ -516,7 +500,7 @@ autocomplete::Data ParserKaba::run_autocomplete(const string &_code, const Path 
 		s->tree->parser->parse_legacy_macros(true);
 
 		//printf("--c\n");
-		s->tree->parser->parse_top_level();
+		s->tree->parser->parse_abstract_top_level();
 
 
 
@@ -536,10 +520,6 @@ autocomplete::Data ParserKaba::run_autocomplete(const string &_code, const Path 
 		int f_line_no = s->tree->parser->Exp.token_logical_line(f->token_id)->physical_line;
 		if (!f->is_extern() and (f_line_no >= 0) and (f_line_no < line))
 			ff = f;
-	}
-	if (ff) {
-//		printf("func: %s\n", ff->name.c_str());
-		_ParseFunctionBody(s->tree.get(), ff);
 	}
 
 	data = simple_parse(s->tree.get(), ff, cur_line);
