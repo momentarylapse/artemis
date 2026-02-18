@@ -3,7 +3,7 @@ use artemis.*
 class GridPoints extends Node
 	var in_grid: InPortGrid
 	var out_points: OutPortVectorList
-	var cell_centers: SettingBool
+	var cell_centers: Setting[bool]
 	
 	func __init__()
 		super.__init__("GridPoints")

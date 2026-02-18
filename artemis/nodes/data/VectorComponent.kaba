@@ -3,7 +3,7 @@ use artemis.*
 class VectorComponent extends Node
 	var in_vector: InPortVector
 	var out_float: OutPortFloat
-	var component: SettingInt
+	var component: Setting[i32]
 	
 	func __init__()
 		super.__init__("VectorComponent")

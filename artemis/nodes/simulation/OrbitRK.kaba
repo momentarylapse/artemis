@@ -112,7 +112,7 @@ class OrbitRK extends Node
 	var in_pos: InPortList
 	var in_vel: InPortList
 	
-	var G: SettingFloat
+	var G: Setting[f64]
 	
 	var state: SimulationState
 	

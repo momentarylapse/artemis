@@ -8,10 +8,10 @@ class StringFEM extends Node
 	var out_dt_dt_u: OutPortVectorField
 	
 #	let length = 0.648 # m  (implicit via grid)
-	var tension: SettingFloat # [N]
-	var diameter: SettingFloat # [m]
-	var fixed_ends: SettingBool
-	var substeps: SettingInt
+	var tension: Setting[f64] # [N]
+	var diameter: Setting[f64] # [m]
+	var fixed_ends: Setting[bool]
+	var substeps: Setting[i32]
 		
 	var mat: Material
 	

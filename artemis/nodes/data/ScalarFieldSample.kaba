@@ -3,7 +3,7 @@ use artemis.*
 class ScalarFieldSample extends Node
 	var in_field: InPortScalarField
 	var out_vector: OutPortFloat
-	var index: SettingInt
+	var index: Setting[i32]
 	
 	func __init__()
 		super.__init__("FloatFieldSample")

@@ -133,7 +133,7 @@ class Flow2dLB extends Node
 	var in_f: InPortMultiComponentField
 	var out_rho: OutPortScalarField
 	var out_v: OutPortVectorField
-	var tau: SettingFloat
+	var tau: Setting[f64]
 	
 	var c1, c2, c3, c4, c5, c6, c7: i32
 	

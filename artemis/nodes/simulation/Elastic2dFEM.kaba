@@ -5,8 +5,8 @@ class Elastic2dFEM extends Node
 	var in_u: InPortVectorField
 	var in_dt_u: InPortVectorField
 	
-	var substeps: SettingInt
-	var thickness: SettingFloat
+	var substeps: Setting[i32]
+	var thickness: Setting[f64]
 	
 	var mat: Material # TODO in port
 	

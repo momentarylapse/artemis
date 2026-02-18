@@ -122,14 +122,6 @@ void link_ports(kaba::Exporter* ext, const string& name) {
 }
 
 template<class T>
-void link_setting(kaba::Exporter* ext, const string& name) {
-	ext->declare_class_size("Setting" + name, sizeof(dataflow::Setting<T>));
-	ext->link_class_func("Setting" + name + ".__init__", &setting_init<T>);
-	ext->link_class_func("Setting" + name + "." + kaba::Identifier::func::Call, &dataflow::Setting<T>::operator());
-	ext->link_class_func("Setting" + name + ".set", &dataflow::Setting<T>::set);
-}
-
-template<class T>
 class GenericVDeleter : public T {
 public:
 	void __delete__() override {
@@ -351,11 +343,13 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	link_ports<Array<double>>(ext, "List");
 	link_ports<Array<vec3>>(ext, "VectorList");
 
-	link_setting<double>(ext, "Float");
-	link_setting<int>(ext, "Int");
-	link_setting<bool>(ext, "Bool");
-	link_setting<string>(ext, "String");
-	link_setting<color>(ext, "Color");
+	ext->declare_class_size("SettingBase", sizeof(dataflow::SettingBase));
+	ext->declare_class_element("SettingBase.name", &dataflow::SettingBase::name);
+	ext->declare_class_element("SettingBase.type", &dataflow::SettingBase::type);
+	ext->declare_class_element("SettingBase.generic_value_pointer", &dataflow::SettingBase::generic_value_pointer);
+	ext->link_class_func("SettingBase.__init2__", &kaba::generic_init_ext<dataflow::SettingBase, dataflow::Node*, const string&, const kaba::Class*, void*, const string&>);
+	ext->link_class_func("SettingBase.__delete__", &kaba::generic_delete<dataflow::SettingBase>);
+	ext->link_class_func("SettingBase.generic_set", &dataflow::SettingBase::generic_set);
 
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);

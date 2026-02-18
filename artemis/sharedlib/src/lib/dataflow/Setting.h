@@ -39,7 +39,7 @@ public:
 
 	std::function<void()> on_update;
 
-protected:
+//protected:
 	void generic_set(void *p);
 };
 

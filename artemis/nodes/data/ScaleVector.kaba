@@ -3,7 +3,7 @@ use artemis.*
 class ScaleVector extends Node
 	var in_vector: InPortVector
 	var out_vector: OutPortVector
-	var factor: SettingFloat
+	var factor: Setting[f64]
 	
 	func __init__()
 		super.__init__("ScaleVector")

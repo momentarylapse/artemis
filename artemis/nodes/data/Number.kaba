@@ -2,7 +2,7 @@ use artemis.*
 
 class Number extends Node
 	var out_float: OutPortFloat
-	var number: SettingFloat
+	var number: Setting[f64]
 	
 	func __init__()
 		super.__init__("Number")

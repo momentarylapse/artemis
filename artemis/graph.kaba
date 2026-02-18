@@ -98,30 +98,36 @@ class OutPortVectorList extends OutPortBase
 	func extern set(x: vec3[])
 
 
-class SettingFloat
-	func extern __init__(node: Node, name: string, value: f64, options: string = "")
-	func extern call() -> f64&
-	func extern mut set(value: f64)
+class SettingBase
+	func __init__() # :( needed for now...
+	func extern __init2__(node: Node, name: string, type: kaba.Class&, p: void&, options: string = "")
+	func extern __delete__()
+	func extern mut generic_set(p: void&)
+	
+	var name: string
+	var type: kaba.Class&
+	var generic_value_pointer: void&
 
-class SettingInt
-	func extern __init__(node: Node, name: string, value: i32, options: string = "")
-	func extern call() -> i32&
-	func extern mut set(value: i32)
 
-class SettingBool
-	func extern __init__(node: Node, name: string, value: bool, options: string = "")
-	func extern call() -> bool&
-	func extern mut set(value: bool)
+class Setting[X]
+	var gen: SettingBase
+	var value: X
+	
+	func __init__()
+		pass
+	func mut __init__(node: Node, name: string, value: X, options: string = "")
+		gen.__init2__(node, name, X, &self.value, options)
+		self.value = value
+	func mut __delete__()
+		pass
+	#func call() -> X&
+	#	return gen.generic_value_pointer as X&
+	func call() -> X
+		return value
+	func mut set(value: X)
+		self.value = value
+		gen.generic_set(&self.value)
 
-class SettingString
-	func extern __init__(node: Node, name: string, value: string, options: string = "")
-	func extern call() -> string&
-	func extern mut set(value: string)
-
-class SettingColor
-	func extern __init__(node: Node, name: string, value: Color, options: string = "")
-	func extern call() -> Color&
-	func extern mut set(value: Color)
 
 class Graph
 	func extern mut clear()

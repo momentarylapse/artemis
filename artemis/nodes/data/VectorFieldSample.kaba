@@ -3,7 +3,7 @@ use artemis.*
 class VectorFieldSample extends Node
 	var in_field: InPortVectorField
 	var out_vector: OutPortVector
-	var index: SettingInt
+	var index: Setting[i32]
 	
 	func __init__()
 		super.__init__("VectorFieldSample")

@@ -6,12 +6,12 @@ class GuitarFEM extends Node
 	var in_dt_u_body: InPortVectorField
 	var in_u_string: InPortVectorField
 	var in_dt_u_string: InPortVectorField
-	var substeps: SettingInt
-	var attach0: SettingInt
-	var attach1: SettingInt
+	var substeps: Setting[i32]
+	var attach0: Setting[i32]
+	var attach1: Setting[i32]
 #	let length = 0.648 # m  (implicit via grid)
-	var tension: SettingFloat # [N]
-	var diameter: SettingFloat # [m]
+	var tension: Setting[f64] # [N]
+	var diameter: Setting[f64] # [m]
 	
 	var mat_body: Material
 	var mat_string: Material
