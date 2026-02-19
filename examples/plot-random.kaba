@@ -1,7 +1,9 @@
 use artemis.*
 
 func main()
-	var g = weak(current_session().graph)
+	var s = current_session()
+	var g = weak(s.graph)
+	s.dt = 0.01
 
 	var rn = g.add_node("RandomNumber", [300, 100])
 	var acc = g.add_node("ListAccumulator", [300, 250])

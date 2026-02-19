@@ -225,7 +225,6 @@ add_library(moduleartemis SHARED
 	src/graph/renderer/SceneRenderer.cpp
 	src/graph/renderer/VectorFieldRenderer.cpp
 	src/graph/renderer/VolumeRenderer.cpp
-	src/graph/value/RandomNumber.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp
 	src/graph/NodeFactory.cpp

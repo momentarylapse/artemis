@@ -35,7 +35,6 @@
 #include "list/ListToVectors.h"
 #include "list/List.h"
 #include "list/ListAccumulator.h"
-#include "value/RandomNumber.h"
 #include "../plugins/PluginManager.h"
 #include "draw2d/ListPlot.h"
 
@@ -115,7 +114,6 @@ void init_factory() {
 	register_node_class<ListPlot>("ListPlot", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<Plotter>("Plotter", {dataflow::NodeCategory::Renderer});
 
-	register_node_class<RandomNumber>("RandomNumber", {dataflow::NodeCategory::Field});
 	register_node_class<List>("List", {dataflow::NodeCategory::Field});
 	register_node_class<ListAccumulator>("ListAccumulator", {dataflow::NodeCategory::Field});
 	register_node_class<ListToVectors>("ListToVectors", {dataflow::NodeCategory::Field});
