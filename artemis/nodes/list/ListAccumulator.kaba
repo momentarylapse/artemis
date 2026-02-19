@@ -1,0 +1,23 @@
+use artemis.*
+
+class ListAccumulator extends Node
+	var in_number: InPort[f64]
+	var out_list: OutPort[f64[]]
+	var capacity: Setting[i32]
+	
+	func __init__()
+		super.__init__("ListAccumulator")
+		in_number.__init__(self, "in")
+		out_list.__init__(self, "out")
+		capacity.__init__(self, "capacity", 1000)
+	
+	func override on_process()
+		for v in in_number.value()
+			out_list.value().add(v)
+			if capacity() > 0
+				while len(out_list.value()) > capacity()
+					out_list.value().remove(0)
+			out_list.has_value = true
+			out_list.mutated()
+		
+	

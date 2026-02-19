@@ -1,0 +1,16 @@
+use artemis.*
+
+class List extends Node
+	var out_list: OutPort[f64[]]
+	var list: Setting[f64[]]
+	
+	func __init__()
+		super.__init__("List")
+		out_list.__init__(self, "out", PortFlags.MUTABLE)
+		list.__init__(self, "list", [0.0, 1.0, 2.0])
+		flags = NodeFlags.RESOURCE
+	
+	func override on_process()
+		out_list.set(list())
+		
+	

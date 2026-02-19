@@ -1,0 +1,27 @@
+use artemis.*
+
+class ListToVectors extends Node
+	var in_list: InPort[f64[]]
+	var out_vectors: OutPort[vec3[]]
+	var first: Setting[i32]
+	var stride: Setting[i32]
+	
+	func __init__()
+		super.__init__("ListToVectors")
+		in_list.__init__(self, "in")
+		out_vectors.__init__(self, "out")
+		first.__init__(self, "first", 0)
+		stride.__init__(self, "stride", 3)
+	
+	func override on_process()
+		if first() < 0
+			return
+		if stride() <= 0
+			return
+		for v in in_list.value()
+			var vectors: vec3[]
+			for i in first():len(v)-2:stride()
+				vectors.add([f32(v[i]), f32(v[i+1]), f32(v[i+2])])
+			out_vectors.set(vectors)
+		
+	

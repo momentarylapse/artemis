@@ -6,8 +6,9 @@ class Number extends Node
 	
 	func __init__()
 		super.__init__("Number")
-		out_float.__init__(self, "out")
+		out_float.__init__(self, "out", PortFlags.MUTABLE)
 		number.__init__(self, "number", 1)
+		flags = NodeFlags.RESOURCE
 	
 	func override on_process()
 		out_float.set(number())

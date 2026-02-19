@@ -49,6 +49,8 @@ class OutPortBase
 	func __init__() # :(
 	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, value: void*, flags = PortFlags.NONE)
 	func extern mut generic_set(p: void*)
+	func extern mut mutated()
+	var has_value: bool
 
 
 class InPort[X] extends InPortBase
@@ -69,6 +71,8 @@ class OutPort[X] extends OutPortBase
 	func mut set(value: X)
 		_value = value
 		generic_set(&_value)
+	func selfref value() -> X&
+		return &_value
 		
 
 

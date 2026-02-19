@@ -309,8 +309,10 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	}
 	{
 		ext->declare_class_size("OutPortBase", sizeof(dataflow::OutPortBase));
+		ext->declare_class_element("OutPortBase.has_value", &dataflow::OutPortBase::has_value);
 		ext->link_class_func("OutPortBase.__init2__", &kaba::generic_init_ext<dataflow::OutPortBase, dataflow::Node*, const string&, const kaba::Class*, void*, dataflow::PortFlags>);
 		ext->link_class_func("OutPortBase.generic_set", &dataflow::OutPortBase::generic_set);
+		ext->link_class_func("OutPortBase.mutated", &dataflow::OutPortBase::mutated);
 	}
 
 	ext->declare_class_size("SettingBase", sizeof(dataflow::SettingBase));
