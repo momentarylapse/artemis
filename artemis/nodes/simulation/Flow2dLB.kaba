@@ -130,9 +130,9 @@ func apply_boundary(out f: MultiComponentField, state0: MultiComponentField, D: 
 
 
 class Flow2dLB extends Node
-	var in_f: InPortMultiComponentField
-	var out_rho: OutPortScalarField
-	var out_v: OutPortVectorField
+	var in_f: InPort[MultiComponentField]
+	var out_rho: OutPort[ScalarField]
+	var out_v: OutPort[VectorField]
 	var tau: Setting[f64]
 	
 	var c1, c2, c3, c4, c5, c6, c7: i32

@@ -1,8 +1,8 @@
 use artemis.*
 
 class Test extends Node	
-	var in_x: InPortScalarField
-	#var out_y: OutPortScalarField
+	var in_x: InPort[ScalarField]
+	#var out_y: OutPort[ScalarField]
 
 
 	func __init__()

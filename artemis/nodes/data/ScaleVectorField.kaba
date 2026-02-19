@@ -1,9 +1,9 @@
 use artemis.*
 
 class ScaleVectorField extends Node
-	var in_field: InPortVectorField
-	var out_field: OutPortVectorField
-	var factor: SettingFloat
+	var in_field: InPort[VectorField]
+	var out_field: OutPort[VectorField]
+	var factor: Setting[f64]
 	
 	func __init__()
 		super.__init__("ScaleVectorField")

@@ -3,9 +3,9 @@ use linalg.*
 use fem.material.*
 
 class StringFEM extends Node
-	var in_u: InPortVectorField
-	var in_dt_u: InPortVectorField
-	var out_dt_dt_u: OutPortVectorField
+	var in_u: InPort[VectorField]
+	var in_dt_u: InPort[VectorField]
+	var out_dt_dt_u: OutPort[VectorField]
 	
 #	let length = 0.648 # m  (implicit via grid)
 	var tension: Setting[f64] # [N]

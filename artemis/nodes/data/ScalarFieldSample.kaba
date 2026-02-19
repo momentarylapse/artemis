@@ -1,8 +1,8 @@
 use artemis.*
 
 class ScalarFieldSample extends Node
-	var in_field: InPortScalarField
-	var out_vector: OutPortFloat
+	var in_field: InPort[ScalarField]
+	var out_vector: OutPort[f64]
 	var index: Setting[i32]
 	
 	func __init__()

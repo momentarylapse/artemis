@@ -1,8 +1,8 @@
 use artemis.*
 
 class ScaleVector extends Node
-	var in_vector: InPortVector
-	var out_vector: OutPortVector
+	var in_vector: InPort[vec3]
+	var out_vector: OutPort[vec3]
 	var factor: Setting[f64]
 	
 	func __init__()

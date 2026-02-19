@@ -1,8 +1,8 @@
 use artemis.*
 
 class VectorComponent extends Node
-	var in_vector: InPortVector
-	var out_float: OutPortFloat
+	var in_vector: InPort[vec3]
+	var out_float: OutPort[f64]
 	var component: Setting[i32]
 	
 	func __init__()
@@ -13,7 +13,7 @@ class VectorComponent extends Node
 	
 	func override on_process()
 		for v in in_vector.value()
-			let c = *component()
+			let c = component()
 			if c >= 0 and c <= 2
 				out_float.set(v._e[c])
 		

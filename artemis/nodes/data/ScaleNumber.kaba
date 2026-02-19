@@ -1,8 +1,8 @@
 use artemis.*
 
 class ScaleNumber extends Node
-	var in_float: InPortFloat
-	var out_float: OutPortFloat
+	var in_float: InPort[f64]
+	var out_float: OutPort[f64]
 	var factor: Setting[f64]
 	
 	func __init__()

@@ -1,12 +1,12 @@
 use artemis.*
 
 class MaxwellFDTD extends Node
-	var in_e: InPortVectorField
-	var in_b: InPortVectorField
-	#var in_rho: InPortScalarField
-	var in_j: InPortVectorField
-	var in_me: InPortVectorField
-	var in_mb: InPortVectorField
+	var in_e: InPort[VectorField]
+	var in_b: InPort[VectorField]
+	#var in_rho: InPort[ScalarField]
+	var in_j: InPort[VectorField]
+	var in_me: InPort[VectorField]
+	var in_mb: InPort[VectorField]
 	var c1, c2, c3, c4, c5: i32
 	
 	func __init__()

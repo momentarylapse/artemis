@@ -108,9 +108,9 @@ class SimulationState
 
 
 class OrbitRK extends Node
-	var in_mass: InPortList
-	var in_pos: InPortList
-	var in_vel: InPortList
+	var in_mass: InPort[f64[]]
+	var in_pos: InPort[f64[]]
+	var in_vel: InPort[f64[]]
 	
 	var G: Setting[f64]
 	

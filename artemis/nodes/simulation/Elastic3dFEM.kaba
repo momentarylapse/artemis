@@ -2,8 +2,8 @@ use artemis.*
 use fem.material.*
 
 class Elastic3dFEM extends Node
-	var in_u: InPortVectorField
-	var in_dt_u: InPortVectorField
+	var in_u: InPort[VectorField]
+	var in_dt_u: InPort[VectorField]
 	var substeps: Setting[i32]
 	
 	var mat: Material

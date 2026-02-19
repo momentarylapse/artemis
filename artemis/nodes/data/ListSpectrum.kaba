@@ -2,8 +2,8 @@ use artemis.*
 use fft
 
 class ListSpectrum extends Node
-	var in_list: InPortList
-	var out_spectrum: OutPortList
+	var in_list: InPort[f64[]]
+	var out_spectrum: OutPort[f64[]]
 	
 	func __init__()
 		super.__init__("ListSpectrum")

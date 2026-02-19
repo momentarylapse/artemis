@@ -10,10 +10,12 @@ enum NodeFlags
 	RENDERER = 2
 	TIME_DEPENDENT = 4
 
+
 enum NodeState
 	UNINITIALIZED
 	DIRTY
 	COMPLETE
+
 
 class Node
 	func extern __init__(name: string)
@@ -28,79 +30,52 @@ class Node
 	var flags: NodeFlags
 	var _state: NodeState
 
+
 enum PortFlags
 	NONE = 0
 	MUTABLE = 1
 	OPTIONAL = 2
 	MULTI = 4
-	
+
+
 class InPortBase
-	func extern __init__(node: Node, name: string, type: kaba.Class*, flags: PortFlags = PortFlags.NONE)
+	func __init__() # FIXME
+	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, flags = PortFlags.NONE)
 	func extern generic_values() -> GenericData[]
-	func extern mutated()
+	func extern mut mutated()
+
+
 class OutPortBase
-	func extern __init__(node: Node, name: string, type: kaba.Class*, value: void*, flags: PortFlags = PortFlags.NONE)
-	func extern generic_set(p: void*)
+	func __init__() # :(
+	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, value: void*, flags = PortFlags.NONE)
+	func extern mut generic_set(p: void*)
 
 
-# TODO kaba template classes!
-class InPortScalarField extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> ScalarField*
-class OutPortScalarField extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: ScalarField)
+class InPort[X] extends InPortBase
+	func override __init__()
+	func __init__(node: Node, name: string, flags = PortFlags.NONE)
+		super.__init2__(node, name, X, flags)
+	func value() -> X*
+		for v in generic_values()
+			return v.p as X*
+		return nil
 
-class InPortVectorField extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> VectorField*
-class OutPortVectorField extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: VectorField)
 
-class InPortMultiComponentField extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> MultiComponentField*
-class OutPortMultiComponentField extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: MultiComponentField)
-	
-class InPortGrid extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> Grid*
+class OutPort[X] extends OutPortBase
+	var _value: X
+	func override __init__()
+	func __init__(node: Node, name: string, flags = PortFlags.NONE)
+		super.__init2__(node, name, X, &_value, flags)
+	func mut set(value: X)
+		_value = value
+		generic_set(&_value)
+		
 
-class InPortFloat extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> f64*
-class OutPortFloat extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: f64)
-
-class InPortVector extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> vec3*
-class OutPortVector extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: vec3)
-
-class InPortList extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> f64[]*
-class OutPortList extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: f64[])
-
-class InPortVectorList extends InPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern value() -> vec3[]*
-class OutPortVectorList extends OutPortBase
-	func extern __init__(node: Node, name: string, flags: PortFlags = PortFlags.NONE)
-	func extern set(x: vec3[])
 
 
 class SettingBase
 	func __init__() # :( needed for now...
-	func extern __init2__(node: Node, name: string, type: kaba.Class&, p: void&, options: string = "")
+	func extern __init2__(node: Node, name: string, type: kaba.Class&, p: void&, options = "")
 	func extern __delete__()
 	func extern mut generic_set(p: void&)
 	
@@ -109,24 +84,20 @@ class SettingBase
 	var generic_value_pointer: void&
 
 
-class Setting[X]
-	var gen: SettingBase
+class Setting[X] extends SettingBase
 	var value: X
 	
-	func __init__()
-		pass
-	func mut __init__(node: Node, name: string, value: X, options: string = "")
-		gen.__init2__(node, name, X, &self.value, options)
+	func override __init__()
+	func mut __init__(node: Node, name: string, value: X, options = "")
+		super.__init2__(node, name, X, &self.value, options)
 		self.value = value
-	func mut __delete__()
-		pass
 	#func call() -> X&
-	#	return gen.generic_value_pointer as X&
+	#	return generic_value_pointer as X&
 	func call() -> X
 		return value
 	func mut set(value: X)
 		self.value = value
-		gen.generic_set(&self.value)
+		generic_set(&self.value)
 
 
 class Graph

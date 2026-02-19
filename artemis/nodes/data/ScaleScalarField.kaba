@@ -1,8 +1,8 @@
 use artemis.*
 
 class ScaleScalarField extends Node
-	var in_field: InPortScalarField
-	var out_field: OutPortScalarField
+	var in_field: InPort[ScalarField]
+	var out_field: OutPort[ScalarField]
 	var factor: Setting[f64]
 	
 	func __init__()

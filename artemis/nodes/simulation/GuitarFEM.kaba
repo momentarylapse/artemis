@@ -2,10 +2,10 @@ use artemis.*
 use fem.material.*
 
 class GuitarFEM extends Node
-	var in_u_body: InPortVectorField
-	var in_dt_u_body: InPortVectorField
-	var in_u_string: InPortVectorField
-	var in_dt_u_string: InPortVectorField
+	var in_u_body: InPort[VectorField]
+	var in_dt_u_body: InPort[VectorField]
+	var in_u_string: InPort[VectorField]
+	var in_dt_u_string: InPort[VectorField]
 	var substeps: Setting[i32]
 	var attach0: Setting[i32]
 	var attach1: Setting[i32]
