@@ -13,9 +13,6 @@
 #include <lib/os/filesystem.h>
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
-#include <lib/linalg/_kaba_export.h>
-#include <lib/fft/_kaba_export.h>
-#include <lib/yrenderer/_kaba_export.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
@@ -34,7 +31,6 @@ extern Session* _current_session_;
 
 void start_session_load_file(Session* s, const Path& filename);
 void start_session_empty(Session* s);
-bool app_init();
 void app_run();
 
 namespace artemis {
@@ -55,11 +51,7 @@ Path PluginManager::directory() {
 
 void PluginManager::init() {
 	package = kaba::default_context->get_package("artemis");
-	kaba::config.directory = directory();
-//	kaba::default_context->register_package_init("artemis", directory() | "artemis", &export_kaba);
-//	kaba::default_context->register_package_init("linalg", directory() | "linalg", &export_package_linalg);
-//	kaba::default_context->register_package_init("fft", directory() | "fft", &export_package_fft);
-//	kaba::default_context->register_package_init("yrenderer", directory() | "yrenderer", &export_package_yrenderer);
+	//kaba::config.directory = directory();
 
 	import_kaba();
 	find_plugins();
@@ -149,7 +141,6 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_func("create_session", &create_session);
 	ext->link_func("start_session_load_file", &start_session_load_file);
 	ext->link_func("start_session_empty", &start_session_empty);
-	ext->link_func("app_init", &app_init);
 	ext->link_func("app_run", &app_run);
 	ext->link_func("test_done", &test_done);
 	ext->link_func("gradient", &processing::gradient);
