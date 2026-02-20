@@ -2,6 +2,12 @@ use kaba
 
 struct Mesh
 	func extern __init__()
+	func extern __delete__()
+	func extern mut __assign__(o: Mesh)
+	func extern mut smoothen()
+	
+	func extern static create_teapot(pos: vec3, radius: f32, samples: i32) -> Mesh
+	func extern static create_sphere(pos: vec3, radius: f32, num: i32) -> Mesh
 
 
 # opaque types for the data graph

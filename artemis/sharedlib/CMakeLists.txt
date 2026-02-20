@@ -212,8 +212,6 @@ add_library(moduleartemis SHARED
 	src/graph/field/VectorFieldComponent.cpp
 	src/graph/field/VectorFieldLength.cpp
 	src/graph/grid/RegularGrid.cpp
-	src/graph/mesh/SphereMesh.cpp
-	src/graph/mesh/TeapotMesh.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
 	src/graph/renderer/MeshRenderer.cpp

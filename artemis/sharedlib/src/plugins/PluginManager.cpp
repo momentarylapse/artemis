@@ -27,6 +27,9 @@
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 
+#include "lib/mesh/GeometrySphere.h"
+#include "lib/mesh/GeometryTeapot.h"
+
 extern Session* _current_session_;
 
 void start_session_load_file(Session* s, const Path& filename);
@@ -155,6 +158,12 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
+	ext->link_class_func("Mesh.__delete__", &kaba::generic_delete<PolygonMesh>);
+	ext->link_class_func("Mesh.__assign__", &kaba::generic_assign<PolygonMesh>);
+	ext->link_class_func("Mesh.smoothen", &PolygonMesh::smoothen);
+
+	ext->link_func("Mesh.create_teapot", &GeometryTeapot::create);
+	ext->link_func("Mesh.create_sphere", &GeometrySphere::create);
 
 	ext->declare_class_size("ColorMap", sizeof(data::ColorMap));
 	ext->declare_class_element("ColorMap.colors", &data::ColorMap::colors);
