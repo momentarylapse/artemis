@@ -214,6 +214,7 @@ add_library(moduleartemis SHARED
 	src/graph/grid/RegularGrid.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
+	src/graph/renderer/ImageRenderer.cpp
 	src/graph/renderer/MeshRenderer.cpp
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp

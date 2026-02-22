@@ -8,6 +8,7 @@
 #include <lib/math/vec3.h>
 #include <lib/math/rect.h>
 #include <lib/image/color.h>
+#include <lib/image/image.h>
 
 
 namespace dataflow {
@@ -31,6 +32,7 @@ void link_basic_types() {
 	//type_map.set(&typeid(mat4), kaba::common_types.mat4);
 	//type_map.set(&typeid(box), kaba::common_types.box);
 	type_map.set(&typeid(color), kaba::common_types.color);
+	type_map.set(&typeid(Image), kaba::common_types.image);
 }
 
 

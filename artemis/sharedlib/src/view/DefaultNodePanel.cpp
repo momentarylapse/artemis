@@ -11,13 +11,21 @@
 #include <lib/any/conversion.h>
 #include <lib/os/msg.h>
 #include <lib/xhui/xhui.h>
+#include <lib/xhui/dialogs/FileSelectionDialog.h>
 
 #include "Session.h"
 #include "dialog/ColorMapDialog.h"
 #include "graph/Graph.h"
-#include "lib/kaba/dynamic/dynamic.h"
+#include <lib/kaba/dynamic/dynamic.h>
+#include <lib/os/app.h>
 
 void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
+
+string nice_path(const Path& p) {
+	if (p.is_in(os::app::home_directory))
+		return "~/" + str(p.relative_to(os::app::home_directory));
+	return str(p);
+}
 
 DefaultNodePanel::DefaultNodePanel(Session* s, dataflow::Node* n) : xhui::Panel("node-panel") {
 	session = s;
@@ -84,6 +92,18 @@ Dialog x ''
 			set_string(id, (*ss)());
 			event(id, [this, id, ss] {
 				session->data->node_set_setting(node, ss->name, get_string(id));
+				//ss->set(get_string(id));
+			});
+		} else if (s->type == kaba::common_types.path) {
+			auto ss = node->settings[i]->as<Path>();
+			add_control("Button", "", 1, i, id);
+			set_options(id, "expandx");
+			set_string(id, nice_path((*ss)()));
+			event(id, [this, id, ss] {
+				xhui::FileSelectionDialog::ask(this, "File", "", {}).then([this, id, ss] (const Path& p) {
+					session->data->node_set_setting(node, ss->name, str(p));
+					set_string(id, nice_path((*ss)()));
+				});
 				//ss->set(get_string(id));
 			});
 		} else if (s->type == kaba::common_types._bool) {

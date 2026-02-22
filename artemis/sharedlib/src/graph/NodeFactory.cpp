@@ -25,6 +25,7 @@
 #include "renderer/GridRenderer.h"
 #include "renderer/SceneRenderer.h"
 #include "renderer/MeshRenderer.h"
+#include "renderer/ImageRenderer.h"
 #include "renderer/PointListRenderer.h"
 #include "renderer/VectorFieldRenderer.h"
 #include "renderer/VolumeRenderer.h"
@@ -98,6 +99,7 @@ void init_factory() {
 	register_node_class_p<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<MeshRenderer>("MeshRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class_p<ImageRenderer>("ImageRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<VolumeRenderer>("VolumeRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {dataflow::NodeCategory::Renderer});

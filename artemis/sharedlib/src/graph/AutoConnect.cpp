@@ -28,6 +28,10 @@ base::expected<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, c
 		return R{"MeshRenderer"};
 	if (source->type->name == "Mesh" and sink->type->name == "RenderData")
 		return R{"MeshRenderer", "SceneRenderer"};
+	if (source->type->name == "Image" and sink->type->name == "DrawCall")
+		return R{"ImageRenderer"};
+	if (source->type->name == "Image" and sink->type->name == "RenderData")
+		return R{"ImageRenderer", "SceneRenderer"};
 	if (source->type->name == "DrawCall" and sink->type->name == "RenderData")
 		return R{"SceneRenderer"};
 	if (source->type->name == "Grid" and sink->type->name == "DrawCall")

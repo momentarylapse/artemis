@@ -1,0 +1,19 @@
+use artemis.*
+use os
+use image
+
+class ImageFile extends Node
+	var out_image: OutPort[image.Image]
+	var file: Setting[os.Path]
+	
+	func __init__()
+		super.__init__("ImageFile")
+		out_image.__init__(self, "out", PortFlags.MUTABLE)
+		file.__init__(self, "file", "")
+		flags = NodeFlags.RESOURCE
+	
+	func override on_process()
+		let i = image.Image.load(file())
+		out_image.set(i)
+		
+	
