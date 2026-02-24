@@ -28,8 +28,8 @@ class MaxwellFDTD extends Node
 	
 		let N = 5
 		let dt = current_session().dt / N * 2
-		for E in in_e.value()
-			for B in in_b.value()
+		for mut E in in_e.value()
+			for mut B in in_b.value()
 				for step in 0:N
 					profiler.begin(c1)
 				

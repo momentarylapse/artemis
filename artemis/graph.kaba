@@ -57,7 +57,7 @@ class InPort[X] extends InPortBase
 	func override __init__()
 	func __init__(node: Node, name: string, flags = PortFlags.NONE)
 		super.__init2__(node, name, X, flags)
-	func value() -> X*
+	func selfref value() -> X*
 		for v in generic_values()
 			return v.p as X*
 		return nil

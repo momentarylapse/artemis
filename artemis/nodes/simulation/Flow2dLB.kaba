@@ -163,7 +163,7 @@ class Flow2dLB extends Node
 	
 	func override on_process()
 		# assume PER_CELL
-		for f in in_f.value()
+		for mut f in in_f.value()
 		
 			#let dt = current_session().graph.dt
 			

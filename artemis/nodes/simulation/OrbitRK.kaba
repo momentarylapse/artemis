@@ -148,8 +148,8 @@ class OrbitRK extends Node
 	
 	func override on_process()
 		for mass in in_mass.value()
-			for pos in in_pos.value()
-				for vel in in_vel.value()
+			for mut pos in in_pos.value()
+				for mut vel in in_vel.value()
 					state_in(mass, pos, vel)
 		
 					state.iterate(current_session().dt)

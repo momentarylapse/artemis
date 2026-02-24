@@ -83,8 +83,8 @@ class Elastic3dFEM extends Node
 	
 	func override on_process()
 		# assume PER_VERTEX
-		for u in in_u.value()
-			for dt_u in in_dt_u.value()
+		for mut u in in_u.value()
+			for mut dt_u in in_dt_u.value()
 		
 				let dt = current_session().dt
 				let N = substeps()

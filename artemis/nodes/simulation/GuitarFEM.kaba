@@ -126,10 +126,10 @@ class GuitarFEM extends Node
 
 	func override on_process()
 		# assume PER_VERTEX
-		for ub in in_u_body.value()
-			for dt_ub in in_dt_u_body.value()
-				for us in in_u_string.value()
-					for dt_us in in_dt_u_string.value()
+		for mut ub in in_u_body.value()
+			for mut dt_ub in in_dt_u_body.value()
+				for mut us in in_u_string.value()
+					for mut dt_us in in_dt_u_string.value()
 		
 						let dt = current_session().dt
 						let N = substeps()

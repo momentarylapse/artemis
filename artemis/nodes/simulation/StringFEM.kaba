@@ -62,8 +62,8 @@ class StringFEM extends Node
 
 	func override on_process()
 		# assume PER_VERTEX
-		for u in in_u.value()
-			for dt_u in in_dt_u.value()
+		for mut u in in_u.value()
+			for mut dt_u in in_dt_u.value()
 			
 				var dt_dt_u = u # dummy
 		
