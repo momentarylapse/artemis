@@ -41,12 +41,15 @@ public:
 	void draw_background(Painter* p);
 	void draw_text(Painter* p);
 	void draw_active_marker(Painter* p);
+	void draw_line_numbers(Painter* p, const color& bg);
 
 	// byte offset in text buffer
 	using Index = int;
 
 	void set_cursor_pos(Index index, bool selecting = false);
-	void scroll_into_view(Index index);
+	void scroll_into_view(Index index); // lazy request
+	void _scroll_into_view(Index index); // actual operation during draw
+	base::optional<Index> _scroll_into_view_request;
 
 	mutable float ui_scale = 1.0f;
 	bool multiline = false;
@@ -88,6 +91,9 @@ public:
 	void multi_line_indent(int indent);
 	string get_range(Index i0, Index i1) const;
 
+	Index find_word_start(Index i0) const;
+	Index find_word_end(Index i0) const;
+
 	struct LinePos {
 		int line, offset;
 	};
@@ -115,7 +121,15 @@ public:
 	};
 	Array<Operation> history;
 	int current_history_index = 0;
+	int save_history_index = 0;
 	void clear_history();
+	void prune_history();
+	void set_save_state();
+	bool is_save_state() const;
+	bool is_undoable() const;
+	bool is_redoable() const;
+	void undo();
+	void redo();
 
 
 	// override in SpinButton etc

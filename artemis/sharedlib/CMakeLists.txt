@@ -229,6 +229,7 @@ add_library(moduleartemis SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
+	src/lib/codeeditor/CodeEditor.cpp
 	src/lib/dataflow/Graph.cpp
 	src/lib/dataflow/Node.cpp
 	src/lib/dataflow/Port.cpp

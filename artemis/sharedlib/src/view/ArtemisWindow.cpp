@@ -90,7 +90,7 @@ Dialog x x padding=0
 				.
 				---|
 				Overlay code-editor-panel '' visible=no
-					MultilineEdit code-editor '' greedfactory=0.5 monospace fontsize=15 linenumbers __altbg lineheightscale=1.1 focusframe=no
+					Grid code-editor-grid ''
 					Grid overlay-code-grid '' margin=25
 						Grid ? ''
 							Label ? '' ignorehover expandx
@@ -121,7 +121,7 @@ Dialog x x padding=0
 	graph_editor = new artemis::view::GraphEditor(session);
 	embed("left-grid", 0, 0, graph_editor);
 
-	code_editor = new artemis::view::CodeEditor(session, this, "code-editor", artemis::PluginManager::directory());
+	code_editor = new artemis::view::CodeEditor(session, this, "code-editor-grid", artemis::PluginManager::directory());
 
 	canvas = new artemis::view::Canvas(session);
 	embed("canvas-grid", 0, 0, canvas.get());

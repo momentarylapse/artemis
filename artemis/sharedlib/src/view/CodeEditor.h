@@ -11,6 +11,9 @@ namespace xhui {
 	class Panel;
 	class Edit;
 }
+namespace codeedit {
+	class CodeEditor;
+}
 
 class Session;
 
@@ -20,14 +23,10 @@ class CodeEditor {
 public:
 	CodeEditor(Session* s, xhui::Panel* panel, const string& id, const Path& package_dir);
 
-	void update_markup();
-
 	void run();
 
 	Session* session;
-	xhui::Panel* panel;
-	xhui::Edit* edit;
-	string id;
+	codeedit::CodeEditor* editor;
 	Path package_dir;
 };
 
