@@ -6,6 +6,7 @@
 
 #include <lib/base/base.h>
 #include <lib/os/path.h>
+#include <lib/pattern/Observable.h>
 
 namespace xhui {
 	class Panel;
@@ -19,7 +20,7 @@ class Session;
 
 namespace artemis::view {
 
-class CodeEditor {
+class CodeEditor : public obs::Node<VirtualBase> {
 public:
 	CodeEditor(Session* s, xhui::Panel* panel, const string& id, const Path& package_dir);
 

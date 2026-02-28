@@ -20,7 +20,7 @@ ImageRenderer::ImageRenderer(Session* s) : RenderEmitterNode(s, "ImageRenderer")
 	material->metal = 0;
 	material->albedo = White;
 	material->emission = Black;//White;
-	material->pass0.cull_mode = vulkan::CullMode::NONE;
+	material->pass0.cull_mode = ygfx::CullMode::NONE;
 	material->textures.add(new ygfx::Texture);
 	vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 }

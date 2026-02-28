@@ -90,7 +90,7 @@ Dialog x x padding=0
 				.
 				---|
 				Overlay code-editor-panel '' visible=no
-					Grid code-editor-grid ''
+					Grid code-editor-grid '' greedfactory=0.5
 					Grid overlay-code-grid '' margin=25
 						Grid ? ''
 							Label ? '' ignorehover expandx
