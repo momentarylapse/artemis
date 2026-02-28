@@ -1,9 +1,9 @@
 use kaba
 use os.Path
-use data.*
-use grid.*
-use fields.*
-use graph.*
+use .data.*
+use .grid.*
+use .fields.*
+use .graph.*
 
 let EXPORT_IMPORTS = true
 

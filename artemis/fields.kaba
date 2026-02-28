@@ -1,5 +1,5 @@
 use kaba
-use grid.*
+use .grid.*
 use yrenderer.gfx.ShaderStorageBuffer
 
 
