@@ -19,6 +19,7 @@
 #include <lib/kaba/syntax/Class.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
+#include <lib/xhui/TextLayout.h>
 #include "DrawingHelper.h"
 #include "plugins/PluginManager.h"
 #include "storage/Storage.h"
@@ -126,7 +127,7 @@ vec2 GraphEditor::node_out_port_pos(dataflow::Node* n, int i) {
 }
 
 template<class P>
-string port_description(P* p) {
+string port_description(P* p, const string& direction) {
 	Array<string> flags;
 	if (p->flags & dataflow::PortFlags::Mutable)
 		flags.add("mutable");
@@ -138,8 +139,8 @@ string port_description(P* p) {
 	if (p->type)
 		type = p->type->name;
 	if (flags.num > 0)
-		return format("<b>%s</b>, type <b>%s</b>  (%s)", p->name, type, implode(flags, ", "));
-	return format("<b>%s</b>, type <b>%s</b>", p->name, type);
+		return format("<b>%s</b> - %s - type: <b>%s</b>  (%s)", p->name, direction, type, implode(flags, ", "));
+	return format("<b>%s</b> - %s - type: <b>%s</b>", p->name, direction, type);
 }
 
 vec2 GraphEditor::to_screen(const vec2 &p) const {
@@ -248,17 +249,17 @@ void GraphEditor::on_draw(Painter* p) {
 
 	string tip;
 	if (hover and hover->type == HoverType::OutPort)
-		tip = format("output %s", port_description(hover->node->out_ports[hover->index]));
+		tip = port_description(hover->node->out_ports[hover->index], "output");
 	if (hover and hover->type == HoverType::InPort)
-		tip = format("input %s", port_description(hover->node->in_ports[hover->index]));
+		tip = port_description(hover->node->in_ports[hover->index], "input");
 	if (hover and hover->type == HoverType::Cable) {
 		const auto c = graph->cables()[hover->index];
-		tip = format("cable, type <b>%s</b>", c.source->type->name);
+		tip = format("cable - type: <b>%s</b>", c.source->type->name);
 	}
 
 	if (tip != "") {
-		const auto l = TextLayout::from_format_string(tip);
-		DrawingHelper::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l, xhui::Theme::_default.background_button);
+		const auto l = xhui::TextLayout::from_format_string(p, tip);
+		xhui::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l, xhui::Theme::_default.background_button);
 	}
 
 	p->set_clip(clip0);

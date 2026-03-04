@@ -23,22 +23,6 @@ namespace yrenderer {
 }
 class Painter;
 
-struct TextLayout {
-	struct Part {
-		string text;
-		float font_size;
-		base::optional<color> col;
-		bool bold;
-		bool italic;
-		vec2 pos;
-		rect box;
-	};
-	Array<Part> parts;
-	rect box() const;
-
-	static TextLayout from_format_string(const string& s, float font_size = -1);
-};
-
 class DrawingHelper {
 public:
 	explicit DrawingHelper(xhui::Context* ctx1, yrenderer::Context* ctx2);
@@ -61,8 +45,6 @@ public:
 	static void draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d);
 
 	static Array<vec2> spline(const vec2& a, const vec2& b, const vec2& c, const vec2& d);
-	static void draw_text_layout(Painter* p, const vec2& pos, const TextLayout& l);
-	static void draw_text_layout_with_box(Painter* p, const vec2& pos, const TextLayout& l, const color& bg, float padding=7, float roundness=7);
 
 	xhui::Context* xhui_ctx;
 	yrenderer::Context* ctx;

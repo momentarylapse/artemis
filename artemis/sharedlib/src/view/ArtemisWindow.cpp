@@ -8,6 +8,7 @@
 #include "lib/xhui/Painter.h"
 #include <lib/xhui/Context.h>
 #include <lib/xhui/Dialog.h>
+#include <lib/xhui/TextLayout.h>
 #include <lib/xhui/controls/Toolbar.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/xhui/dialogs/QuestionDialog.h>
@@ -216,8 +217,8 @@ Dialog x x padding=0
 			} else if (m.type == Session::Message::Type::Warning) {
 				bg = color(1, 0.5f, 0.3f, 0);
 			}
-			const auto l = TextLayout::from_format_string(text, xhui::Theme::_default.font_size * 1.5f);
-			DrawingHelper::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box().width()/2, 30.0f*i), l, bg, 14, 10);
+			const auto l = xhui::TextLayout::from_format_string(p, text, xhui::Theme::_default.font_size * 1.5f);
+			xhui::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box().width()/2, 30.0f*i), l, bg, 14, 10);
 		}
 	});
 	event_x(id, xhui::event_id::Close, [this] {

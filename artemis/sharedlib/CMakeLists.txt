@@ -452,6 +452,7 @@ add_library(moduleartemis SHARED
 	src/lib/xhui/PainterVulkan.cpp
 	src/lib/xhui/Panel.cpp
 	src/lib/xhui/Resource.cpp
+	src/lib/xhui/TextLayout.cpp
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
