@@ -259,7 +259,9 @@ void GraphEditor::on_draw(Painter* p) {
 
 	if (tip != "") {
 		const auto l = xhui::TextLayout::from_format_string(p, tip);
-		xhui::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l, xhui::Theme::_default.background_button);
+		color fg = xhui::Theme::_default.text_label;
+		color bg = xhui::Theme::_default.background_button;
+		xhui::draw_text_layout_with_box(p, get_window()->mouse_position() + vec2(-10, 30), l, fg, bg);
 	}
 
 	p->set_clip(clip0);

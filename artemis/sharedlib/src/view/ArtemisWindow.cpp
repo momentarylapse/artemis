@@ -208,6 +208,7 @@ Dialog x x padding=0
 	});
 	event_xp("overlay-area", xhui::event_id::Draw, [this] (Painter* p) {
 		for (const auto& [i, m]: enumerate(session->messages)) {
+			color fg = xhui::Theme::_default.text_label;
 			color bg = xhui::Theme::_default.background_button;
 			string text = m.text;
 			if (m.type == Session::Message::Type::Error) {
@@ -218,7 +219,7 @@ Dialog x x padding=0
 				bg = color(1, 0.5f, 0.3f, 0);
 			}
 			const auto l = xhui::TextLayout::from_format_string(p, text, xhui::Theme::_default.font_size * 1.5f);
-			xhui::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box().width()/2, 30.0f*i), l, bg, 14, 10);
+			xhui::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box().width()/2, 30.0f*(float)i), l, fg, bg, 14, 10);
 		}
 	});
 	event_x(id, xhui::event_id::Close, [this] {

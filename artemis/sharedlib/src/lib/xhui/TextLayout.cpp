@@ -14,11 +14,14 @@ TextLayout TextLayout::from_format_string(::Painter* p, const string& s, float f
 	auto add = [&] (const string& text, bool bold) {
 		auto face = xhui::pick_font(xhui::Theme::_default.font_name, bold, false);
 		face->set_size(font_size * p->ui_scale);
-		l.parts.add({text, font_size, base::None, bold, false, pos});
-
 		const auto dims = face->get_text_dimensions(text);
+
+		//float dy = (font_size - dims.ascender) / p->ui_scale;
+		float dy = font_size - dims.ascender / p->ui_scale;
+		l.parts.add({text, font_size, base::None, bold, false, pos + vec2(0, dy)});
+
 		vec2 size = {dims.bounding_width / p->ui_scale, dims.inner_height() / p->ui_scale};
-		l.parts.back().box = {pos.x, pos.x + size.x, pos.y, pos.y + size.y};
+		l.parts.back().box = {pos.x, pos.x + size.x, pos.y + dy, pos.y + size.y + dy};
 		pos += vec2(size.x, 0);
 	};
 
@@ -51,31 +54,24 @@ rect TextLayout::box() const {
 }
 
 
-void draw_text_layout(::Painter* p, const vec2& pos, const TextLayout& l) {
+void draw_text_layout(::Painter* p, const vec2& pos, const TextLayout& l, const color& fg) {
 	for (const auto& t: l.parts) {
 		if (t.col)
 			p->set_color(*t.col);
+		else
+			p->set_color(fg);
 		p->set_font("", t.font_size, t.bold, t.italic);
 		p->draw_str(pos + t.pos, t.text);
 	}
 }
 
-void draw_text_layout_with_box(::Painter* p, const vec2& pos, const TextLayout& l, const color& bg, float padding, float roundness) {
-	/*vec2 size = p->get_str_size(str);
-	vec2 pos = _pos;
-	if (align == 0)
-		pos.x -= size.x / 2;
-	if (align == 1)
-		pos.x -= size.x;*/
+void draw_text_layout_with_box(::Painter* p, const vec2& pos, const TextLayout& l, const color& fg, const color& bg, float padding, float roundness) {
 	p->set_color(bg);
 	p->set_roundness(roundness);
 	auto box = l.box();
 	p->draw_rect(rect(pos + box.p00(), pos + box.p11()).grow(padding));
-	p->set_color(xhui::Theme::_default.text_label);
 	p->set_roundness(0);
-	draw_text_layout(p, pos, l);
-
-	//draw_boxed_str(p, pos, l.parts[0].text);
+	draw_text_layout(p, pos, l, fg);
 }
 
 }

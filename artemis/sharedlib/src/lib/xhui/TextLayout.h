@@ -26,7 +26,8 @@ struct TextLayout {
 	static TextLayout from_format_string(::Painter* p, const string& s, float font_size = -1);
 };
 
-void draw_text_layout(::Painter* p, const vec2& pos, const TextLayout& l);
-void draw_text_layout_with_box(::Painter* p, const vec2& pos, const TextLayout& l, const color& bg, float padding=7, float roundness=7);
+// base line will be at y = (pos.y + font_size)
+void draw_text_layout(::Painter* p, const vec2& pos, const TextLayout& l, const color& fg);
+void draw_text_layout_with_box(::Painter* p, const vec2& pos, const TextLayout& l, const color& fg, const color& bg, float padding=7, float roundness=7);
 
 }
