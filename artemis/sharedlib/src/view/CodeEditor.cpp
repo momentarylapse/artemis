@@ -30,8 +30,8 @@ func main()
 )foodelim");
 	editor->update_highlight_all();
 
-	editor->out_no_error >> create_sink([this] {
-		session->info("no error");
+	editor->out_info >> create_data_sink<string>([this] (const string& m) {
+		session->info(m);
 	});
 	editor->out_error >> create_data_sink<string>([this] (const string& m) {
 		session->error(m);
