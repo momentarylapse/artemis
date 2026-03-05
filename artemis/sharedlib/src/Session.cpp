@@ -29,6 +29,7 @@ Session *create_session() {
 	s->graph = s->data->graph.get();
 	//s->mode_world = new ModeWorld(s);
 	s->win = new ArtemisWindow(s);
+	xhui::fly(s->win);
 	_current_session_ = s;
 	artemis::processing::pool::init();
 	return s;

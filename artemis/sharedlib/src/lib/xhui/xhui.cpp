@@ -20,7 +20,7 @@
 
 
 namespace xhui {
-	extern Array<Window*> _windows_;
+	extern shared_array<Window> _windows_;
 
 	float global_ui_scale = 1;
 	ColorSpace color_space_display = ColorSpace::SRGB;
@@ -207,31 +207,34 @@ void iterate_runners(float dt) {
 	}
 }
 
+void do_single_main_loop() {
+	static os::Timer timer;
+
+	glfwPollEvents();
+
+	for (auto w: _windows_)
+		w->_handle_events();
+
+	for (auto w: _windows_)
+		if (w->dialogs.num > 0)
+			if (w->dialogs.back()->_destroy_requested)
+				w->close_dialog(w->dialogs.back().get());
+
+	for (int i=_windows_.num-1; i>=0; i--)
+		if (_windows_[i]->_destroy_requested) {
+			_windows_[i]->end_run_promise();
+			_windows_.erase(i);
+		}
+
+	iterate_runners(timer.get());
+
+	//usleep(8000);
+	os::sleep(0.008f);
+}
+
 void run() {
-	os::Timer timer;
-	while (!Application::_end_requested) {
-		glfwPollEvents();
-
-		for (auto w: _windows_)
-			w->_handle_events();
-
-		for (auto w: _windows_)
-			if (w->dialogs.num > 0)
-				if (w->dialogs.back()->_destroy_requested)
-					w->close_dialog(w->dialogs.back().get());
-
-		for (int i=_windows_.num-1; i>=0; i--)
-			if (_windows_[i]->_destroy_requested) {
-				delete _windows_[i];
-				if (_windows_.num == 0)
-					return;
-			}
-
-		iterate_runners(timer.get());
-
-		//usleep(8000);
-		os::sleep(0.008f);
-	};
+	while (!Application::_end_requested and _windows_.num > 0)
+		do_single_main_loop();
 }
 
 namespace clipboard {

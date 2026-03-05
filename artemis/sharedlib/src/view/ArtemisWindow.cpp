@@ -219,7 +219,7 @@ Dialog x x padding=0
 				bg = color(1, 0.5f, 0.3f, 0);
 			}
 			const auto l = xhui::TextLayout::from_format_string(p, text, xhui::Theme::_default.font_size * 1.5f);
-			xhui::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box().width()/2, 30.0f*(float)i), l, fg, bg, 14, 10);
+			xhui::draw_text_layout_with_box(p, p->area().center() + vec2(-l.box.width()/2, 30.0f*(float)i), l, fg, bg, 14, 10);
 		}
 	});
 	event_x(id, xhui::event_id::Close, [this] {

@@ -138,9 +138,11 @@ string port_description(P* p, const string& direction) {
 	string type = "*";
 	if (p->type)
 		type = p->type->name;
+	string sflags = "-";
 	if (flags.num > 0)
-		return format("<b>%s</b> - %s - type: <b>%s</b>  (%s)", p->name, direction, type, implode(flags, ", "));
-	return format("<b>%s</b> - %s - type: <b>%s</b>", p->name, direction, type);
+		sflags = implode(flags, ", ");
+	//return format("<big>%s: <b>%s</b></big>\n<soft>type:</soft> <b>%s</b>", direction, p->name, type) + sflags;
+	return format("<big><b>%s</b></big>  (%s)\n<soft>type:</soft> <b>%s</b>\n<soft>flags:</soft> %s", p->name, direction, type, sflags);
 }
 
 vec2 GraphEditor::to_screen(const vec2 &p) const {
@@ -254,7 +256,7 @@ void GraphEditor::on_draw(Painter* p) {
 		tip = port_description(hover->node->in_ports[hover->index], "input");
 	if (hover and hover->type == HoverType::Cable) {
 		const auto c = graph->cables()[hover->index];
-		tip = format("cable - type: <b>%s</b>", c.source->type->name);
+		tip = format("<big>cable</big>\n<soft>type:</soft> <b>%s</b>", c.source->type->name);
 	}
 
 	if (tip != "") {

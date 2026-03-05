@@ -10,20 +10,26 @@ class Painter;
 
 namespace xhui {
 
+struct TextFormat {
+	float font_size;
+	base::optional<color> col;
+	float alpha;
+	bool bold;
+	bool italic;
+};
+
 struct TextLayout {
 	struct Part {
 		string text;
-		float font_size;
-		base::optional<color> col;
-		bool bold;
-		bool italic;
+		TextFormat format;
 		vec2 pos;
 		rect box;
 	};
 	Array<Part> parts;
-	rect box() const;
+	rect box;
+	rect compute_box() const;
 
-	static TextLayout from_format_string(::Painter* p, const string& s, float font_size = -1);
+	static TextLayout from_format_string(::Painter* p, const string& s, float font_size = -1, int align = -1);
 };
 
 // base line will be at y = (pos.y + font_size)
