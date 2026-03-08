@@ -8,8 +8,6 @@
 #include <lib/xhui/controls/MultilineEdit.h>
 #include <lib/xhui/controls/ListView.h>
 
-#include "lib/os/msg.h"
-
 namespace codeedit {
 
 CodeEditor::CodeEditor() : obs::Node<xhui::Panel>("") {
@@ -18,10 +16,8 @@ Dialog coding-panel ''
 	Grid ? ''
 		Overlay ? ''
 			MultilineEdit edit '' grabfocus monospace linenumbers focusframe=no
-			Grid ? ''
-				Label ? '' height=25
-				---|
-				Label ? '' expandx
+			Grid ? '' margin=25
+				Label ? '' ignorehover expandx
 				Grid search-grid '' class=card hidden
 					Edit search-pattern '' width=300
 					Grid ? ''
@@ -32,9 +28,6 @@ Dialog coding-panel ''
 					Edit search-replace '' noexpandx
 					Grid ? ''
 						Button search-replace-next 'replace' noexpandx
-				Label ? '' width=25
-				---|
-					Label ? '' expandy
 		ListView structure 'symbol' nobar style=compact width=250
 )foodelim");
 	propagate_events = true;
@@ -53,10 +46,7 @@ Dialog coding-panel ''
 
 	auto list = (xhui::ListView*)get_control(id_structure);
 	list->column_factories[0].f_create = [] (const string& id) -> xhui::Control* {
-		auto l = new xhui::Label(id, "");
-		l->set_option("markup", "");
-		l->set_option("vmargin", "2");
-		return l;
+		return xhui::create_control("Label", "!markup,vmargin=2", id);
 	};
 
 	static int xcounter = 0;
@@ -189,10 +179,10 @@ void CodeEditor::update_structure() {
 		label_line_numbers.clear();
 		for (const auto& l: p->find_labels(edit->text)) {
 			string title = l.name;
-			title = title.replace("class ", "<b><red>C</red></b>  ").replace("struct ", "<b><red>S</red></b>  ").replace("enum ", "<b><red>E</red></b>  ").replace("func ", "<green><b>F</b></green>  ");
+			title = title.replace("class ", "<b><font color='red'>C</font></b>  ").replace("struct ", "<b><red>S</red></b>  ").replace("enum ", "<b><font color='red'>E</font></b>  ").replace("func ", "<font color='green'><b>F</b></font>  ");
 			int p0 = title.find("(");
 			if (p0 >= 0)
-				title = title.sub(0, p0) + " <soft>" + title.sub(p0) + "</soft>";
+				title = title.sub(0, p0) + " <span alpha='50%'>" + title.sub(p0) + "</span>";
 			add_string(id_structure, string("        ").repeat(l.level) + title);
 			label_line_numbers.add(l.line);
 		}

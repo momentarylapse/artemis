@@ -86,6 +86,7 @@ public:
 
 	void request_redraw();
 	bool has_focus() const;
+	void prevent_event_propagation();
 
 	rect _area;
 	string id;
@@ -119,5 +120,7 @@ public:
 
 	bool emit_event(const string& msg, bool is_default);
 };
+
+xfer<Control> create_control(const string &type, const string &_title, const string &id);
 
 }
