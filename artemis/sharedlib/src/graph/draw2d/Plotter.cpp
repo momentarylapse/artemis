@@ -9,7 +9,9 @@
 #include <lib/math/rect.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/xhui.h>
+#include <lib/profiler/Profiler.h>
 #include <cmath>
+
 
 namespace artemis::graph {
 
@@ -55,6 +57,7 @@ Array<float> ticks(float x_min, float x_max, float scale) {
 }
 
 void Plotter::draw_2d(Painter* p) {
+	profiler::begin(channel_draw);
 	const auto area = p->area();
 	const auto c0 = p->clip();
 	p->set_clip(area);
@@ -122,6 +125,7 @@ void Plotter::draw_2d(Painter* p) {
 		p->draw_lines(points);
 	}
 	p->set_clip(c0);
+	profiler::end(channel_draw);
 }
 
 

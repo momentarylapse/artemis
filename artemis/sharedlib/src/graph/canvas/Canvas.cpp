@@ -4,9 +4,8 @@
 
 #include "Canvas.h"
 #include "view/Canvas.h"
-
 #include <Session.h>
-#include <view/DrawingHelper.h>
+#include <lib/profiler/Profiler.h>
 #include "view/ArtemisWindow.h"
 
 namespace artemis::graph {
@@ -14,6 +13,7 @@ namespace artemis::graph {
 RendererNode::RendererNode(Session* s, const string& name) : Node(name) {
 	session = s;
 	flags = dataflow::NodeFlags::Renderer;
+	channel_draw = profiler::create_channel(name + ":draw", channel);
 }
 
 void Canvas::on_process() {

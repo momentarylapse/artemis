@@ -48,6 +48,7 @@ public:
 	dataflow::Graph* graph;
 	xhui::Panel* node_panel = nullptr;
 	dataflow::Node* _node_panel_node = nullptr;
+	int channel;
 
 	enum class HoverType {
 		Node,

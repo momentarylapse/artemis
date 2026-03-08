@@ -44,6 +44,7 @@ public:
 	dataflow::OutPort<RenderData> out_draw{this, "draw"};
 
 	Session* session;
+	int channel_draw;
 };
 
 class Canvas : public dataflow::Node {

@@ -20,10 +20,10 @@
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/TextLayout.h>
+#include <lib/profiler/Profiler.h>
 #include "DrawingHelper.h"
-#include "plugins/PluginManager.h"
-#include "storage/Storage.h"
 #include <cmath>
+
 
 namespace artemis::view {
 
@@ -36,6 +36,7 @@ static constexpr float PANEL_WIDTH = 280.0f;
 GraphEditor::GraphEditor(Session* s) : obs::Node<Panel>("graph-editor") {
 	session = s;
 	graph = s->graph;
+	channel = profiler::create_channel("GraphEditor");
 
 	from_source(R"foodelim(
 Dialog x ''
@@ -206,6 +207,7 @@ void GraphEditor::draw_grid(Painter* p) {
 }
 
 void GraphEditor::on_draw(Painter* p) {
+	profiler::begin(channel);
 	auto clip0 = p->clip();
 	p->set_clip(_area);
 
@@ -267,6 +269,7 @@ void GraphEditor::on_draw(Painter* p) {
 	}
 
 	p->set_clip(clip0);
+	profiler::end(channel);
 }
 
 void GraphEditor::draw_node(Painter* p, dataflow::Node* n) {
