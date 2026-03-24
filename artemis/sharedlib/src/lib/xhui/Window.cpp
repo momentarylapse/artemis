@@ -12,6 +12,7 @@
 #include <lib/os/time.h>
 #include <lib/os/msg.h>
 
+#include "TextLayout.h"
 
 
 namespace xhui {
@@ -24,7 +25,7 @@ Window::Window(const string &_title, int w, int h, Flags _flags) : Panel(":windo
 	type = ControlType::Window;
 	title = _title;
 	flags = _flags;
-	ui_scale = global_ui_scale;
+	ui_scale = 1;
 	window = nullptr;
 	memset(&state, 0, sizeof(state));
 	memset(&state_prev, 0, sizeof(state_prev));
@@ -61,6 +62,8 @@ Window::Window(const string &_title, int w, int h, Flags _flags) : Panel(":windo
 		glfwSetScrollCallback(window, _scroll_callback);
 		glfwSetWindowRefreshCallback(window, _refresh_callback);
 		glfwSetWindowSizeCallback(window, _resize_callback);
+		glfwSetWindowContentScaleCallback(window, _content_scale_callback);
+		glfwSetFramebufferSizeCallback(window, _framebuffer_size_callback);
 	}
 }
 
@@ -210,7 +213,7 @@ void Window::_char_callback(GLFWwindow* window, unsigned int codepoint) {
 static bool resync_next_mouse_move = false;
 
 void Window::_cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
-	//msg_write(format("mouse %f  %f", xpos, ypos));
+	//msg_write(format("mouse %.1f  %.1f", xpos, ypos));
 	auto w = (Window*)glfwGetWindowUserPointer(window);
 	Event e;
 	e.type = Event::Type::MouseMove;
@@ -279,6 +282,21 @@ void Window::_resize_callback(GLFWwindow* window, int width, int height) {
 	//msg_write(format("resize %d  %d", width, height));
 	auto w = (Window*)glfwGetWindowUserPointer(window);
 
+//	if (w->context)
+//		w->context->resize(width, height);
+	w->_refresh_requested = true;
+}
+
+void Window::_content_scale_callback(GLFWwindow *window, float fx, float fy) {
+	auto w = (Window*)glfwGetWindowUserPointer(window);
+	//msg_write(format("ui scale: %f", fx));
+	w->ui_scale = fx;
+	w->_refresh_requested = true;
+}
+
+void Window::_framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+	auto w = (Window*)glfwGetWindowUserPointer(window);
+	//msg_error(format("frame buffer: %d %d", width, height));
 	if (w->context)
 		w->context->resize(width, height);
 	w->_refresh_requested = true;
@@ -382,8 +400,23 @@ void Window::_on_mouse_move(const vec2 &m, const vec2& d) {
 		if (hover_control)
 			hover_control->on_mouse_leave(m);
 		hover_control = hover;
-		if (hover_control)
+		if (hover_control) {
 			hover_control->on_mouse_enter(m);
+			if (tooltip == "" and hover_control->tooltip != "") {
+				// start tooltip -> delayed
+				run_later(0.25f, [this] {
+					if (hover_control) {
+						tooltip = hover_control->tooltip;
+						request_redraw();
+					}
+				});
+			} else if (tooltip != "") {
+				// switch -> quick
+				tooltip = hover_control->tooltip;
+			}
+		} else {
+			tooltip = "";
+		}
 	}
 	if (hover_control)
 		hover_control->on_mouse_move(m, d);
@@ -440,7 +473,7 @@ void Window::_on_draw() {
 	if (!p)
 		return;
 	auto a = p->area();
-	_area = p->area();
+	area = p->area();
 
 	if (first_draw)
 		handle_event_p(id, event_id::Initialize, p);
@@ -499,6 +532,13 @@ void Window::_on_draw() {
 		dlg->_draw(p);
 	}
 
+	if (hover_control and tooltip != "") {
+		auto l = TextLayout::from_format_string(p, tooltip, Theme::_default.font_size);
+		vec2 pos = hover_control->area.p01() + vec2(10, 20);
+		pos.x = clamp(pos.x, 5.0f, area.x2 - l.box.x2 - 5);
+		draw_text_layout_with_box(p, pos, l, White, Black);
+	}
+
 	if (drag.active) {
 		p->set_font_size(Theme::_default.font_size * 1.5f);
 		p->set_color(Red);
@@ -510,7 +550,7 @@ void Window::_on_draw() {
 	if (hover_control) {
 		p->set_color(Red);
 		p->set_fill(false);
-		p->draw_rect(hover_control->_area);
+		p->draw_rect(hover_control->area);
 		p->set_fill(true);
 	}
 
@@ -524,7 +564,7 @@ void Window::_on_draw() {
 		// hover debug
 		p->set_color(color(0.2f, 1, 0,0));
 		if (hover_control)
-			p->draw_rect(hover_control->_area);
+			p->draw_rect(hover_control->area);
 	}
 
 	_refresh_requested = false;
@@ -609,11 +649,11 @@ Control *Window::get_hover_control(const vec2 &p) {
 	while (cur_seed < seeds.num) {
 		auto c = seeds[cur_seed ++];
 		while (c) {
-			if (c->_area.inside(p) and !c->ignore_hover and c->visible)
+			if (c->area.inside(p) and !c->ignore_hover and c->visible)
 				best = c;
 			Control* next = nullptr;
 			for (auto cc: c->get_children(ChildFilter::OnlyActive))
-				if (cc->_area.inside(p) and cc->visible) {
+				if (cc->area.inside(p) and cc->visible) {
 					if (next)
 						seeds.add(cc);
 					else

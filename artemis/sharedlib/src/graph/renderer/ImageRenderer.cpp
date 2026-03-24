@@ -15,7 +15,7 @@ namespace artemis::graph {
 ImageRenderer::ImageRenderer(Session* s) : RenderEmitterNode(s, "ImageRenderer") {
 	if (!s->ctx)
 		msg_error("no ctx");
-	material = new yrenderer::Material(s->ctx);
+	material = new yrenderer::Material();
 	material->roughness = 1;
 	material->metal = 0;
 	material->albedo = White;

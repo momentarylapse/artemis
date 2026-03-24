@@ -66,7 +66,7 @@ void Expander::_draw(Painter* p) {
 	if (child and child->visible and state != State::Compact) {
 		const auto c0 = p->clip();
 		if (state != State::Expanded)
-			p->set_clip(_area and c0);
+			p->set_clip(area and c0);
 		child->_draw(p);
 		if (state != State::Expanded)
 			p->set_clip(c0);
@@ -94,13 +94,13 @@ Array<Control*> Expander::get_children(ChildFilter f) const {
 void Expander::negotiate_area(const rect& available) {
 	if (state == State::Undecided)
 		state = State::Compact;
-	_area = available;
+	area = available;
 	float hh = 0;
 	if (show_header)
 		hh = header.get_content_min_size().y;
 	header.negotiate_area({available.p00(), available.p10() + vec2(0, hh)});
 	if (child)
-		child->negotiate_area({_area.p00() + vec2(0, hh + SPACING), _area.p11()});
+		child->negotiate_area({area.p00() + vec2(0, hh + SPACING), area.p11()});
 }
 
 vec2 Expander::get_content_min_size() const {
@@ -138,6 +138,8 @@ vec2 Expander::get_greed_factor() const {
 void Expander::set_option(const string &key, const string &value) {
 	if (key == "expanded") {
 		expand(value == "" or value._bool());
+	} else if (key == "markup") {
+		header.set_option(key, value);
 	} else {
 		Control::set_option(key, value);
 	}

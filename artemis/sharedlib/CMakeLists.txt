@@ -315,6 +315,8 @@ add_library(moduleartemis SHARED
 	src/lib/kaba/Interpreter.cpp
 	src/lib/kaba/kaba.cpp
 	src/lib/kaba/Module.cpp
+	src/lib/layout/Grid.cpp
+	src/lib/layout/Node.cpp
 	src/lib/linalg/_kaba_export.cpp
 	src/lib/linalg/Matrix.cpp
 	src/lib/math/Box.cpp
@@ -491,7 +493,7 @@ add_library(moduleartemis SHARED
 	src/lib/yrenderer/scene/RenderViewData.cpp
 	src/lib/yrenderer/scene/SceneRenderer.cpp
 	src/lib/yrenderer/scene/SceneView.cpp
-	src/lib/yrenderer/target/HeadlessRendererVulkan.cpp
+	src/lib/yrenderer/target/HeadlessRenderer.cpp
 	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
 	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
 	src/lib/yrenderer/target/TargetRenderer.cpp

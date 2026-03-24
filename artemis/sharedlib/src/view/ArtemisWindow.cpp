@@ -171,7 +171,7 @@ Dialog x x padding=0
 		session->ctx->shader_manager = session->shader_manager;
 		session->ctx->texture_manager = session->texture_manager;
 		session->shader_manager->default_shader = "default.shader";
-		session->material_manager = new yrenderer::MaterialManager(session->ctx, "");
+		session->material_manager = new yrenderer::MaterialManager(session->ctx->texture_manager, "");
 		session->ctx->material_manager = session->material_manager;
 		session->drawing_helper = new DrawingHelper(pp->context, session->ctx);
 		try {

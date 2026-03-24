@@ -79,8 +79,8 @@ Dialog x x padding=0
 		auto pp = static_cast<xhui::Painter*>(p);
 		const auto a0 = pp->area();
 		const auto na0 = pp->native_area;
-		pp->_area = _area;
-		pp->native_area = scale_area(_area, pp->ui_scale);
+		pp->_area = area;
+		pp->native_area = scale_area(area, pp->ui_scale);
 		on_pre_draw(p);
 		pp->_area = a0;
 		pp->native_area = na0;
@@ -181,8 +181,8 @@ void SceneRenderer::set_content_bounding_box(const Box &b) {
 
 
 void SceneRenderer::set_drawing_helper() {
-	session->drawing_helper->target_area = _area;
-	session->drawing_helper->projection = view_port.params().projection_matrix(_area.width() / _area.height());
+	session->drawing_helper->target_area = area;
+	session->drawing_helper->projection = view_port.params().projection_matrix(area.width() / area.height());
 	session->drawing_helper->view = view_port.params().view_matrix();
 }
 

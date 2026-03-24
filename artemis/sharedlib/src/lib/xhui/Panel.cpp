@@ -65,9 +65,9 @@ void Panel::_draw(Painter *p) {
 }
 
 void Panel::negotiate_area(const rect &available) {
-	_area = available;
+	area = available;
 	if (top_control)
-		top_control->negotiate_area(_area.grow(-padding));
+		top_control->negotiate_area(area.grow(-padding));
 
 	/*Array<int> w, h;
 	get_grid_min_sizes(w, h);
@@ -113,11 +113,11 @@ vec2 Panel::get_greed_factor() const {
 		f = top_control->get_greed_factor();
 	if (size_mode_x == SizeMode::Expand)
 		f.x = 1;
-	else if (size_mode_x == SizeMode::Shrink)
+	else if (size_mode_x == SizeMode::Fill or size_mode_x == SizeMode::Shrink)
 		f.x = 0;
 	if (size_mode_y == SizeMode::Expand)
 		f.y = 1;
-	else if (size_mode_y == SizeMode::Shrink)
+	else if (size_mode_y == SizeMode::Fill or size_mode_y == SizeMode::Shrink)
 		f.y = 0;
 	return f;
 }
@@ -330,6 +330,10 @@ void Panel::activate(const string &id) {
 			}
 }
 
+void Panel::set_tooltip(const string& id, const string& tip) {
+	set_options(id, "tooltip=" + tip);
+}
+
 void Panel::set_options(const string& id, const string& options) {
 	for_control(id, [&options] (Control* c) {
 		for (const auto& [k,v]: parse_options(options)) {
@@ -350,8 +354,8 @@ void Panel::set_option(const string& key, const string& value) {
 
 
 
-Array<Control*> Panel::get_children(ChildFilter) const {
-	if (top_control)
+Array<Control*> Panel::get_children(ChildFilter f) const {
+	if (top_control and (top_control->visible or f == ChildFilter::All))
 		return {top_control.get()};
 	return {};
 }
@@ -467,12 +471,12 @@ void Panel::_add_control(const string &ns, const Resource &cmd, const string &pa
 		hide_control(cmd.id, true);
 
 	if (cmd.image().num > 0)
-		set_image(cmd.id, cmd.image());
+		set_image(cmd.id, cmd.image());*/
 
 
 	string tooltip = get_language_t(ns, cmd.id, cmd.tooltip);
 	if (tooltip.num > 0)
-		set_tooltip(cmd.id, tooltip);*/
+		set_tooltip(cmd.id, tooltip);
 
 	for (const Resource &c: cmd.children)
 		_add_control(ns, c, cmd.id);

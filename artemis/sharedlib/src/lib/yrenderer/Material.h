@@ -54,7 +54,7 @@ class ShaderManager;
 // visual and physical properties
 class Material {
 public:
-	Context* ctx;
+	Material* parent = nullptr;
 
 	shared_array<ygfx::Texture> textures;
 
@@ -67,16 +67,18 @@ public:
 	bool cast_shadow;
 
 	struct RenderPassData {
+		RenderPassData();
 		TransparencyMode mode = TransparencyMode::NONE;
 		ygfx::Alpha source, destination;
 		float factor = 1;
 		bool z_buffer = true;
 		bool z_test = true;
-		ygfx::CullMode cull_mode = (ygfx::CullMode)0;
+		ygfx::CullMode cull_mode;
 		Path shader_path;
 	};
 	int num_passes = 1;
 	RenderPassData pass0;
+	void set_num_passes(int num_passes);
 
 	struct ExtendedData {
 		RenderPassData pass[4];
@@ -95,8 +97,11 @@ public:
 		float jump, _static, sliding, rolling;
 	} friction;
 
-	explicit Material(Context* ctx);
-	xfer<Material> copy();
+	explicit Material();
+	Material(const Material& m);
+	void operator=(const Material& material);
+	xfer<Material> copy() const;
+	void derive_from(Material* parent);
 
 	bool is_transparent() const;
 	const RenderPassData& pass(int k) const;
@@ -104,6 +109,7 @@ public:
 };
 
 struct ShaderCache {
+	Context* ctx;
 	shared<ygfx::Shader> shader[2]; // * #(render paths)
 	void _prepare_shader(RenderPathType render_path_type, const Material& material, const string& vertex_module, const string& geometry_module);
 	void _prepare_shader_multi_pass(RenderPathType render_path_type, const Material& material, const string& vertex_module, const string& geometry_module, int k);

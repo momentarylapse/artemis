@@ -12,37 +12,37 @@
 
 namespace xhui {
 
+void open_popup_menu(Control* c, shared<Menu> menu) {
+	c->owner->open_dialog(new MenuPopup(menu, c->owner, c->area, [c] (const string& id) {
+		// wait for the popup to close
+		run_later(0.01f, [c, id] {
+			c->owner->handle_event(id, event_id::Activate, true);
+		});
+	}));
+}
+
 class MenuBarButton : public Button {
 public:
 	explicit MenuBarButton(const string& id, const string& title, shared<Menu> _menu) : Button(id, title) {
-		size_mode_x = SizeMode::Shrink;
+		size_mode_x = SizeMode::Fill;
 		padding.x1 = padding.x2 = Theme::_default.button_margin_y;
 		flat = true;
 		menu = _menu;
 	}
 	void on_click() override {
-		/*menu->open_popup_x(owner).then([this] (const string& id) {
-			owner->handle_event(id, event_id::Activate, true);
-		});*/
-
-		owner->open_dialog(new MenuPopup(*menu.get(), owner, _area, [this] (const string& id) {
-			// wait for the popup to close
-			run_later(0.01f, [this, id] {
-				owner->handle_event(id, event_id::Activate, true);
-			});
-		}));
+		open_popup_menu(this, menu);
 	}
 	shared<Menu> menu;
 };
 
 MenuBar::MenuBar(const string& id) : Grid(id) {
-	spacing = 3;
+	grid.spacing = 3;
 }
 
 void MenuBar::_draw(Painter* p) {
 	if (is_main) {
 		p->set_color(Theme::_default.background_raised());
-		p->draw_rect(_area);
+		p->draw_rect(area);
 	}
 	Grid::_draw(p);
 }
@@ -50,8 +50,8 @@ void MenuBar::_draw(Painter* p) {
 
 void MenuBar::set_menu(shared<Menu> _menu) {
 	// clear
-	while (children.num > 0)
-		Grid::remove_child(children.back().control.get());
+	while (grid.children.num > 0)
+		Grid::remove_child((Control*)grid.children.back().node.get());
 
 	menu = _menu;
 	for (const auto [i, it]: enumerate(menu->items)) {

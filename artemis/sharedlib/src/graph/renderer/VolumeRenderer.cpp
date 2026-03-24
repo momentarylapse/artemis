@@ -17,7 +17,7 @@
 namespace artemis::graph {
 
 VolumeRenderer::VolumeRenderer(Session* s) : RenderEmitterNode(s, "VolumeRenderer") {
-	material = new yrenderer::Material(s->ctx);
+	material = new yrenderer::Material();
 	material->pass0.shader_path = "volume.shader";
 	material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
 	material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
@@ -26,7 +26,7 @@ VolumeRenderer::VolumeRenderer(Session* s) : RenderEmitterNode(s, "VolumeRendere
 	material->pass0.z_test = true;
 	material->textures.add(s->ctx->tex_white);
 
-	material_solid = new yrenderer::Material(s->ctx);
+	material_solid = new yrenderer::Material();
 	material_solid->pass0.shader_path = "volume-surface.shader";
 	material_solid->textures.add(s->ctx->tex_white);
 }

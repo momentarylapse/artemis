@@ -163,11 +163,11 @@ Array<vec2> GraphEditor::cable_spline(const dataflow::CableInfo& c) {
 
 void GraphEditor::draw_grid(Painter* p) {
 	p->set_color(xhui::Theme::_default.background);
-	p->draw_rect(_area);
+	p->draw_rect(area);
 	p->set_line_width(max(1.0f * view_scale, 1.0f));
 	p->set_contiguous(false);
 
-	rect view_area = rect(from_screen(_area.p00()), from_screen(_area.p11()));
+	rect view_area = rect(from_screen(area.p00()), from_screen(area.p11()));
 	color c0 = color::mix(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.07f * min(view_scale, 1.0f));
 	color c1 = color::mix(xhui::Theme::_default.background, xhui::Theme::_default.text_disabled, 0.15f * min(view_scale, 1.0f));
 	const float D = 20.0f;
@@ -176,15 +176,15 @@ void GraphEditor::draw_grid(Painter* p) {
 		if (i % 5 == 0)
 			continue;
 		float y = to_screen({0, (float)i*D}).y;
-		points.add({_area.x1, y});
-		points.add({_area.x2, y});
+		points.add({area.x1, y});
+		points.add({area.x2, y});
 	}
 	for (int i=(int)floorf(view_area.x1 / D); i<(int)ceilf(view_area.x2 / D); i++) {
 		if (i % 5 == 0)
 			continue;
 		float x = to_screen({(float)i*D, 0}).x;
-		points.add({x, _area.y1});
-		points.add({x, _area.y2});
+		points.add({x, area.y1});
+		points.add({x, area.y2});
 	}
 	p->set_color(c0);
 	p->draw_lines(points);
@@ -193,13 +193,13 @@ void GraphEditor::draw_grid(Painter* p) {
 	points.clear();
 	for (int i=(int)floorf(view_area.y1 / (D*5)); i<(int)ceilf(view_area.y2 / (D*5)); i++) {
 		float y = to_screen({0, (float)i*D*5}).y;
-		points.add({_area.x1, y});
-		points.add({_area.x2, y});
+		points.add({area.x1, y});
+		points.add({area.x2, y});
 	}
 	for (int i=(int)floorf(view_area.x1 / (D*5)); i<(int)ceilf(view_area.x2 / (D*5)); i++) {
 		float x = to_screen({(float)i*D*5, 0}).x;
-		points.add({x, _area.y1});
-		points.add({x, _area.y2});
+		points.add({x, area.y1});
+		points.add({x, area.y2});
 	}
 	p->set_color(c1);
 	p->draw_lines(points);
@@ -209,7 +209,7 @@ void GraphEditor::draw_grid(Painter* p) {
 void GraphEditor::on_draw(Painter* p) {
 	profiler::begin(channel);
 	auto clip0 = p->clip();
-	p->set_clip(_area);
+	p->set_clip(area);
 
 	draw_grid(p);
 
