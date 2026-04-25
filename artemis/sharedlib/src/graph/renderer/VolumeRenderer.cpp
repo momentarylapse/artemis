@@ -22,7 +22,7 @@ VolumeRenderer::VolumeRenderer(Session* s) : RenderEmitterNode(s, "VolumeRendere
 	material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
 	material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
 	material->pass0.destination = ygfx::Alpha::SOURCE_INV_ALPHA;
-	material->pass0.z_buffer = false;
+	material->pass0.z_write = false;
 	material->pass0.z_test = true;
 	material->textures.add(s->ctx->tex_white);
 
@@ -79,7 +79,7 @@ void VolumeRenderer::on_emit(const yrenderer::RenderParams &params, yrenderer::R
 
 
 		auto shader = rvd.get_shader(_material, 0, "default", "");
-		auto& rd = rvd.start(params, matrix, shader, *_material, 0, ygfx::PrimitiveTopology::TRIANGLES, vertex_buffer.get());
+		auto& rd = rvd.start(params, matrix, shader, _material, 0, ygfx::PrimitiveTopology::TRIANGLES, vertex_buffer.get());
 
 		auto cm = color_map();
 

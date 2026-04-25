@@ -154,6 +154,8 @@ void MaterialManager::_load_from_file(Material* m, const Path &filename) {
 
 	if (c.has("textures")) {
 		auto texture_files = c.get_str_array("textures");
+		if (texture_files.num == 0)
+			texture_files.add("");
 		m->textures.resize(max(m->textures.num, texture_files.num));
 		for (const auto& [i, f]: enumerate(texture_files))
 			m->textures[i] = texture_manager->load_texture(f);
@@ -194,12 +196,12 @@ void MaterialManager::_load_from_file(Material* m, const Path &filename) {
 		} else if (mode == "factor") {
 				p.mode = TransparencyMode::FACTOR;
 			p.factor = c.get_float(key + ".factor");
-			p.z_buffer = false;
+			p.z_write = false;
 		} else if (mode == "function") {
 			p.mode = TransparencyMode::FUNCTIONS;
 			p.source = parse_alpha(c.get_str(key + ".source", "zero"));
 			p.destination = parse_alpha(c.get_str(key + ".dest", "zero"));
-			p.z_buffer = false;
+			p.z_write = false;
 		} else if (mode == "key-hard") {
 			p.mode = TransparencyMode::COLOR_KEY_HARD;
 		} else if (mode == "key-smooth") {
@@ -288,7 +290,7 @@ void MaterialManager::_write_to_file(Material* material, const Path &filename) {
 
 	Array<Path> texture_files;
 	for (auto t: weak(material->textures))
-		texture_files.add(texture_manager->texture_file(t));
+		texture_files.add(texture_manager->get_filename(t));
 
 	c.set_str_array("textures", paths_to_str_arr(texture_files));
 	if (!material->cast_shadow)
@@ -325,8 +327,8 @@ void MaterialManager::_write_to_file(Material* material, const Path &filename) {
 			c.set_str(key + ".cull", "none");
 		else if (p.cull_mode == ygfx::CullMode::FRONT)
 			c.set_str(key + ".cull", "front");
-		if (p.mode != yrenderer::TransparencyMode::NONE or !p.z_buffer or !p.z_test)
-			c.set_bool(key + ".z-write", p.z_buffer);
+		if (p.mode != yrenderer::TransparencyMode::NONE or !p.z_write or !p.z_test)
+			c.set_bool(key + ".z-write", p.z_write);
 		if (!p.z_test)
 			c.set_bool(key + ".z-test", p.z_test);
 		/*if (material->transparency_mode != TransparencyMode::NONE) {

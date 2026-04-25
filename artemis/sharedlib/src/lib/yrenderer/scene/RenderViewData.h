@@ -22,7 +22,7 @@ namespace yrenderer {
 
 struct Context;
 class ShaderCache;
-class Material;
+struct Material;
 struct CameraParams;
 struct SceneView;
 struct RenderParams;
@@ -39,6 +39,7 @@ static constexpr int BINDING_PARAMS = 8;
 static constexpr int BINDING_LIGHT = 9;
 static constexpr int BINDING_INSTANCE_MATRICES = 10;
 static constexpr int BINDING_BONE_MATRICES = 11;
+static constexpr int BINDING_SURFELS = 12;
 
 
 // per mesh
@@ -57,10 +58,11 @@ struct RenderData {
 	ygfx::UniformBuffer* ubo;
 	ygfx::DescriptorSet* dset;
 #else
-	void set_material_x(const SceneView& scene_view, const Material& m, ygfx::Shader* s, int pass_no);
+	void set_material_x(const SceneView& scene_view, const Material* m, ygfx::Shader* s, int pass_no);
 #endif
 	void set_texture(int binding, ygfx::Texture* tex);
 	void set_textures(const SceneView& scene_view, const Array<ygfx::Texture*>& tex);
+	void set_uniform_buffer(int binding, ygfx::UniformBuffer* ubo);
 	void draw_triangles(const RenderParams& params, ygfx::VertexBuffer* vb);
 	void draw_instanced(const RenderParams& params, ygfx::VertexBuffer* vb, int count);
 	void draw(const RenderParams& params, ygfx::VertexBuffer* vb, ygfx::PrimitiveTopology topology);
@@ -101,13 +103,13 @@ struct RenderViewData {
 	void clear(const RenderParams& params, const Array<color>& colors, float z=-1);
 
 	RenderData& start(const RenderParams& params, const mat4& matrix,
-	                  ygfx::Shader* shader, const Material& material, int pass_no,
+	                  ygfx::Shader* shader, const Material* material, int pass_no,
 	                  ygfx::PrimitiveTopology top, ygfx::VertexBuffer *vb);
 
 
-	base::map<Material*, ShaderCache> multi_pass_shader_cache[4];
+	base::map<const Material*, ShaderCache> multi_pass_shader_cache[4];
 	// material as id!
-	ygfx::Shader* get_shader(Material* material, int pass_no, const string& vertex_shader_module, const string& geometry_shader_module);
+	ygfx::Shader* get_shader(const Material* material, int pass_no, const string& vertex_shader_module, const string& geometry_shader_module = "", const string& tessellation_module = "");
 };
 
 }

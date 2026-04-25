@@ -87,16 +87,16 @@ void RenderViewData::update_light_ubo() {
 
 #ifdef USING_OPENGL
 
-void RenderData::set_material_x(const SceneView& scene_view, const Material& material, Shader* shader, int pass_no) {
+void RenderData::set_material_x(const SceneView& scene_view, const Material* material, Shader* shader, int pass_no) {
 	nix::set_shader(shader);
 	if constexpr (SceneRenderer::using_view_space)
 		shader->set_floats("eye_pos", &scene_view.main_camera_params.pos.x, 3); // NAH....
 	else
 		shader->set_floats("eye_pos", &vec3::ZERO.x, 3);
-	apply_shader_data(RenderParams{}, shader, material.shader_data);
+	apply_shader_data(RenderParams{}, shader, material->shader_data);
 
-	auto& pass = material.pass(pass_no);
-	nix::set_z(pass.z_buffer, pass.z_test);
+	auto& pass = material->pass(pass_no);
+	nix::set_z(pass.z_write, pass.z_test);
 	if (pass.mode == TransparencyMode::FUNCTIONS)
 		nix::set_alpha(pass.source, pass.destination);
 	else if (pass.mode == TransparencyMode::COLOR_KEY_HARD)
@@ -106,17 +106,21 @@ void RenderData::set_material_x(const SceneView& scene_view, const Material& mat
 	else
 		nix::disable_alpha();
 
-	nix::bind_textures(weak(material.textures));
+	nix::bind_textures(weak(material->textures));
 	nix::bind_texture(BINDING_CUBE, scene_view.cube_map.get());
 
-	shader->set_color_l(shader->location[Shader::LOCATION_MATERIAL_ALBEDO], material.albedo);
-	shader->set_float_l(shader->location[Shader::LOCATION_MATERIAL_ROUGHNESS], material.roughness);
-	shader->set_float_l(shader->location[Shader::LOCATION_MATERIAL_METAL], material.metal);
-	shader->set_color_l(shader->location[Shader::LOCATION_MATERIAL_EMISSION], material.emission);
+	shader->set_color_l(shader->location[Shader::LOCATION_MATERIAL_ALBEDO], material->albedo);
+	shader->set_float_l(shader->location[Shader::LOCATION_MATERIAL_ROUGHNESS], material->roughness);
+	shader->set_float_l(shader->location[Shader::LOCATION_MATERIAL_METAL], material->metal);
+	shader->set_color_l(shader->location[Shader::LOCATION_MATERIAL_EMISSION], material->emission);
 }
 
 void RenderData::set_texture(int binding, Texture *tex) {
 	nix::bind_texture(binding, tex);
+}
+
+void RenderData::set_uniform_buffer(int binding, UniformBuffer* ubo) {
+	nix::bind_uniform_buffer(binding, ubo);
 }
 
 void RenderData::draw_triangles(const RenderParams&, VertexBuffer* vb) {
@@ -161,7 +165,7 @@ void RenderViewData::clear(const RenderParams& params, const Array<color>& color
 }
 
 RenderData& RenderViewData::start(const RenderParams& params, const mat4& matrix,
-                                  Shader* shader, const Material& material, int pass_no,
+                                  Shader* shader, const Material* material, int pass_no,
                                   PrimitiveTopology top, VertexBuffer *vb) {
 
 	rd.set_material_x(*scene_view, material, shader, pass_no);
@@ -202,7 +206,7 @@ void RenderViewData::clear(const RenderParams& params, const Array<color>& color
 
 RenderData& RenderViewData::start(
 		const RenderParams& params, const mat4& matrix,
-		Shader* shader, const Material& material, int pass_no,
+		Shader* shader, const Material* material, int pass_no,
 		PrimitiveTopology top, VertexBuffer *vb) {
 	if (index >= rda.num) {
 		rda.add({new UniformBuffer(sizeof(UBO)),
@@ -212,20 +216,20 @@ RenderData& RenderViewData::start(
 	}
 
 	ubo.m = matrix;
-	ubo.albedo = material.albedo;
-	ubo.emission = material.emission;
-	ubo.metal = material.metal;
-	ubo.roughness = material.roughness;
+	ubo.albedo = material->albedo;
+	ubo.emission = material->emission;
+	ubo.metal = material->metal;
+	ubo.roughness = material->roughness;
 	rda[index].ubo->update_part(&ubo, 0, sizeof(UBO));
 
-	auto p = SceneRenderer::get_pipeline(shader, params.render_pass, material.pass(pass_no), top, vb);
+	auto p = SceneRenderer::get_pipeline(shader, params.render_pass, material->pass(pass_no), top, vb);
 
 	params.command_buffer->bind_pipeline(p);
 
 	if (scene_view) {
-		rda[index].set_textures(*scene_view, weak(material.textures));
+		rda[index].set_textures(*scene_view, weak(material->textures));
 		if (scene_view->surfel_buffer)
-			rda[index].dset->set_uniform_buffer(12, scene_view->surfel_buffer.get());
+			rda[index].dset->set_uniform_buffer(BINDING_SURFELS, scene_view->surfel_buffer.get());
 	}
 
 	return rda[index ++];
@@ -245,6 +249,10 @@ void RenderData::set_textures(const SceneView& scene_view, const Array<Texture*>
 
 void RenderData::set_texture(int binding, Texture *tex) {
 	dset->set_texture(binding, tex);
+}
+
+void RenderData::set_uniform_buffer(int binding, UniformBuffer* ubo) {
+	dset->set_uniform_buffer(binding, ubo);
 }
 
 void RenderData::draw_triangles(const RenderParams& params, VertexBuffer* vb) {
@@ -268,14 +276,14 @@ void RenderData::draw(const RenderParams& params, VertexBuffer* vb, PrimitiveTop
 
 
 
-Shader* RenderViewData::get_shader(Material* material, int pass_no, const string& vertex_shader_module, const string& geometry_shader_module) {
+Shader* RenderViewData::get_shader(const Material* material, int pass_no, const string& vertex_shader_module, const string& geometry_shader_module, const string& tessellation_module) {
 	if (!multi_pass_shader_cache[pass_no].contains(material))
 		multi_pass_shader_cache[pass_no].set(material, {ctx});
 	auto& cache = multi_pass_shader_cache[pass_no][material];
 	if (is_shadow_pass())
-		cache._prepare_shader_multi_pass(type, *material_shadow, vertex_shader_module, geometry_shader_module, pass_no);
+		cache._prepare_shader_multi_pass(type, material_shadow, vertex_shader_module, geometry_shader_module, tessellation_module, pass_no);
 	else
-		cache._prepare_shader_multi_pass(type, *material, vertex_shader_module, geometry_shader_module, pass_no);
+		cache._prepare_shader_multi_pass(type, material, vertex_shader_module, geometry_shader_module, tessellation_module, pass_no);
 	return cache.get_shader(type);
 }
 

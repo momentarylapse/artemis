@@ -53,8 +53,8 @@ void CubeEmitter::set_cube(const Box& box) {
 }
 
 void CubeEmitter::emit(const RenderParams& params, RenderViewData& rvd, bool shadow_pass) {
-	auto shader = rvd.get_shader(material.get(), 0, "default", "");
-	auto& rd = rvd.start(params, matrix, shader, *material, 0, ygfx::PrimitiveTopology::TRIANGLES, vb.get());
+	auto shader = rvd.get_shader(material.get(), 0, "default", "", "");
+	auto& rd = rvd.start(params, matrix, shader, material.get(), 0, ygfx::PrimitiveTopology::TRIANGLES, vb.get());
 	rd.draw_triangles(params, vb.get());
 }
 
