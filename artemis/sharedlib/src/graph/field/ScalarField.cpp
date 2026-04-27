@@ -41,7 +41,7 @@ func f(p: vec3, t: f32) -> f32
 	let y = p.y
 	let z = p.z
 	return %s
-)foodelim", formula()));
+)foodelim", formula()), "<temp>");
 
 				f_p = (f_t)module->match_function("f", "f32", {"math.vec3", "f32"});
 

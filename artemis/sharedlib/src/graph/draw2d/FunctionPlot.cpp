@@ -16,7 +16,7 @@ void FunctionPlot::on_process() {
 			module = ctx->create_module_for_source(format(R"foodelim(
 func f(x: f32) -> f32
 	return %s
-)foodelim", formula()));
+)foodelim", formula()), "<temp>");
 
 			f_p = (f_t)module->match_function("f", "f32", {"f32"});
 
