@@ -1,22 +1,16 @@
 use artemis.*
 
 class MaxwellFDTD extends Node
-	var in_e: InPort[VectorField]
-	var in_b: InPort[VectorField]
-	#var in_rho: InPort[ScalarField]
-	var in_j: InPort[VectorField]
-	var in_me: InPort[VectorField]
-	var in_mb: InPort[VectorField]
+	var in_e = InPort[VectorField](self, "e", PortFlags.MUTABLE)
+	var in_b = InPort[VectorField](self, "b", PortFlags.MUTABLE)
+	#var in_rho = InPort[ScalarField](self, "rho", PortFlags.NONE)
+	var in_j = InPort[VectorField](self, "j", PortFlags.OPTIONAL)
+	var in_me = InPort[VectorField](self, "me", PortFlags.OPTIONAL)
+	var in_mb = InPort[VectorField](self, "mb", PortFlags.OPTIONAL)
 	var c1, c2, c3, c4, c5: i32
 	
 	func __init__()
 		super.__init__("MaxwellFDTD")
-		in_e.__init__(self, "e", PortFlags.MUTABLE)
-		in_b.__init__(self, "b", PortFlags.MUTABLE)
-	#	in_rho.__init__(self, "rho", PortFlags.NONE)
-		in_j.__init__(self, "j", PortFlags.OPTIONAL)
-		in_me.__init__(self, "me", PortFlags.OPTIONAL)
-		in_mb.__init__(self, "mb", PortFlags.OPTIONAL)
 		flags = NodeFlags.TIME_DEPENDENT
 		c1 = profiler.create_channel("a", channel)
 		c2 = profiler.create_channel("b", channel)

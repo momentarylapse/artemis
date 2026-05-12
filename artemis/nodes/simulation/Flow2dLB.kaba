@@ -130,10 +130,10 @@ func apply_boundary(out f: MultiComponentField, state0: MultiComponentField, D: 
 
 
 class Flow2dLB extends Node
-	var in_f: InPort[MultiComponentField]
-	var out_rho: OutPort[ScalarField]
-	var out_v: OutPort[VectorField]
-	var tau: Setting[f64]
+	var in_f = InPort[MultiComponentField](self, "f", PortFlags.MUTABLE)
+	var out_rho = OutPort[ScalarField](self, "rho")
+	var out_v = OutPort[VectorField](self, "v")
+	var tau = Setting[f64](self, "tau", 0.5)
 	
 	var c1, c2, c3, c4, c5, c6, c7: i32
 	
@@ -147,10 +147,6 @@ class Flow2dLB extends Node
 	
 	func __init__()
 		super.__init__("Flow2dLB")
-		in_f.__init__(self, "f", PortFlags.MUTABLE)
-		out_rho.__init__(self, "rho")
-		out_v.__init__(self, "v")
-		tau.__init__(self, "tau", 0.5)
 		flags = NodeFlags.TIME_DEPENDENT
 		c1 = profiler.create_channel("drift", channel)
 		c2 = profiler.create_channel("rho", channel)

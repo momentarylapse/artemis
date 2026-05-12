@@ -2,36 +2,24 @@ use artemis.*
 use fem.material.*
 
 class GuitarFEM extends Node
-	var in_u_body: InPort[VectorField]
-	var in_dt_u_body: InPort[VectorField]
-	var in_u_string: InPort[VectorField]
-	var in_dt_u_string: InPort[VectorField]
-	var substeps: Setting[i32]
-	var attach0: Setting[i32]
-	var attach1: Setting[i32]
+	var in_u_body = InPort[VectorField](self, "u-body", PortFlags.MUTABLE)
+	var in_dt_u_body = InPort[VectorField](self, "dt-u-body", PortFlags.MUTABLE)
+	var in_u_string = InPort[VectorField](self, "u-string", PortFlags.MUTABLE)
+	var in_dt_u_string = InPort[VectorField](self, "dt-u-string", PortFlags.MUTABLE)
+	var substeps = Setting[i32](self, "substeps", 100)
+	var attach0 = Setting[i32](self, "attach0", 0)
+	var attach1 = Setting[i32](self, "attach1", 100)
 #	let length = 0.648 # m  (implicit via grid)
-	var tension: Setting[f64] # [N]
-	var diameter: Setting[f64] # [m]
+	var tension = Setting[f64](self, "tension", 84.0) # [N]
+	var diameter = Setting[f64](self, "diameter", 0.0004318) # [m] - gauge = 0.017 inch
 	
-	var mat_body: Material
-	var mat_string: Material
+	var mat_body: Material = maple()
+	var mat_string: Material = nickel()
 	
 	
 	func __init__()
 		super.__init__("GuitarFEM")
-		in_u_body.__init__(self, "u-body", PortFlags.MUTABLE)
-		in_dt_u_body.__init__(self, "dt-u-body", PortFlags.MUTABLE)
-		in_u_string.__init__(self, "u-string", PortFlags.MUTABLE)
-		in_dt_u_string.__init__(self, "dt-u-string", PortFlags.MUTABLE)
-		substeps.__init__(self, "substeps", 100)
-		attach0.__init__(self, "attach0", 0)
-		attach1.__init__(self, "attach1", 100)
-		tension.__init__(self, "tension", 84.0)
-		diameter.__init__(self, "diameter", 0.0004318) # gauge = 0.017 inch
 		flags = NodeFlags.TIME_DEPENDENT
-		
-		mat_body = maple()
-		mat_string = nickel()
 	
 	func mut substep_body(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	print("---------------------")

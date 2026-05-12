@@ -1,14 +1,12 @@
 use artemis.*
 
 class Test extends Node	
-	var in_x: InPort[ScalarField]
-	#var out_y: OutPort[ScalarField]
+	var in_x = InPort[ScalarField](self, "x", PortFlags.MUTABLE)
+	#var out_y = OutPort[ScalarField](self, "y")
 
 
 	func __init__()
 		super.__init__("Test")
-		in_x.__init__(self, "x", PortFlags.MUTABLE)
-		#out_y.__init__(self, "y")
 		flags = NodeFlags.TIME_DEPENDENT
 	
 	func override on_process()

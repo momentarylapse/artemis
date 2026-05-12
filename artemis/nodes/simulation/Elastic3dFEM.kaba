@@ -2,26 +2,21 @@ use artemis.*
 use fem.material.*
 
 class Elastic3dFEM extends Node
-	var in_u: InPort[VectorField]
-	var in_dt_u: InPort[VectorField]
-	var substeps: Setting[i32]
+	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
+	var in_dt_u = InPort[VectorField](self, "dt-u", PortFlags.MUTABLE)
+	var substeps = Setting[i32](self, "substeps", 100)
 	
-	var mat: Material
+	var mat: Material = nickel()
 	
 	var c1, c2, c3: i32
 	
 	
 	func __init__()
 		super.__init__("Elastic3dFEM")
-		in_u.__init__(self, "u", PortFlags.MUTABLE)
-		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
-		substeps.__init__(self, "substeps", 100)
 		flags = NodeFlags.TIME_DEPENDENT
 		c1 = profiler.create_channel("hessian", channel)
 		c2 = profiler.create_channel("force", channel)
 		c3 = profiler.create_channel("update", channel)
-		
-		mat = nickel()
 	
 	func mut substep(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	print("---------------------")

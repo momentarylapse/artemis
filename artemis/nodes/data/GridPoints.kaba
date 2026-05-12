@@ -1,15 +1,12 @@
 use artemis.*
 
 class GridPoints extends Node
-	var in_grid: InPort[Grid]
-	var out_points: OutPort[vec3[]]
-	var cell_centers: Setting[bool]
+	var in_grid = InPort[Grid](self, "in")
+	var out_points = OutPort[vec3[]](self, "out")
+	var cell_centers = Setting[bool](self, "cell-centers", false)
 	
 	func __init__()
 		super.__init__("GridPoints")
-		in_grid.__init__(self, "in")
-		out_points.__init__(self, "out")
-		cell_centers.__init__(self, "cell-centers", false)
 	
 	func override on_process()
 		for g in in_grid.value()

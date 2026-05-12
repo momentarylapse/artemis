@@ -1,15 +1,12 @@
 use artemis.*
 
 class ScaleVector extends Node
-	var in_vector: InPort[vec3]
-	var out_vector: OutPort[vec3]
-	var factor: Setting[f64]
+	var in_vector = InPort[vec3](self, "in")
+	var out_vector = OutPort[vec3](self, "out")
+	var factor = Setting[f64](self, "factor", 1)
 	
 	func __init__()
 		super.__init__("ScaleVector")
-		in_vector.__init__(self, "in")
-		out_vector.__init__(self, "out")
-		factor.__init__(self, "factor", 1)
 	
 	func override on_process()
 		for v in in_vector.value()

@@ -1,15 +1,12 @@
 use artemis.*
 
 class VectorComponent extends Node
-	var in_vector: InPort[vec3]
-	var out_float: OutPort[f64]
-	var component: Setting[i32]
+	var in_vector = InPort[vec3](self, "in")
+	var out_float = OutPort[f64](self, "out")
+	var component = Setting[i32](self, "component", 0)
 	
 	func __init__()
 		super.__init__("VectorComponent")
-		in_vector.__init__(self, "in")
-		out_float.__init__(self, "out")
-		component.__init__(self, "component", 0)
 	
 	func override on_process()
 		for v in in_vector.value()

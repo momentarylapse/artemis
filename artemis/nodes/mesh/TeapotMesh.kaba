@@ -1,17 +1,13 @@
 use artemis.*
 
 class TeapotMesh extends Node
-	var out_mesh: OutPort[Mesh]
-	var radius: Setting[f64]
-	var samples: Setting[i32]
-	var smooth: Setting[bool]
+	var out_mesh = OutPort[Mesh](self, "out", PortFlags.MUTABLE)
+	var radius = Setting[f64](self, "radius", 1.0)
+	var samples = Setting[i32](self, "samples", 8)
+	var smooth = Setting[bool](self, "smooth", true)
 	
 	func __init__()
 		super.__init__("TeapotMesh")
-		out_mesh.__init__(self, "out", PortFlags.MUTABLE)
-		radius.__init__(self, "radius", 1.0)
-		samples.__init__(self, "samples", 8)
-		smooth.__init__(self, "smooth", true)
 		flags = NodeFlags.RESOURCE
 	
 	func override on_process()

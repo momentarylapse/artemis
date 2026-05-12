@@ -1,13 +1,11 @@
 use artemis.*
 
 class Number extends Node
-	var out_float: OutPort[f64]
-	var number: Setting[f64]
+	var out_float = OutPort[f64](self, "out", PortFlags.MUTABLE)
+	var number = Setting[f64](self, "number", 1)
 	
 	func __init__()
 		super.__init__("Number")
-		out_float.__init__(self, "out", PortFlags.MUTABLE)
-		number.__init__(self, "number", 1)
 		flags = NodeFlags.RESOURCE
 	
 	func override on_process()

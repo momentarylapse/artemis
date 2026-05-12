@@ -1,15 +1,12 @@
 use artemis.*
 
 class ScaleScalarField extends Node
-	var in_field: InPort[ScalarField]
-	var out_field: OutPort[ScalarField]
-	var factor: Setting[f64]
+	var in_field = InPort[ScalarField](self, "in")
+	var out_field = OutPort[ScalarField](self, "out")
+	var factor = Setting[f64](self, "factor", 1.0)
 	
 	func __init__()
 		super.__init__("ScaleScalarField")
-		in_field.__init__(self, "in")
-		out_field.__init__(self, "out")
-		factor.__init__(self, "factor", 1.0)
 	
 	func override on_process()
 		for f in in_field.value()

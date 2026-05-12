@@ -1,15 +1,12 @@
 use artemis.*
 
 class ScalarFieldSample extends Node
-	var in_field: InPort[ScalarField]
-	var out_vector: OutPort[f64]
-	var index: Setting[i32]
+	var in_field = InPort[ScalarField](self, "in")
+	var out_vector = OutPort[f64](self, "out")
+	var index = Setting[i32](self, "index", 0)
 	
 	func __init__()
 		super.__init__("FloatFieldSample")
-		in_field.__init__(self, "in")
-		out_vector.__init__(self, "out")
-		index.__init__(self, "index", 0)
 	
 	func override on_process()
 		for f in in_field.value()

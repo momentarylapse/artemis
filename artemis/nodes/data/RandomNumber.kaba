@@ -1,11 +1,10 @@
 use artemis.*
 
 class RandomNumber extends Node
-	var out_float: OutPort[f64]
+	var out_float = OutPort[f64](self, "out")
 	
 	func __init__()
 		super.__init__("RandomNumber")
-		out_float.__init__(self, "out")
 		flags = NodeFlags.TIME_DEPENDENT
 	
 	func override on_process()

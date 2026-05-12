@@ -1,17 +1,13 @@
 use artemis.*
 
 class Vector extends Node
-	var out_vector: OutPort[vec3]
-	var x: Setting[f64]
-	var y: Setting[f64]
-	var z: Setting[f64]
+	var out_vector = OutPort[vec3](self, "out")
+	var x = Setting[f64](self, "x", 0)
+	var y = Setting[f64](self, "y", 0)
+	var z = Setting[f64](self, "z", 0)
 	
 	func __init__()
 		super.__init__("ScaleVector")
-		out_vector.__init__(self, "out")
-		x.__init__(self, "x", 0)
-		y.__init__(self, "y", 0)
-		z.__init__(self, "z", 0)
 	
 	func override on_process()
 		out_vector.set(vec3(f32(x()), f32(y()), f32(z())))

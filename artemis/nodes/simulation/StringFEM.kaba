@@ -3,32 +3,22 @@ use linalg.*
 use fem.material.*
 
 class StringFEM extends Node
-	var in_u: InPort[VectorField]
-	var in_dt_u: InPort[VectorField]
-	var out_dt_dt_u: OutPort[VectorField]
+	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
+	var in_dt_u = InPort[VectorField](self, "dt-u", PortFlags.MUTABLE)
+	var out_dt_dt_u = OutPort[VectorField](self, "dt-dt-u")
 	
 #	let length = 0.648 # m  (implicit via grid)
-	var tension: Setting[f64] # [N]
-	var diameter: Setting[f64] # [m]
-	var fixed_ends: Setting[bool]
-	var substeps: Setting[i32]
+	var tension = Setting[f64](self, "tension", 84.0) # [N]
+	var diameter = Setting[f64](self, "diameter", 0.0004318) # [m] - gauge = 0.017 inch
+	var fixed_ends = Setting[bool](self, "fixed-ends", true)
+	var substeps = Setting[i32](self, "substeps", 10)
 		
-	var mat: Material
+	var mat: Material = nickel()
 	
 	
 	func __init__()
 		super.__init__("StringFEM")
-		in_u.__init__(self, "u", PortFlags.MUTABLE)
-		in_dt_u.__init__(self, "dt-u", PortFlags.MUTABLE)
-		out_dt_dt_u.__init__(self, "dt-dt-u")
 		flags = NodeFlags.TIME_DEPENDENT
-		
-		tension.__init__(self, "tension", 84.0)
-		diameter.__init__(self, "diameter", 0.0004318) # gauge = 0.017 inch
-		fixed_ends.__init__(self, "fixed-ends", true)
-		substeps.__init__(self, "substeps", 10)
-		
-		mat = nickel()
 
 
 	func mut substep(dt: f64, out u: VectorField, out dt_u: VectorField, out dt_dt_u: VectorField)

@@ -108,21 +108,17 @@ class SimulationState
 
 
 class OrbitRK extends Node
-	var in_mass: InPort[f64[]]
-	var in_pos: InPort[f64[]]
-	var in_vel: InPort[f64[]]
+	var in_mass = InPort[f64[]](self, "mass", PortFlags.NONE)
+	var in_pos = InPort[f64[]](self, "pos", PortFlags.MUTABLE)
+	var in_vel = InPort[f64[]](self, "vel", PortFlags.MUTABLE)
 	
-	var G: Setting[f64]
+	var G = Setting[f64](self, "g", 100.0)
 	
 	var state: SimulationState
 	
 	
 	func __init__()
 		super.__init__("OrbitRK")
-		in_mass.__init__(self, "mass", PortFlags.NONE)
-		in_pos.__init__(self, "pos", PortFlags.MUTABLE)
-		in_vel.__init__(self, "vel", PortFlags.MUTABLE)
-		G.__init__(self, "g", 100.0)
 		flags = NodeFlags.TIME_DEPENDENT
 		
 	func mut state_in(mass: f64[], pos: f64[], vel: f64[])

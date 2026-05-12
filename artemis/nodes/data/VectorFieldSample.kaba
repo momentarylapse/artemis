@@ -1,15 +1,12 @@
 use artemis.*
 
 class VectorFieldSample extends Node
-	var in_field: InPort[VectorField]
-	var out_vector: OutPort[vec3]
-	var index: Setting[i32]
+	var in_field = InPort[VectorField](self, "in")
+	var out_vector = OutPort[vec3](self, "out")
+	var index = Setting[i32](self, "index", 0)
 	
 	func __init__()
 		super.__init__("VectorFieldSample")
-		in_field.__init__(self, "in")
-		out_vector.__init__(self, "out")
-		index.__init__(self, "index", 0)
 	
 	func override on_process()
 		for f in in_field.value()
