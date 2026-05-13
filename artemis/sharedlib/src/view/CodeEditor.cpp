@@ -45,7 +45,7 @@ void CodeEditor::run() {
 
 	try {
 		const Path filename = package_dir | "from-code-editor.kaba";
-		auto m = kaba::default_context->dll_create_module_for_source(source, filename);
+		auto m = kaba::default_context->create_module_for_source(source, filename, false);
 		typedef void t_f();
 		if (auto f = (t_f*)m->match_function("main", "void", {}))
 			(*f)();

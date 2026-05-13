@@ -8,7 +8,7 @@
 #include <lib/base/algo.h>
 #include <lib/base/error.h>
 #include <lib/os/msg.h>
-#include <lib/kaba/syntax/Class.h>
+#include <lib/kapi/kapi.h>
 #include <lib/profiler/Profiler.h>
 
 #if 0
@@ -90,7 +90,9 @@ bool port_type_match(const OutPortBase& source, const InPortBase& sink) {
 
 base::expected<int> Graph::connect(const CableInfo& c) {
 	if (!port_type_match(*c.source, *c.sink))
-		return base::Error{format("failed to connect: %s  vs  %s", c.source->type->name, c.sink->type->name)};
+		return base::Error{format("failed to connect: %s  vs  %s",
+			kaba::default_context->type_name(c.source->type),
+			kaba::default_context->type_name(c.sink->type))};
 	if (c.sink->sources.num > 0 and !(c.sink->flags & PortFlags::Multi))
 		return base::Error{format("failed to connect: sink already connected")};
 	if ((c.sink->flags & PortFlags::Mutable) and !(c.source->flags & PortFlags::Mutable))

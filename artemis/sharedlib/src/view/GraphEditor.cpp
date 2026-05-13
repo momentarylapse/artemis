@@ -16,7 +16,7 @@
 #include <lib/base/sort.h>
 #include <lib/os/msg.h>
 #include <lib/os/filesystem.h>
-#include <lib/kaba/syntax/Class.h>
+#include <lib/kapi/kapi.h>
 #include <lib/xhui/xhui.h>
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/TextLayout.h>
@@ -138,7 +138,7 @@ string port_description(P* p, const string& direction) {
 		flags.add("multi");
 	string type = "*";
 	if (p->type)
-		type = p->type->name;
+		type = kaba::default_context->type_name(p->type);
 	string sflags = "-";
 	if (flags.num > 0)
 		sflags = implode(flags, ", ");
@@ -258,7 +258,7 @@ void GraphEditor::on_draw(Painter* p) {
 		tip = port_description(hover->node->in_ports[hover->index], "input");
 	if (hover and hover->type == HoverType::Cable) {
 		const auto c = graph->cables()[hover->index];
-		tip = format("<big>cable</big>\n<soft>type:</soft> <b>%s</b>", c.source->type->name);
+		tip = format("<big>cable</big>\n<soft>type:</soft> <b>%s</b>", kaba::default_context->type_name(c.source->type));
 	}
 
 	if (tip != "") {

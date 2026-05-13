@@ -35,16 +35,16 @@ namespace artemis::graph {
 			if (formula() != cached_formula or !f_p) {
 				cached_formula = formula();
 				// use kaba.Context dll API
-				ctx = kaba::default_context->f_create_new_context();
+				ctx = kaba::default_context->create_new_context();
 
 				try {
-					module = ctx->dll_create_module_for_source(format(R"foodelim(
+					module = ctx->create_module_for_source(format(R"foodelim(
 func f(p: vec3, t: f32) -> f32[]
 	let x = p.x
 	let y = p.y
 	let z = p.z
 	return %s
-)foodelim", formula()), "<temp>");
+)foodelim", formula()), "<temp>", false);
 
 					f_p = (f_t)module->match_function("f", "f32[]", {"math.vec3", "f32"});
 

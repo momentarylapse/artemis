@@ -1,6 +1,6 @@
 #include "../base/base.h"
 #include "Matrix.h"
-#include "../kabaexport/KabaExporter.h"
+#include "../kapi/KabaExporter.h"
 
 template<class T>
 Array<T> kaba_mul_matrix_vector(const linalg::Matrix<T>& A, const Array<T>& v) {
@@ -27,7 +27,9 @@ linalg::Matrix<T> kaba_inverse_sparse_matrix(const linalg::SparseMatrix<T>& A) {
 	return linalg::inverse(A);
 }
 
-void export_package_linalg(kaba::Exporter* e) {
+void export_package_linalg(kaba::IExporter* e) {
+	e->package_info("linalg", "0.3");
+
 	using Matrix = linalg::Matrix<float>;
 	e->declare_class_size("Matrix", sizeof(Matrix));
 	e->declare_class_element("Matrix.cols", &Matrix::cols);

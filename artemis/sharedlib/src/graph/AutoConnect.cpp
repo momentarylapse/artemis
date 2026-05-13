@@ -9,7 +9,7 @@
 #include <lib/dataflow/Node.h>
 #include <lib/dataflow/Graph.h>
 #include <lib/dataflow/Port.h>
-#include <lib/kaba/syntax/Class.h>
+#include <lib/kapi/kapi.h>
 
 namespace artemis {
 	Session* current_session();
@@ -23,40 +23,42 @@ base::expected<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, c
 	auto sink = c.sink;
 	if (dataflow::port_type_match(*source, *sink))
 		return R{};
+	string source_name = kaba::default_context->type_name(source->type);
+	string sink_name = kaba::default_context->type_name(sink->type);
 	// TODO recursive "solver"
-	if (source->type->name == "Mesh" and sink->type->name == "DrawCall")
+	if (source_name == "Mesh" and sink_name == "DrawCall")
 		return R{"MeshRenderer"};
-	if (source->type->name == "Mesh" and sink->type->name == "RenderData")
+	if (source_name == "Mesh" and sink_name == "RenderData")
 		return R{"MeshRenderer", "SceneRenderer"};
-	if (source->type->name == "Image" and sink->type->name == "DrawCall")
+	if (source_name == "Image" and sink_name == "DrawCall")
 		return R{"ImageRenderer"};
-	if (source->type->name == "Image" and sink->type->name == "RenderData")
+	if (source_name == "Image" and sink_name == "RenderData")
 		return R{"ImageRenderer", "SceneRenderer"};
-	if (source->type->name == "DrawCall" and sink->type->name == "RenderData")
+	if (source_name == "DrawCall" and sink_name == "RenderData")
 		return R{"SceneRenderer"};
-	if (source->type->name == "Grid" and sink->type->name == "DrawCall")
+	if (source_name == "Grid" and sink_name == "DrawCall")
 		return R{"GridRenderer"};
-	if (source->type->name == "Grid" and sink->type->name == "RenderData")
+	if (source_name == "Grid" and sink_name == "RenderData")
 		return R{"GridRenderer", "SceneRenderer"};
-	if (source->type->name == "ScalarField" and sink->type->name == "DrawCall")
+	if (source_name == "ScalarField" and sink_name == "DrawCall")
 		return R{"VolumeRenderer"};
-	if (source->type->name == "ScalarField" and sink->type->name == "RenderData")
+	if (source_name == "ScalarField" and sink_name == "RenderData")
 		return R{"VolumeRenderer", "SceneRenderer"};
-	if (source->type->name == "VectorField" and sink->type->name == "DrawCall")
+	if (source_name == "VectorField" and sink_name == "DrawCall")
 		return R{"VectorFieldRenderer"};
-	if (source->type->name == "VectorField" and sink->type->name == "RenderData")
+	if (source_name == "VectorField" and sink_name == "RenderData")
 		return R{"VectorFieldRenderer", "SceneRenderer"};
-	if (source->type->name == "vec3[]" and sink->type->name == "DrawCall")
+	if (source_name == "vec3[]" and sink_name == "DrawCall")
 		return R{"PointListRenderer"};
-	if (source->type->name == "vec3[]" and sink->type->name == "RenderData")
+	if (source_name == "vec3[]" and sink_name == "RenderData")
 		return R{"PointListRenderer", "SceneRenderer"};
-	if (source->type->name == "PlotData" and sink->type->name == "RenderData")
+	if (source_name == "PlotData" and sink_name == "RenderData")
 		return R{"Plotter"};
-	if (source->type->name == "f64[]" and sink->type->name == "RenderData")
+	if (source_name == "f64[]" and sink_name == "RenderData")
 		return R{"ListPlot", "Plotter"};
-	if (source->type->name == "f64[]" and sink->type->name == "PlotData")
+	if (source_name == "f64[]" and sink_name == "PlotData")
 		return R{"ListPlot"};
-	return base::Error{format("can not connect  <b>%s</b>  to  <b>%s</b>", source->type->name, sink->type->name)};
+	return base::Error{format("can not connect  <b>%s</b>  to  <b>%s</b>", source_name, sink_name)};
 }
 
 base::expected<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {

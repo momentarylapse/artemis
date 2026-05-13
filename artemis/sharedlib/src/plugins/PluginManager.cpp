@@ -137,7 +137,7 @@ const kaba::Class* field_get_type(const T& field) {
 	return type_data_to_kaba(field.type);
 }
 
-void PluginManager::export_kaba(kaba::Exporter* ext) {
+void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
 	ext->link_func("current_session", &current_session);
@@ -347,11 +347,11 @@ void PluginManager::import_kaba() {
 
 	const auto dir = package->directory;
 
-	auto m = kaba::default_context->dll_load_module(dir | "artemis.kaba");
-	auto mdata = kaba::default_context->dll_load_module(dir | "data.kaba");
-	auto mgrid = kaba::default_context->dll_load_module(dir | "grid.kaba");
-	auto mfields = kaba::default_context->dll_load_module(dir | "fields.kaba");
-	auto mgraph = kaba::default_context->dll_load_module(dir | "graph.kaba");
+	auto m = kaba::default_context->load_module(dir | "artemis.kaba", false);
+	auto mdata = kaba::default_context->load_module(dir | "data.kaba", false);
+	auto mgrid = kaba::default_context->load_module(dir | "grid.kaba", false);
+	auto mfields = kaba::default_context->load_module(dir | "fields.kaba", false);
+	auto mgraph = kaba::default_context->load_module(dir | "graph.kaba", false);
 	import_component_class<PolygonMesh>(mdata, "Mesh");
 	import_component_class<data::Grid>(mgrid, "Grid");
 	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
@@ -376,7 +376,7 @@ void PluginManager::find_plugins() {
 void* PluginManager::create_instance(const string& name) {
 	for (const auto& [n, f] : plugin_classes)
 		if (name == n) {
-			auto m = kaba::default_context->dll_load_module(f);
+			auto m = kaba::default_context->load_module(f, false);
 			for (const auto c: m->classes())
 				if (c->name == name)
 					return c->create_instance();

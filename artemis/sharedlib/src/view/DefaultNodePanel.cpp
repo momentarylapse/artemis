@@ -16,7 +16,7 @@
 #include "Session.h"
 #include "dialog/ColorMapDialog.h"
 #include "graph/Graph.h"
-#include <lib/kaba/dynamic/dynamic.h>
+//#include <lib/kaba/dynamic/dynamic.h>
 #include <lib/os/app.h>
 
 void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
@@ -134,7 +134,7 @@ Dialog x ''
 			});
 			event_x(id, xhui::event_id::LeftButtonUp, [this, ss] {
 				ColorMapDialog::ask(this, (*ss)()).then([this, ss] (const artemis::data::ColorMap& cm) {
-					session->data->node_set_setting(node, ss->name, kaba::dynify(&cm, dataflow::get_class<artemis::data::ColorMap>()));
+					session->data->node_set_setting(node, ss->name, kaba::default_context->dynify(&cm, dataflow::get_class<artemis::data::ColorMap>()));
 					//ss->set(cm);
 				});
 			});

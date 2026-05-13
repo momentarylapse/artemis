@@ -29,7 +29,7 @@ public:
 	dataflow::InPort<data::Grid> in_grid{this, "grid"};
 
 	string cached_formula;
-	owned<kaba::Context> ctx;
+	owned<kaba::IContext> ctx;
 	shared<kaba::Module> module;
 	typedef vec3 (*f_t)(const vec3&, float);
 	f_t f_p = nullptr;

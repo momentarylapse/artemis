@@ -6,18 +6,15 @@
  */
 
 #include "FormatArtemis.h"
-#include "../../Session.h"
 #include <lib/base/iter.h>
-#include "../../lib/math/vec2.h"
-#include "../../lib/math/vec3.h"
-#include "../../lib/os/msg.h"
-#include "../../lib/doc/xml.h"
-#include "graph/NodeFactory.h"
-#include "lib/any/any.h"
-#include "lib/dataflow/Node.h"
-#include "lib/dataflow/Port.h"
-#include "lib/dataflow/Setting.h"
-#include "lib/kaba/syntax/Class.h"
+#include <lib/math/vec2.h>
+#include <lib/doc/xml.h>
+#include <lib/any/any.h>
+#include <lib/dataflow/Node.h>
+#include <lib/dataflow/Port.h>
+#include <lib/dataflow/Setting.h>
+#include <graph/NodeFactory.h>
+#include <Session.h>
 
 static string _(const string &s) { return s; }
 string f642s_clean(double f, int dez);

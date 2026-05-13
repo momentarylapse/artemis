@@ -1,6 +1,6 @@
 namespace kaba {
-	class Exporter;
+	class IExporter;
 }
 
-void export_package_linalg(kaba::Exporter* e);
+void export_package_linalg(kaba::IExporter* e);
 

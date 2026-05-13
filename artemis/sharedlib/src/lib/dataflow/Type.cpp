@@ -3,7 +3,7 @@
 //
 
 #include "Type.h"
-#include <lib/kaba/kaba.h>
+#include <lib/kapi/kapi.h>
 #include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
 #include <lib/math/rect.h>

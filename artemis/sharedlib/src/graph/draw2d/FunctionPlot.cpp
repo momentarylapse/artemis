@@ -10,13 +10,13 @@ namespace artemis::graph {
 void FunctionPlot::on_process() {
 	if (formula() != cached_formula or !f_p) {
 		cached_formula = formula();
-		ctx = kaba::Context::create();
+		ctx = kaba::default_context->create_new_context();
 
 		try {
 			module = ctx->create_module_for_source(format(R"foodelim(
 func f(x: f32) -> f32
 	return %s
-)foodelim", formula()), "<temp>");
+)foodelim", formula()), "<temp>", false);
 
 			f_p = (f_t)module->match_function("f", "f32", {"f32"});
 

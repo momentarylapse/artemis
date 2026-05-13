@@ -61,7 +61,7 @@ void start_session_load_file(Session* parent, const Path& filename) {
 		if (ext == "artemis") {
 			s->storage->load(filename, s->data.get());
 		} else if (ext == "kaba") {
-			auto m = kaba::default_context->dll_load_module(filename.absolute());
+			auto m = kaba::default_context->load_module(filename.absolute(), false);
 			typedef void (*f_p)();
 			if (auto f = (f_p)m->match_function("main", "void", {})) {
 				f();
