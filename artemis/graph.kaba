@@ -17,7 +17,7 @@ enum NodeState
 	COMPLETE
 
 
-class Node
+class extern Node
 	func extern __init__(name: string)
 	func extern virtual __delete__()
 	func extern mut additional_init()
@@ -38,14 +38,14 @@ enum PortFlags
 	MULTI = 4
 
 
-class InPortBase
+class extern InPortBase
 	func __init__() # FIXME
 	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, flags = PortFlags.NONE)
 	func extern generic_values() -> GenericData[]
 	func extern mut mutated()
 
 
-class OutPortBase
+class extern OutPortBase
 	func __init__() # :(
 	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, value: void*, flags = PortFlags.NONE)
 	func extern mut generic_set(p: void*)
@@ -77,7 +77,7 @@ class OutPort[X] extends OutPortBase
 
 
 
-class SettingBase
+class extern SettingBase
 	func __init__() # :( needed for now...
 	func extern __init2__(node: Node, name: string, type: kaba.Class&, p: void&, options = "")
 	func extern __delete__()
@@ -104,7 +104,7 @@ class Setting[X] extends SettingBase
 		generic_set(&self.value)
 
 
-class Graph
+class extern Graph
 	func extern mut clear()
 	func extern mut add_node(name: string, pos: vec2) -> Node&
 	func extern mut connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)

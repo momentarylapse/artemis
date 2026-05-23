@@ -265,11 +265,17 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("RegularGrid.dx", &data::RegularGrid::dx);
 	ext->declare_class_element("RegularGrid.dy", &data::RegularGrid::dy);
 	ext->declare_class_element("RegularGrid.dz", &data::RegularGrid::dz);
+	ext->declare_class_element("RegularGrid.offset", &data::RegularGrid::offset);
 	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<data::RegularGrid>);
 	ext->link_class_func("RegularGrid.points", &data::RegularGrid::points);
 	ext->link_class_func("RegularGrid.count", &data::RegularGrid::count);
 
+	ext->declare_enum("GridType.NONE", data::GridType::None);
+	ext->declare_enum("GridType.REGULAR", data::GridType::Regular);
+	ext->declare_enum("GridType.UNSTRUCTURED", data::GridType::Unstructured);
+
 	ext->declare_class_size("Grid", sizeof(data::Grid));
+	ext->declare_class_element("Grid.type", &data::Grid::type);
 	ext->declare_class_element("Grid.regular", &data::Grid::regular);
 	ext->link_class_func("Grid.__init__", &kaba::generic_init<data::Grid>);
 	ext->link_class_func("Grid.points", &data::Grid::points);

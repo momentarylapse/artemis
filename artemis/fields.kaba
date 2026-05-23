@@ -3,7 +3,7 @@ use .grid.*
 use yrenderer.gfx.ShaderStorageBuffer
 
 
-struct ScalarField
+struct extern ScalarField
 	var grid: RegularGrid
 	var sampling_mode: SamplingMode
 #	var v32: f32[]
@@ -35,7 +35,8 @@ struct ScalarField
 	
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> ScalarField
 
-struct VectorField
+
+struct extern VectorField
 	var grid: RegularGrid
 	var sampling_mode: SamplingMode
 #	var v32: vec3[]
@@ -65,7 +66,8 @@ struct VectorField
 	func extern mut set_component(i: i32, s: ScalarField)
 	func extern static merge(x: ScalarField, y: ScalarField, z: ScalarField) -> VectorField
 
-struct MultiComponentField
+
+struct extern MultiComponentField
 	var grid: RegularGrid
 	var sampling_mode: SamplingMode
 	var components: i32

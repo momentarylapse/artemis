@@ -1,6 +1,7 @@
 use kaba
 
-struct Mesh
+
+struct extern Mesh
 	func extern __init__()
 	func extern __delete__()
 	func extern mut __assign__(o: Mesh)
@@ -11,16 +12,16 @@ struct Mesh
 
 
 # opaque types for the data graph
-struct PlotData
-struct RenderData
-struct DrawCall
+struct extern PlotData
+struct extern RenderData
+struct extern DrawCall
 
 
-struct ColorMap
+struct extern ColorMap
 	var colors: Color[]
 	var values: f32[]
 
 
-struct GenericData
+struct extern GenericData
 	type: kaba.Class&
 	p: void&
