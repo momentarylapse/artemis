@@ -183,16 +183,9 @@ add_library(moduleartemis SHARED
 	src/graph/draw2d/FunctionPlot.cpp
 	src/graph/draw2d/ListPlot.cpp
 	src/graph/draw2d/Plotter.cpp
-	src/graph/field/Divergence.cpp
-	src/graph/field/Gradient.cpp
-	src/graph/field/IsoSurface.cpp
-	src/graph/field/Laplace.cpp
 	src/graph/field/MultiComponentField.cpp
-	src/graph/field/Rotation.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
-	src/graph/field/VectorFieldComponent.cpp
-	src/graph/field/VectorFieldLength.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
 	src/graph/renderer/ImageRenderer.cpp

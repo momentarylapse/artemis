@@ -1,0 +1,16 @@
+use artemis.*
+
+class Rotation extends Node
+	var in_field = InPort[VectorField](self, "in")
+	var out_field = OutPort[VectorField](self, "out")
+	var backwards = Setting[bool](self, "backwards", false)
+	
+	func __init__()
+		super.__init__("Rotation")
+	
+	func override on_process()
+		for f in in_field.value()
+			if backwards()
+				out_field.set(rotation_bw(f))
+			else
+				out_field.set(rotation_fw(f))

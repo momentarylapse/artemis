@@ -1,0 +1,13 @@
+use artemis.*
+
+class IsoSurface extends Node
+	var in_field = InPort[ScalarField](self, "in")
+	var out_mesh = OutPort[Mesh](self, "out")
+	var iso_value = Setting[f64](self, "iso-value", 0.0)
+	
+	func __init__()
+		super.__init__("IsoSurface")
+	
+	func override on_process()
+		for f in in_field.value()
+			out_mesh.set(iso_surface(f, f32(iso_value())))

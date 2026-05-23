@@ -26,9 +26,10 @@
 #include <graph/draw2d/Plotter.h>
 #include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
+#include <processing/field/IsoSurface.h>
 
-#include "lib/mesh/GeometrySphere.h"
-#include "lib/mesh/GeometryTeapot.h"
+#include <lib/mesh/GeometrySphere.h>
+#include <lib/mesh/GeometryTeapot.h>
 
 extern Session* _current_session_;
 
@@ -152,6 +153,8 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("rotation_bw", &processing::rotation_bw);
 	ext->link_func("laplace", &processing::laplace);
 	ext->link_func("hessian_x", &processing::hessian_x);
+	ext->link_func("iso_surface", &processing::iso_surface);
+
 	ext->link_func("profiler.create_channel", &profiler::create_channel);
 	ext->link_func("profiler.begin", &profiler::begin);
 	ext->link_func("profiler.end", &profiler::end);
@@ -212,6 +215,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("VectorField._set", &data::VectorField::_set32);
 	ext->link_class_func("VectorField._value", &data::VectorField::_value32);
 	ext->link_class_func("VectorField.average", &data::VectorField::average32);
+	ext->link_class_func("VectorField.length", &data::VectorField::length);
 	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);
 	ext->link_class_func("VectorField.__assign__:VectorField:VectorField", &kaba::generic_assign<data::VectorField>);
 	ext->link_class_func("VectorField.__assign__:VectorField:math.vec3", &kaba::generic_assign<data::VectorField, const vec3&>);

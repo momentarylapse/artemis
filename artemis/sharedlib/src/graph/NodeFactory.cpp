@@ -3,18 +3,8 @@
 //
 
 #include "NodeFactory.h"
-
-#include <lib/os/msg.h>
-
-#include "field/Gradient.h"
-#include "field/Laplace.h"
-#include "field/Divergence.h"
-#include "field/Rotation.h"
-#include "field/IsoSurface.h"
 #include "field/ScalarField.h"
 #include "field/VectorField.h"
-#include "field/VectorFieldComponent.h"
-#include "field/VectorFieldLength.h"
 #include "field/MultiComponentField.h"
 #include "canvas/Canvas.h"
 #include "canvas/LayoutGrid.h"
@@ -32,6 +22,7 @@
 #include "draw2d/FunctionPlot.h"
 #include "../plugins/PluginManager.h"
 #include "draw2d/ListPlot.h"
+#include <lib/os/msg.h>
 
 namespace artemis::graph {
 
@@ -76,17 +67,9 @@ void register_node_class_p(const string& class_name, const Array<dataflow::NodeC
 }
 
 void init_factory() {
-	register_node_class<IsoSurface>("IsoSurface", {dataflow::NodeCategory::Field, dataflow::NodeCategory::Mesh});
-
 	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});
 	register_node_class<VectorField>("VectorField", {dataflow::NodeCategory::Field});
 	register_node_class<MultiComponentField>("MultiComponentField", {dataflow::NodeCategory::Field});
-	register_node_class<Gradient>("Gradient", {dataflow::NodeCategory::Field});
-	register_node_class<Divergence>("Divergence", {dataflow::NodeCategory::Field});
-	register_node_class<Rotation>("Rotation", {dataflow::NodeCategory::Field});
-	register_node_class<Laplace>("Laplace", {dataflow::NodeCategory::Field});
-	register_node_class<VectorFieldComponent>("VectorFieldComponent", {dataflow::NodeCategory::Field});
-	register_node_class<VectorFieldLength>("VectorFieldLength", {dataflow::NodeCategory::Field});
 
 	register_node_class_p<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
 	register_node_class_p<LayoutGrid>("LayoutGrid", {dataflow::NodeCategory::Renderer});

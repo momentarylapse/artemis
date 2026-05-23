@@ -1,0 +1,12 @@
+use artemis.*
+
+class Gradient extends Node
+	var in_field = InPort[ScalarField](self, "in")
+	var out_field = OutPort[VectorField](self, "out")
+	
+	func __init__()
+		super.__init__("Gradient")
+	
+	func override on_process()
+		for f in in_field.value()
+			out_field.set(gradient(f))

@@ -48,6 +48,7 @@ struct extern VectorField
 	func extern _value(i: i32, j: i32, k: i32) -> vec3
 	func extern type() -> kaba.Class&
 	func extern average() -> vec3
+	func extern length() -> ScalarField
 	func extern mut __assign__(o: VectorField)
 	func extern mut __assign__(o: vec3)
 	func extern mut __iadd__(o: VectorField)

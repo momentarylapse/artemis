@@ -8,6 +8,8 @@ use .graph.*
 let EXPORT_IMPORTS = true
 
 
+func extern iso_surface(s: ScalarField, t0: f32) -> Mesh
+
 
 class extern Session
 	var graph: owned![Graph]
