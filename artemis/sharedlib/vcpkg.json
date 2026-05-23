@@ -1,7 +1,6 @@
 {
   "dependencies": [
     "armadillo",
-    "fftw3",
     "freetype",
     "glew",
     "glfw3",

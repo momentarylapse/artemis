@@ -145,24 +145,6 @@ find_package(Armadillo REQUIRED)
 list(APPEND DEPS ${ARMADILLO_LIBRARIES})
 list(APPEND COMPILE_DEFINITIONS HAS_LIB_ARMADILLO=1)
 
-
-# lib: fftw3 (optional)
-set(LIB_FFTW3_ENABLED true CACHE BOOL "Use fftw3 library?")
-pkg_check_modules(FFTW3F fftw3f)
-if(FFTW3F_FOUND)
-else()
-	set(LIB_FFTW3_ENABLED false CACHE BOOL "fftw3 library not found" FORCE)
-endif()
-if(${LIB_FFTW3_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${FFTW3F_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${FFTW3F_LIBRARY_DIRS})
-	list(APPEND DEPS ${FFTW3F_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${FFTW3F_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_FFTW3=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_FFTW3=0)
-endif()
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
@@ -229,6 +211,7 @@ add_library(moduleartemis SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
+	src/lib/codeeditor/_kaba_export.cpp
 	src/lib/codeeditor/CodeEditor.cpp
 	src/lib/dataflow/Graph.cpp
 	src/lib/dataflow/Node.cpp
@@ -241,8 +224,6 @@ add_library(moduleartemis SHARED
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
-	src/lib/fft/_kaba_export.cpp
-	src/lib/fft/fft.cpp
 	src/lib/image/color.cpp
 	src/lib/image/image.cpp
 	src/lib/image/image_bmp.cpp
@@ -349,10 +330,6 @@ add_library(moduleartemis SHARED
 	src/lib/mesh/PolygonMesh.cpp
 	src/lib/mesh/SkinGenerator.cpp
 	src/lib/mesh/VertexStagingBuffer.cpp
-	src/lib/net/_kaba_export.cpp
-	src/lib/net/BinaryBuffer.cpp
-	src/lib/net/net.cpp
-	src/lib/net/Socket.cpp
 	src/lib/nix/_kaba_export.cpp
 	src/lib/nix/nix.cpp
 	src/lib/nix/nix_buffer.cpp
