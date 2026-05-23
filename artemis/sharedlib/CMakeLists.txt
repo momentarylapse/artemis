@@ -193,7 +193,6 @@ add_library(moduleartemis SHARED
 	src/graph/field/VectorField.cpp
 	src/graph/field/VectorFieldComponent.cpp
 	src/graph/field/VectorFieldLength.cpp
-	src/graph/grid/RegularGrid.cpp
 	src/graph/renderer/DeformationRenderer.cpp
 	src/graph/renderer/GridRenderer.cpp
 	src/graph/renderer/ImageRenderer.cpp

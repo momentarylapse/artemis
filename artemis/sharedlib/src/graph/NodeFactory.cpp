@@ -16,7 +16,6 @@
 #include "field/VectorFieldComponent.h"
 #include "field/VectorFieldLength.h"
 #include "field/MultiComponentField.h"
-#include "grid/RegularGrid.h"
 #include "canvas/Canvas.h"
 #include "canvas/LayoutGrid.h"
 #include "canvas/LayoutOverlay.h"
@@ -77,8 +76,6 @@ void register_node_class_p(const string& class_name, const Array<dataflow::NodeC
 }
 
 void init_factory() {
-	register_node_class<RegularGrid>("RegularGrid", {dataflow::NodeCategory::Grid});
-
 	register_node_class<IsoSurface>("IsoSurface", {dataflow::NodeCategory::Field, dataflow::NodeCategory::Mesh});
 
 	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});

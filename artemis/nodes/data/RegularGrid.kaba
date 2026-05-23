@@ -1,0 +1,30 @@
+use artemis.graph.*
+use artemis.grid
+
+class RegularGrid extends Node
+	var out_grid = OutPort[grid.Grid](self, "out")
+	var nx = Setting[i32](self, "nx", 8)
+	var ny = Setting[i32](self, "ny", 8)
+	var nz = Setting[i32](self, "nz", 1)
+	var lx = Setting[f64](self, "lx", 8.0)
+	var ly = Setting[f64](self, "ly", 8.0)
+	var lz = Setting[f64](self, "lz", 1.0)
+	var offset = Setting[vec3](self, "offset", vec3(0,0,0))
+	
+	func __init__()
+		super.__init__("RegularGrid")
+	
+	func override on_process()
+		var g: grid.Grid
+		g.type = grid.GridType.REGULAR
+		g.regular = grid.RegularGrid()
+		g.regular!.nx = nx()
+		g.regular!.ny = ny()
+		g.regular!.nz = nz()
+		g.regular!.dx = vec3(f32(lx()), 0, 0) / f32(max(nx(), 1))
+		g.regular!.dy = vec3(0, f32(ly()), 0) / f32(max(ny(), 1))
+		g.regular!.dz = vec3(0, 0, f32(lz())) / f32(max(nz(), 1))
+		g.regular!.offset = offset()
+		out_grid.set(g)
+		
+	
