@@ -178,15 +178,15 @@ void Edit::on_key_down(int key) {
 	};
 
 	if (key_no_shift == KEY_LEFT) {
-		if (cursor_pos != selection_start) {
-			set_cursor_pos(min(cursor_pos, selection_start), shift);
+		if (cursor_pos != selection_start and !shift) {
+			set_cursor_pos(min(cursor_pos, selection_start), false);
 		} else {
 			set_cursor_pos(clamp(prior_index(cursor_pos), 0, text.num), shift);
 		}
 		prevent_event_propagation();
 	} else if (key_no_shift == KEY_RIGHT) {
-		if (cursor_pos != selection_start) {
-			set_cursor_pos(max(cursor_pos, selection_start), shift);
+		if (cursor_pos != selection_start and !shift) {
+			set_cursor_pos(max(cursor_pos, selection_start), false);
 		} else {
 			set_cursor_pos(clamp(next_index(cursor_pos), 0, text.num), shift);
 		}
@@ -518,6 +518,8 @@ void Edit::_replace_range(Index i0, Index i1, const string& t) {
 		return index;
 	};
 	cursor_pos = map_index(cursor_pos);
+	if (user_editing)
+		_cursor_preferred_col = index_to_column(cursor_pos);
 	//scroll_into_view(cursor_pos);
 	selection_start = map_index(selection_start);
 	on_edit();
@@ -615,7 +617,9 @@ void Edit::_scroll_into_view(Index index) {
 		viewport_offset.y += (xy.y - area.y2) + font_size * 2;
 	viewport_offset = vec2::max(vec2::min(viewport_offset, viewport_size()), vec2::ZERO);
 	_scroll_into_view_request = base::None;
-	request_redraw();
+	run_later(0.01f, [this] {
+		request_redraw();
+	});
 }
 
 
