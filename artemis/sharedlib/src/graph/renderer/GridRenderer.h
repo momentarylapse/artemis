@@ -14,7 +14,7 @@ namespace artemis::graph {
 
 class GridRenderer : public RenderEmitterNode {
 public:
-	explicit GridRenderer(Session* s) : RenderEmitterNode(s, "GridRenderer") {}
+	explicit GridRenderer() : RenderEmitterNode("GridRenderer") {}
 
 	void on_process() override;
 

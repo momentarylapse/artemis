@@ -23,6 +23,10 @@ namespace yrenderer {
 class Session;
 class Painter;
 
+namespace artemis {
+	extern Session* default_session;
+}
+
 namespace artemis::view {
 	class RenderNode;
 }
@@ -39,7 +43,7 @@ struct RenderData {
 
 class RendererNode : public dataflow::Node {
 public:
-	explicit RendererNode(Session* s, const string& name);
+	explicit RendererNode(const string& name);
 
 	dataflow::OutPort<RenderData> out_draw{this, "draw"};
 
@@ -49,8 +53,8 @@ public:
 
 class Canvas : public dataflow::Node {
 public:
-	explicit Canvas(Session* s) : Node("Canvas") {
-		session = s;
+	explicit Canvas() : Node("Canvas") {
+		session = default_session;
 		flags = dataflow::NodeFlags::Canvas;
 	}
 

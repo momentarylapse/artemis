@@ -47,8 +47,7 @@ void ViewPort::focus_on_box(const Box& box) {
 
 
 
-SceneRenderer::SceneRenderer(Session* s) : RenderNode(s) {
-	session = s;
+SceneRenderer::SceneRenderer() {
 
 	from_source(R"foodelim(
 Dialog x x padding=0

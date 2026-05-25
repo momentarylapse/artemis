@@ -7,8 +7,8 @@
 
 namespace artemis::graph {
 
-LayoutOverlay::LayoutOverlay(Session* s) : RendererNode(s, "LayoutOverlay") {
-	layout_overlay = new view::LayoutOverlay(s);
+LayoutOverlay::LayoutOverlay() : RendererNode("LayoutOverlay") {
+	layout_overlay = new view::LayoutOverlay();
 }
 
 void LayoutOverlay::on_process() {

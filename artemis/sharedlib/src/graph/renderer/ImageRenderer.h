@@ -16,7 +16,7 @@ namespace artemis::graph {
 
 class ImageRenderer : public RenderEmitterNode {
 public:
-	explicit ImageRenderer(Session* s);
+	explicit ImageRenderer();
 	~ImageRenderer() override;
 
 	void on_process() override;

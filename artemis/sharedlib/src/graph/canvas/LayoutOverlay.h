@@ -15,7 +15,7 @@ namespace artemis::graph {
 
 class LayoutOverlay : public RendererNode {
 public:
-	explicit LayoutOverlay(Session* s);
+	explicit LayoutOverlay();
 
 	void on_process() override;
 

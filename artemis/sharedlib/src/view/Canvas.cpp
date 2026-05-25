@@ -10,13 +10,17 @@
 #include "Session.h"
 #include "lib/os/msg.h"
 
-namespace artemis::view {
-
-RenderNode::RenderNode(Session* _session) : xhui::Panel(p2s(this)) {
-	session = _session;
+namespace artemis {
+	extern Session* default_session;
 }
 
-Canvas::Canvas(Session *s) : RenderNode(s) {
+namespace artemis::view {
+
+RenderNode::RenderNode() : xhui::Panel(p2s(this)) {
+	session = default_session;
+}
+
+Canvas::Canvas() : RenderNode() {
 	add_control("Grid", "", 0, 0, "grid"); // not sure we even need this...
 }
 
@@ -32,7 +36,7 @@ void Canvas::set_child(RenderNode* c) {
 
 
 
-LayoutGrid::LayoutGrid(Session *s) : RenderNode(s) {
+LayoutGrid::LayoutGrid() : RenderNode() {
 	add_control("Grid", "", 0, 0, "grid");
 	set_options("grid", "spacing=0");
 }
@@ -54,7 +58,7 @@ void LayoutGrid::configure(int spacing, int margin) {
 	set_options("grid", format("spacing=%d,margin=%d", spacing, margin));
 }
 
-LayoutOverlay::LayoutOverlay(Session *s) : RenderNode(s) {
+LayoutOverlay::LayoutOverlay() : RenderNode() {
 	add_control("Overlay", "", 0, 0, "overlay");
 }
 
@@ -70,7 +74,7 @@ void LayoutOverlay::set_children(const Array<RenderNode*>& _children) {
 			embed("overlay", i, 0, c);
 }
 
-	LayoutNested::LayoutNested(Session *s) : RenderNode(s) {
+	LayoutNested::LayoutNested() : RenderNode() {
 	from_source(R"foodelim(
 Dialog ? x
 	Overlay ? ''

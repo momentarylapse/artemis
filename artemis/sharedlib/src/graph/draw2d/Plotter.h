@@ -26,7 +26,7 @@ struct PlotData {
 
 class Plotter : public RendererNode {
 public:
-	explicit Plotter(Session* s);
+	explicit Plotter();
 
 	void on_process() override;
 

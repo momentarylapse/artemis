@@ -8,10 +8,14 @@
 #include <lib/profiler/Profiler.h>
 #include "view/ArtemisWindow.h"
 
+namespace artemis {
+	extern Session* default_session;
+}
+
 namespace artemis::graph {
 
-RendererNode::RendererNode(Session* s, const string& name) : Node(name) {
-	session = s;
+RendererNode::RendererNode(const string& name) : Node(name) {
+	session = default_session;
 	flags = dataflow::NodeFlags::Renderer;
 	channel_draw = profiler::create_channel(name + ":draw", channel);
 }

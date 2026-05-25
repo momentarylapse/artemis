@@ -21,11 +21,11 @@ base::optional<Box> mesh_bounding_box(const PolygonMesh& mesh) {
 	return b;
 }
 
-MeshRenderer::MeshRenderer(Session* s) : RenderEmitterNode(s, "MeshRenderer") {
-	if (!s->ctx)
+MeshRenderer::MeshRenderer() : RenderEmitterNode("MeshRenderer") {
+	if (!session->ctx)
 		msg_error("no ctx");
 	material = new yrenderer::Material();
-	material->textures.add(s->ctx->tex_white);
+	material->textures.add(session->ctx->tex_white);
 	vertex_buffer = new ygfx::VertexBuffer("3f,3f,2f");
 }
 

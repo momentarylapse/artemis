@@ -36,7 +36,7 @@ struct DrawCall {
 
 class RenderEmitterNode : public dataflow::Node {
 public:
-	explicit RenderEmitterNode(Session* s, const string& name);
+	explicit RenderEmitterNode(const string& name);
 	~RenderEmitterNode() override;
 
 	virtual void on_emit(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd, bool shadow_pass) {}

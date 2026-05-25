@@ -17,7 +17,7 @@ namespace artemis::graph {
 
 class SceneRenderer : public RendererNode {
 public:
-	explicit SceneRenderer(Session* s);
+	explicit SceneRenderer();
 
 	void additional_init() override;
 	void on_process() override;

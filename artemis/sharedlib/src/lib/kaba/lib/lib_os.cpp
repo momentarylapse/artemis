@@ -209,6 +209,9 @@ public:
 	}
 };
 
+bool op_int_eq(int, int);
+bool op_int_neq(int, int);
+
 void SIAddPackageOSPath(Context *c) {
 	add_internal_package(c, "os", "1");
 
@@ -512,6 +515,8 @@ void SIAddPackageOS(Context *c) {
 		class_add_enum("LINUX", TypeSystemType, SystemType::Linux);
 		class_add_enum("WINDOWS", TypeSystemType, SystemType::Windows);
 		class_add_enum("MAC", TypeSystemType, SystemType::Mac);
+		add_operator(OperatorID::Equal, common_types._bool, TypeSystemType, TypeSystemType, InlineID::Int32Equal, &op_int_eq);
+		add_operator(OperatorID::NotEqual, common_types._bool, TypeSystemType, TypeSystemType, InlineID::Int32NotEqual, &op_int_neq);
 
 
 	add_class(TypeTerminal);

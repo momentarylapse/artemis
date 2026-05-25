@@ -7,6 +7,10 @@
 #include <lib/os/msg.h>
 #include "Session.h"
 
+namespace artemis {
+	extern Session* default_session;
+}
+
 namespace artemis::graph {
 
 class RenderEmitterNode::Emitter : public yrenderer::MeshEmitter {
@@ -22,10 +26,10 @@ public:
 	}
 };
 
-RenderEmitterNode::RenderEmitterNode(Session* s, const string& name) : Node(name) {
-	session = s;
+RenderEmitterNode::RenderEmitterNode(const string& name) : Node(name) {
+	session = default_session;
 	flags = dataflow::NodeFlags::Renderer;
-	emitter = new Emitter(s->ctx, this);
+	emitter = new Emitter(session->ctx, this);
 }
 
 RenderEmitterNode::~RenderEmitterNode() = default;

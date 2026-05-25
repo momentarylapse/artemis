@@ -7,8 +7,8 @@
 
 namespace artemis::graph {
 
-LayoutNested::LayoutNested(Session* s) : RendererNode(s, "LayoutNested") {
-	layout_nested = new view::LayoutNested(s);
+LayoutNested::LayoutNested() : RendererNode("LayoutNested") {
+	layout_nested = new view::LayoutNested();
 }
 
 void LayoutNested::on_process() {

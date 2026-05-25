@@ -15,7 +15,7 @@ namespace artemis::graph {
 
 class LayoutGrid : public RendererNode {
 public:
-	explicit LayoutGrid(Session* s);
+	explicit LayoutGrid();
 
 	void on_process() override;
 

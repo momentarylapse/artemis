@@ -19,7 +19,7 @@ namespace artemis::graph {
 
 class VolumeRenderer : public RenderEmitterNode {
 public:
-	explicit VolumeRenderer(Session* s);
+	explicit VolumeRenderer();
 
 	void on_process() override;
 

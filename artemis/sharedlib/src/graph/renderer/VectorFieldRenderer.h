@@ -13,7 +13,7 @@ namespace artemis::graph {
 
 class VectorFieldRenderer : public RenderEmitterNode {
 public:
-	explicit VectorFieldRenderer(Session* s) : RenderEmitterNode(s, "VectorFieldRenderer") {}
+	explicit VectorFieldRenderer() : RenderEmitterNode("VectorFieldRenderer") {}
 
 	void on_process() override;
 

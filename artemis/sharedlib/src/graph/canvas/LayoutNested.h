@@ -15,7 +15,7 @@ namespace artemis::graph {
 
 class LayoutNested : public RendererNode {
 public:
-	explicit LayoutNested(Session* s);
+	explicit LayoutNested();
 
 	void on_process() override;
 

@@ -14,7 +14,7 @@ namespace artemis::graph {
 
 class DeformationRenderer : public RenderEmitterNode {
 public:
-	explicit DeformationRenderer(Session* s);
+	explicit DeformationRenderer();
 
 	void on_process() override;
 

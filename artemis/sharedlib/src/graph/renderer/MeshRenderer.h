@@ -15,7 +15,7 @@ namespace artemis::graph {
 
 class MeshRenderer : public RenderEmitterNode {
 public:
-	explicit MeshRenderer(Session* s);
+	explicit MeshRenderer();
 	~MeshRenderer() override;
 
 	void on_process() override;

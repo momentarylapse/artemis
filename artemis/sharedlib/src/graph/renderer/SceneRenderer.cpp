@@ -9,8 +9,8 @@
 
 namespace artemis::graph {
 
-SceneRenderer::SceneRenderer(Session *s) : RendererNode(s, "SceneRenderer") {
-	scene_renderer = new view::SceneRenderer(session);
+SceneRenderer::SceneRenderer() : RendererNode("SceneRenderer") {
+	scene_renderer = new view::SceneRenderer();
 	state = dataflow::NodeState::Uninitialized;
 	background.set(xhui::Theme::_default.background_low);
 }

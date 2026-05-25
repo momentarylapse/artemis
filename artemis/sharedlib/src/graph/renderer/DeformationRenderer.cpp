@@ -7,7 +7,7 @@
 
 namespace artemis::graph {
 
-DeformationRenderer::DeformationRenderer(Session* s) : RenderEmitterNode(s, "DeformationRenderer") {}
+DeformationRenderer::DeformationRenderer() : RenderEmitterNode("DeformationRenderer") {}
 
 void DeformationRenderer::on_process() {
 	auto d = in_diff.value();

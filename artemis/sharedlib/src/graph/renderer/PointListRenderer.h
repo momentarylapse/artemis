@@ -18,7 +18,7 @@ namespace artemis::graph {
 
 class PointListRenderer : public RenderEmitterNode {
 public:
-	explicit PointListRenderer(Session* s);
+	explicit PointListRenderer();
 
 	void on_process() override;
 

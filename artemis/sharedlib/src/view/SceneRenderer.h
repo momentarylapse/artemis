@@ -35,7 +35,7 @@ struct ViewPort {
 
 class SceneRenderer : public RenderNode {
 public:
-	explicit SceneRenderer(Session *s);
+	explicit SceneRenderer();
 	~SceneRenderer() override;
 
 	bool build();
@@ -46,7 +46,6 @@ public:
 	void set_content_bounding_box(const Box& b);
 	void set_drawing_helper();
 
-	Session* session;
 	owned<yrenderer::XhuiRenderer> render_target;
 	owned<yrenderer::RenderPath> render_path;
 	Array<yrenderer::Light> lights;

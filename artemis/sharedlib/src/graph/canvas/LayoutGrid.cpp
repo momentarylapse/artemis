@@ -7,8 +7,8 @@
 
 namespace artemis::graph {
 
-LayoutGrid::LayoutGrid(Session* s) : RendererNode(s, "LayoutGrid") {
-	layout_grid = new view::LayoutGrid(s);
+LayoutGrid::LayoutGrid() : RendererNode("LayoutGrid") {
+	layout_grid = new view::LayoutGrid();
 }
 
 void LayoutGrid::on_process() {

@@ -18,7 +18,7 @@ namespace artemis::graph {
 class PlotterRenderNode : public view::RenderNode {
 public:
 	Plotter* plotter;
-	explicit PlotterRenderNode(Plotter* _plotter) : RenderNode(_plotter->session) {
+	explicit PlotterRenderNode(Plotter* _plotter) {
 		add_control("DrawingArea", "", 0, 0, "area");
 		plotter = _plotter;
 		event_xp("area", xhui::event_id::Draw, [this] (Painter* p) {
@@ -27,7 +27,7 @@ public:
 	}
 };
 
-Plotter::Plotter(Session* s) : RendererNode(s, "Plotter") {
+Plotter::Plotter() : RendererNode( "Plotter") {
 	render_node = new PlotterRenderNode(this);
 	background.set(xhui::Theme::_default.background);
 }

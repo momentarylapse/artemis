@@ -18,17 +18,15 @@ class RenderNode : public xhui::Panel {
 public:
 	Session* session;
 
-	explicit RenderNode(Session* session);
+	explicit RenderNode();
 };
 
 
 class Canvas : public RenderNode {
 public:
-	explicit Canvas(Session* s);
+	explicit Canvas();
 
 	void set_child(RenderNode* n);
-
-	Session* session;
 
 private:
 	RenderNode* child = nullptr;
@@ -36,7 +34,7 @@ private:
 
 class LayoutGrid : public RenderNode {
 public:
-	explicit LayoutGrid(Session* s);
+	explicit LayoutGrid();
 	void set_children(const Array<RenderNode*>& c, bool horizontal);
 	void configure(int spacing, int margin);
 
@@ -47,7 +45,7 @@ private:
 
 class LayoutOverlay : public RenderNode {
 public:
-	explicit LayoutOverlay(Session* s);
+	explicit LayoutOverlay();
 	void set_children(const Array<RenderNode*>& c);
 
 private:
@@ -56,7 +54,7 @@ private:
 
 class LayoutNested : public RenderNode {
 public:
-	explicit LayoutNested(Session* s);
+	explicit LayoutNested();
 	void set_children(RenderNode* main, const Array<RenderNode*>& c, int mode);
 
 private:

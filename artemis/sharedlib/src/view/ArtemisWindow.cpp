@@ -38,7 +38,10 @@
 extern string AppName;
 
 
-Session* session;
+//Session* session;
+namespace artemis {
+	Session* default_session;
+}
 
 rect dynamicly_scaled_area(ygfx::FrameBuffer*) { return {}; }
 rect dynamicly_scaled_source() { return {}; }
@@ -82,6 +85,7 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 {
 	maximize(true);
 	session = _session;
+	artemis::default_session = session;
 
 	from_source(R"foodelim(
 Dialog x x padding=0
@@ -124,7 +128,7 @@ Dialog x x padding=0
 
 	code_editor = new artemis::view::CodeEditor(session, this, "code-editor-grid", artemis::PluginManager::directory());
 
-	canvas = new artemis::view::Canvas(session);
+	canvas = new artemis::view::Canvas();
 	embed("canvas-grid", 0, 0, canvas.get());
 
 #ifdef OS_MAC

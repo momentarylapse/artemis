@@ -53,41 +53,29 @@ void register_node_class(const string& class_name, const Array<dataflow::NodeCat
 		}
 	});
 }
-template<class T>
-void register_node_class_p(const string& class_name, const Array<dataflow::NodeCategory>& categories) {
-	node_class_db.add({
-		class_name,
-		category_set(categories),
-		[] (Session* s, const string& name) {
-			auto node = new T(s);
-			node->name = name;
-			return node;
-		}
-	});
-}
 
 void init_factory() {
 	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});
 	register_node_class<VectorField>("VectorField", {dataflow::NodeCategory::Field});
 	register_node_class<MultiComponentField>("MultiComponentField", {dataflow::NodeCategory::Field});
 
-	register_node_class_p<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<LayoutGrid>("LayoutGrid", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<LayoutOverlay>("LayoutOverlay", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<LayoutNested>("LayoutNested", {dataflow::NodeCategory::Renderer});
+	register_node_class<Canvas>("Canvas", {dataflow::NodeCategory::Renderer});
+	register_node_class<LayoutGrid>("LayoutGrid", {dataflow::NodeCategory::Renderer});
+	register_node_class<LayoutOverlay>("LayoutOverlay", {dataflow::NodeCategory::Renderer});
+	register_node_class<LayoutNested>("LayoutNested", {dataflow::NodeCategory::Renderer});
 
-	register_node_class_p<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<MeshRenderer>("MeshRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<ImageRenderer>("ImageRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<VolumeRenderer>("VolumeRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<VectorFieldRenderer>("VectorFieldRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<DeformationRenderer>("DeformationRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<MeshRenderer>("MeshRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<ImageRenderer>("ImageRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<VolumeRenderer>("VolumeRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<VectorFieldRenderer>("VectorFieldRenderer", {dataflow::NodeCategory::Renderer});
+	register_node_class<DeformationRenderer>("DeformationRenderer", {dataflow::NodeCategory::Renderer});
 
 	register_node_class<FunctionPlot>("FunctionPlot", {dataflow::NodeCategory::Renderer});
 	register_node_class<ListPlot>("ListPlot", {dataflow::NodeCategory::Renderer});
-	register_node_class_p<Plotter>("Plotter", {dataflow::NodeCategory::Renderer});
+	register_node_class<Plotter>("Plotter", {dataflow::NodeCategory::Renderer});
 
 
 	for (const auto& [class_name, filename] : artemis::PluginManager::plugin_classes) {
