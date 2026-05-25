@@ -1,3 +1,4 @@
+use xhui
 use .graph.*
 use .session.*
 use .data.*
@@ -5,6 +6,11 @@ use .yrenderer # TODO switch to external package!
 use .gfx
 
 func extern tex_white() -> shared![gfx.Texture]
+
+
+class extern RendererNode extends Node
+	var out_draw: OutPort[RenderData]
+	func extern override __init__(name: string)
 
 
 class extern RenderEmitterNode extends Node
@@ -17,3 +23,17 @@ class extern RenderEmitterNode extends Node
 	func extern virtual bounding_box() -> Box?
 	func extern mut draw_mesh(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, matrix: mat4, vb: gfx.VertexBuffer, material: yrenderer.Material)
 	func extern mut send_out(transparent = false)
+
+
+
+class extern RenderNode extends xhui.Panel
+	var session: Session&
+	func extern mut __init__()
+
+
+class extern XSceneRenderer extends RenderNode
+	var render_path: owned![yrenderer.RenderPath]
+
+	func extern mut override __init__()
+	func extern mut set_content_bounding_box(b: Box)
+	func extern mut build() -> bool

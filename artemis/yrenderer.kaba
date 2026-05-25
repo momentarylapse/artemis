@@ -226,6 +226,7 @@ class extern RenderPath extends Renderer
 
 	func extern mut set_lights(lights: YLight&[])
 	func extern mut set_view(view: CameraParams)
+	func extern virtual mut remove_all_emitters()
 	func extern virtual mut add_background_emitter(emitter: shared![MeshEmitter])
 	func extern virtual mut add_opaque_emitter(emitter: shared![MeshEmitter])
 	func extern virtual mut add_transparent_emitter(emitter: shared![MeshEmitter])

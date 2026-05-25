@@ -10,7 +10,6 @@
 #include "canvas/LayoutGrid.h"
 #include "canvas/LayoutOverlay.h"
 #include "canvas/LayoutNested.h"
-#include "renderer/SceneRenderer.h"
 #include "draw2d/Plotter.h"
 #include "draw2d/FunctionPlot.h"
 #include "../plugins/PluginManager.h"
@@ -56,8 +55,6 @@ void init_factory() {
 	register_node_class<LayoutGrid>("LayoutGrid", {dataflow::NodeCategory::Renderer});
 	register_node_class<LayoutOverlay>("LayoutOverlay", {dataflow::NodeCategory::Renderer});
 	register_node_class<LayoutNested>("LayoutNested", {dataflow::NodeCategory::Renderer});
-
-	register_node_class<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
 
 	register_node_class<FunctionPlot>("FunctionPlot", {dataflow::NodeCategory::Renderer});
 	register_node_class<ListPlot>("ListPlot", {dataflow::NodeCategory::Renderer});

@@ -448,6 +448,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->declare_class_element("RenderPath.ambient_occlusion_radius", &RenderPath::ambient_occlusion_radius);
 		ext->link_class_func("RenderPath.set_lights", &RenderPath::set_lights);
 		ext->link_class_func("RenderPath.set_view", &RenderPath::set_view);
+		ext->link_virtual("RenderPath.remove_all_emitters", &RenderPath::remove_all_emitters, &rp);
 		ext->link_virtual("RenderPath.add_background_emitter", &RenderPath::add_background_emitter, &rp);
 		ext->link_virtual("RenderPath.add_opaque_emitter", &RenderPath::add_opaque_emitter, &rp);
 		ext->link_virtual("RenderPath.add_transparent_emitter", &RenderPath::add_transparent_emitter, &rp);

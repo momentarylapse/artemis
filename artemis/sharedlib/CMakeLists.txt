@@ -187,7 +187,6 @@ add_library(moduleartemis SHARED
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
 	src/graph/renderer/RendererNode.cpp
-	src/graph/renderer/SceneRenderer.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp
 	src/graph/NodeFactory.cpp

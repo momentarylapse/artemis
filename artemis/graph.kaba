@@ -20,7 +20,7 @@ enum NodeState
 class extern Node
 	func extern __init__(name: string)
 	func extern virtual __delete__()
-	func extern mut additional_init()
+	func extern virtual mut additional_init()
 	func extern mut process()
 	func extern virtual mut on_process()
 	func extern virtual mut create_panel() -> void*
@@ -61,6 +61,11 @@ class InPort[X] extends InPortBase
 		for v in generic_values()
 			return v.p as X*
 		return nil
+	func selfref values() -> X&[]
+		var r: X&[]
+		for v in generic_values()
+			r.add(v.p as X&)
+		return r
 
 
 class OutPort[X] extends OutPortBase

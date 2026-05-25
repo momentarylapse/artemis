@@ -1,5 +1,6 @@
 use kaba
 use .gfx
+use .yrenderer
 
 
 struct extern Mesh
@@ -17,8 +18,18 @@ struct extern Mesh
 
 # opaque types for the data graph
 struct extern PlotData
+
 struct extern RenderData
+	var active = true
+	var bounding_box: Box?
+	var render_node: void* = nil
+
+
 struct extern DrawCall
+	var active = true
+	var bounding_box: Box?
+	var emitter: shared[yrenderer.MeshEmitter]
+	var transparent = false
 
 
 struct extern ColorMap

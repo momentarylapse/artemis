@@ -1,0 +1,49 @@
+use artemis.render
+use artemis.data.*
+use artemis.graph.*
+
+
+class SceneRenderer extends render.RendererNode
+	var in_draw = InPort[DrawCall](&self, "draw", PortFlags.MULTI)
+	var background = Setting[Color](&self, "background", Color(-1,-1,-1,-1))
+
+	var scene_renderer: shared![render.XSceneRenderer]
+
+
+	func __init__()
+		super.__init__("SceneRenderer")
+		scene_renderer = new render.XSceneRenderer()
+		_state = NodeState.UNINITIALIZED
+		background.set(Color(0.2,0.2,0.2,1))
+
+
+	func override additional_init()
+		if scene_renderer.build()
+			_state = NodeState.DIRTY
+
+
+	func override on_process()
+		scene_renderer.render_path.remove_all_emitters()
+		scene_renderer.render_path.background_color = background()
+
+		var box: Box?
+		for x in in_draw.values()
+			if x.active
+				if weak(x.emitter)
+					if x.transparent
+						scene_renderer.render_path.add_transparent_emitter(x.emitter!)
+					else
+						scene_renderer.render_path.add_opaque_emitter(x.emitter!)
+
+					for b in x.bounding_box
+						for bb in box
+							box = bb or b
+						else
+							box = b
+	
+		for b in box
+			scene_renderer.set_content_bounding_box(b)
+	
+		var d: RenderData
+		d.render_node = weak(scene_renderer)
+		out_draw.set(d)

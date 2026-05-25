@@ -31,11 +31,10 @@
 #include <lib/mesh/GeometryCube.h>
 #include <lib/mesh/GeometrySphere.h>
 #include <lib/mesh/GeometryTeapot.h>
-
 #include <lib/yrenderer/_kaba_export.h>
-
-#include "lib/yrenderer/Context.h"
-#include "view/DrawingHelper.h"
+#include <lib/yrenderer/Context.h>
+#include <view/DrawingHelper.h>
+#include <view/SceneRenderer.h>
 
 extern Session* _current_session_;
 
@@ -187,6 +186,12 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("ColorMap.values", &data::ColorMap::values);
 	ext->link("default_color_map", (void*)&data::ColorMap::_default);
 	ext->link("default_color_map_transparent", (void*)&data::ColorMap::_default_transparent);
+
+	ext->declare_class_size("DrawCall", sizeof(graph::DrawCall));
+	ext->declare_class_element("DrawCall.active", &graph::DrawCall::active);
+	ext->declare_class_element("DrawCall.bounding_box", &graph::DrawCall::bounding_box);
+	ext->declare_class_element("DrawCall.emitter", &graph::DrawCall::emitter);
+	ext->declare_class_element("DrawCall.transparent", &graph::DrawCall::transparent);
 
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
@@ -379,6 +384,12 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Graph.group_nodes", &graph_group_nodes);
 
 	{
+		ext->declare_class_size("RendererNode", sizeof(graph::RendererNode));
+		ext->declare_class_element("RendererNode.out_draw", &graph::RendererNode::out_draw);
+		ext->link_class_func("RendererNode.__init__", &kaba::generic_init_ext<graph::RendererNode, const string&>);
+	}
+
+	{
 		const auto tm = dataflow::type_map;
 		dataflow::type_map.set(&typeid(graph::DrawCall), (const kaba::Class*)(int_p)0x1234);
 		dataflow::type_map.set(&typeid(bool), kaba::common_types._bool);
@@ -393,6 +404,21 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 		ext->link_class_func("RenderEmitterNode.send_out", &graph::RenderEmitterNode::send_out);
 		ext->link_virtual("RenderEmitterNode.on_emit", &graph::RenderEmitterNode::on_emit, &n);
 		ext->link_virtual("RenderEmitterNode.bounding_box", &graph::RenderEmitterNode::bounding_box, &n);
+	}
+
+	{
+		ext->declare_class_size("RenderNode", sizeof(view::RenderNode));
+		ext->declare_class_element("RenderNode.session", &view::RenderNode::session);
+		ext->link_class_func("RenderNode.__init__", &kaba::generic_init<view::RenderNode>);
+	}
+
+	{
+		ext->declare_class_size("XSceneRenderer", sizeof(view::SceneRenderer));
+		ext->declare_class_element("XSceneRenderer." + kaba::Identifier::SharedCount, &view::SceneRenderer::_pointer_ref_counter);
+		ext->declare_class_element("XSceneRenderer.render_path", &view::SceneRenderer::render_path);
+		ext->link_class_func("XSceneRenderer.__init__", &kaba::generic_init<view::SceneRenderer>);
+		ext->link_class_func("XSceneRenderer.set_content_bounding_box", &view::SceneRenderer::set_content_bounding_box);
+		ext->link_class_func("XSceneRenderer.build", &view::SceneRenderer::build);
 	}
 
 	// TODO remove when switching to external package!
