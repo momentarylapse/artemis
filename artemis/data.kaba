@@ -12,6 +12,7 @@ struct extern Mesh
 	
 	func extern static create_teapot(pos: vec3, radius: f32, samples: i32) -> Mesh
 	func extern static create_sphere(pos: vec3, radius: f32, num: i32) -> Mesh
+	func extern static create_cube(box: Box, slices: gfx.ivec3) -> Mesh
 
 
 # opaque types for the data graph
@@ -23,6 +24,8 @@ struct extern DrawCall
 struct extern ColorMap
 	var colors: Color[]
 	var values: f32[]
+var extern static default_color_map: ColorMap
+var extern static default_color_map_transparent: ColorMap
 
 
 struct extern GenericData

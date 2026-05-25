@@ -50,6 +50,7 @@ struct VectorField {
 	void _set(int i, int j, int k, const dvec3& v);
 	vec3 _value32(int i, int j, int k) const;
 	void _set32(int i, int j, int k, const vec3& v);
+	DynamicArray& raw();
 
 	dvec3 average() const;
 	vec3 average32() const;

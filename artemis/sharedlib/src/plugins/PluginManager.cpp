@@ -28,6 +28,7 @@
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
 
+#include <lib/mesh/GeometryCube.h>
 #include <lib/mesh/GeometrySphere.h>
 #include <lib/mesh/GeometryTeapot.h>
 
@@ -179,10 +180,13 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 
 	ext->link_func("Mesh.create_teapot", &GeometryTeapot::create);
 	ext->link_func("Mesh.create_sphere", &GeometrySphere::create);
+	ext->link_func("Mesh.create_cube", &GeometryCube::create);
 
 	ext->declare_class_size("ColorMap", sizeof(data::ColorMap));
 	ext->declare_class_element("ColorMap.colors", &data::ColorMap::colors);
 	ext->declare_class_element("ColorMap.values", &data::ColorMap::values);
+	ext->link("default_color_map", (void*)&data::ColorMap::_default);
+	ext->link("default_color_map_transparent", (void*)&data::ColorMap::_default_transparent);
 
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
@@ -195,6 +199,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("ScalarField.set", &data::ScalarField::set);
 	ext->link_class_func("ScalarField._set", &data::ScalarField::_set);
 	ext->link_class_func("ScalarField._value", &data::ScalarField::_value);
+	ext->link_class_func("ScalarField.raw", &data::ScalarField::raw);
 	ext->link_class_func("ScalarField.average", &data::ScalarField::average);
 	ext->link_class_func("ScalarField.min", &data::ScalarField::min);
 	ext->link_class_func("ScalarField.max", &data::ScalarField::max);
@@ -226,6 +231,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
 	ext->link_class_func("VectorField._set", &data::VectorField::_set32);
 	ext->link_class_func("VectorField._value", &data::VectorField::_value32);
+	ext->link_class_func("VectorField.raw", &data::VectorField::raw);
 	ext->link_class_func("VectorField.average", &data::VectorField::average32);
 	ext->link_class_func("VectorField.length", &data::VectorField::length);
 	ext->link_class_func("VectorField.type", &field_get_type<data::VectorField>);

@@ -191,7 +191,6 @@ add_library(moduleartemis SHARED
 	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/SceneRenderer.cpp
-	src/graph/renderer/VolumeRenderer.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp
 	src/graph/NodeFactory.cpp

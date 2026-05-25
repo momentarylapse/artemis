@@ -14,7 +14,6 @@
 #include "renderer/GridRenderer.h"
 #include "renderer/SceneRenderer.h"
 #include "renderer/PointListRenderer.h"
-#include "renderer/VolumeRenderer.h"
 #include "draw2d/Plotter.h"
 #include "draw2d/FunctionPlot.h"
 #include "../plugins/PluginManager.h"
@@ -64,7 +63,6 @@ void init_factory() {
 	register_node_class<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class<VolumeRenderer>("VolumeRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<DeformationRenderer>("DeformationRenderer", {dataflow::NodeCategory::Renderer});
 
 	register_node_class<FunctionPlot>("FunctionPlot", {dataflow::NodeCategory::Renderer});

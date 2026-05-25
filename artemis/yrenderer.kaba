@@ -36,6 +36,12 @@ struct extern YLight
 	var shadow_dist_max: f32
 
 
+enum extern TransparencyMode
+	NONE
+	FUNCTIONS
+	COLOR_KEY_HARD
+	COLOR_KEY_SMOOTH
+
 class extern Material
 	var albedo: Color
 	var roughness: f32
@@ -49,8 +55,9 @@ class extern Material
 		cull_mode: CullMode
 		wire_mode: bool
 		z_write, z_test: bool
-		mode: i32 # TransparencyMode
-		source, dest: i32 # Alpha
+		mode: TransparencyMode
+		source: Alpha
+		destination: Alpha
 	var pass0: Pass
 	struct extern Friction as @noauto
 		sliding: f32
@@ -92,10 +99,16 @@ func extern api_init_xhui(p: void*) -> xfer[Context] # p: xhui.Painter*
 struct extern RenderParams
 	func extern __assign__(o: RenderParams)
 
+class extern RenderData as @noauto
+	func extern draw_triangles(params: RenderParams, vb: VertexBuffer&)
 
 class extern RenderViewData
 	func extern __init__(ctx: Context&)
 	func extern set_view(params: RenderParams, cam: CameraParams, proj: mat4* = (nil as mat4*))
+	func extern get_shader(material: Material*, pass_no: i32, vertex_shader_module: string, geometry_shader_module="", tessellation_module="") -> Shader&
+	func extern start(params: RenderParams, matrix: mat4, shader: Shader*, material: Material*, pass_no: i32, top: PrimitiveTopology, vb: VertexBuffer*) -> RenderData&
+
+func extern apply_shader_data(params: RenderParams, s: Shader*, shader_data: Any)
 
 
 #---------------------------

@@ -57,6 +57,13 @@ namespace artemis::data {
 			*v64._at(index) = f;
 	}
 
+	DynamicArray& ScalarField::raw() {
+		if (type == ScalarType::Float32)
+			return v32.v;
+		//if (type == ScalarType::Float64)
+		return v64.v;
+	}
+
 #define CREATE_IMPLACE_SINGLE_OP(OP) \
 void ScalarField::operator OP(double o) { \
 	if (type == ScalarType::Float32) { \

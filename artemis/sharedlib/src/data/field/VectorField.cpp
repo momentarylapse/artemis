@@ -119,6 +119,13 @@ void VectorField::set32(int index, const vec3& vv) {
 	set(index, dvec3(vv));
 }
 
+DynamicArray& VectorField::raw() {
+	if (type == ScalarType::Float32)
+		return v32.v;
+	//if (type == ScalarType::Float64)
+	return v64.v;
+}
+
 dvec3 VectorField::average() const {
 	dvec3 sum = {0,0,0};
 	int n = grid.count(sampling_mode);

@@ -25,6 +25,7 @@ struct ScalarField {
 	void _set(int i, int j, int k, double f);
 	float _value32(int i, int j, int k) const;
 	void _set32(int i, int j, int k, float f);
+	DynamicArray& raw();
 
 	double average() const;
 	double min() const;

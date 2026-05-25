@@ -108,14 +108,6 @@ void computetask_init(yrenderer::ComputeTask* task, yrenderer::Context* ctx, con
 	new(task) yrenderer::ComputeTask(ctx, name, shader, nx, ny, nz);
 }
 
-void texture_init(Texture *t, int w, int h, const string &format) {
-	new(t) Texture(w, h, format);
-}
-
-void texture_delete(Texture *t) {
-	t->~Texture();
-}
-
 void texture_write(Texture *t, const Image &im) {
 	t->write(im);
 }
@@ -256,6 +248,22 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->declare_enum("CullMode.BACK", CullMode::BACK);
 	ext->declare_enum("CullMode.FRONT", CullMode::FRONT);
 
+	ext->declare_enum("Alpha.ZERO", Alpha::ZERO);
+	ext->declare_enum("Alpha.ZERO", Alpha::ONE);
+	ext->declare_enum("Alpha.SOURCE_COLOR", Alpha::SOURCE_COLOR);
+	ext->declare_enum("Alpha.SOURCE_INV_COLOR", Alpha::SOURCE_INV_COLOR);
+	ext->declare_enum("Alpha.SOURCE_ALPHA", Alpha::SOURCE_ALPHA);
+	ext->declare_enum("Alpha.SOURCE_INV_ALPHA", Alpha::SOURCE_INV_ALPHA);
+	ext->declare_enum("Alpha.DEST_COLOR", Alpha::DEST_COLOR);
+	ext->declare_enum("Alpha.DEST_INV_COLOR", Alpha::DEST_INV_COLOR);
+	ext->declare_enum("Alpha.DEST_ALPHA", Alpha::DEST_ALPHA);
+	ext->declare_enum("Alpha.DEST_INV_ALPHA", Alpha::DEST_INV_ALPHA);
+
+	ext->declare_enum("TransparencyMode.NONE", TransparencyMode::NONE);
+	ext->declare_enum("TransparencyMode.FUNCTIONS", TransparencyMode::FUNCTIONS);
+	ext->declare_enum("TransparencyMode.COLOR_KEY_HARD", TransparencyMode::COLOR_KEY_HARD);
+	ext->declare_enum("TransparencyMode.COLOR_KEY_SMOOTH", TransparencyMode::COLOR_KEY_SMOOTH);
+
 	ext->declare_class_size("FrameBuffer", sizeof(FrameBuffer));
 	ext->declare_class_element("FrameBuffer.width", &FrameBuffer::width);
 	ext->declare_class_element("FrameBuffer.height", &FrameBuffer::height);
@@ -282,8 +290,9 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->declare_class_size("Texture", sizeof(Texture));
 	ext->declare_class_element("Texture.width", &Texture::width);
 	ext->declare_class_element("Texture.height", &Texture::height);
-	ext->link_class_func("Texture.__init__", &texture_init);
-	ext->link_class_func("Texture.__delete__", &texture_delete);
+	ext->declare_class_element("Texture.depth", &Texture::depth);
+	ext->link_class_func("Texture.__init__", &kaba::generic_init_ext<Texture, int, int, const string&>);
+	ext->link_class_func("Texture.__delete__", &kaba::generic_delete<Texture>);
 	ext->link_class_func("Texture.write", &texture_write);
 	ext->link_class_func("Texture.write_float", &texture_write_float);
 	ext->link_class_func("Texture.read", &texture_read);
@@ -418,10 +427,17 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	}
 
 	{
+		ext->declare_class_size("RenderData", sizeof(RenderData));
+		ext->link_class_func("RenderData.draw_triangles", &RenderData::draw_triangles);
+	}
+
+	{
 		ext->declare_class_size("RenderViewData", sizeof(RenderViewData));
 		//ext->declare_class_element("RenderViewData.x", &RenderViewData::c);
-		ext->link_class_func("RenderViewData.set_view", &RenderViewData::set_view);
 		ext->link_class_func("RenderViewData.__init__", &kaba::generic_init_ext<RenderViewData, yrenderer::Context*>);
+		ext->link_class_func("RenderViewData.set_view", &RenderViewData::set_view);
+		ext->link_class_func("RenderViewData.get_shader", &RenderViewData::get_shader);
+		ext->link_class_func("RenderViewData.start", &RenderViewData::start);
 	}
 
 	{
@@ -482,6 +498,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->link_class_func("Context.load_shader_module", &yrenderer::Context::load_shader_module);
 	ext->link_class_func("Context.load_surface_shader", &yrenderer::Context::load_surface_shader);
 
+	ext->link_func("apply_shader_data", &apply_shader_data);
 
 	ext->link_func("api_init_glfw", &api_init_glfw);
 	ext->link_func("api_init_xhui", &api_init_xhui);
