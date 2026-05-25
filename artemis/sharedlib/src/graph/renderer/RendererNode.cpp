@@ -5,6 +5,7 @@
 #include "RendererNode.h"
 #include <lib/yrenderer/scene/MeshEmitter.h>
 #include <lib/os/msg.h>
+#include <view/DrawingHelper.h>
 #include "Session.h"
 
 namespace artemis {
@@ -29,7 +30,8 @@ public:
 RenderEmitterNode::RenderEmitterNode(const string& name) : Node(name) {
 	session = default_session;
 	flags = dataflow::NodeFlags::Renderer;
-	emitter = new Emitter(session->ctx, this);
+	if (session)
+		emitter = new Emitter(session->ctx, this);
 }
 
 RenderEmitterNode::~RenderEmitterNode() = default;
@@ -41,6 +43,11 @@ void RenderEmitterNode::send_out(bool transparent) {
 	c.transparent = transparent;
 	c.bounding_box = bounding_box();
 	out_draw(c);
+}
+
+void RenderEmitterNode::draw_mesh(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd,
+								  const mat4& matrix, ygfx::VertexBuffer* vb, yrenderer::Material* material) {
+	session->drawing_helper->draw_mesh(params, rvd, matrix, vb, material);
 }
 
 } // graph

@@ -1,0 +1,28 @@
+use os
+use .graph.*
+
+
+#class extern DrawingHelper
+
+
+class extern Session
+	var graph: owned![Graph]
+	var t: f64
+	var dt: f64
+#	var drawing_helper: DrawingHelper&
+
+func extern current_session() -> Session&
+
+
+namespace profiler
+	func extern static create_channel(name: string, parent: i32) -> i32
+	func extern static begin(channel: i32)
+	func extern static end(channel: i32)
+
+
+func extern create_session() -> Session&
+func extern start_session_empty(s: Session&)
+func extern start_session_load_file(s: Session&, filename: os.Path)
+func extern app_run()
+func extern test_done()
+

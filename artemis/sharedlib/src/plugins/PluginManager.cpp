@@ -31,6 +31,10 @@
 #include <lib/mesh/GeometrySphere.h>
 #include <lib/mesh/GeometryTeapot.h>
 
+#include <lib/yrenderer/_kaba_export.h>
+
+#include "lib/yrenderer/Context.h"
+
 extern Session* _current_session_;
 
 void start_session_load_file(Session* s, const Path& filename);
@@ -138,6 +142,10 @@ const kaba::Class* field_get_type(const T& field) {
 	return type_data_to_kaba(field.type);
 }
 
+shared<ygfx::Texture> get_tex_white() {
+	return current_session()->ctx->tex_white;
+}
+
 void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
@@ -146,6 +154,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("start_session_load_file", &start_session_load_file);
 	ext->link_func("start_session_empty", &start_session_empty);
 	ext->link_func("app_run", &app_run);
+	ext->link_func("tex_white", &get_tex_white);
 	ext->link_func("test_done", &test_done);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);
@@ -164,6 +173,8 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Mesh.__delete__", &kaba::generic_delete<PolygonMesh>);
 	ext->link_class_func("Mesh.__assign__", &kaba::generic_assign<PolygonMesh>);
 	ext->link_class_func("Mesh.smoothen", &PolygonMesh::smoothen);
+	ext->link_class_func("Mesh.build", &PolygonMesh::build);
+	ext->link_class_func("Mesh.bounding_box", &PolygonMesh::bounding_box);
 
 	ext->link_func("Mesh.create_teapot", &GeometryTeapot::create);
 	ext->link_func("Mesh.create_sphere", &GeometrySphere::create);
@@ -340,6 +351,25 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Graph.iterate", &dataflow::Graph::iterate);
 	ext->link_class_func("Graph.group_nodes", &graph_group_nodes);
 
+	{
+		const auto tm = dataflow::type_map;
+		dataflow::type_map.set(&typeid(graph::DrawCall), (const kaba::Class*)(int_p)0x1234);
+		dataflow::type_map.set(&typeid(bool), kaba::common_types._bool);
+		graph::RenderEmitterNode n("");
+		dataflow::type_map = tm;
+		ext->declare_class_size("RenderEmitterNode", sizeof(graph::RenderEmitterNode));
+		ext->declare_class_element("RenderEmitterNode.session", &graph::RenderEmitterNode::session);
+		ext->declare_class_element("RenderEmitterNode.out_draw", &graph::RenderEmitterNode::out_draw);
+		ext->link_class_func("RenderEmitterNode.__init__", &kaba::generic_init_ext<graph::RenderEmitterNode, const string&>);
+		ext->link_virtual("RenderEmitterNode.__delete__", &kaba::generic_virtual<graph::RenderEmitterNode>::__delete__, &n);
+		ext->link_class_func("RenderEmitterNode.draw_mesh", &graph::RenderEmitterNode::draw_mesh);
+		ext->link_class_func("RenderEmitterNode.send_out", &graph::RenderEmitterNode::send_out);
+		ext->link_virtual("RenderEmitterNode.on_emit", &graph::RenderEmitterNode::on_emit, &n);
+		ext->link_virtual("RenderEmitterNode.bounding_box", &graph::RenderEmitterNode::bounding_box, &n);
+	}
+
+	// TODO remove when switching to external package!
+	_export_package_yrenderer_internal(ext);
 }
 
 template<class C>

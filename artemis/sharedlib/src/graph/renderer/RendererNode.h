@@ -10,9 +10,12 @@
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <lib/math/Box.h>
-//#include <lib/ygraphics/graphics-fwd.h>
+
+#include "lib/ygraphics/graphics-impl.h"
+// #include <lib/ygraphics/graphics-fwd.h>
 
 namespace yrenderer {
+	struct Material;
 	struct RenderViewData;
 	struct RenderParams;
 	class MeshEmitter;
@@ -42,6 +45,8 @@ public:
 	virtual void on_emit(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd, bool shadow_pass) {}
 	virtual base::optional<Box> bounding_box() const { return base::None; }
 	void send_out(bool transparent = false);
+
+	void draw_mesh(const yrenderer::RenderParams &params, yrenderer::RenderViewData &rvd, const mat4& matrix, ygfx::VertexBuffer* vb, yrenderer::Material* material);
 
 	dataflow::Setting<bool> active{this, "active", true};
 

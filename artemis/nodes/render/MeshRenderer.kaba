@@ -1,0 +1,46 @@
+use artemis.*
+use artemis.yrenderer
+use artemis.gfx
+
+
+class MeshRenderer extends RenderEmitterNode
+	var in_mesh = InPort[Mesh](self, "in")
+	var roughness = Setting[f64](self, "roughness", 0.7)
+	var metal = Setting[f64](self, "metal", 0.05)
+	var albedo = Setting[Color](self, "albedo", Color.WHITE)
+	var emission = Setting[Color](self, "emission", Color.BLACK)
+
+	var vertex_buffer: owned![gfx.VertexBuffer]
+	var material: owned![yrenderer.Material]
+
+	
+	func __init__()
+		super.__init__("MeshRenderer")
+		material = new yrenderer.Material()
+		material.textures.add(tex_white())
+		vertex_buffer = new gfx.VertexBuffer("3f,3f,2f")
+
+
+	func override mut on_process()
+		for m in in_mesh.value()
+
+			m.build(vertex_buffer)
+
+			material.roughness = f32(roughness())
+			material.metal = f32(metal())
+			material.albedo = albedo()
+			material.emission = emission()
+
+			send_out()
+
+	
+	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		draw_mesh(params, rvd, mat4.ID, weak(vertex_buffer), weak(material))
+
+
+	func override bounding_box() -> Box?
+		for m in in_mesh.value()
+			return m.bounding_box()
+		return nil
+		
+	

@@ -1,0 +1,19 @@
+use .graph.*
+use .session.*
+use .data.*
+use .yrenderer # TODO switch to external package!
+use .gfx
+
+func extern tex_white() -> shared![gfx.Texture]
+
+
+class extern RenderEmitterNode extends Node
+	var session: Session&
+	var out_draw: OutPort[DrawCall]
+
+	func extern override __init__(name: string)
+#	func extern override __delete__()
+	func extern virtual mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func extern virtual bounding_box() -> Box?
+	func extern mut draw_mesh(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, matrix: mat4, vb: gfx.VertexBuffer, material: yrenderer.Material)
+	func extern mut send_out(transparent = false)
