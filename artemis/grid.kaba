@@ -17,6 +17,7 @@ struct extern RegularGrid
 	var offset: vec3
 	func extern points(mode: SamplingMode) -> vec3[]
 	func extern count(mode: SamplingMode) -> i32
+	func extern bounding_box() -> Box
 
 
 struct extern Grid
@@ -25,4 +26,5 @@ struct extern Grid
 	func extern __init__()
 	func extern points(mode: SamplingMode) -> vec3[]
 	func extern count(mode: SamplingMode) -> i32
+	func extern bounding_box() -> Box
 

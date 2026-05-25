@@ -5,7 +5,7 @@ use image
 
 
 class ImageRenderer extends RenderEmitterNode
-	var in_image = InPort[image.Image](self, "in")
+	var in_image = InPort[image.Image](self, "image")
 
 	var vertex_buffer: owned![gfx.VertexBuffer]
 	var material: owned![yrenderer.Material]

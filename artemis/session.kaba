@@ -2,14 +2,17 @@ use os
 use .graph.*
 
 
-#class extern DrawingHelper
+class extern DrawingHelper
+	func extern set_color(c: Color)
+	func extern set_line_width(w: f32)
+	func extern draw_lines(points: vec3[], contiguous: bool)
 
 
 class extern Session
 	var graph: owned![Graph]
 	var t: f64
 	var dt: f64
-#	var drawing_helper: DrawingHelper&
+	var drawing_helper: DrawingHelper&
 
 func extern current_session() -> Session&
 

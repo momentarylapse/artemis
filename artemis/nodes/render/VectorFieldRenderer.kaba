@@ -1,0 +1,40 @@
+use artemis.*
+use artemis.yrenderer
+use artemis.gfx
+
+
+class VectorFieldRenderer extends RenderEmitterNode
+	var in_field = InPort[VectorField](self, "field")
+	var line_width = Setting[f64](self, "line-width", 2.0, "range=0:99:0.1")
+	var scale = Setting[f64](self, "scale", 1.0)
+	var color = Setting[Color](self, "color", Color.GREEN)
+
+	
+	func __init__()
+		super.__init__("VectorFieldRenderer")
+
+
+	func override mut on_process()
+		for f in in_field.value()
+			send_out()
+
+	
+	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		for f in in_field.value()
+			let s = scale() as f32
+			var points: vec3[]
+			for i=>p in f.grid.points(f.sampling_mode)
+				points.add(p)
+				points.add(p + f.value(i) * s)
+		
+			session.drawing_helper.set_color(color())
+			session.drawing_helper.set_line_width(line_width() as f32)
+			session.drawing_helper.draw_lines(points, false)
+
+
+	func override bounding_box() -> Box?
+		for f in in_field.value()
+			return f.grid.bounding_box()
+		return nil
+		
+	
