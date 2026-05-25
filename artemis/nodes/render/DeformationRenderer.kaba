@@ -1,0 +1,97 @@
+use artemis.*
+use artemis.yrenderer
+use artemis.gfx
+
+
+class DeformationRenderer extends RenderEmitterNode
+	var in_diff = InPort[VectorField](self, "diff")
+	var in_scalar = InPort[ScalarField](self, "scalar", PortFlags.OPTIONAL)
+	var scale = Setting[f64](self, "scale", 1.0)
+	var radius = Setting[f64](self, "radius", 0.1)
+	var show_balls = Setting[bool](self, "show-balls", true)
+	var show_grid = Setting[bool](self, "show-grid", true)
+	var line_width = Setting[f64](self, "line-width", 1.0, "range=0:99:0.1")
+	var color = Setting[Color](self, "color", Color.GRAY)
+
+	var vertex_buffer: owned![gfx.VertexBuffer]
+	var material: owned![yrenderer.Material]
+
+	
+	func __init__()
+		super.__init__("DeformationRenderer")
+		vertex_buffer = new gfx.VertexBuffer("3f,3f,2f")
+		material = new yrenderer.Material()
+		material.albedo = Color.BLACK.with_alpha(0.5)
+		material.emission = Color(0.1,0.5,0.1, 1)
+		material.pass0.mode = yrenderer.TransparencyMode.FUNCTIONS
+		material.pass0.source = gfx.Alpha.SOURCE_ALPHA
+		material.pass0.destination = gfx.Alpha.SOURCE_INV_ALPHA
+		material.pass0.z_write = false
+		material.pass0.z_test = true
+		material.textures.add(tex_white())
+
+
+	func override mut on_process()
+		for d in in_diff.value()
+			send_out()
+
+	
+	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		for d in in_diff.value()
+			let mesh = Mesh.create_sphere([0,0,0], 1, 2)
+			mesh.build(weak(vertex_buffer))
+		
+			let s = scale() as f32
+			let r = radius() as f32
+			let g = d.grid
+		
+			if show_balls()
+				material.emission = color()
+				for i=>p in g.points(d.sampling_mode)
+					let pos = p + d.value(i) * s
+					draw_mesh(params, rvd,
+						mat4.translation(pos) * mat4.scale(r, r, r),
+						weak(vertex_buffer), weak(material))
+		
+			match d.sampling_mode
+				SamplingMode.PER_CELL =>
+					if show_grid()
+						var points: vec3[]
+						for i in 0:g.nx
+							for j in 0:g.ny
+								for k in 0:g.nz-1
+									points.add(g.cell_center(i, j, k) + d._value(i, j, k) * s)
+									points.add(g.cell_center(i, j, k + 1) + d._value(i, j, k + 1) * s)
+						for i in 0:g.nx
+							for j in 0:g.ny-1
+								for k in 0:g.nz
+									points.add(g.cell_center(i, j, k) + d._value(i, j, k) * s)
+									points.add(g.cell_center(i, j + 1, k) + d._value(i, j + 1, k) * s)
+						for i in 0:g.nx-1
+							for j in 0:g.ny
+								for k in 0:g.nz-1
+									points.add(g.cell_center(i, j, k) + d._value(i, j, k) * s)
+									points.add(g.cell_center(i + 1, j, k) + d._value(i + 1, j, k) * s)
+			
+						session.drawing_helper.set_color(color())
+						session.drawing_helper.set_line_width(line_width() as f32)
+						session.drawing_helper.draw_lines(points, false)
+				SamplingMode.PER_VERTEX =>
+					if show_grid()
+						var points: vec3[]
+						let p0 = g.vertices()
+						for e in g.edges()
+							points.add(p0[e[0]] + d.value(e[0]) * s)
+							points.add(p0[e[1]] + d.value(e[1]) * s)
+			
+						session.drawing_helper.set_color(color())
+						session.drawing_helper.set_line_width(line_width() as f32)
+						session.drawing_helper.draw_lines(points, false)
+
+
+	func override bounding_box() -> Box?
+		for d in in_diff.value()
+			return d.grid.bounding_box()
+		return nil
+		
+	
