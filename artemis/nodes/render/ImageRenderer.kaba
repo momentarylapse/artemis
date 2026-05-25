@@ -1,0 +1,44 @@
+use artemis.*
+use artemis.yrenderer
+use artemis.gfx
+use image
+
+
+class ImageRenderer extends RenderEmitterNode
+	var in_image = InPort[image.Image](self, "in")
+
+	var vertex_buffer: owned![gfx.VertexBuffer]
+	var material: owned![yrenderer.Material]
+
+	
+	func __init__()
+		super.__init__("ImageRenderer")
+		material = new yrenderer.Material()
+		material.textures.add(new gfx.Texture(16,16,"rgba:i8"))
+		material.roughness = 1
+		material.metal = 0
+		material.albedo = Color.WHITE
+		material.emission = Color.BLACK
+		material.pass0.cull_mode = gfx.CullMode.NONE
+		vertex_buffer = new gfx.VertexBuffer("3f,3f,2f")
+
+
+	func override mut on_process()
+		for image in in_image.value()
+
+			material.textures[0].write(image)
+			vertex_buffer.create_quad([0, f32(image.width), -f32(image.height), 0])
+
+			send_out()
+
+	
+	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		draw_mesh(params, rvd, mat4.rotation_x(pi), weak(vertex_buffer), weak(material))
+
+
+	func override bounding_box() -> Box?
+		for image in in_image.value()
+			return Box([0, 0, 0], [f32(image.width), f32(image.height), 0])
+		return nil
+		
+	

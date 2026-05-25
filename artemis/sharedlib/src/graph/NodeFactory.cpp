@@ -13,7 +13,6 @@
 #include "renderer/DeformationRenderer.h"
 #include "renderer/GridRenderer.h"
 #include "renderer/SceneRenderer.h"
-#include "renderer/ImageRenderer.h"
 #include "renderer/PointListRenderer.h"
 #include "renderer/VectorFieldRenderer.h"
 #include "renderer/VolumeRenderer.h"
@@ -65,7 +64,6 @@ void init_factory() {
 
 	register_node_class<SceneRenderer>("SceneRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<GridRenderer>("GridRenderer", {dataflow::NodeCategory::Renderer});
-	register_node_class<ImageRenderer>("ImageRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<PointListRenderer>("PointListRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<VolumeRenderer>("VolumeRenderer", {dataflow::NodeCategory::Renderer});
 	register_node_class<VectorFieldRenderer>("VectorFieldRenderer", {dataflow::NodeCategory::Renderer});

@@ -83,10 +83,6 @@ void buffer_read_array(Buffer *buf, DynamicArray &data) {
 #endif
 }
 
-void vertexbuffer_init(VertexBuffer *vb, const string &format) {
-	new(vb) VertexBuffer(format);
-}
-
 void vertexbuffer_update_array(VertexBuffer *buf, const DynamicArray &data) {
 	buf->update(data);
 }
@@ -273,8 +269,9 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->link_class_func("Buffer.read_chunk", &buffer_read_chunk);
 
 	ext->declare_class_size("VertexBuffer", sizeof(VertexBuffer));
-	ext->link_class_func("VertexBuffer.__init__", &vertexbuffer_init);
+	ext->link_class_func("VertexBuffer.__init__", &kaba::generic_init_ext<VertexBuffer, const string&>);
 	ext->link_class_func("VertexBuffer.update", &vertexbuffer_update_array);
+	ext->link_class_func("VertexBuffer.create_quad", &VertexBuffer::create_quad);
 
 	ext->declare_class_size("UniformBuffer", sizeof(UniformBuffer));
 	ext->link_class_func("UniformBuffer.__init__", &uniformbuffer_init);

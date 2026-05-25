@@ -5,8 +5,6 @@ use os
 struct ivec3
 	x, y, z: i32
 
-#----------------------------------------------------------------
-# ygfx
 
 enum extern PrimitiveTopology
 	TRIANGLES
@@ -15,19 +13,24 @@ enum extern PrimitiveTopology
 	POINTS
 	PATCHES
 
+enum extern CullMode
+	NONE
+	FONT
+	BACK
+
 struct extern Vertex
 	var p, n: vec3
 	var u, v: f32
 
 struct extern VertexFx
 	pos: vec3
-	col: Color
+	color: Color
 	u, v: f32
 
 struct extern PointVertex
 	pos: vec3
 	radius: f32
-	col: Color
+	color: Color
 
 class extern FrameBuffer
 	var width, height: i32
@@ -35,11 +38,11 @@ class extern FrameBuffer
 	func extern selfref depth_buffer() -> shared[DepthBuffer]
 	func extern selfref color_attachments() -> shared![Texture][]
 
-class extern Shader as shared
+class extern Shader as Sharable
 	func extern set_float(name: string, f: f32)
 	func extern set_floats(name: string, f: f32&, num: i32)
 
-class extern Texture as shared
+class extern Texture as Sharable
 	var width, height: i32
 	func extern __init__(w: i32, h: i32, format: string = "rgba:i8")
 	func extern __delete__()
@@ -70,6 +73,7 @@ class extern Buffer
 class extern VertexBuffer
 	func extern __init__(format: string = "3f,3f,2f")
 	func extern mut update(data: @DynamicArray)
+	func extern mut create_quad(d: Rect, s = Rect.ID)
 
 class extern UniformBuffer extends Buffer
 	func extern __init__(size: i32)
