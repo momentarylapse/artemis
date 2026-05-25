@@ -1,0 +1,75 @@
+use artemis.*
+use artemis.yrenderer
+use artemis.gfx
+
+
+func point_list_bounding_box(points: vec3[]) -> Box?
+	if len(points) == 0
+		return nil
+	var b = Box(points[0], points[0])
+	for p in points
+		b = b or Box(p, p)
+	return b
+
+
+class PointListRenderer extends RenderEmitterNode
+	var in_points = InPort[vec3[]](self, "points")
+	var in_mesh = InPort[Mesh](self, "mesh", PortFlags.OPTIONAL)
+	var radius = Setting[f64](self, "radius", 0.2, "range=0:99:0.1")
+	var trail_length = Setting[i32](self, "trail-length", 0, "range=0:")
+	var line_width = Setting[f64](self, "line-width", 1.0, "range=0:99:0.1")
+	var color = Setting[Color](self, "color", Color.GRAY)
+
+	var vertex_buffer: owned![gfx.VertexBuffer]
+	var material: owned![yrenderer.Material]
+
+	var trails: vec3[][]
+
+	
+	func __init__()
+		super.__init__("PointListRenderer")
+		vertex_buffer = new gfx.VertexBuffer("3f,3f,2f")
+		material = new yrenderer.Material()
+		material.textures.add(tex_white())
+
+
+	func override mut on_process()
+		if trail_length() > 0
+			for points in in_points.value()
+				trails.resize(len(points))
+				for i=>v in points
+					trails[i].add(v)
+					while len(trails) > trail_length()
+						trails[i].remove(0)
+		else
+			trails.clear()
+		send_out()
+
+	
+	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		for m in in_mesh.value()
+			m.build(weak(vertex_buffer))
+		else
+			let mm = Mesh.create_sphere([0,0,0], radius() as f32, 4)
+			mm.build(weak(vertex_buffer))
+
+		material.albedo = Color.BLACK
+		material.emission = color()
+
+		for points in in_points.value()
+			for p in points
+				draw_mesh(params, rvd, mat4.translation(p), weak(vertex_buffer), weak(material))
+
+		if trail_length() > 0
+			for points in trails
+					session.drawing_helper.set_color(color())
+					session.drawing_helper.set_line_width(line_width() as f32)
+					session.drawing_helper.draw_lines(points, true)
+
+
+	func override bounding_box() -> Box?
+		for points in in_points.value()
+			return point_list_bounding_box(points)
+		return nil
+		
+	

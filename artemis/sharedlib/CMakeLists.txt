@@ -186,7 +186,6 @@ add_library(moduleartemis SHARED
 	src/graph/field/MultiComponentField.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
-	src/graph/renderer/PointListRenderer.cpp
 	src/graph/renderer/RendererNode.cpp
 	src/graph/renderer/SceneRenderer.cpp
 	src/graph/AutoConnect.cpp
