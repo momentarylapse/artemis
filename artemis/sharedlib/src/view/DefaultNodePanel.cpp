@@ -19,6 +19,8 @@
 //#include <lib/kaba/dynamic/dynamic.h>
 #include <lib/os/app.h>
 
+#include "lib/kaba/syntax/Constant.h"
+
 void draw_color_map_background(Painter* p, const artemis::data::ColorMap& color_map, float value_min, float value_max, const rect& area);
 
 string nice_path(const Path& p) {
@@ -144,6 +146,24 @@ Dialog x ''
 			set_options(id, "expandx");
 			enable(id, false);
 			set_string(id, str((*ss)()));
+		} else if (s->type->is_enum()) {
+			auto ss = node->settings[i]->as<int>();
+			add_control("ComboBox", "", 1, i, id);
+			set_options(id, "expandx");
+
+			Array<int> values;
+			for (auto c: weak(s->type->constants))
+				if (c->type == s->type) {
+					values.add(c->as_int());
+					add_string(id, c->name);
+				}
+			int index = values.find((*ss)());
+			if (index >= 0)
+				set_int(id, index);
+			event(id, [this, id, ss, values] {
+				session->data->node_set_setting(node, ss->name, values[get_int(id)]);
+				//ss->set(values[get_int(id)]);
+			});
 		} else {
 			add_control("Label", format("(%s)", s->type->name), 1, i, "");
 		}

@@ -289,7 +289,12 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("RegularGrid.dz", &data::RegularGrid::dz);
 	ext->declare_class_element("RegularGrid.offset", &data::RegularGrid::offset);
 	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<data::RegularGrid>);
+	ext->link_class_func("RegularGrid.vertices", &data::RegularGrid::vertices);
+	ext->link_class_func("RegularGrid.vertex", &data::RegularGrid::vertex);
+	ext->link_class_func("RegularGrid.cell_centers", &data::RegularGrid::cell_centers);
+	ext->link_class_func("RegularGrid.cell_center", &data::RegularGrid::cell_center);
 	ext->link_class_func("RegularGrid.points", &data::RegularGrid::points);
+	ext->link_class_func("RegularGrid.edges", &data::RegularGrid::edges);
 	ext->link_class_func("RegularGrid.count", &data::RegularGrid::count);
 	ext->link_class_func("RegularGrid.bounding_box", &data::RegularGrid::bounding_box);
 
@@ -301,7 +306,10 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("Grid.type", &data::Grid::type);
 	ext->declare_class_element("Grid.regular", &data::Grid::regular);
 	ext->link_class_func("Grid.__init__", &kaba::generic_init<data::Grid>);
+	ext->link_class_func("Grid.vertices", &data::Grid::vertices);
+	ext->link_class_func("Grid.cell_centers", &data::Grid::cell_centers);
 	ext->link_class_func("Grid.points", &data::Grid::points);
+	ext->link_class_func("Grid.edges", &data::Grid::edges);
 	ext->link_class_func("Grid.count", &data::Grid::count);
 	ext->link_class_func("Grid.bounding_box", &data::Grid::bounding_box);
 

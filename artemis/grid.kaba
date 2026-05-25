@@ -15,7 +15,12 @@ struct extern RegularGrid
 	var nx, ny, nz: i32
 	var dx, dy, dz: vec3
 	var offset: vec3
+	func extern vertices() -> vec3[]
+	func extern vertex(i: i32, j: i32, k: i32) -> vec3
+	func extern cell_centers() -> vec3[]
+	func extern cell_center(i: i32, j: i32, k: i32) -> vec3
 	func extern points(mode: SamplingMode) -> vec3[]
+	func extern edges() -> (i32,i32)[]
 	func extern count(mode: SamplingMode) -> i32
 	func extern bounding_box() -> Box
 
@@ -24,7 +29,10 @@ struct extern Grid
 	var type: GridType
 	var regular: RegularGrid?
 	func extern __init__()
+	func extern vertices() -> vec3[]
+	func extern cell_centers() -> vec3[]
 	func extern points(mode: SamplingMode) -> vec3[]
+	func extern edges() -> (i32,i32)[]
 	func extern count(mode: SamplingMode) -> i32
 	func extern bounding_box() -> Box
 

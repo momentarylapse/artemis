@@ -1,0 +1,77 @@
+use artemis.*
+use artemis.yrenderer
+use artemis.gfx
+
+
+enum RenderMode
+	OUTLINES
+	FULL
+
+
+class GridRenderer extends RenderEmitterNode
+	var in_grid = InPort[Grid](self, "grid")
+	var line_width = Setting[f64](self, "line-width", 1.0, "range=0:99:0.1")
+	var color = Setting[Color](self, "color", Color.GRAY)
+	var mode = Setting[RenderMode](self, "mode", RenderMode.FULL)
+
+	
+	func __init__()
+		super.__init__("GridRenderer")
+
+
+	func override mut on_process()
+		for g in in_grid.value()
+			send_out()
+
+	
+	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		for g in in_grid.value()
+			var points: vec3[]
+	
+			if g.type == GridType.REGULAR
+				var r = g.regular!
+				match mode()
+					RenderMode.OUTLINES =>
+						for i in 0:r.nx+1:r.nx
+							for j in 0:r.ny+1:r.ny
+								points.add(r.vertex(i, j, 0))
+								points.add(r.vertex(i, j, r.nz))
+						for i in 0:r.nx+1:r.nx
+							for k in 0:r.nz+1:r.nz
+								points.add(r.vertex(i, 0, k))
+								points.add(r.vertex(i, r.ny, k))
+						for j in 0:r.ny+1:r.ny
+							for k in 0:r.nz+1:r.nz
+								points.add(r.vertex(0, j, k))
+								points.add(r.vertex(r.nx, j, k))
+					RenderMode.FULL =>
+						for i in 0:r.nx+1
+							for j in 0:r.ny+1
+								points.add(r.vertex(i, j, 0))
+								points.add(r.vertex(i, j, r.nz))
+						for i in 0:r.nx+1
+							for k in 0:r.nz+1
+								points.add(r.vertex(i, 0, k))
+								points.add(r.vertex(i, r.ny, k))
+						for j in 0:r.ny+1
+							for k in 0:r.nz+1
+								points.add(r.vertex(0, j, k))
+								points.add(r.vertex(r.nx, j, k))
+			else
+				# if mode() == RenderMode.Outlines TODO
+				let vertices = g.vertices()
+			#	for a,b in g.edges()
+			#		points.add(vertices[a])
+			#		points.add(vertices[b])
+		
+			session.drawing_helper.set_color(color())
+			session.drawing_helper.set_line_width(line_width() as f32)
+			session.drawing_helper.draw_lines(points, false)
+
+
+	func override bounding_box() -> Box?
+		for g in in_grid.value()
+			return g.bounding_box()
+		return nil
+		
+	
