@@ -13,6 +13,7 @@
 #include <lib/os/filesystem.h>
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
+#include <lib/ygraphics/graphics-impl.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
@@ -24,7 +25,6 @@
 #include <graph/Graph.h>
 #include <graph/NodeFactory.h>
 #include <graph/draw2d/Plotter.h>
-#include <graph/renderer/RendererNode.h>
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
 
@@ -187,12 +187,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link("default_color_map", (void*)&data::ColorMap::_default);
 	ext->link("default_color_map_transparent", (void*)&data::ColorMap::_default_transparent);
 
-	ext->declare_class_size("DrawCall", sizeof(graph::DrawCall));
-	ext->declare_class_element("DrawCall.active", &graph::DrawCall::active);
-	ext->declare_class_element("DrawCall.bounding_box", &graph::DrawCall::bounding_box);
-	ext->declare_class_element("DrawCall.emitter", &graph::DrawCall::emitter);
-	ext->declare_class_element("DrawCall.transparent", &graph::DrawCall::transparent);
-
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
 	ext->declare_class_element("ScalarField.sampling_mode", &data::ScalarField::sampling_mode);
@@ -332,6 +326,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("Session.t", &Session::t);
 	ext->declare_class_element("Session.dt", &Session::dt);
 	ext->declare_class_element("Session.drawing_helper", &Session::drawing_helper);
+	ext->declare_class_element("Session.ctx", &Session::ctx);
 
 
 	{
@@ -390,23 +385,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	}
 
 	{
-		const auto tm = dataflow::type_map;
-		dataflow::type_map.set(&typeid(graph::DrawCall), (const kaba::Class*)(int_p)0x1234);
-		dataflow::type_map.set(&typeid(bool), kaba::common_types._bool);
-		graph::RenderEmitterNode n("");
-		dataflow::type_map = tm;
-		ext->declare_class_size("RenderEmitterNode", sizeof(graph::RenderEmitterNode));
-		ext->declare_class_element("RenderEmitterNode.session", &graph::RenderEmitterNode::session);
-		ext->declare_class_element("RenderEmitterNode.out_draw", &graph::RenderEmitterNode::out_draw);
-		ext->link_class_func("RenderEmitterNode.__init__", &kaba::generic_init_ext<graph::RenderEmitterNode, const string&>);
-		ext->link_virtual("RenderEmitterNode.__delete__", &kaba::generic_virtual<graph::RenderEmitterNode>::__delete__, &n);
-		ext->link_class_func("RenderEmitterNode.draw_mesh", &graph::RenderEmitterNode::draw_mesh);
-		ext->link_class_func("RenderEmitterNode.send_out", &graph::RenderEmitterNode::send_out);
-		ext->link_virtual("RenderEmitterNode.on_emit", &graph::RenderEmitterNode::on_emit, &n);
-		ext->link_virtual("RenderEmitterNode.bounding_box", &graph::RenderEmitterNode::bounding_box, &n);
-	}
-
-	{
 		ext->declare_class_size("RenderNode", sizeof(view::RenderNode));
 		ext->declare_class_element("RenderNode.session", &view::RenderNode::session);
 		ext->link_class_func("RenderNode.__init__", &kaba::generic_init<view::RenderNode>);
@@ -445,6 +423,7 @@ void PluginManager::import_kaba() {
 	auto mgrid = kaba::default_context->load_module(dir | "grid.kaba", false);
 	auto mfields = kaba::default_context->load_module(dir | "fields.kaba", false);
 	auto mgraph = kaba::default_context->load_module(dir | "graph.kaba", false);
+	auto mrender = kaba::default_context->load_module(dir | "render.kaba", false);
 	import_component_class<PolygonMesh>(mdata, "Mesh");
 	import_component_class<data::Grid>(mgrid, "Grid");
 	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
@@ -454,7 +433,6 @@ void PluginManager::import_kaba() {
 	import_component_class<data::ColorMap>(mdata, "ColorMap");
 	import_component_class<graph::PlotData>(mdata, "PlotData");
 	import_component_class<graph::RenderData>(mdata, "RenderData");
-	import_component_class<graph::DrawCall>(mdata, "DrawCall");
 	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
 }
 

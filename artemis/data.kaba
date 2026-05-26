@@ -25,13 +25,6 @@ struct extern RenderData
 	var render_node: void* = nil
 
 
-struct extern DrawCall
-	var active = true
-	var bounding_box: Box?
-	var emitter: shared[yrenderer.MeshEmitter]
-	var transparent = false
-
-
 struct extern ColorMap
 	var colors: Color[]
 	var values: f32[]

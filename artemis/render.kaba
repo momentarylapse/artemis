@@ -8,21 +8,54 @@ use .gfx
 func extern tex_white() -> shared![gfx.Texture]
 
 
+# basic canvas / layout
 class extern RendererNode extends Node
 	var out_draw: OutPort[RenderData]
 	func extern override __init__(name: string)
 
 
-class extern RenderEmitterNode extends Node
-	var session: Session&
-	var out_draw: OutPort[DrawCall]
 
-	func extern override __init__(name: string)
+struct DrawCall
+	var active = true
+	var bounding_box: Box?
+	var emitter: shared[yrenderer.MeshEmitter]
+	var transparent = false
+
+
+
+class RenderEmitterNodeEmitter extends yrenderer.MeshEmitter
+	var owner: RenderEmitterNode&
+	func mut __init__(ctx: yrenderer.Context&, o: RenderEmitterNode&)
+		super.__init__(ctx, "em")
+		owner := o
+	func override emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		owner.on_emit(params, rvd, shadow_pass)
+
+
+# 3d rendering
+class RenderEmitterNode extends Node
+	var session: Session&
+	var out_draw = OutPort[DrawCall](&self, "draw")
+	var active = Setting[bool](&self, "active", true)
+	var emitter: shared![RenderEmitterNodeEmitter]
+
+	func override __init__(name: string)
+		session := current_session()
+		flags = NodeFlags.RENDERER
+		emitter = new RenderEmitterNodeEmitter(session.ctx, &self)
 #	func extern override __delete__()
-	func extern virtual mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
-	func extern virtual bounding_box() -> Box?
-	func extern mut draw_mesh(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, matrix: mat4, vb: gfx.VertexBuffer, material: yrenderer.Material)
-	func extern mut send_out(transparent = false)
+	func virtual mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func virtual bounding_box() -> Box?
+		return nil
+	func mut draw_mesh(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, matrix: mat4, vb: gfx.VertexBuffer, material: yrenderer.Material)
+		session.drawing_helper.draw_mesh(params, rvd, matrix, vb, material)
+	func mut send_out(transparent = false)
+		var c: DrawCall
+		c.active = active()
+		c.emitter = emitter
+		c.transparent = transparent
+		c.bounding_box = bounding_box()
+		out_draw.set(c)
 
 
 

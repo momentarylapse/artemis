@@ -1,17 +1,21 @@
 use os
 use .graph.*
+use .gfx
+use .yrenderer
 
 
 class extern DrawingHelper
 	func extern set_color(c: Color)
 	func extern set_line_width(w: f32)
 	func extern draw_lines(points: vec3[], contiguous: bool)
+	func extern draw_mesh(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, matrix: mat4, vb: gfx.VertexBuffer, material: yrenderer.Material, pass_no=0, vertex_module="default")
 
 
 class extern Session
 	var graph: owned![Graph]
 	var t: f64
 	var dt: f64
+	var ctx: yrenderer.Context&
 	var drawing_helper: DrawingHelper&
 
 func extern current_session() -> Session&

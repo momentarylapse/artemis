@@ -168,7 +168,7 @@ class extern TextureRenderer extends Renderer
 
 class extern MeshEmitter extends Object as shared
 	func extern __init__(ctx: Context&, name: string)
-	func extern virtual emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
+	func extern virtual mut emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
 	var ctx: Context&
 
 

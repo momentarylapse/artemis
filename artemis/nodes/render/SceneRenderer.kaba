@@ -4,7 +4,7 @@ use artemis.graph.*
 
 
 class SceneRenderer extends render.RendererNode
-	var in_draw = InPort[DrawCall](&self, "draw", PortFlags.MULTI)
+	var in_draw = InPort[render.DrawCall](&self, "draw", PortFlags.MULTI)
 	var background = Setting[Color](&self, "background", Color(-1,-1,-1,-1))
 
 	var scene_renderer: shared![render.XSceneRenderer]
