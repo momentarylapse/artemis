@@ -5,17 +5,20 @@ enum PlotMode
 	POINTS
 
 
-struct extern PlotData
+struct PlotData
 	source: PlotSource&
 	mode: PlotMode
 
 
-class extern PlotSource extends Node
-	var out_plot: OutPort[PlotData]
-	var line_width: Setting[f64]
-	var color: Setting[Color]
+class PlotSource extends Node
+	var out_plot = OutPort[PlotData](&self, "plot")
+	var line_width = Setting[f64](&self, "line-width", 2.0)
+	var color = Setting[Color](&self, "color", Color.RED)
 
-	func extern override mut __init__(name: string)
-	func extern virtual plot_function(x: f32[]) -> f32[]
-	func extern virtual plot_points() -> vec2[]
+	func override mut __init__(name: string)
+		super.__init__(name)
+	func virtual plot_function(x: f32[]) -> f32[]
+		return []
+	func virtual plot_points() -> vec2[]
+		return []
 

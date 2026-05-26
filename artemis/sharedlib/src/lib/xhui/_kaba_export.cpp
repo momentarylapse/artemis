@@ -4,6 +4,7 @@
 #include "Panel.h"
 #include "Resource.h"
 #include "Window.h"
+#include "Theme.h"
 #include "dialogs/FileSelectionDialog.h"
 #include "../kapi/KabaExporter.h"
 #include "../base/callable.h"
@@ -81,7 +82,7 @@ void _dummy() {}
 
 
 void export_package_xhui(kaba::IExporter* e) {
-	e->package_info("xhui", "0.12");
+	e->package_info("xhui", "0.13");
 
 	e->declare_class_size("Menu", sizeof(xhui::Menu));
 	e->link_class_func("Menu.__init__", &kaba::generic_init<xhui::Menu>);
@@ -466,7 +467,31 @@ void export_package_xhui(kaba::IExporter* e) {
 	add_enum("KEY_ANY", TypeInt32, hui::KEY_ANY);
 #endif
 
+	e->declare_class_size("Theme", sizeof(xhui::Theme));
+	e->declare_class_element("Theme.background", &xhui::Theme::background);
+	e->declare_class_element("Theme.background_button", &xhui::Theme::background_button);
+	e->declare_class_element("Theme.background_button_primary", &xhui::Theme::background_button_primary);
+	e->declare_class_element("Theme.background_button_primary_hover", &xhui::Theme::background_button_primary_hover);
+	e->declare_class_element("Theme.background_button_primary_active", &xhui::Theme::background_button_primary_active);
+	e->declare_class_element("Theme.background_button_danger", &xhui::Theme::background_button_danger);
+	e->declare_class_element("Theme.background_button_danger_hover", &xhui::Theme::background_button_danger_hover);
+	e->declare_class_element("Theme.background_button_danger_active", &xhui::Theme::background_button_danger_active);
+	e->declare_class_element("Theme.background_header", &xhui::Theme::background_header);
+	e->declare_class_element("Theme.background_header_button", &xhui::Theme::background_header_button);
+	e->declare_class_element("Theme.background_hover", &xhui::Theme::background_active);
+	e->declare_class_element("Theme.background_low", &xhui::Theme::background_low);
+	e->declare_class_element("Theme.background_low_hover", &xhui::Theme::background_low_hover);
+	e->declare_class_element("Theme.background_low_selected", &xhui::Theme::background_low_selected);
+	e->declare_class_element("Theme.text", &xhui::Theme::text);
+	e->declare_class_element("Theme.text_label", &xhui::Theme::text_label);
+	e->declare_class_element("Theme.text_disabled", &xhui::Theme::text_disabled);
+	e->declare_class_element("Theme.text_link", &xhui::Theme::text_link);
+	e->declare_class_element("Theme.border", &xhui::Theme::border);
+	e->declare_class_element("Theme.background", &xhui::Theme::background);
+	e->link_class_func("Theme.background_raised", &xhui::Theme::background_raised);
+
 	e->link("app_config", &xhui::config);
+	e->link("theme", &xhui::Theme::_default);
 
 	e->link_func("create_control", &xhui::create_control);
 }

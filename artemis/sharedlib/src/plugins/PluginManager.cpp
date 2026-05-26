@@ -20,14 +20,14 @@
 #include <data/field/MultiComponentField.h>
 #include <data/grid/Grid.h>
 #include <data/grid/RegularGrid.h>
-#include <lib/mesh/PolygonMesh.h>
 #include <data/util/ColorMap.h>
 #include <graph/Graph.h>
 #include <graph/NodeFactory.h>
-#include <graph/draw2d/Plotter.h>
+#include <graph/canvas/Canvas.h>
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
 
+#include <lib/mesh/PolygonMesh.h>
 #include <lib/mesh/GeometryCube.h>
 #include <lib/mesh/GeometrySphere.h>
 #include <lib/mesh/GeometryTeapot.h>
@@ -408,24 +408,10 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 		ext->link_class_func("XSceneRenderer.build", &view::SceneRenderer::build);
 	}
 
-	ext->declare_class_size("PlotData", sizeof(graph::PlotData));
-	ext->declare_class_element("PlotData.source", &graph::PlotData::source);
-	ext->declare_class_element("PlotData.source", &graph::PlotData::mode);
-
-	{
-		dataflow::type_map.set(&typeid(double), (const kaba::Class*)0x1234);
-		dataflow::type_map.set(&typeid(color), (const kaba::Class*)0x1234);
-		dataflow::type_map.set(&typeid(graph::PlotData), (const kaba::Class*)0x1234);
-		graph::PlotSource p("");
-		dataflow::type_map.clear();
-		ext->declare_class_size("PlotSource", sizeof(graph::PlotSource));
-		ext->declare_class_element("PlotSource.out_plot", &graph::PlotSource::out_plot);
-		ext->declare_class_element("PlotSource.line_width", &graph::PlotSource::line_width);
-		ext->declare_class_element("PlotSource.color", &graph::PlotSource::_color);
-		ext->link_class_func("PlotSource.__init__", &kaba::generic_init_ext<graph::PlotSource, const string&>);
-		ext->link_virtual("PlotSource.plot_function", &graph::PlotSource::plot_function, &p);
-		ext->link_virtual("PlotSource.plot_points", &graph::PlotSource::plot_points, &p);
-	}
+	ext->declare_class_size("RenderData", sizeof(graph::RenderData));
+	ext->declare_class_element("RenderData.active", &graph::RenderData::active);
+	ext->declare_class_element("RenderData.bounding_box", &graph::RenderData::bounding_box);
+	ext->declare_class_element("RenderData.render_node", &graph::RenderData::render_node);
 
 	// TODO remove when switching to external package!
 	_export_package_yrenderer_internal(ext);
@@ -462,7 +448,6 @@ void PluginManager::import_kaba() {
 	import_component_class<data::ColorMap>(mdata, "ColorMap");
 	import_component_class<graph::RenderData>(mdata, "RenderData");
 	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
-	import_component_class<graph::PlotData>(mplot, "PlotData");
 }
 
 void PluginManager::find_plugins() {

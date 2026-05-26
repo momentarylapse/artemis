@@ -180,7 +180,6 @@ add_library(moduleartemis SHARED
 	src/graph/canvas/LayoutGrid.cpp
 	src/graph/canvas/LayoutNested.cpp
 	src/graph/canvas/LayoutOverlay.cpp
-	src/graph/draw2d/Plotter.cpp
 	src/graph/field/MultiComponentField.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
