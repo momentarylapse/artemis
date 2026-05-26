@@ -147,6 +147,14 @@ shared<ygfx::Texture> get_tex_white() {
 	return current_session()->ctx->tex_white;
 }
 
+typedef float(f_f32_f32)(float);
+Array<float> eval_f32_f32_list(f_f32_f32* f, const Array<float>& list) {
+	Array<float> out;
+	for (float x: list)
+		out.add((*f)(x));
+	return out;
+}
+
 void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
@@ -156,6 +164,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("start_session_empty", &start_session_empty);
 	ext->link_func("app_run", &app_run);
 	ext->link_func("tex_white", &get_tex_white);
+	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
 	ext->link_func("test_done", &test_done);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);

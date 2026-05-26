@@ -11,7 +11,6 @@
 #include "canvas/LayoutOverlay.h"
 #include "canvas/LayoutNested.h"
 #include "draw2d/Plotter.h"
-#include "draw2d/FunctionPlot.h"
 #include "../plugins/PluginManager.h"
 #include <lib/os/msg.h>
 
@@ -55,7 +54,6 @@ void init_factory() {
 	register_node_class<LayoutOverlay>("LayoutOverlay", {dataflow::NodeCategory::Renderer});
 	register_node_class<LayoutNested>("LayoutNested", {dataflow::NodeCategory::Renderer});
 
-	register_node_class<FunctionPlot>("FunctionPlot", {dataflow::NodeCategory::Renderer});
 	register_node_class<Plotter>("Plotter", {dataflow::NodeCategory::Renderer});
 
 

@@ -16,6 +16,6 @@ class extern PlotSource extends Node
 	var color: Setting[Color]
 
 	func extern override mut __init__(name: string)
-	func extern virtual plot_function(x: f32) -> f32
+	func extern virtual plot_function(x: f32[]) -> f32[]
 	func extern virtual plot_points() -> vec2[]
 

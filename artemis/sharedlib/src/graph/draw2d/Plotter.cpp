@@ -107,11 +107,8 @@ void Plotter::draw_2d(Painter* p) {
 		Array<vec2> points;
 
 		if (d->mode == PlotMode::Function) {
-			Array<float> xs = lin_spacing((float)x_min(), (float)x_max(), 200), ys;
-			for (float x: xs) {
-				float y = d->source->plot_function(x);
-				ys.add(y);
-			}
+			const auto xs = lin_spacing((float)x_min(), (float)x_max(), 200);
+			const auto ys = d->source->plot_function(xs);
 
 			for (int i=0; i<xs.num; i++)
 				points.add(project({xs[i], ys[i]}));

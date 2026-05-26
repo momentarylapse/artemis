@@ -34,7 +34,7 @@ class PlotSource : public dataflow::Node {
 public:
 	explicit PlotSource(const string& name) : Node(name) {}
 
-	virtual float plot_function(float x) { return 0; }
+	virtual Array<float> plot_function(const Array<float>& x) { return x; }
 	virtual Array<vec2> plot_points() { return {}; }
 
 	dataflow::Setting<double> line_width{this, "line-width", 2.0};

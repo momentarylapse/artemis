@@ -1,0 +1,45 @@
+use artemis.*
+use kaba
+
+
+class FunctionPlot extends PlotSource
+	var formula = Setting[string](&self, "formula", "x^2")
+
+	var cached_formula: string
+	var ctx: owned[kaba.Context]
+	var module: shared[kaba.Module]
+	var f_p = nil as kaba.code*
+
+
+	func mut __init__()
+		super.__init__("FunctionPlot")
+
+
+	func override mut on_process()
+		if formula() != cached_formula
+			cached_formula = formula()
+
+			let source = "
+func f(x: f32) -> f32
+	return {{formula()}}
+"
+
+			try
+				#ctx = kaba.default_context.create_new_context()
+				ctx = kaba.Context.create()
+				module = ctx!.create_module_for_source(source, false)
+				f_p = module!.match_function("f", f32, [f32])
+				if not f_p
+					print("ERROR not found...")
+			except Exception as e
+				print("ERROR  {{e}}")
+				return
+
+		out_plot.set([&self, PlotMode.FUNCTION])
+
+
+	func override plot_function(x: f32[]) -> f32[]
+		for f in f_p
+			return eval_f32_f32_list(&f, x)
+		return []
+

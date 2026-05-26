@@ -32,3 +32,7 @@ var extern static default_color_map_transparent: ColorMap
 struct extern GenericData
 	type: kaba.Class&
 	p: void&
+
+
+# f of type f32->f32...
+func extern eval_f32_f32_list(f: kaba.code&, x: f32[]) -> f32[]
