@@ -32,24 +32,4 @@ private:
 	RenderNode* child = nullptr;
 };
 
-class LayoutOverlay : public RenderNode {
-public:
-	explicit LayoutOverlay();
-	void set_children(const Array<RenderNode*>& c);
-
-private:
-	Array<RenderNode*> children;
-};
-
-class LayoutNested : public RenderNode {
-public:
-	explicit LayoutNested();
-	void set_children(RenderNode* main, const Array<RenderNode*>& c, int mode);
-
-private:
-	RenderNode* _main = nullptr;
-	Array<RenderNode*> children;
-	Array<xhui::Panel*> dummies;
-};
-
 }
