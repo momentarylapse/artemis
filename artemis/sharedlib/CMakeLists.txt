@@ -177,7 +177,6 @@ add_library(moduleartemis SHARED
 	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
 	src/graph/canvas/Canvas.cpp
-	src/graph/canvas/LayoutGrid.cpp
 	src/graph/canvas/LayoutNested.cpp
 	src/graph/canvas/LayoutOverlay.cpp
 	src/graph/field/MultiComponentField.cpp

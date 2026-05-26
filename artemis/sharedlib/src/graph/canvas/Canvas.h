@@ -63,7 +63,6 @@ public:
 	dataflow::InPort<RenderData> in_draw{this, "draw", dataflow::PortFlags::Optional};
 
 	Session* session;
-	bool camera_defined = false;
 };
 
 }

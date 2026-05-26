@@ -36,28 +36,6 @@ void Canvas::set_child(RenderNode* c) {
 
 
 
-LayoutGrid::LayoutGrid() : RenderNode() {
-	add_control("Grid", "", 0, 0, "grid");
-	set_options("grid", "spacing=0");
-}
-
-void LayoutGrid::set_children(const Array<RenderNode*>& _children, bool _horizontal) {
-	if (_children == children and _horizontal == horizontal)
-		return;
-	for (auto c: children)
-		if (c)
-			unembed(c);
-	children = _children;
-	horizontal = _horizontal;
-	for (const auto& [i, c]: enumerate(children))
-		if (c)
-			embed("grid", horizontal ? i : 0, horizontal ? 0 : i, c);
-}
-
-void LayoutGrid::configure(int spacing, int margin) {
-	set_options("grid", format("spacing=%d,margin=%d", spacing, margin));
-}
-
 LayoutOverlay::LayoutOverlay() : RenderNode() {
 	add_control("Overlay", "", 0, 0, "overlay");
 }

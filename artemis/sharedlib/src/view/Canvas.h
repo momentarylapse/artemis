@@ -32,17 +32,6 @@ private:
 	RenderNode* child = nullptr;
 };
 
-class LayoutGrid : public RenderNode {
-public:
-	explicit LayoutGrid();
-	void set_children(const Array<RenderNode*>& c, bool horizontal);
-	void configure(int spacing, int margin);
-
-private:
-	bool horizontal = false;
-	Array<RenderNode*> children;
-};
-
 class LayoutOverlay : public RenderNode {
 public:
 	explicit LayoutOverlay();

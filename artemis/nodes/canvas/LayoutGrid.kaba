@@ -1,0 +1,63 @@
+use artemis.*
+
+
+class XLayoutGrid extends RenderNode
+	var horizontal = false
+	var children: shared[RenderNode][]
+
+	func override mut __init__()
+		add_control("Grid", "", 0, 0, "grid")
+		set_options("grid", "spacing=0")
+
+	func mut set_children(_children: shared[RenderNode][], _horizontal: bool)
+		if weak(_children) == weak(children) and _horizontal == horizontal
+			return
+		for c in children
+			for _c in c
+				unembed(weak(c))
+		children = _children
+		horizontal = _horizontal
+		for i=>c in children
+			for _c in c
+				if horizontal
+					embed("grid", i, 0, c)
+				else
+					embed("grid", 0, i, c)
+
+	func mut configure(spacing: i32, margin: i32)
+		set_options("grid", "spacing={{spacing}},margin={{margin}}")
+
+
+class LayoutGrid extends RendererNode
+	var in_a = InPort[RenderData](&self, "a", PortFlags.OPTIONAL)
+	var in_b = InPort[RenderData](&self, "b", PortFlags.OPTIONAL)
+	var in_c = InPort[RenderData](&self, "c", PortFlags.OPTIONAL)
+	var in_d = InPort[RenderData](&self, "d", PortFlags.OPTIONAL)
+	var horizontal = Setting[bool](&self, "horizontal", false)
+	var spacing = Setting[i32](&self, "spacing", 0)
+	var margin = Setting[i32](&self, "margin", 0)
+	var layout_grid: owned![XLayoutGrid]
+
+
+	func __init__()
+		super.__init__("LayoutGrid")
+		layout_grid = new XLayoutGrid()
+
+	func override on_process()
+		var rd: RenderData
+	
+		var children: shared[RenderNode][]
+		children.resize(4)
+		for a in in_a.value()
+			children[0] = a.render_node
+		for b in in_b.value()
+			children[1] = b.render_node
+		for c in in_c.value()
+			children[2] = c.render_node
+		for d in in_d.value()
+			children[3] = d.render_node
+		layout_grid.set_children(children, horizontal())
+		layout_grid.configure(spacing(), margin())
+		rd.render_node = weak(layout_grid)
+		out_draw.set(rd)
+
