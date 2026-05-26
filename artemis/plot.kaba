@@ -1,0 +1,21 @@
+use .graph.*
+
+enum PlotMode
+	FUNCTION
+	POINTS
+
+
+struct extern PlotData
+	source: PlotSource&
+	mode: PlotMode
+
+
+class extern PlotSource extends Node
+	var out_plot: OutPort[PlotData]
+	var line_width: Setting[f64]
+	var color: Setting[Color]
+
+	func extern override mut __init__(name: string)
+	func extern virtual plot_function(x: f32) -> f32
+	func extern virtual plot_points() -> vec2[]
+

@@ -27,6 +27,7 @@ public:
 	}
 };
 
+
 Plotter::Plotter() : RendererNode( "Plotter") {
 	render_node = new PlotterRenderNode(this);
 	background.set(xhui::Theme::_default.background);
@@ -71,12 +72,11 @@ void Plotter::draw_2d(Painter* p) {
 	if (auto_zoom()) {
 		float y0 = 0, y1 = 0;
 		for (const auto d: in_plot.values()) {
-			if (d->f) {
-
-			} else {
-				if (y0 == y1 and d->points.num > 0)
-					y0 = y1 = d->points[0].y;
-				for (const auto& pp: d->points) {
+			if (d->mode == PlotMode::Points) {
+				const auto points = d->source->plot_points();
+				if (y0 == y1 and points.num > 0)
+					y0 = y1 = points[0].y;
+				for (const auto& pp: points) {
 					y0 = min(y0, pp.y);
 					y1 = max(y1, pp.y);
 				}
@@ -106,22 +106,23 @@ void Plotter::draw_2d(Painter* p) {
 	for (const auto d: in_plot.values()) {
 		Array<vec2> points;
 
-		if (d->f) {
+		if (d->mode == PlotMode::Function) {
 			Array<float> xs = lin_spacing((float)x_min(), (float)x_max(), 200), ys;
 			for (float x: xs) {
-				float y = (*d->f)(x);
+				float y = d->source->plot_function(x);
 				ys.add(y);
 			}
 
 			for (int i=0; i<xs.num; i++)
 				points.add(project({xs[i], ys[i]}));
-		} else {
-			for (const vec2& v: d->points)
+		} else if (d->mode == PlotMode::Points) {
+			const auto points0 = d->source->plot_points();
+			for (const vec2& v: points0)
 				points.add(project(v));
 		}
 
-		p->set_color(d->_color);
-		p->set_line_width((float)d->line_width);
+		p->set_color(d->source->_color());
+		p->set_line_width((float)d->source->line_width());
 		p->draw_lines(points);
 	}
 	p->set_clip(c0);

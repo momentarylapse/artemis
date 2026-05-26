@@ -11,17 +11,14 @@
 
 namespace artemis::graph {
 
-class FunctionPlot : public dataflow::Node {
+class FunctionPlot : public PlotSource {
 public:
-	explicit FunctionPlot() : Node("FunctionPlot") {}
+	explicit FunctionPlot() : PlotSource("FunctionPlot") {}
 
 	void on_process() override;
+	float plot_function(float x) override;
 
 	dataflow::Setting<string> formula{this, "formula", "x^2"};
-	dataflow::Setting<double> line_width{this, "line-width", 2.0};
-	dataflow::Setting<color> _color{this, "color", Red};
-
-	dataflow::OutPort<PlotData> out_plot{this, "plot"};
 
 	string cached_formula;
 	owned<kaba::IContext> ctx;

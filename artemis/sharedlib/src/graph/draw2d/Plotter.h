@@ -15,13 +15,31 @@ namespace artemis::view {
 
 namespace artemis::graph {
 
+class PlotSource;
+
 typedef float (*scalar_function_1d)(float); // double..?
 
+enum class PlotMode {
+	Function,
+	Points
+};
+
 struct PlotData {
-	double line_width;
-	color _color;
-	scalar_function_1d f;
-	Array<vec2> points;
+	PlotSource* source = nullptr;
+	PlotMode mode;
+	int dummy[8];
+};
+
+class PlotSource : public dataflow::Node {
+public:
+	explicit PlotSource(const string& name) : Node(name) {}
+
+	virtual float plot_function(float x) { return 0; }
+	virtual Array<vec2> plot_points() { return {}; }
+
+	dataflow::Setting<double> line_width{this, "line-width", 2.0};
+	dataflow::Setting<color> _color{this, "color", Red};
+	dataflow::OutPort<PlotData> out_plot{this, "plot"};
 };
 
 class Plotter : public RendererNode {

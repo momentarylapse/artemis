@@ -6,6 +6,7 @@ use .fields.*
 use .graph.*
 use .session.*
 use .render.*
+use .plot.*
 
 let EXPORT_IMPORTS = true
 

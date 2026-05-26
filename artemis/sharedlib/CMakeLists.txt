@@ -181,7 +181,6 @@ add_library(moduleartemis SHARED
 	src/graph/canvas/LayoutNested.cpp
 	src/graph/canvas/LayoutOverlay.cpp
 	src/graph/draw2d/FunctionPlot.cpp
-	src/graph/draw2d/ListPlot.cpp
 	src/graph/draw2d/Plotter.cpp
 	src/graph/field/MultiComponentField.cpp
 	src/graph/field/ScalarField.cpp

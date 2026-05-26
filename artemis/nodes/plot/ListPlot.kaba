@@ -1,0 +1,24 @@
+use artemis.*
+
+
+class ListPlot extends PlotSource
+	var in_list = InPort[f64[]](&self, "list")
+	var x_scale = Setting[f64](&self, "x-scale", 1.0)
+
+
+	func mut __init__()
+		super.__init__("ListPlot")
+
+
+	func override mut on_process()
+		out_plot.set([&self, PlotMode.POINTS])
+
+
+	func override plot_points() -> vec2[]
+		var points: vec2[]
+		let sx = x_scale() as f32
+		for list in in_list.value()
+			for i=>y in list
+				points.add([f32(i) * sx, f32(y)])
+		return points
+
