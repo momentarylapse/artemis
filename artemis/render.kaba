@@ -4,6 +4,7 @@ use .session.*
 use .data.*
 use .yrenderer # TODO switch to external package!
 use .gfx
+use .profiler.*
 
 func extern tex_white() -> shared![gfx.Texture]
 
@@ -48,7 +49,7 @@ class RenderEmitterNode extends Node
 	func override __init__(name: string)
 		session := current_session()
 		flags = NodeFlags.RENDERER
-		emitter = new RenderEmitterNodeEmitter(session.ctx, &self)
+		emitter = new RenderEmitterNodeEmitter(session.ctx!, &self)
 #	func extern override __delete__()
 	func virtual mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 	func virtual bounding_box() -> Box?

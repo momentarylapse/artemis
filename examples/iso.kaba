@@ -15,6 +15,7 @@ func main()
 	var gr = g.add_node("GridRenderer", [50,550])
 	gr.set("line-width", 2.0)
 	gr.set("color", dyn([0.5,0.5,0.5,1]))
+	gr.set("mode", "OUTLINES")
 	
 	var field = g.add_node("ScalarField", [370,250])
 	field.set("formula", "sin(0.8 * len(p-vec3(4.5,4.5,15)) + t)")

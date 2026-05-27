@@ -97,14 +97,15 @@ public:
 
 	os::Timer timer;
 	double t, dt;
+	bool simulation_active = false;
 
 	base::promise<Session*> promise_started;
 
 	owned<artemis::graph::DataGraph> data;
 	dataflow::Graph* graph;
 
-	float simulation_update_dt = 0.1f; // "outside" / how often to perform steps
+	double simulation_update_dt = 0.1; // "outside" / how often to perform steps
 };
 
-Session *create_session();
+Session *create_session(bool with_window=true);
 

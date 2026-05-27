@@ -33,12 +33,17 @@ void Data::redo() {
 	action_manager->redo();
 }
 
-
-
 void Data::undo() {
 	action_manager->undo();
 }
 
+bool Data::undoable() const {
+	return action_manager->undoable();
+}
+
+bool Data::redoable() const {
+	return action_manager->redoable();
+}
 
 
 void *Data::execute(Action *a) {

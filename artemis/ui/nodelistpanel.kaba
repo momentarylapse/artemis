@@ -1,0 +1,65 @@
+use xhui
+use ..graph.enumerate_nodes
+
+
+class NodeListPanel extends xhui.Panel
+	let list_id = "list"
+	var all_classes: string[]
+	var classes_filtered: string[]
+
+	func __init__()
+		super.__init__("node-list-panel")
+		from_source("
+Dialog x ''
+	Grid ? '' class=card
+		Group node-list-group 'New node' height=500
+			Grid ? ''
+				Edit filter ''
+				---|
+				ListView list 'class' nobar expandy dragsource=new-node format=m
+")
+	
+#		struct X {
+#			dataflow::NodeCategory category;
+#			string name, title;
+#		};
+#		Array<X> categories = {
+#			{dataflow::NodeCategory::Field, "field", "field"},
+#			{dataflow::NodeCategory::Grid, "grid", "grid"},
+#			{dataflow::NodeCategory::Mesh, "mesh", "mesh"},
+#			{dataflow::NodeCategory::Renderer, "renderer", "render"},
+#			{dataflow::NodeCategory::Simulation, "simulation", "sim"}
+#		};
+		all_classes = enumerate_nodes() #dataflow::NodeCategory.NONE)
+		classes_filtered = all_classes
+		fill_list()
+	
+		xhui.run_later(0.1, func() activate("filter"))
+	
+		event("filter", on_filter)
+		event_x("list", "hui:drag-start", on_list_drag_start)
+	
+#		size_mode_x = SizeMode::Shrink
+#		size_mode_y = SizeMode::Shrink
+
+
+	func mut fill_list()
+			reset(list_id)
+			for c in classes_filtered
+				add_string(list_id, c) # + "\n<b> x</b>")
+
+
+	func mut on_filter()
+			let filter = get_string("filter").lower()
+			classes_filtered.clear()
+			for c in all_classes
+				for _ in c.lower().find(filter)
+					classes_filtered.add(c)
+			fill_list()
+
+
+	func mut on_list_drag_start()
+		let i = get_int(list_id)
+		if i >= 0
+			get_window()!.start_drag(classes_filtered[i], "add-node:" + classes_filtered[i])
+

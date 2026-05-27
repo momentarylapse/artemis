@@ -1,0 +1,7 @@
+
+
+namespace profiler
+	func extern create_channel(name: string, parent: i32) -> i32
+	func extern begin(channel: i32)
+	func extern end(channel: i32)
+

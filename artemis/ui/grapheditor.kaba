@@ -1,0 +1,522 @@
+use os
+use obs
+use xhui
+use kaba
+use image.Painter
+use ..graph.*
+use ..profiler.*
+use .nodelistpanel.NodeListPanel
+
+# :( TODO kaba internal
+func in_list[X](x: X, list: X[]) -> bool
+	for y in list
+		if y == x
+			return true
+	return false
+
+func list_last[X](list: X[]) -> X
+	let n = len(list)
+	return list[n - 1]
+
+func set_add[X](out list: X[], x: X)
+	if not in_list(x, list)
+		list.add(x)
+
+# :P
+func wash_f32(p: f32&) -> f32
+	return *p
+func wash_col(c: Color&) -> Color
+	return *c
+
+func extern spline_curve(a: vec2, b: vec2, c: vec2, d: vec2) -> vec2[]
+
+func spline_hover(points: vec2[], m: vec2) -> bool
+	for p in points
+		if len(p - m) < 20
+			return true
+	return false
+
+func type_name(t: kaba.Class*) -> string
+	for c in t
+		return c.name
+	return "<null>"
+
+
+func port_description[P](p: P&, direction: string) -> string
+	var flags: string[]
+	if i32(p.flags & PortFlags.MUTABLE) > 0
+		flags.add("mutable")
+	if i32(p.flags & PortFlags.OPTIONAL) > 0
+		flags.add("optional")
+	if i32(p.flags & PortFlags.MULTI) > 0
+		flags.add("multi")
+	var type = "*"
+	for t in p.type
+		type = type_name(p.type)
+	var sflags = "-"
+	if len(flags) > 0
+		sflags = flags.join(", ")
+	#return format("<big>%s: <b>%s</b></big>\n<soft>type:</soft> <b>%s</b>", direction, p->name, type) + sflags;
+	return "<big><b>{{p.name}}</b></big>  ({{direction}})\n<soft>type:</soft> <b>{{type}}</b>\n<soft>flags:</soft> {{sflags}}"
+
+
+class GraphEditor extends xhui.Panel as obs.Node
+	var out_info = obs.XSource[string](&self, &ind, "info")
+	var out_error = obs.XSource[string](&self, &ind, "error")
+	var graph: Graph&
+	var graph_con: GraphController&
+	var channel: i32
+	var view_scale = 1.0
+	var view_offset = vec2(0,0)
+
+	var selected_nodes: Node&[]
+
+	let NODE_WIDTH = 150.0
+	let NODE_HEIGHT = 50.0
+	let PORT_DX = 30.0
+	let PORT_DY = 10.0
+	let PANEL_WIDTH = 280.0
+
+	enum HoverType
+		NODE
+		IN_PORT
+		OUT_PORT
+		CABLE
+
+	struct Hover
+		type: HoverType
+		node: Node&
+		index: i32
+	hover: Hover?
+	selection: Hover?
+	var node_panel: shared[xhui.Panel]
+	var _node_panel_node = nil as Node*
+
+	enum Mode
+		DEFAULT
+		CREATING_NEW_CABLE
+		SELECTING
+		MOVING_NODES
+	var mode = Mode.DEFAULT
+	var selection_start = vec2(0,0)
+	var moving_last_pos = vec2(0,0)
+
+
+	func __init__(g: Graph&, gc: GraphController&)
+		super.__init__("graph-editor")
+		graph := g
+		graph_con := gc
+
+		channel = profiler.create_channel("GraphEditor", -1)
+
+		from_source("
+Dialog x ''
+	Overlay ? ''
+		DrawingArea graph '' grabfocus width=400 expandx
+		Grid overlay-grid '' margin=25
+			Grid ? '' spacing=20
+				Label ? '' ignorehover expandx
+				Button add-node '+' height=50 width=50 padding=7 noexpandx ignorefocus
+				Button show-code-editor 'E' height=50 width=50 padding=7 noexpandx ignorefocus
+			---|
+			Grid ? ''
+				Label ? '' ignorehover expandy
+				Label ? '' ignorehover expandx
+				---|
+				Grid dock ''
+				.
+")
+
+		event_x("graph", "hui:draw", on_draw)
+		event_x("graph", "hui:mouse-move", _on_mouse_move)
+		event_x("graph", "hui:mouse-wheel", _on_mouse_wheel)
+		event_x("graph", "hui:mouse-leave", _on_mouse_leave)
+		event_x("graph", "hui:left-button-down", _on_left_button_down)
+		event_x("graph", "hui:left-button-up", _on_left_button_up)
+		event_x("graph", "hui:key-down", _on_key_down)
+		event_x("graph", "hui:drag-drop", on_drag_drop)
+		event("add-node", open_node_list_panel)
+
+
+	func mut _on_mouse_move()
+		let d = get_window()!.get_mouse_delta()
+		let m = get_window()!.get_mouse_position()
+		if mode == Mode.SELECTING
+			let r = Rect(to_screen(selection_start), m).canonical()
+			selected_nodes.clear()
+			for n in graph.nodes
+				if node_area(n).overlaps(r)
+					selected_nodes.add(n)
+			if len(selected_nodes) == 1
+				selection = Hover(HoverType.NODE, selected_nodes[0], -1)
+				open_node_panel(selected_nodes[0])
+			else
+				open_node_panel(nil)
+		else if mode == Mode.MOVING_NODES
+			let cur_pos = from_screen(m)
+			graph_con.move_nodes(selected_nodes, cur_pos - moving_last_pos)
+			moving_last_pos = cur_pos
+		else if mode == Mode.CREATING_NEW_CABLE
+			hover = get_hover(m)
+		else if get_window()!.left_button()
+			pass
+#>			if get_window()!.drag.active and get_window()!.drag.payload.match("add-node:*"))
+#>				hover = get_hover(m)
+		else
+			hover = get_hover(m)
+	
+		request_redraw()
+
+
+	func mut _on_mouse_wheel()
+		let d = get_window()!.get_scroll()
+		let m = get_window()!.get_mouse_position()
+		let mm = from_screen(m)
+		view_scale = clamp(view_scale * exp(0.2 * d.y), 0.5, 10.0)
+		view_offset -= to_screen(mm) - m
+	
+		hover = get_hover(m)
+		request_redraw()
+
+
+	func mut _on_mouse_leave()
+		hover = nil
+		request_redraw()
+
+
+	func mut _on_left_button_down()
+		let m = get_window()!.get_mouse_position()
+		hover = get_hover(m)
+		selection = hover
+		for s in selection
+			if s.type == HoverType.NODE
+				if not in_list(s.node, selected_nodes)
+					selected_nodes.clear()
+					set_add(selected_nodes, s.node)
+			else
+				selected_nodes.clear()
+		else
+			selected_nodes.clear()
+		mode = Mode.DEFAULT
+
+		open_node_panel(nil)
+	
+		for s in selection
+			if s.type == HoverType.NODE
+				if len(selected_nodes) == 1
+					open_node_panel(s.node)
+	
+				mode = Mode.MOVING_NODES
+				moving_last_pos = from_screen(m)
+			else if s.type == HoverType.OUT_PORT or s.type == HoverType.IN_PORT
+				mode = Mode.CREATING_NEW_CABLE
+		else
+			mode = Mode.SELECTING
+			selection_start = from_screen(m)
+	
+		request_redraw()
+
+
+	func mut _on_left_button_up()
+		let m = get_window()!.get_mouse_position()
+		if mode == Mode.CREATING_NEW_CABLE
+			for s in selection
+				for h in hover
+					if s.type == HoverType.OUT_PORT and h.type == HoverType.IN_PORT
+						let r = graph_con.auto_connect([s.node.out_ports[s.index], h.node.in_ports[h.index]])
+						#if (!r)
+						#	session->error(r.error().msg);
+					if s.type == HoverType.IN_PORT and h.type == HoverType.OUT_PORT
+						let r = graph_con.auto_connect([h.node.out_ports[h.index], s.node.in_ports[s.index]])
+					#	if (!r)
+					#		session->error(r.error().msg)
+		mode = Mode.DEFAULT
+
+
+
+	func mut _on_key_down()
+		let key = get_window()!.get_key_code()
+		if key == xhui.KEY_CONTROL + xhui.KEY_Z
+			if graph_con.undoable()
+				graph_con.undo()
+				out_info("undo")
+			else
+				out_info("nothing to undo")
+		if key == xhui.KEY_CONTROL + xhui.KEY_Y
+			if graph_con.redoable()
+				graph_con.redo()
+				out_info("redo")
+			else
+				out_info("nothing to redo")
+		if key == xhui.KEY_DELETE or key == xhui.KEY_BACKSPACE
+			for s in selection
+				if s.type == HoverType.CABLE
+					graph_con.unconnect(graph.cables()[s.index])
+					selection = nil
+					hover = nil
+				if s.type == HoverType.NODE
+					graph_con.remove_nodes(selected_nodes)
+					selected_nodes.clear()
+					selection = nil
+					hover = nil
+					open_node_panel(nil)
+		if key == xhui.KEY_TAB
+			open_node_list_panel()
+		if key == xhui.KEY_G
+			if len(selected_nodes) >= 2
+	
+				let group = graph_con.group_nodes(selected_nodes)
+	
+			#	const Path dir = artemis::PluginManager::template_directory();
+			#	os::fs::create_directory(dir);
+			#	artemis::graph::DataGraph data_group(session);
+			#	session->storage->save(dir | "a.artemis", &data_group);
+	
+				out_info("node group created")
+
+
+	func mut on_drag_drop()
+		for w in get_window()
+			if w.drag.payload.match("add-node:*")
+				let m = w.get_mouse_position()
+				var n = create_node(w.drag.payload[9:])
+				n.pos = from_screen(m)
+				graph_con.add_node(give(n))
+				for h in hover
+					if h.type == HoverType.OUT_PORT and len(n.in_ports) > 0
+						let source = h.node.out_ports[h.index]
+						let sink = n.in_ports[0]
+						if port_type_match(source, n.in_ports[0])
+							n.pos.y += 50
+							graph_con.connect(CableInfo(source, sink))
+					else if h.type == HoverType.IN_PORT and len(n.out_ports) > 0
+						let source = n.out_ports[0]
+						let sink = h.node.in_ports[h.index]
+						if port_type_match(source, sink)
+							n.pos.y -= 100
+							graph_con.connect(CableInfo(source, sink))
+
+
+	func on_draw(out p: Painter)
+		profiler.begin(channel)
+		let clip0 = p.clip()
+		p.set_clip(area)
+	
+		draw_grid(p)
+
+		for i=>c in graph.cables()
+			p.set_color(Color.GRAY)
+			p.set_line_width(3 * view_scale)
+			for h in hover
+				if h.type == HoverType.CABLE and h.index == i
+					p.set_color(Color.mix(Color.GRAY, Color.WHITE, 0.3))
+					p.set_line_width(3 * view_scale)
+			for s in selection
+				if s.type == HoverType.CABLE and s.index == i
+					p.set_color(Color.WHITE)
+					p.set_line_width(4 * view_scale)
+			p.draw_lines(cable_spline(c))
+
+		for n in graph.nodes
+			draw_node(p, n)
+			
+		p.set_font("", wash_f32(&xhui.theme.font_size), false, false)
+
+
+		let m = get_window()!.get_mouse_position()
+		if mode == Mode.SELECTING
+			let c = Color(0.1, 0.9, 0.1, 1)
+			p.set_color(c.with_alpha(0.2))
+			p.draw_rect(Rect(to_screen(selection_start), m).canonical())
+			p.set_color(c)
+			p.set_fill(false)
+			p.draw_rect(Rect(to_screen(selection_start), m))
+			p.set_fill(true)
+		else if mode == Mode.CREATING_NEW_CABLE
+			for s in selection
+				if s.type == HoverType.OUT_PORT
+					p.set_color(Color.WHITE)
+					p.set_line_width(3 * view_scale)
+					p.draw_line(node_out_port_pos(s.node, s.index), m)
+				if s.type == HoverType.IN_PORT
+					p.set_color(Color.WHITE)
+					p.set_line_width(3 * view_scale)
+					p.draw_line(node_in_port_pos(s.node, s.index), m)
+
+
+		var tip = ""
+		for h in hover
+			if h.type == HoverType.OUT_PORT
+				tip = port_description[OutPortBase](h.node.out_ports[h.index], "output")
+			if h.type == HoverType.IN_PORT
+				tip = port_description[InPortBase](h.node.in_ports[h.index], "input")
+			if h.type == HoverType.CABLE
+				let c = graph.cables()[h.index]
+				tip = "<big>cable</big>\n<soft>type:</soft> <b>{{type_name(c.source.type)}}</b>"
+	
+		if tip != ""
+			let l = xhui.TextLayout.from_format_string(p, tip)
+#			let fg = xhui.theme.text_label
+#			let bg = xhui.theme.background_button
+			xhui.draw_text_layout_with_box(p, m + vec2(-10, 30), l, xhui.theme.text_label, xhui.theme.background_button)
+
+		p.set_clip(clip0)
+		profiler.end(channel)
+
+
+	func to_screen(p: vec2) -> vec2
+		return p * view_scale + view_offset
+
+
+	func from_screen(p: vec2) -> vec2
+		return (p - view_offset) / view_scale
+
+
+	func node_area(n: Node) -> Rect
+		return Rect(to_screen(n.pos), to_screen(n.pos + vec2(NODE_WIDTH, NODE_HEIGHT)))
+
+	func node_in_port_pos(n: Node, i: i32) -> vec2
+		return to_screen(n.pos + vec2(NODE_WIDTH / 2 + (f32(i) - f32(len(n.in_ports) - 1) / 2) * PORT_DX, -PORT_DY))
+
+	func node_out_port_pos(n: Node, i: i32) -> vec2
+		return to_screen(n.pos + vec2(NODE_WIDTH / 2 + (f32(i) - f32(len(n.out_ports) - 1) / 2) * PORT_DX, NODE_HEIGHT + PORT_DY))
+
+	func cable_spline(c: CableInfo) -> vec2[]
+		let A = node_out_port_pos(c.source.owner, c.source_port_no())
+		let B = node_in_port_pos(c.sink.owner, c.sink_port_no())
+		return spline_curve(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B)
+
+	func draw_grid(out p: Painter)
+		p.set_color(xhui.theme.background)
+		p.draw_rect(area)
+		p.set_line_width(max(1.0 * view_scale, 1.0))
+		p.set_contiguous(false)
+	
+		let view_area = Rect(from_screen(area.p00()), from_screen(area.p11()))
+		let c0 = Color.mix(xhui.theme.background, xhui.theme.text_disabled, 0.07 * min(view_scale, 1.0))
+		let c1 = Color.mix(xhui.theme.background, xhui.theme.text_disabled, 0.15 * min(view_scale, 1.0))
+		let D = 20.0
+		var points: vec2[]
+		for i in i32(floor(view_area.y1 / D)):i32(ceil(view_area.y2 / D))
+			if i % 5 == 0
+				continue
+			let y = to_screen([0, f32(i)*D]).y
+			points.add([area.x1, y])
+			points.add([area.x2, y])
+		for i in i32(floor(view_area.x1 / D)):i32(ceil(view_area.x2 / D))
+			if i % 5 == 0
+				continue
+			let x = to_screen([f32(i)*D, 0]).x
+			points.add([x, area.y1])
+			points.add([x, area.y2])
+		p.set_color(c0)
+		p.draw_lines(points)
+	
+	
+		points.clear()
+		for i in i32(floor(view_area.y1 / (D*5))):i32(ceil(view_area.y2 / (D*5)))
+			let y = to_screen([0, f32(i)*D*5]).y
+			points.add([area.x1, y])
+			points.add([area.x2, y])
+		for i in i32(floor(view_area.x1 / (D*5))):i32(ceil(view_area.x2 / (D*5)))
+			let x = to_screen([f32(i)*D*5, 0]).x
+			points.add([x, area.y1])
+			points.add([x, area.y2])
+		p.set_color(c1)
+		p.draw_lines(points)
+		p.set_contiguous(true)
+
+
+	func draw_node(out p: Painter, n: Node)
+		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, true, false)
+	
+		if in_list(&n, selected_nodes)
+			p.set_color(Color.RED.with_alpha(0.7))
+			p.set_roundness(14 * view_scale)
+			p.draw_rect(node_area(n).grow(4 * view_scale))
+		var bg = Color.mix(Color.ORANGE, xhui.theme.background_low, 0.3)
+		if i32(n.flags & NodeFlags.RESOURCE) > 0
+			bg = Color.mix(Color(0.3, 0.4, 1, 1), xhui.theme.background_low, 0.3)
+		else if i32(n.flags & NodeFlags.TIME_DEPENDENT) > 0
+			bg = Color.mix(Color(0, 0.7, 0, 1), xhui.theme.background_low, 0.3)
+		else if i32(n.flags & NodeFlags.META) > 0
+			bg = Color.mix(Color(0.5, 0.5, 0.5, 1), xhui.theme.background_low, 0.3)
+		for h in hover
+			if h.type == HoverType.NODE and h.node == &n
+				bg = Color.mix(bg, Color.WHITE, 0.2)
+		p.set_color(bg)
+		p.set_roundness(10 * view_scale)
+		p.draw_rect(node_area(n))
+	
+		p.set_color(Color.WHITE)
+		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, true, false)
+		if true
+			let name = list_last(n.name.explode(":"))
+			let w = p.get_str_width(name) / view_scale
+			p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2 - w/2, 5)), name)
+			if n._state == NodeState.UNINITIALIZED
+				p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2, 35)), "U")
+			else if n._state == NodeState.DIRTY
+				p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2, 35)), "*")
+		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, false, false)
+	
+		for _ in n.name.find(":")
+			p.set_color(Color.WHITE.with_alpha(0.7))
+			let class_name = n.name.explode(":")[0]
+			let w = p.get_str_width(class_name) / view_scale
+			p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2 - w/2, 20)), class_name)
+
+	
+		for i=>_ in n.in_ports
+			p.set_color(Color.GRAY)
+			for h in hover
+				if h.type == HoverType.IN_PORT and h.node == &n and h.index == i
+					p.set_color(Color.WHITE)
+			p.draw_circle(node_in_port_pos(n, i), 5 * view_scale)
+		for i=>_ in n.out_ports
+			p.set_color(Color.GRAY)
+			for h in hover
+				if h.type == HoverType.OUT_PORT and h.node == &n and h.index == i
+					p.set_color(Color.WHITE)
+			p.draw_circle(node_out_port_pos(n, i), 5 * view_scale)
+
+
+	func mut open_node_list_panel()
+		open_node_panel(nil)
+		node_panel = new NodeListPanel()
+		node_panel!.set_option("width", str(PANEL_WIDTH))
+		embed("dock", 0, 0, node_panel)
+
+
+	func mut open_node_panel(n: Node*)
+		if n == _node_panel_node and n
+			# force reset when list panel is open
+			return
+
+		for p in node_panel
+			unembed(&p)
+			node_panel = nil
+
+		_node_panel_node = n
+	
+		var nn = n # FIXME kaba work-around - making n mutable :P
+		for mut _n in nn
+			node_panel = _n.create_panel()
+			node_panel!.set_option("width", str(PANEL_WIDTH))
+			embed("dock", 0, 0, node_panel!)
+
+
+	func get_hover(m: vec2) -> Hover?
+		for n in graph.nodes
+			for i=>_ in n.in_ports
+				if len(m - node_in_port_pos(n, i)) < 15
+					return Hover(HoverType.IN_PORT, &n, i)
+			for i=>_ in n.out_ports
+				if len(m - node_out_port_pos(n, i)) < 15
+					return Hover(HoverType.OUT_PORT, &n, i)
+			if node_area(n).inside(m)
+				return Hover(HoverType.NODE, &n, -1)
+		for i=>c in graph.cables()
+			if spline_hover(cable_spline(c), m)
+				return Hover(HoverType.CABLE, c.source.owner, i) # nil...
+		return nil

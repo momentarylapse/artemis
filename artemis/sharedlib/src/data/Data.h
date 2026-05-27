@@ -36,6 +36,8 @@ public:
 	void end_action_group();
 	void undo();
 	void redo();
+	bool undoable() const;
+	bool redoable() const;
 
 	virtual void on_post_action_update() {}
 

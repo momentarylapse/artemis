@@ -28,7 +28,6 @@ public:
 	artemis::graph::DataGraph* data;
 	dataflow::Graph* graph;
 
-	bool simulation_active = false;
 	bool show_profiling = false;
 
 	void update_menu();

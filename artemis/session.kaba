@@ -1,9 +1,26 @@
 use os
 use obs
 use xhui
+use image.Painter
+use async
 use .graph.*
 use .gfx
 use .yrenderer
+use .ui.grapheditor.*
+
+# :( TODO kaba internal
+func in_list[X](x: X, list: X[]) -> bool
+	for y in list
+		if y == x
+			return true
+	return false
+
+func list_last[X](list: X[]) -> X
+	let n = len(list)
+	return list[n - 1]
+
+func wash_f32(p: f32&) -> f32
+	return *p
 
 
 class extern DrawingHelper
@@ -17,28 +34,153 @@ class extern DrawingHelper
 
 
 class extern ArtemisWindow extends xhui.Window as obs.Node
+	var session: Session&
+	var graph_editor: shared![GraphEditor]
+
+
+	func __init__(s: Session&)
+		super.__init__("artemis", 1024, 768)
+		set_maximized(true)
+		session := s
+		from_source("
+Dialog x x padding=0
+	Overlay ? ''
+		Grid main-grid '' spacing=0
+			Grid left-grid '' spacing=0
+				.
+				---|
+				Overlay code-editor-panel '' visible=no
+					Grid code-editor-grid '' greedfactory=0.5
+					Grid overlay-code-grid '' margin=25
+						Grid ? ''
+							Label ? '' ignorehover expandx
+							Button close-code-editor 'X' noexpandx
+						---|
+						Label ? '' ignorehover expandy
+						---|
+						Grid overlay-button-grid-code-bottom '' spacing=20
+							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+			Overlay ? '' width=400 greedfactorx=1.6 expandx
+				Grid canvas-grid '' grabfocus
+				DrawingArea canvas-overlay '' ignorehover expandx
+				Grid overlay-main-grid '' margin=25
+					Label ? '' ignorehover expandy
+					---|
+					Grid overlay-button-grid-bottom '' spacing=20
+						Label ? '' ignorehover expandx
+						Button simulation-start 'Start' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-pause 'Pause' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-stop 'Stop' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-step 'Step' height=50 width=50 padding=7 noexpandx ignorefocus
+		DrawingArea overlay-area '' ignorehover
+")
+		set_option("padding", "0")
+
+
+		graph_editor = new GraphEditor(session.graph, session.graph_con)
+		embed("left-grid", 0, 0, graph_editor)
+
+		graph_editor.out_info >> create_data_sink[string](func(s: string) session.info(s))
+		graph_editor.out_error >> create_data_sink[string](func(s: string) session.error(s))
+
+		event_x("canvas-overlay", "hui:initialize", on_initialize)
+		event_x("canvas-overlay", "hui:draw", on_overlay_draw)
+
+		event("simulation-start", on_sim_start)
+		event("simulation-pause", on_sim_pause)
+		event("simulation-stop", on_sim_stop)
+		event("simulation-step", on_sim_step)
+
+
+	func mut on_sim_start()
+		session.simulation_active = true
+		#update_menu()
+
+
+	func mut on_sim_pause()
+		session.simulation_active = not session.simulation_active
+		#update_menu()
+
+
+	func mut on_sim_stop()
+		session.simulation_active = false
+		session.t = 0
+		session.graph.reset_state()
+		#update_menu()
+
+
+	func mut on_sim_step()
+		session.simulation_active = false
+		iterate_simulation(session)
+		#update_menu()
+
+
+	func mut on_initialize(out p: Painter)
+		#auto pp = (xhui::Painter*)p;
+		session.ctx = yrenderer.api_init_xhui(&p)
+		init_graphics_stuff(session, p)
+
+	
+	func mut on_overlay_draw(out p: Painter)
+		for i=>m in session.messages
+			var fg = wash_col(&xhui.theme.text_label)
+			var bg = wash_col(&xhui.theme.background_button)
+			var text = m.text
+			if m.type == Session.Message.Type.ERROR
+				#bg = color(1, 0.5f, 0, 0);
+				bg = Color(0.5, 0.3, 0, 1)
+				text = "<b>ERROR</b>: {{m.text}}"
+			else if m.type == Session.Message.Type.WARNING
+				bg = Color(0.5, 0.3, 0, 1)
+			let l = xhui.TextLayout.from_format_string(p, text, wash_f32(&xhui.theme.font_size) * 1.5)
+			xhui.draw_text_layout_with_box(p, p.area().center() + vec2(-l.box.width()/2, 30.0*f32(i)), l, fg, bg, 14, 10)
 
 
 class extern Session
 	var graph: owned![Graph]
+	var graph_con: owned![GraphController]
+	var simulation_active = false
 	var t: f64
 	var dt: f64
-	var ctx: yrenderer.Context&
+	var simulation_update_dt: f64
+	var ctx: owned[yrenderer.Context]
 	var drawing_helper: DrawingHelper&
 	var win: ArtemisWindow&
+#	var promise_started: async.promise[Session]
+
+	struct Message
+		enum Type
+			INFO
+			WARNING
+			ERROR
+		type: Type
+		text: string
+	var messages: Message[]
+	func mut add_message(type: Message.Type, m: string)
+		print(m.replace("<b>", "").replace("</b>", ""))
+		messages.add([type, m])
+		win.request_redraw()
+		xhui.run_later(3.0, remove_message)
+	func mut remove_message()
+		messages.remove(0)
+		win.request_redraw()
+	func mut info(m: string)
+		add_message(Message.Type.INFO, m)
+	func mut warning(m: string)
+		add_message(Message.Type.WARNING, m)
+	func mut error(m: string)
+		add_message(Message.Type.ERROR, m)
 
 func extern current_session() -> Session&
 
 
-namespace profiler
-	func extern static create_channel(name: string, parent: i32) -> i32
-	func extern static begin(channel: i32)
-	func extern static end(channel: i32)
-
-
-func extern create_session() -> Session&
+func extern create_session(with_window=true) -> Session&
 func extern start_session_empty(s: Session&)
 func extern start_session_load_file(s: Session&, filename: os.Path)
+func extern session_load_file(s: Session&, filename: os.Path)
+func extern add_default_graph(s: Session&)
+func extern init_graphics_stuff(s: Session&, p: Painter)
+func extern iterate_simulation(s: Session&)
 func extern app_run()
 func extern test_done()
 

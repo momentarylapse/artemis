@@ -23,8 +23,8 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 	data = session->data.get();
 	graph = session->graph;
 
-	xhui::run_repeated(session->simulation_update_dt, [this] {
-		if (simulation_active)
+	xhui::run_repeated((float)session->simulation_update_dt, [this] {
+		if (session->simulation_active)
 			artemis::graph::iterate_simulation(session);
 		if (graph->iterate())
 			session->win->request_redraw();
@@ -36,21 +36,21 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 
 	auto win = session->win;
 	win->event("simulation-start", [this] {
-		simulation_active = true;
+		session->simulation_active = true;
 		update_menu();
 	});
 	win->event("simulation-pause", [this] {
-		simulation_active = !simulation_active;
+		session->simulation_active = !session->simulation_active;
 		update_menu();
 	});
 	win->event("simulation-stop", [this] {
-		simulation_active = false;
+		session->simulation_active = false;
 		session->t = 0;
 		session->graph->reset_state();
 		update_menu();
 	});
 	win->event("simulation-step", [this] {
-		simulation_active = false;
+		session->simulation_active = false;
 		artemis::graph::iterate_simulation(session);
 		update_menu();
 	});
@@ -60,9 +60,9 @@ ModeDefault::ModeDefault(Session* s) : Mode(s) {
 
 void ModeDefault::update_menu() {
 	auto win = session->win;
-	win->enable("simulation-start", !simulation_active);
-	win->enable("simulation-pause", simulation_active or session->t > 0);
-	win->enable("simulation-stop", simulation_active or session->t > 0);
+	win->enable("simulation-start", !session->simulation_active);
+	win->enable("simulation-pause", session->simulation_active or session->t > 0);
+	win->enable("simulation-stop", session->simulation_active or session->t > 0);
 }
 
 string nice_time(double t, double dt) {

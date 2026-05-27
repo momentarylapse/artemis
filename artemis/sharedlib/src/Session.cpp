@@ -22,14 +22,15 @@
 
 Session* _current_session_ = nullptr;
 
-Session *create_session() {
+Session *create_session(bool with_window) {
 	auto s = new Session;
 	s->storage = new Storage(s);
 	s->data = new artemis::graph::DataGraph(s);
 	s->graph = s->data->graph.get();
-	//s->mode_world = new ModeWorld(s);
-	s->win = new ArtemisWindow(s);
-	xhui::fly(s->win);
+	if (with_window) {
+		s->win = new ArtemisWindow(s);
+		xhui::fly(s->win);
+	}
 	_current_session_ = s;
 	artemis::processing::pool::init();
 	return s;
@@ -280,6 +281,7 @@ void Session::add_message(Message::Type type, const string &message) {
 	messages.add({type, message});
 	win->request_redraw();
 	xhui::run_later(3.0f, [this] {
+		msg_write("REM");
 		remove_message();
 	});
 }

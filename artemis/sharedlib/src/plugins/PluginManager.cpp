@@ -41,6 +41,9 @@ extern Session* _current_session_;
 
 void start_session_load_file(Session* s, const Path& filename);
 void start_session_empty(Session* s);
+void session_load_file(Session* s, const Path& filename);
+void init_graphics_stuff(Session* session, xhui::Painter* pp);
+void add_default_graph(Session* s);
 void app_run();
 
 namespace artemis {
@@ -156,6 +159,10 @@ Array<float> eval_f32_f32_list(f_f32_f32* f, const Array<float>& list) {
 	return out;
 }
 
+dataflow::Node* xxx_create_node(const string& name) {
+	return graph::create_node(current_session(), name);
+}
+
 void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
@@ -163,9 +170,17 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("create_session", &create_session);
 	ext->link_func("start_session_load_file", &start_session_load_file);
 	ext->link_func("start_session_empty", &start_session_empty);
+	ext->link_func("session_load_file", &session_load_file);
+	ext->link_func("init_graphics_stuff", &init_graphics_stuff);
+	ext->link_func("add_default_graph", &add_default_graph);
 	ext->link_func("app_run", &app_run);
 	ext->link_func("tex_white", &get_tex_white);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
+	ext->link_func("spline_curve", &DrawingHelper::spline);
+	ext->link_func("iterate_simulation", &graph::iterate_simulation);
+	ext->link_func("enumerate_nodes", &graph::enumerate_nodes);
+	ext->link_func("port_type_match", &dataflow::port_type_match);
+	ext->link_func("create_node", &xxx_create_node);
 	ext->link_func("test_done", &test_done);
 	ext->link_func("gradient", &processing::gradient);
 	ext->link_func("divergence", &processing::divergence);
@@ -336,11 +351,20 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
+	ext->declare_class_element("Session.graph_con", &Session::data);
 	ext->declare_class_element("Session.t", &Session::t);
 	ext->declare_class_element("Session.dt", &Session::dt);
+	ext->declare_class_element("Session.simulation_active", &Session::simulation_active);
+	ext->declare_class_element("Session.simulation_update_dt", &Session::simulation_update_dt);
 	ext->declare_class_element("Session.drawing_helper", &Session::drawing_helper);
 	ext->declare_class_element("Session.ctx", &Session::ctx);
 	ext->declare_class_element("Session.win", &Session::win);
+	ext->declare_class_element("Session.promise_started", &Session::promise_started);
+	ext->declare_class_element("Session.messages", &Session::messages);
+	ext->link_class_func("Session.info", &Session::info);
+	ext->link_class_func("Session.warning", &Session::warning);
+	ext->link_class_func("Session.error", &Session::error);
+	ext->link_class_func("Session.remove_message", &Session::remove_message);
 
 	ext->declare_class_size("ArtemisWindow", sizeof(ArtemisWindow));
 	ext->declare_class_element("ArtemisWindow.ind", &ArtemisWindow::_internal_node_data);
@@ -349,6 +373,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	{
 		dataflow::Node n("");
 		ext->declare_class_size("Node", sizeof(dataflow::Node));
+		ext->declare_class_element("Node.pos", &dataflow::Node::pos);
+		ext->declare_class_element("Node.in_ports", &dataflow::Node::in_ports);
+		ext->declare_class_element("Node.out_ports", &dataflow::Node::out_ports);
 		ext->declare_class_element("Node.name", &dataflow::Node::name);
 		ext->declare_class_element("Node.channel", &dataflow::Node::channel);
 		ext->declare_class_element("Node._state", &dataflow::Node::state);
@@ -368,12 +395,20 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	}
 	{
 		ext->declare_class_size("InPortBase", sizeof(dataflow::InPortBase));
+		ext->declare_class_element("InPortBase.owner", &dataflow::InPortBase::owner);
+		ext->declare_class_element("InPortBase.name", &dataflow::InPortBase::name);
+		ext->declare_class_element("InPortBase.flags", &dataflow::InPortBase::flags);
+		ext->declare_class_element("InPortBase.type", &dataflow::InPortBase::type);
 		ext->link_class_func("InPortBase.__init2__", &kaba::generic_init_ext<dataflow::InPortBase, dataflow::Node*, const string&, const kaba::Class*, dataflow::PortFlags>);
 		ext->link_class_func("InPortBase.mutated", &dataflow::InPortBase::mutated);
 		ext->link_class_func("InPortBase.generic_values", &dataflow::InPortBase::generic_values);
 	}
 	{
 		ext->declare_class_size("OutPortBase", sizeof(dataflow::OutPortBase));
+		ext->declare_class_element("OutPortBase.owner", &dataflow::OutPortBase::owner);
+		ext->declare_class_element("OutPortBase.name", &dataflow::OutPortBase::name);
+		ext->declare_class_element("OutPortBase.flags", &dataflow::OutPortBase::flags);
+		ext->declare_class_element("OutPortBase.type", &dataflow::OutPortBase::type);
 		ext->declare_class_element("OutPortBase.has_value", &dataflow::OutPortBase::has_value);
 		ext->link_class_func("OutPortBase.__init2__", &kaba::generic_init_ext<dataflow::OutPortBase, dataflow::Node*, const string&, const kaba::Class*, void*, dataflow::PortFlags>);
 		ext->link_class_func("OutPortBase.generic_set", &dataflow::OutPortBase::generic_set);
@@ -388,12 +423,35 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("SettingBase.__delete__", &kaba::generic_delete<dataflow::SettingBase>);
 	ext->link_class_func("SettingBase.generic_set", &dataflow::SettingBase::generic_set);
 
+
+	ext->declare_class_size("CableInfo", sizeof(dataflow::CableInfo));
+	ext->declare_class_element("CableInfo.source", &dataflow::CableInfo::source);
+	ext->declare_class_element("CableInfo.sink", &dataflow::CableInfo::sink);
+	ext->link_class_func("CableInfo.sink_port_no", &dataflow::CableInfo::sink_port_no);
+	ext->link_class_func("CableInfo.source_port_no", &dataflow::CableInfo::source_port_no);
+
 	ext->declare_class_size("Graph", sizeof(dataflow::Graph));
+	ext->declare_class_element("Graph.nodes", &dataflow::Graph::nodes);
+	ext->link_class_func("Graph.cables", &dataflow::Graph::cables);
 	ext->link_class_func("Graph.add_node", &graph_add_node_by_class);
 	ext->link_class_func("Graph.connect", &graph_connect);
 	ext->link_class_func("Graph.clear", &dataflow::Graph::clear);
 	ext->link_class_func("Graph.iterate", &dataflow::Graph::iterate);
 	ext->link_class_func("Graph.group_nodes", &graph_group_nodes);
+	ext->link_class_func("Graph.reset_state", &dataflow::Graph::reset_state);
+
+	ext->declare_class_size("GraphController", sizeof(graph::DataGraph));
+	ext->link_class_func("GraphController.undoable", &graph::DataGraph::undoable);
+	ext->link_class_func("GraphController.redoable", &graph::DataGraph::redoable);
+	ext->link_class_func("GraphController.undo", &graph::DataGraph::undo);
+	ext->link_class_func("GraphController.redo", &graph::DataGraph::redo);
+	ext->link_class_func("GraphController.remove_nodes", &graph::DataGraph::remove_nodes);
+	ext->link_class_func("GraphController.connect", &graph::DataGraph::connect);
+	ext->link_class_func("GraphController.unconnect", &graph::DataGraph::unconnect);
+	ext->link_class_func("GraphController.auto_connect", &graph::DataGraph::auto_connect);
+	ext->link_class_func("GraphController.add_node", &graph::DataGraph::add_node);
+	ext->link_class_func("GraphController.group_nodes", &graph::DataGraph::group_nodes);
+	ext->link_class_func("GraphController.move_nodes", &graph::DataGraph::move_nodes);
 
 	// TODO remove when switching to external package!
 	_export_package_yrenderer_internal(ext);

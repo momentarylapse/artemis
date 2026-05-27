@@ -194,7 +194,7 @@ void Graph::reset_state() {
 			n->state = NodeState::Dirty;
 }
 
-	Graph* Graph::group_nodes(const base::set<Node*>& selected_nodes) {
+Graph* Graph::group_nodes(const base::set<Node*>& selected_nodes) {
 	auto _cables = cables();
 
 	auto group = new Graph();

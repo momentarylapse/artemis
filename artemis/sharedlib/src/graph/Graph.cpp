@@ -12,6 +12,7 @@
 #include <action/graph/ActionGraphConnect.h>
 #include <action/graph/ActionGraphUnconnect.h>
 #include <action/graph/ActionNodeSetSetting.h>
+#include <action/graph/ActionNodesMove.h>
 
 namespace artemis {
 	Session* current_session();
@@ -88,5 +89,16 @@ base::expected<int> DataGraph::auto_connect(const dataflow::CableInfo& c) {
 	return 0;
 }
 
-
+dataflow::Graph* DataGraph::group_nodes(const Array<dataflow::Node*>& selected_nodes) {
+	base::set<dataflow::Node*> nodes;
+	for (auto n: selected_nodes)
+		nodes.add(n);
+	return graph->group_nodes(nodes);
 }
+
+void DataGraph::move_nodes(const Array<dataflow::Node*>& selected_nodes, const vec2& delta) {
+	session->data->execute(new ActionNodesMove(selected_nodes, delta));
+}
+
+
+} // namespace artemis::graph

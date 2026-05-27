@@ -1,4 +1,5 @@
 use artemis.*
+use artemis.profiler.*
 use fem.material.*
 
 class Elastic3dFEM extends Node

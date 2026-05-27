@@ -26,6 +26,8 @@ public:
 	base::expected<int> connect(const dataflow::CableInfo& cable);
 	void unconnect(const dataflow::CableInfo& cable);
 	base::expected<int> auto_connect(const dataflow::CableInfo& c);
+	dataflow::Graph* group_nodes(const Array<dataflow::Node*>& selected_nodes);
+	void move_nodes(const Array<dataflow::Node*>& selected_nodes, const vec2& delta);
 };
 
 }

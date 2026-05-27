@@ -56,6 +56,35 @@ namespace yrenderer {
 	}
 }
 
+void init_graphics_stuff(Session* session, xhui::Painter* pp) {
+
+	auto dir = artemis::PluginManager::directory() | "static";
+	session->texture_manager = new yrenderer::TextureManager(session->ctx->context, dir);
+	session->shader_manager = new yrenderer::ShaderManager(session->ctx->context, dir | "shader");
+	session->ctx->shader_manager = session->shader_manager;
+	session->ctx->texture_manager = session->texture_manager;
+	session->shader_manager->default_shader = "default.shader";
+	session->material_manager = new yrenderer::MaterialManager(session->ctx->texture_manager, "");
+	session->ctx->material_manager = session->material_manager;
+	session->drawing_helper = new DrawingHelper(pp->context, session->ctx);
+	try {
+		session->shader_manager->load_shader_module("module-basic-data.shader");
+		session->shader_manager->load_shader_module("module-basic-interface.shader");
+		session->shader_manager->load_shader_module("module-vertex-default.shader");
+		session->shader_manager->load_shader_module("module-vertex-animated.shader");
+		session->shader_manager->load_shader_module("module-light-sources-default.shader");
+		session->shader_manager->load_shader_module("module-shadows-pcf.shader");
+		session->shader_manager->load_shader_module("module-lighting-pbr.shader");
+		session->shader_manager->load_shader_module("forward/module-surface.shader");
+	} catch(Exception& e) {
+		msg_error(e.message());
+	}
+
+	//		engine.file_errors_are_critical = false;
+	//		engine.ignore_missing_files = true;
+	//		engine.resource_manager = session->resource_manager;
+}
+
 
 ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppName, 1024, 768),
 	in_redraw(this, [this] {
@@ -165,31 +194,7 @@ Dialog x x padding=0
 	event_xp("canvas-overlay", xhui::event_id::Initialize, [this] (Painter* p) {
 		auto pp = (xhui::Painter*)p;
 		session->ctx = yrenderer::api_init_xhui(pp);
-		auto dir = artemis::PluginManager::directory() | "static";
-		session->texture_manager = new yrenderer::TextureManager(session->ctx->context, dir);
-		session->shader_manager = new yrenderer::ShaderManager(session->ctx->context, dir | "shader");
-		session->ctx->shader_manager = session->shader_manager;
-		session->ctx->texture_manager = session->texture_manager;
-		session->shader_manager->default_shader = "default.shader";
-		session->material_manager = new yrenderer::MaterialManager(session->ctx->texture_manager, "");
-		session->ctx->material_manager = session->material_manager;
-		session->drawing_helper = new DrawingHelper(pp->context, session->ctx);
-		try {
-			session->shader_manager->load_shader_module("module-basic-data.shader");
-			session->shader_manager->load_shader_module("module-basic-interface.shader");
-			session->shader_manager->load_shader_module("module-vertex-default.shader");
-			session->shader_manager->load_shader_module("module-vertex-animated.shader");
-			session->shader_manager->load_shader_module("module-light-sources-default.shader");
-			session->shader_manager->load_shader_module("module-shadows-pcf.shader");
-			session->shader_manager->load_shader_module("module-lighting-pbr.shader");
-			session->shader_manager->load_shader_module("forward/module-surface.shader");
-		} catch(Exception& e) {
-			msg_error(e.message());
-		}
-
-//		engine.file_errors_are_critical = false;
-//		engine.ignore_missing_files = true;
-//		engine.resource_manager = session->resource_manager;
+		init_graphics_stuff(session, pp);
 
 		session->promise_started(session);
 	});

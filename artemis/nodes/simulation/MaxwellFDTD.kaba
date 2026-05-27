@@ -1,4 +1,6 @@
 use artemis.*
+use artemis.profiler.*
+
 
 class MaxwellFDTD extends Node
 	var in_e = InPort[VectorField](self, "e", PortFlags.MUTABLE)

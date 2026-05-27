@@ -27,6 +27,9 @@ class extern Node
 	func extern virtual mut create_panel() -> void*
 	func extern mut set(key: string, value: Any)
 	var name: string
+	var in_ports: InPortBase&[]
+	var out_ports: OutPortBase&[]
+	var pos: vec2
 	var channel: i32
 	var flags: NodeFlags
 	var _state: NodeState
@@ -44,6 +47,10 @@ class extern InPortBase
 	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, flags = PortFlags.NONE)
 	func extern generic_values() -> GenericData[]
 	func extern mut mutated()
+	var name: string
+	var owner: Node&
+	var type: kaba.Class* # filter, can be null
+	var flags: PortFlags
 
 
 class extern OutPortBase
@@ -51,6 +58,10 @@ class extern OutPortBase
 	func extern mut __init2__(node: Node, name: string, type: kaba.Class*, value: void*, flags = PortFlags.NONE)
 	func extern mut generic_set(p: void*)
 	func extern mut mutated()
+	var name: string
+	var owner: Node&
+	var type: kaba.Class* # never null!
+	var flags: PortFlags
 	var has_value: bool
 
 
@@ -110,9 +121,39 @@ class Setting[X] extends SettingBase
 		generic_set(&self.value)
 
 
+struct extern CableInfo
+	var source: OutPortBase&
+	var sink: InPortBase&
+	func extern source_port_no() -> i32
+	func extern sink_port_no() ->i32
+
+
 class extern Graph
+	var nodes: Node&[]
+	func extern cables() -> CableInfo[]
 	func extern mut clear()
 	func extern mut add_node(name: string, pos: vec2) -> Node&
 	func extern mut connect(source: Node&, source_port: i32, sink: Node&, sink_port: i32)
-	func extern mut iterate()
+	func extern mut iterate() -> bool
 	func extern mut group_nodes(nodes: Node&[]) -> Graph&
+	func extern mut reset_state()
+
+
+func extern create_node(type: string) -> xfer[Node]
+func extern enumerate_nodes(category=0) -> string[]
+func extern port_type_match(source: OutPortBase&, sink: InPortBase&) -> bool
+
+
+class extern GraphController
+	func extern undoable() -> bool
+	func extern redoable() -> bool
+	func extern mut undo()
+	func extern mut redo()
+	func extern mut add_node(node: xfer[Node])
+	func extern mut remove_nodes(nodes: Node&[])
+	func extern mut connect(c: CableInfo) -> i32?
+	func extern mut unconnect(c: CableInfo)
+	func extern mut auto_connect(c: CableInfo) -> i32?
+	func extern mut group_nodes(nodes: Node&[]) -> Graph&
+	func extern mut move_nodes(nodes: Node&[], delta: vec2)
+

@@ -93,14 +93,13 @@ Dialog x x padding=0
 
 
 	func mut build() -> bool
-		if not session.ctx
-			return false
-	
-		if not weak(render_target)
-			render_target = new yrenderer.XhuiRenderer(session.ctx)
-			render_path = new yrenderer.RenderPathForward(session.ctx, 2048)
-			render_target!.add_child(render_path!)
-		return true
+		for ctx in session.ctx
+			if not weak(render_target)
+				render_target = new yrenderer.XhuiRenderer(&ctx)
+				render_path = new yrenderer.RenderPathForward(&ctx, 2048)
+				render_target!.add_child(render_path!)
+			return true
+		return false
 
 
 	func mut on_just_before_draw(out p: Painter)

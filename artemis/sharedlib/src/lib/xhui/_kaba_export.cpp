@@ -5,6 +5,7 @@
 #include "Resource.h"
 #include "Window.h"
 #include "Theme.h"
+#include "TextLayout.h"
 #include "dialogs/FileSelectionDialog.h"
 #include "../kapi/KabaExporter.h"
 #include "../base/callable.h"
@@ -94,7 +95,19 @@ void _dummy() {}
 
 
 void export_package_xhui(kaba::IExporter* e) {
-	e->package_info("xhui", "0.13");
+	e->package_info("xhui", "0.14");
+
+	e->declare_class_size("TextLayout", sizeof(xhui::TextLayout));
+	e->declare_class_element("TextLayout.box", &xhui::TextLayout::box);
+	e->link_class_func("TextLayout.__init__", &kaba::generic_init<xhui::TextLayout>);
+	e->link_class_func("TextLayout.__delete__", &kaba::generic_delete<xhui::TextLayout>);
+	e->link_class_func("TextLayout.__assign__", &kaba::generic_assign<xhui::TextLayout>);
+	e->link_func("TextLayout.from_format_string", &xhui::TextLayout::from_format_string);
+
+
+	e->link_func("draw_text_layout", &xhui::draw_text_layout);
+	e->link_func("draw_text_layout_with_box", &xhui::draw_text_layout_with_box);
+
 
 	e->declare_class_size("Menu", sizeof(xhui::Menu));
 	e->link_class_func("Menu.__init__", &kaba::generic_init<xhui::Menu>);
@@ -278,8 +291,13 @@ void export_package_xhui(kaba::IExporter* e) {
 	}
 
 	{
+		e->declare_class_size("Window.Drag", sizeof(xhui::Window::Drag));
+		e->declare_class_element("Window.Drag.title", &xhui::Window::Drag::title);
+		e->declare_class_element("Window.Drag.payload", &xhui::Window::Drag::payload);
+
 		xhui::Window win("", 0, 0, xhui::Flags::FAKE);
 		e->declare_class_size("Window", sizeof(xhui::Window));
+		e->declare_class_element("Window.drag", &xhui::Window::drag);
 		e->link_class_func("Window.__init__", &kaba::generic_init_ext<xhui::Window, const string&, int, int>);
 		e->link_virtual("Window.__delete__", &xhui::Window::__delete__, &win);
 		e->link_class_func("Window.destroy", &xhui::Window::request_destroy);
@@ -312,6 +330,7 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->link_class_func("Window.left_button", &KabaWindowWrapper::left_button);
 		e->link_class_func("Window.middle_button", &KabaWindowWrapper::middle_button);
 		e->link_class_func("Window.right_button", &KabaWindowWrapper::right_button);
+		e->link_class_func("Window.start_drag", &xhui::Window::start_drag);
 	}
 
 	{
@@ -491,6 +510,9 @@ void export_package_xhui(kaba::IExporter* e) {
 #endif
 
 	e->declare_class_size("Theme", sizeof(xhui::Theme));
+	e->declare_class_element("Theme.font_size", &xhui::Theme::font_size);
+	e->declare_class_element("Theme.font_size_small", &xhui::Theme::font_size_small);
+	e->declare_class_element("Theme.font_size_big", &xhui::Theme::font_size_big);
 	e->declare_class_element("Theme.background", &xhui::Theme::background);
 	e->declare_class_element("Theme.background_button", &xhui::Theme::background_button);
 	e->declare_class_element("Theme.background_button_primary", &xhui::Theme::background_button_primary);

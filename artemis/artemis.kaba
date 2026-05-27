@@ -1,5 +1,6 @@
 use kaba
 use os.Path
+use xhui
 use .data.*
 use .grid.*
 use .fields.*
@@ -14,7 +15,51 @@ let EXPORT_IMPORTS = true
 func extern iso_surface(s: ScalarField, t0: f32) -> Mesh
 
 
+class Artemis
+	var session: Session&
+	var filename: Path
+
+	func __init__()
+		session := create_session(false)
+		var w = new shared ArtemisWindow(session)
+		session.win := weak(w)
+		xhui.fly(w)
+
+		xhui.run_repeated(f32(session.simulation_update_dt), update)
+		xhui.run_repeated(1.0, func() session.win.request_redraw())
+
+
+	func mut start(args: string[])
+		if len(args) >= 1
+			filename = args[0]
+			xhui.run_later(1.0, func() session_load_file(session, filename))
+		else
+			xhui.run_later(1.0, func() add_default_graph(session))
+
+
+	func mut update()
+		if session.simulation_active
+			iterate_simulation(session)
+		if session.graph.iterate()
+			session.win.request_redraw()
+
+
+	func run()
+		xhui.run()
+
+
+func main_new(args: string[])
+	var a = new Artemis()
+	a.start(args)
+
+	a.run()
+
+
 func main(args: string[])
+	if args[:1] == ["-x"]
+		main_new(args[1:])
+		return
+
 	var s = create_session()
 	if len(args) >= 1
 		start_session_load_file(s, args[0])
