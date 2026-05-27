@@ -16,7 +16,7 @@ struct extern Mesh
 	func extern static create_cube(box: Box, slices: gfx.ivec3) -> Mesh
 
 
-struct extern RenderData
+struct RenderData
 	var active = true
 	var bounding_box: Box?
 	var render_node: void* = nil

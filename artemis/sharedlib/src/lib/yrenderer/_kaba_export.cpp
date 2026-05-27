@@ -317,6 +317,17 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	}
 
 	{
+		ext->declare_class_size("CameraParams", sizeof(CameraParams));
+		ext->declare_class_element("CameraParams.pos", &CameraParams::pos);
+		ext->declare_class_element("CameraParams.ang", &CameraParams::ang);
+		ext->declare_class_element("CameraParams.fov", &CameraParams::fov);
+		ext->declare_class_element("CameraParams.min_depth", &CameraParams::min_depth);
+		ext->declare_class_element("CameraParams.max_depth", &CameraParams::max_depth);
+		ext->link_class_func("CameraParams.projection_matrix", &CameraParams::projection_matrix);
+		ext->link_class_func("CameraParams.view_matrix", &CameraParams::view_matrix);
+	}
+
+	{
 		Renderer renderer(nullptr, "");
 		ext->declare_class_size("Renderer", sizeof(Renderer));
 	//	ext->link_class_func("Renderer.__init__", &renderer);

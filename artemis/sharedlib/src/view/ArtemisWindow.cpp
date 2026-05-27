@@ -20,7 +20,6 @@
 #include "DrawingHelper.h"
 #include "GraphEditor.h"
 #include "CodeEditor.h"
-#include "Canvas.h"
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/yrenderer/ShaderManager.h>
@@ -127,9 +126,6 @@ Dialog x x padding=0
 	embed("left-grid", 0, 0, graph_editor);
 
 	code_editor = new artemis::view::CodeEditor(session, this, "code-editor-grid", artemis::PluginManager::directory());
-
-	canvas = new artemis::view::Canvas();
-	embed("canvas-grid", 0, 0, canvas.get());
 
 #ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;

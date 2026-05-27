@@ -5,7 +5,6 @@
 #include "ModeDefault.h"
 #include <Session.h>
 #include <graph/Graph.h>
-#include <graph/canvas/Canvas.h>
 #include <lib/dataflow/Node.h>
 #include <lib/xhui/dialogs/FileSelectionDialog.h>
 #include <lib/xhui/Theme.h>
@@ -64,13 +63,6 @@ void ModeDefault::update_menu() {
 	win->enable("simulation-start", !simulation_active);
 	win->enable("simulation-pause", simulation_active or session->t > 0);
 	win->enable("simulation-stop", simulation_active or session->t > 0);
-}
-
-artemis::graph::Canvas* get_canvas(dataflow::Graph* graph) {
-	for (auto n: graph->nodes)
-		if (n->flags & dataflow::NodeFlags::Canvas)
-			return static_cast<artemis::graph::Canvas*>(n);
-	return nullptr;
 }
 
 string nice_time(double t, double dt) {

@@ -32,7 +32,6 @@ public:
 
 	xhui::Toolbar* toolbar;
 
-	shared<artemis::view::Canvas> canvas;
 	artemis::view::GraphEditor* graph_editor;
 	artemis::view::CodeEditor* code_editor;
 

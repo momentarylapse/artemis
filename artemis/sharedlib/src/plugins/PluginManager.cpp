@@ -6,6 +6,7 @@
 #include <lib/dataflow/Node.h>
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Type.h>
+#include <lib/dataflow/Setting.h>
 #include <lib/kaba/kaba.h>
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
@@ -23,7 +24,6 @@
 #include <data/util/ColorMap.h>
 #include <graph/Graph.h>
 #include <graph/NodeFactory.h>
-#include <graph/canvas/Canvas.h>
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
 
@@ -34,7 +34,8 @@
 #include <lib/yrenderer/_kaba_export.h>
 #include <lib/yrenderer/Context.h>
 #include <view/DrawingHelper.h>
-#include <view/SceneRenderer.h>
+
+#include "view/ArtemisWindow.h"
 
 extern Session* _current_session_;
 
@@ -322,6 +323,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Grid.bounding_box", &data::Grid::bounding_box);
 
 	ext->declare_class_size("DrawingHelper", sizeof(DrawingHelper));
+	ext->declare_class_element("DrawingHelper.target_area", &DrawingHelper::target_area);
+	ext->declare_class_element("DrawingHelper.projection", &DrawingHelper::projection);
+	ext->declare_class_element("DrawingHelper.view", &DrawingHelper::view);
 	ext->link_class_func("DrawingHelper.set_color", &DrawingHelper::set_color);
 	ext->link_class_func("DrawingHelper.set_line_width", &DrawingHelper::set_line_width);
 	ext->link_class_func("DrawingHelper.draw_lines", &DrawingHelper::draw_lines);
@@ -336,6 +340,10 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("Session.dt", &Session::dt);
 	ext->declare_class_element("Session.drawing_helper", &Session::drawing_helper);
 	ext->declare_class_element("Session.ctx", &Session::ctx);
+	ext->declare_class_element("Session.win", &Session::win);
+
+	ext->declare_class_size("ArtemisWindow", sizeof(ArtemisWindow));
+	ext->declare_class_element("ArtemisWindow.ind", &ArtemisWindow::_internal_node_data);
 
 
 	{
@@ -387,32 +395,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Graph.iterate", &dataflow::Graph::iterate);
 	ext->link_class_func("Graph.group_nodes", &graph_group_nodes);
 
-	{
-		ext->declare_class_size("RendererNode", sizeof(graph::RendererNode));
-		ext->declare_class_element("RendererNode.out_draw", &graph::RendererNode::out_draw);
-		ext->link_class_func("RendererNode.__init__", &kaba::generic_init_ext<graph::RendererNode, const string&>);
-	}
-
-	{
-		ext->declare_class_size("RenderNode", sizeof(view::RenderNode));
-		ext->declare_class_element("RenderNode.session", &view::RenderNode::session);
-		ext->link_class_func("RenderNode.__init__", &kaba::generic_init<view::RenderNode>);
-	}
-
-	{
-		ext->declare_class_size("XSceneRenderer", sizeof(view::SceneRenderer));
-		ext->declare_class_element("XSceneRenderer." + kaba::Identifier::SharedCount, &view::SceneRenderer::_pointer_ref_counter);
-		ext->declare_class_element("XSceneRenderer.render_path", &view::SceneRenderer::render_path);
-		ext->link_class_func("XSceneRenderer.__init__", &kaba::generic_init<view::SceneRenderer>);
-		ext->link_class_func("XSceneRenderer.set_content_bounding_box", &view::SceneRenderer::set_content_bounding_box);
-		ext->link_class_func("XSceneRenderer.build", &view::SceneRenderer::build);
-	}
-
-	ext->declare_class_size("RenderData", sizeof(graph::RenderData));
-	ext->declare_class_element("RenderData.active", &graph::RenderData::active);
-	ext->declare_class_element("RenderData.bounding_box", &graph::RenderData::bounding_box);
-	ext->declare_class_element("RenderData.render_node", &graph::RenderData::render_node);
-
 	// TODO remove when switching to external package!
 	_export_package_yrenderer_internal(ext);
 }
@@ -446,7 +428,6 @@ void PluginManager::import_kaba() {
 	import_component_class<data::VectorField>(mfields, "VectorField");
 	import_component_class<data::MultiComponentField>(mfields, "MultiComponentField");
 	import_component_class<data::ColorMap>(mdata, "ColorMap");
-	import_component_class<graph::RenderData>(mdata, "RenderData");
 	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
 }
 

@@ -9,6 +9,7 @@ enum NodeFlags
 	RESOURCE = 1
 	RENDERER = 2
 	TIME_DEPENDENT = 4
+	META = 8
 
 
 enum NodeState

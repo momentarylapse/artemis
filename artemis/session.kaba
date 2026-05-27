@@ -1,14 +1,22 @@
 use os
+use obs
+use xhui
 use .graph.*
 use .gfx
 use .yrenderer
 
 
 class extern DrawingHelper
+	var target_area: Rect
+	var projection: mat4
+	var view: mat4
 	func extern set_color(c: Color)
 	func extern set_line_width(w: f32)
 	func extern draw_lines(points: vec3[], contiguous: bool)
 	func extern draw_mesh(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, matrix: mat4, vb: gfx.VertexBuffer, material: yrenderer.Material, pass_no=0, vertex_module="default")
+
+
+class extern ArtemisWindow extends xhui.Window as obs.Node
 
 
 class extern Session
@@ -17,6 +25,7 @@ class extern Session
 	var dt: f64
 	var ctx: yrenderer.Context&
 	var drawing_helper: DrawingHelper&
+	var win: ArtemisWindow&
 
 func extern current_session() -> Session&
 

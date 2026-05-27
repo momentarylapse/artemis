@@ -9,11 +9,15 @@ func extern tex_white() -> shared![gfx.Texture]
 
 
 # basic canvas / layout
-class extern RendererNode extends Node
-	var out_draw: OutPort[RenderData]
+class RendererNode extends Node
+	var out_draw = OutPort[RenderData](&self, "draw")
 	var session: Session&
 	var channel_draw: i32
-	func extern override __init__(name: string)
+	func override __init__(name: string)
+		super.__init__(name)
+		session := current_session()
+		flags = NodeFlags.RENDERER
+		channel_draw = profiler.create_channel("{{name}}:draw", channel)
 
 
 
@@ -61,14 +65,10 @@ class RenderEmitterNode extends Node
 
 
 
-class extern RenderNode extends xhui.Panel
+class RenderNode extends xhui.Panel
 	var session: Session&
-	func extern mut __init__()
+	func mut __init__()
+		super.__init__(p2s(&self))
+		session := current_session()
 
 
-class extern XSceneRenderer extends RenderNode
-	var render_path: owned![yrenderer.RenderPath]
-
-	func extern mut override __init__()
-	func extern mut set_content_bounding_box(b: Box)
-	func extern mut build() -> bool

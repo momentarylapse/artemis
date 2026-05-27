@@ -176,7 +176,6 @@ add_library(moduleartemis SHARED
 	src/data/grid/UnstructuredGrid.cpp
 	src/data/util/ColorMap.cpp
 	src/data/Data.cpp
-	src/graph/canvas/Canvas.cpp
 	src/graph/field/MultiComponentField.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
@@ -477,14 +476,12 @@ add_library(moduleartemis SHARED
 	src/storage/Storage.cpp
 	src/view/dialog/ColorMapDialog.cpp
 	src/view/ArtemisWindow.cpp
-	src/view/Canvas.cpp
 	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
 	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
 	src/view/NodeListPanel.cpp
-	src/view/SceneRenderer.cpp
 	src/Artemis.cpp
 	src/LibExport.cpp
 	src/ModeDefault.cpp

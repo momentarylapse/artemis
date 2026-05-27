@@ -1,18 +1,195 @@
 use artemis.render
 use artemis.data.*
 use artemis.graph.*
+use artemis.yrenderer
+use image.Painter
+use xhui
+
+
+func scale_area(area: Rect, scale: f32) -> Rect
+	return Rect(area.p00() * scale, area.p11() * scale)
+
+
+struct ViewPort
+	var pos: vec3
+	var ang: Quaternion
+	var radius: f32
+	var fov: f32
+	var defined_by_user = false
+
+	func mut move(dpos: vec3)
+		pos += ang * (dpos * radius)
+		defined_by_user = true
+	func mut rotate(dq: Quaternion)
+		ang = ang * dq
+		defined_by_user = true
+	func mut zoom(factor: f32)
+		radius *= factor
+		defined_by_user = true
+	func mut focus_on_box(box: Box)
+		pos = box.center()
+		radius = len(box.size()) * 2
+		defined_by_user = true
+	func params() -> yrenderer.CameraParams
+		return [pos - ang * vec3(0,0,radius), ang, fov, radius * 0.01, radius * 100.0]
+
+
+class extern ZSceneRenderer extends render.RenderNode
+	var render_target: owned[yrenderer.XhuiRenderer]
+	var render_path: owned[yrenderer.RenderPath]
+	var lights: yrenderer.YLight[]
+
+	var view_port: ViewPort
+
+	enum MouseMode
+		NONE
+		ROTATE
+		MOVE
+	var mode = MouseMode.NONE
+
+	func mut override __init__()
+		from_source("
+Dialog x x padding=0
+		Overlay ? ''
+			DrawingArea area '' grabfocus
+			Grid overlay-main-grid '' margin=25
+				Grid ? ''
+					Label ? '' ignorehover expandx
+					Grid overlay-button-grid-right '' spacing=20
+						Button cam-rotate 'R' image=rf-rotate height=50 width=50 padding=7 noexpandx ignorefocus
+						---|
+						Button cam-move 'M' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
+				---|
+				Label ? '' ignorehover expandy
+")
+
+		view_port.pos = [0,0,0]
+		view_port.ang = Quaternion.ID
+		view_port.radius = 5
+		view_port.fov = pi / 4
+
+		lights.resize(1)
+		lights[0].init(yrenderer.LightType.DIRECTIONAL, Color.WHITE)
+		lights[0].ang = Quaternion.ID
+
+		session.win.event_x(session.win.id, "hui:just-before-draw", on_just_before_draw)
+		event_x("area", "hui:draw", on_draw)
+
+		event_x("area", "hui:mouse-move", _on_mouse_move)
+#		event_x("area", "hui:left-button-down", func() mode = MouseMode.ROTATE)
+		event_x("area", "hui:left-button-up", func() mode = MouseMode.NONE)
+		event_x("area", "hui:middle-button-down", func() mode = MouseMode.MOVE)
+		event_x("area", "hui:middle-button-up", func() mode = MouseMode.NONE)
+		event_x("area", "hui:right-button-down", func() mode = MouseMode.ROTATE)
+		event_x("area", "hui:right-button-up", func() mode = MouseMode.NONE)
+		event_x("area", "hui:mouse-wheel", _on_mouse_wheel)
+
+		event_x("cam-move", "hui:left-button-down", func() get_window()!.set_mouse_mode(0))
+		event_x("cam-move", "hui:left-button-up", func() get_window()!.set_mouse_mode(1))
+		event_x("cam-move", "hui:mouse-move", on_cam_move_mouse_move)
+		event_x("cam-rotate", "hui:left-button-down", func() get_window()!.set_mouse_mode(0))
+		event_x("cam-rotate", "hui:left-button-up", func() get_window()!.set_mouse_mode(1))
+		event_x("cam-rotate", "hui:mouse-move", on_cam_rotate_mouse_move)
+
+
+	func mut build() -> bool
+		if not session.ctx
+			return false
+	
+		if not weak(render_target)
+			render_target = new yrenderer.XhuiRenderer(session.ctx)
+			render_path = new yrenderer.RenderPathForward(session.ctx, 2048)
+			render_target!.add_child(render_path!)
+		return true
+
+
+	func mut on_just_before_draw(out p: Painter)
+		var pp = &p as xhui.Painter&
+		let a0 = pp.area()
+		let na0 = pp.native_area
+		pp._area = area
+		pp.native_area = scale_area(area, pp.ui_scale)
+		on_pre_draw(p)
+		pp._area = a0
+		pp.native_area = na0
+
+
+	func mut on_pre_draw(out p: Painter)
+		for mut rt in render_target
+			for mut rp in render_path
+				rp.set_view(view_port.params())
+				lights[0].ang = view_port.ang
+				rp.set_lights([&lights[0]])
+		
+				set_drawing_helper()
+		
+				rt.before_draw(&p)
+
+
+	func mut on_draw(out p: Painter)
+		for mut rt in render_target
+			set_drawing_helper()
+			rt.draw(&p)
+
+
+	func mut _on_mouse_move()
+		for w in get_window()
+			let d = w.get_mouse_delta()
+			if mode == MouseMode.ROTATE
+				view_port.rotate(Quaternion(vec3(d.y, d.x, 0.0) * 0.003))
+				request_redraw()
+			else if mode == MouseMode.MOVE
+				view_port.move(vec3(-d.x, d.y, 0.0) * 0.001)
+				request_redraw()
+
+
+	func mut _on_mouse_wheel()
+		view_port.zoom(exp(-0.1 * get_window()!.get_scroll().y))
+		request_redraw()
+
+
+	func mut on_cam_move_mouse_move()
+		for w in get_window()
+			let d = w.get_mouse_delta()
+			if w.left_button()
+					if w.is_key_pressed(xhui.KEY_SHIFT)
+						view_port.move(vec3(0,0,d.y) / 800.0)
+					else
+						view_port.move(vec3(-d.x, d.y, 0) / 800.0)
+					request_redraw()
+
+
+	func mut on_cam_rotate_mouse_move()
+		for w in get_window()
+			let d = w.get_mouse_delta()
+			if w.left_button()
+				view_port.rotate(Quaternion([d.y*0.003, d.x*0.003, 0]))
+				request_redraw()
+
+
+	func mut set_content_bounding_box(b: Box)
+		if not view_port.defined_by_user
+			view_port.focus_on_box(b)
+
+
+	func mut set_drawing_helper()
+		session.drawing_helper.target_area = area
+		session.drawing_helper.projection = view_port.params().projection_matrix(area.width() / area.height())
+		session.drawing_helper.view = view_port.params().view_matrix()
+
+
 
 
 class SceneRenderer extends render.RendererNode
 	var in_draw = InPort[render.DrawCall](&self, "draw", PortFlags.MULTI)
 	var background = Setting[Color](&self, "background", Color(-1,-1,-1,-1))
 
-	var scene_renderer: shared![render.XSceneRenderer]
+	var scene_renderer: shared![ZSceneRenderer]
 
 
 	func __init__()
 		super.__init__("SceneRenderer")
-		scene_renderer = new render.XSceneRenderer()
+		scene_renderer = new ZSceneRenderer()
 		_state = NodeState.UNINITIALIZED
 		background.set(Color(0.2,0.2,0.2,1))
 
@@ -23,27 +200,28 @@ class SceneRenderer extends render.RendererNode
 
 
 	func override on_process()
-		scene_renderer.render_path.remove_all_emitters()
-		scene_renderer.render_path.background_color = background()
-
-		var box: Box?
-		for x in in_draw.values()
-			if x.active
-				if weak(x.emitter)
-					if x.transparent
-						scene_renderer.render_path.add_transparent_emitter(x.emitter!)
-					else
-						scene_renderer.render_path.add_opaque_emitter(x.emitter!)
-
-					for b in x.bounding_box
-						for bb in box
-							box = bb or b
+		for mut rp in scene_renderer.render_path
+			rp.remove_all_emitters()
+			rp.background_color = background()
+	
+			var box: Box?
+			for x in in_draw.values()
+				if x.active
+					if weak(x.emitter)
+						if x.transparent
+							rp.add_transparent_emitter(x.emitter!)
 						else
-							box = b
+							rp.add_opaque_emitter(x.emitter!)
 	
-		for b in box
-			scene_renderer.set_content_bounding_box(b)
-	
-		var d: RenderData
-		d.render_node = weak(scene_renderer)
-		out_draw.set(d)
+						for b in x.bounding_box
+							for bb in box
+								box = bb or b
+							else
+								box = b
+		
+			for b in box
+				scene_renderer.set_content_bounding_box(b)
+		
+			var d: RenderData
+			d.render_node = weak(scene_renderer)
+			out_draw.set(d)

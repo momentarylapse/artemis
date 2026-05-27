@@ -58,6 +58,18 @@ namespace hui{
 			event_xp(id, msg, [&ff](Painter *p){ ff(p); });
 		}
 	};
+	class KabaWindowWrapper : public xhui::Window {
+	public:
+		bool left_button() {
+			return state.lbut;
+		}
+		bool middle_button() {
+			return state.mbut;
+		}
+		bool right_button() {
+			return state.rbut;
+		}
+	};
 	class KabaListViewColumnFactoryWrapper: public xhui::ListView::ColumnFactory {
 	public:
 		void set_create(Callable<xhui::Control*(const string&)>& f) {
@@ -104,6 +116,8 @@ void export_package_xhui(kaba::IExporter* e) {
 	{
 		xhui::Control ctrl("");
 		e->declare_class_size("Control", sizeof(xhui::Control));
+		e->declare_class_element("Control.id", &xhui::Control::id);
+		e->declare_class_element("Control.area", &xhui::Control::area);
 		e->link_class_func("Control.request_redraw", &xhui::Control::request_redraw);
 		e->link_class_func("Control.get_window", &xhui::Control::get_window);
 
@@ -289,9 +303,15 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->link_class_func("Window.redraw", &xhui::Window::redraw);
 		e->link_class_func("Window.set_key_code", &xhui::Window::set_key_code);
 		e->link_class_func("Window.request_destroy", &xhui::Window::request_destroy);
+		e->link_class_func("Window.set_mouse_mode", &xhui::Window::set_mouse_mode);
 		e->link_class_func("Window.get_mouse_position", &xhui::Window::mouse_position);
+		e->link_class_func("Window.get_mouse_delta", &xhui::Window::mouse_delta);
+		e->link_class_func("Window.get_scroll", &xhui::Window::get_scroll);
 		e->link_class_func("Window.get_key_code", &xhui::Window::get_key_code);
 		e->link_class_func("Window.is_key_pressed", &xhui::Window::is_key_pressed);
+		e->link_class_func("Window.left_button", &KabaWindowWrapper::left_button);
+		e->link_class_func("Window.middle_button", &KabaWindowWrapper::middle_button);
+		e->link_class_func("Window.right_button", &KabaWindowWrapper::right_button);
 	}
 
 	{
@@ -305,6 +325,9 @@ void export_package_xhui(kaba::IExporter* e) {
 	
 
 	xhui::Painter painter(nullptr, nullptr, rect::ID, rect::ID);
+	e->declare_class_element("Painter._area", &xhui::Painter::_area);
+	e->declare_class_element("Painter.native_area", &xhui::Painter::native_area);
+	e->declare_class_element("Painter.ui_scale", &xhui::Painter::ui_scale);
 	e->link_func("Painter.__init__", &_dummy); // dummy
 	e->link_virtual("Painter.__delete__", &kaba::generic_virtual<xhui::Painter>::__delete__, &painter);
 

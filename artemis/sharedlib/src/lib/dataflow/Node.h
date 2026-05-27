@@ -36,8 +36,7 @@ enum class NodeFlags {
 	Resource = 1,
 	Renderer = 2,
 	TimeDependent = 4,
-	Canvas = 8,
-	Meta = 16
+	Meta = 8
 };
 NodeFlags operator|(NodeFlags a, NodeFlags b);
 bool operator&(NodeFlags a, NodeFlags b);
