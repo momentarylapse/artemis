@@ -95,7 +95,7 @@ void _dummy() {}
 
 
 void export_package_xhui(kaba::IExporter* e) {
-	e->package_info("xhui", "0.14");
+	e->package_info("xhui", "0.15");
 
 	e->declare_class_size("TextLayout", sizeof(xhui::TextLayout));
 	e->declare_class_element("TextLayout.box", &xhui::TextLayout::box);
@@ -245,6 +245,7 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->link_class_func("Panel.add_control", &xhui::Panel::add_control);
 		e->link_class_func("Panel.embed", &xhui::Panel::embed);
 		e->link_class_func("Panel.unembed", &xhui::Panel::unembed);
+		e->link_class_func("Panel.set_target", &xhui::Panel::set_target);
 		e->link_class_func("Panel.set_string", &xhui::Panel::set_string);
 		e->link_class_func("Panel.add_string", &xhui::Panel::add_string);
 		e->link_class_func("Panel.get_string", &xhui::Panel::get_string);

@@ -8,6 +8,7 @@
 #include <lib/dataflow/Type.h>
 #include <lib/dataflow/Setting.h>
 #include <lib/kaba/kaba.h>
+#include <lib/kaba/lib/future.h>
 #include <lib/math/vec2.h>
 #include <lib/math/rect.h>
 #include <lib/os/app.h>
@@ -36,6 +37,7 @@
 #include <view/DrawingHelper.h>
 
 #include "view/ArtemisWindow.h"
+#include "view/dialog/ColorMapDialog.h"
 
 extern Session* _current_session_;
 
@@ -190,6 +192,10 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("iso_surface", &processing::iso_surface);
 
+	ext->link_class_func("future[ColorMap].__delete__", &kaba::generic_delete<base::future<data::ColorMap>>);
+	ext->link_class_func("future[ColorMap].then", &kaba::KabaFuture<data::ColorMap>::kaba_then);
+	ext->link_class_func("future[ColorMap].then_or_fail", &kaba::KabaFuture<data::ColorMap>::kaba_then_or_fail);
+
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
 	ext->link_class_func("Mesh.__delete__", &kaba::generic_delete<PolygonMesh>);
@@ -205,6 +211,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_size("ColorMap", sizeof(data::ColorMap));
 	ext->declare_class_element("ColorMap.colors", &data::ColorMap::colors);
 	ext->declare_class_element("ColorMap.values", &data::ColorMap::values);
+	ext->link_class_func("ColorMap.get", &data::ColorMap::get);
+	ext->link_class_func("ColorMap.min", &data::ColorMap::min);
+	ext->link_class_func("ColorMap.max", &data::ColorMap::max);
 	ext->link("default_color_map", (void*)&data::ColorMap::_default);
 	ext->link("default_color_map_transparent", (void*)&data::ColorMap::_default_transparent);
 
@@ -372,6 +381,8 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 		ext->declare_class_element("Node.pos", &dataflow::Node::pos);
 		ext->declare_class_element("Node.in_ports", &dataflow::Node::in_ports);
 		ext->declare_class_element("Node.out_ports", &dataflow::Node::out_ports);
+		ext->declare_class_element("Node.settings", &dataflow::Node::settings);
+		ext->declare_class_element("Node.graph", &dataflow::Node::graph);
 		ext->declare_class_element("Node.name", &dataflow::Node::name);
 		ext->declare_class_element("Node.channel", &dataflow::Node::channel);
 		ext->declare_class_element("Node._state", &dataflow::Node::state);
@@ -414,6 +425,8 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_size("SettingBase", sizeof(dataflow::SettingBase));
 	ext->declare_class_element("SettingBase.name", &dataflow::SettingBase::name);
 	ext->declare_class_element("SettingBase.type", &dataflow::SettingBase::type);
+	ext->declare_class_element("SettingBase.owner", &dataflow::SettingBase::owner);
+	ext->declare_class_element("SettingBase.options", &dataflow::SettingBase::options);
 	ext->declare_class_element("SettingBase.generic_value_pointer", &dataflow::SettingBase::generic_value_pointer);
 	ext->link_class_func("SettingBase.__init2__", &kaba::generic_init_ext<dataflow::SettingBase, dataflow::Node*, const string&, const kaba::Class*, void*, const string&>);
 	ext->link_class_func("SettingBase.__delete__", &kaba::generic_delete<dataflow::SettingBase>);
@@ -448,6 +461,11 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("GraphController.add_node", &graph::DataGraph::add_node);
 	ext->link_class_func("GraphController.group_nodes", &graph::DataGraph::group_nodes);
 	ext->link_class_func("GraphController.move_nodes", &graph::DataGraph::move_nodes);
+	ext->link_class_func("GraphController.node_set_setting", &graph::DataGraph::node_set_setting);
+
+
+	ext->declare_class_size("ColorMapDialog", sizeof(ColorMapDialog));
+	ext->link_func("ColorMapDialog.ask", &ColorMapDialog::ask);
 
 	// TODO remove when switching to external package!
 	_export_package_yrenderer_internal(ext);

@@ -1,0 +1,201 @@
+use os
+use xhui
+use image.Painter
+use ..graph.*
+use ..data.*
+use .colormapdialog.*
+
+func list_find[X](list: X[], v: X) -> i32?
+	for i=>x in list
+		if x == v
+			return i
+	return nil
+
+
+func nice_path(p: os.Path) -> string
+	if p in os.fs.home_directory
+		return "~/" + str(p.relative_to(os.fs.home_directory))
+	return str(p)
+
+
+
+class SettingPanel extends xhui.Panel
+	var s: SettingBase&
+	var g: GraphController&
+	func __init__(_s: SettingBase&, _g: GraphController&)
+		super.__init__("setting")
+		s := _s
+		g := _g
+	func virtual mut build()
+
+
+class SettingPanelDummy extends SettingPanel
+	func override build()
+		add_control("Label", "({{s.type.name}})", 0, 0, "label")
+
+
+class SettingPanelFloat extends SettingPanel
+	func override build()
+		var ss = s.to[f64]()
+		add_control("SpinButton", "", 0, 0, "spin")
+		set_options("spin", "expandx")
+		for _ in s.options.find("range=")
+			set_options("spin", s.options)
+		else
+			set_options("spin", "range=::0.001")
+		set_float("spin", f32((*ss)()))
+		event("spin", func() g.node_set_setting(s.owner, s.name, get_float("spin")))
+
+
+class SettingPanelInt extends SettingPanel
+	func override build()
+		var ss = s.to[i32]()
+		add_control("SpinButton", "", 0, 0, "spin")
+		set_options("spin", "expandx")
+		for _ in s.options.find("range=")
+			set_options("spin", s.options)
+		set_int("spin", (*ss)())
+		event("spin", func() g.node_set_setting(s.owner, s.name, get_int("spin")))
+
+
+class SettingPanelBool extends SettingPanel
+	func override build()
+		var ss = s.to[bool]()
+		add_control("CheckBox", "", 0, 0, "box")
+		set_options("box", "expandx")
+		check("box", (*ss)())
+		event("box", func() g.node_set_setting(s.owner, s.name, is_checked("box")))
+
+
+class SettingPanelString extends SettingPanel
+	func override build()
+		var ss = s.to[string]()
+		add_control("Edit", "", 0, 0, "edit")
+		set_options("edit", "expandx")
+		set_string("edit", (*ss)())
+		event("edit", func() g.node_set_setting(s.owner, s.name, get_string("edit")))
+
+
+class SettingPanelPath extends SettingPanel
+	func override build()
+		var ss = s.to[os.Path]()
+		add_control("Button", "", 0, 0, "edit")
+		set_options("edit", "expandx")
+		set_string("edit", nice_path((*ss)()))
+		event("edit", on_click)
+	func mut on_click()
+		xhui.file_dialog(&self, "File...", "", []).then(on_select)
+	func mut on_select(p: os.Path)
+		g.node_set_setting(s.owner, s.name, str(p))
+		set_string("edit", nice_path(p))
+
+
+class SettingPanelColor extends SettingPanel
+	func override build()
+		var ss = s.to[Color]()
+		add_control("ColorButton", "", 0, 0, "col")
+		set_options("col", "expandx")
+		set_color("col", (*ss)())
+		event("col", func() g.node_set_setting(s.owner, s.name, dyn(get_color("col"))))
+
+
+class SettingPanelColorMap extends SettingPanel
+	var cm: ColorMap
+	func override build()
+		var ss = s.to[ColorMap]()
+		cm = (*ss)()
+
+		add_control("DrawingArea", "", 0, 0, "area")
+		set_options("area", "expandx,noexpandy")
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-up", on_click)
+	func on_draw(out p: Painter)
+		draw_color_map_background(p, cm, cm.min(), cm.max(), p.area())
+	func on_click()
+		ColorMapDialog.ask(&self, cm).then(on_select)
+	func mut on_select(new_cm: ColorMap)
+		cm = new_cm
+		g.node_set_setting(s.owner, s.name, dyn(cm))
+		#ss->set(cm);
+
+
+class SettingPanelList extends SettingPanel
+	func override build()
+		var ss = s.to[f64[]]()
+		add_control("Edit", "", 0, 0, "list")
+		set_options("list", "expandx,disabled")
+		set_string("list", str((*ss)()))
+
+
+class SettingPanelEnum extends SettingPanel
+	var values: i32[]
+	func override build()
+		var ss = s.to[i32]()
+		add_control("ComboBox", "", 0, 0, "box")
+		set_options("box", "expandx")
+		for c in s.type.constants
+			if c.type == s.type
+				values.add(c.as_int())
+				add_string("box", c.name)
+		for index in list_find(values, (*ss)())
+			set_int("box", index)
+		event("box", func() g.node_set_setting(s.owner, s.name, values[get_int("box")]))
+
+
+class SettingPanelEnumLegacy extends SettingPanel
+	var values: i32[]
+	func override build()
+		var ss = s.to[i32]()
+		let xx = s.options[5:].parse_tokens(":,")
+		add_control("ComboBox", "", 0, 0, "box")
+		set_options("box", "expandx")
+		for si in 0:(len(xx) + 2)/4
+			values.add(i32(xx[si*4]))
+			add_string("box", xx[si*4 + 2])
+		for index in list_find(values, (*ss)())
+			set_int("box", index)
+		event("box", func() g.node_set_setting(s.owner, s.name, values[get_int("box")]))
+
+
+class DefaultNodePanel extends xhui.Panel
+	var node: Node&
+
+	func __init__(n: Node&, g: GraphController&)
+		super.__init__("node-panel")
+
+		node := n
+		from_source("
+Dialog x ''
+	Grid node-panel '' class=card
+		Group node-group 'Test'
+			Grid settings-grid ''
+")
+
+		set_string("node-group", node.name)
+
+		for i=>s in node.settings
+			set_target("settings-grid")
+			add_control("Label", s.name, 0, i, "")
+			var panel = new shared SettingPanel(s, g)
+			match s.type
+				f64 => panel = new SettingPanelFloat(s, g)
+				i32 =>
+					if s.options.head(4) == "set="
+						panel = new SettingPanelEnumLegacy(s, g)
+					else
+						panel = new SettingPanelInt(s, g)
+				bool => panel = new SettingPanelBool(s, g)
+				string => panel = new SettingPanelString(s, g)
+				os.Path => panel = new SettingPanelPath(s, g)
+				Color => panel = new SettingPanelColor(s, g)
+				ColorMap => panel = new SettingPanelColorMap(s, g)
+				f64[] => panel = new SettingPanelList(s, g)
+				else => panel = new SettingPanelDummy(s, g)
+			if s.type.is_enum()
+				panel = new SettingPanelEnum(s, g)
+			embed("setting-grid", 1, i, panel)
+			panel.build()
+
+		if len(node.settings) == 0
+			add_control("Label", "(no settings)", 0, 0, "")
+

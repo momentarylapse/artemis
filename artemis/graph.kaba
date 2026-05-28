@@ -29,10 +29,12 @@ class extern Node
 	var name: string
 	var in_ports: InPortBase&[]
 	var out_ports: OutPortBase&[]
+	var settings: SettingBase&[]
 	var pos: vec2
 	var channel: i32
 	var flags: NodeFlags
 	var _state: NodeState
+	var graph: Graph*
 
 
 enum PortFlags
@@ -99,9 +101,13 @@ class extern SettingBase
 	func extern __init2__(node: Node, name: string, type: kaba.Class&, p: void&, options = "")
 	func extern __delete__()
 	func extern mut generic_set(p: void&)
+	func selfref to[X]() -> Setting[X]&
+		return &self as Setting[X]&
 	
 	var name: string
 	var type: kaba.Class&
+	var options: string
+	var owner: Node&
 	var generic_value_pointer: void&
 
 
@@ -156,4 +162,5 @@ class extern GraphController
 	func extern mut auto_connect(c: CableInfo) -> i32?
 	func extern mut group_nodes(nodes: Node&[]) -> Graph&
 	func extern mut move_nodes(nodes: Node&[], delta: vec2)
+	func extern mut node_set_setting(node: Node&, name: string, value: Any)
 

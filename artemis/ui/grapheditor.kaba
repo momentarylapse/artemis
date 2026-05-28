@@ -6,6 +6,7 @@ use image.Painter
 use ..graph.*
 use ..profiler.*
 use .nodelistpanel.NodeListPanel
+use .defaultnodepanel.DefaultNodePanel
 
 # :( TODO kaba internal
 func in_list[X](x: X, list: X[]) -> bool
@@ -501,7 +502,7 @@ Dialog x ''
 	
 		var nn = n # FIXME kaba work-around - making n mutable :P
 		for mut _n in nn
-			node_panel = _n.create_panel()
+			node_panel = new DefaultNodePanel(&_n, graph_con)#_n.create_panel()
 			node_panel!.set_option("width", str(PANEL_WIDTH))
 			embed("dock", 0, 0, node_panel!)
 
