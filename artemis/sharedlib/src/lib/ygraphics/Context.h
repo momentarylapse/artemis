@@ -37,6 +37,7 @@ struct DrawingHelperData {
 #ifdef USING_VULKAN
 	vulkan::CommandBuffer* cb = nullptr;
 	vulkan::GraphicsPipeline* pipeline = nullptr;
+	vulkan::GraphicsPipeline* pipeline_z = nullptr;
 	vulkan::GraphicsPipeline* pipeline_alpha = nullptr;
 	vulkan::GraphicsPipeline* pipeline_lines = nullptr;
 	vulkan::DescriptorPool* pool = nullptr;

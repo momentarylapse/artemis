@@ -346,10 +346,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("DrawingHelper.set_color", &DrawingHelper::set_color);
 	ext->link_class_func("DrawingHelper.set_line_width", &DrawingHelper::set_line_width);
 	ext->link_class_func("DrawingHelper.draw_lines", &DrawingHelper::draw_lines);
-	ext->link_class_func("DrawingHelper.draw_circle", &DrawingHelper::draw_circle);
-	ext->link_class_func("DrawingHelper.draw_spline", &DrawingHelper::draw_spline);
-	ext->link_class_func("DrawingHelper.draw_boxed_str", &DrawingHelper::draw_boxed_str);
-	ext->link_class_func("DrawingHelper.draw_mesh", &DrawingHelper::draw_mesh);
 
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
@@ -359,6 +355,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("Session.simulation_active", &Session::simulation_active);
 	ext->declare_class_element("Session.simulation_update_dt", &Session::simulation_update_dt);
 	ext->declare_class_element("Session.drawing_helper", &Session::drawing_helper);
+	ext->declare_class_element("Session.line_helper", &Session::line_helper);
 	ext->declare_class_element("Session.ctx", &Session::ctx);
 	ext->declare_class_element("Session.win", &Session::win);
 	ext->declare_class_element("Session.promise_started", &Session::promise_started);

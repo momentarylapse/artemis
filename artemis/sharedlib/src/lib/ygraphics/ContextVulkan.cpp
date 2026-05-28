@@ -271,6 +271,12 @@ void DrawingHelperData::rebuild(RenderPass* render_pass) {
 	pipeline->set_culling(vulkan::CullMode::NONE);
 	pipeline->rebuild();
 
+	pipeline_z = new vulkan::GraphicsPipeline(shader, render_pass, 0, vulkan::PrimitiveTopology::TRIANGLES, vb);
+	pipeline_z->set_dynamic({"scissor"});
+	pipeline_z->set_z(true, true);
+	pipeline_z->set_culling(vulkan::CullMode::NONE);
+	pipeline_z->rebuild();
+
 	pipeline_alpha = new vulkan::GraphicsPipeline(shader, render_pass, 0, vulkan::PrimitiveTopology::TRIANGLES, vb);
 	pipeline_alpha->set_dynamic({"scissor"});
 	pipeline_alpha->set_z(false, false);

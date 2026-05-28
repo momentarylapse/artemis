@@ -114,12 +114,15 @@ Dialog x x padding=0
 
 
 	func mut on_pre_draw(out p: Painter)
+		var pp = &p as xhui.Painter&
 		for mut rt in render_target
 			for mut rp in render_path
 				rp.set_view(view_port.params())
 				lights[0].ang = view_port.ang
 				rp.set_lights([&lights[0]])
 		
+				for mut lh in session.line_helper
+					lh.start_frame(pp.ui_scale)
 				set_drawing_helper()
 		
 				rt.before_draw(&p)

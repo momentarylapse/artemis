@@ -15,10 +15,5 @@ Mode::Mode(Session* _session) {
 	session = _session;
 }
 
-void Mode::draw_info(Painter* p, const string& msg) {
-	vec2 pos = p->area().p01() + vec2(30, -40);
-	session->drawing_helper->draw_boxed_str(p, pos, msg);
-}
-
 
 

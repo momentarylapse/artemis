@@ -2,6 +2,7 @@
 #include "Material.h"
 #include "helper/ComputeTask.h"
 #include "helper/LightMeter.h"
+#include "helper/LineHelper.h"
 #include "post/HDRResolver.h"
 #include "scene/Light.h"
 #include "scene/CameraParams.h"
@@ -452,6 +453,18 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	}
 
 	{
+		ext->declare_class_size("LineHelper", sizeof(LineHelper));
+		ext->link_class_func("LineHelper.__init__", &kaba::generic_init<LineHelper>);
+		ext->link_class_func("LineHelper.__delete__", &kaba::generic_delete<LineHelper>);
+		ext->link_class_func("LineHelper.start_frame", &LineHelper::start_frame);
+		ext->link_class_func("LineHelper.begin_draw", &LineHelper::begin_draw);
+		ext->link_class_func("LineHelper.set_z", &LineHelper::set_z);
+		ext->link_class_func("LineHelper.set_color", &LineHelper::set_color);
+		ext->link_class_func("LineHelper.set_line_width", &LineHelper::set_line_width);
+		ext->link_class_func("LineHelper.draw_lines", &LineHelper::draw_lines);
+	}
+
+	{
 		RenderPath rp(nullptr, "");
 		ext->declare_class_size("RenderPath", sizeof(RenderPath));
 		ext->declare_class_element("RenderPath.view", &RenderPath::view);
@@ -517,7 +530,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.11");
+	ext->package_info("yrenderer", "0.12");
 	_export_package_yrenderer_internal(ext);
 }
 

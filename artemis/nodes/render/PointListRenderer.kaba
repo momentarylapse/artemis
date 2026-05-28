@@ -61,10 +61,12 @@ class PointListRenderer extends RenderEmitterNode
 				draw_mesh(params, rvd, mat4.translation(p), weak(vertex_buffer), weak(material))
 
 		if trail_length() > 0
-			for points in trails
-					session.drawing_helper.set_color(color())
-					session.drawing_helper.set_line_width(line_width() as f32)
-					session.drawing_helper.draw_lines(points, true)
+			for mut lh in session.line_helper
+				lh.begin_draw(params, rvd)
+				for points in trails
+					lh.set_color(color())
+					lh.set_line_width(line_width() as f32)
+					lh.draw_lines(points, true)
 
 
 	func override bounding_box() -> Box?

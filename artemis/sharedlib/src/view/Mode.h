@@ -48,8 +48,6 @@ public:
 	virtual void on_draw_post(Painter*) {}
 	virtual Mode* get_parent() { return nullptr; }
 
-	void draw_info(Painter* p, const string& msg);
-
 	Session* session = nullptr;
 	Data* generic_data = nullptr;
 	Data* get_data() const { return generic_data; }

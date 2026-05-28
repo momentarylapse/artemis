@@ -27,6 +27,7 @@ class ArtemisWindow;
 namespace yrenderer {
 	class TextureManager;
 	class ShaderManager;
+	class LineHelper;
 }
 
 namespace dataflow {
@@ -87,6 +88,7 @@ public:
 	yrenderer::TextureManager* texture_manager;
 	yrenderer::MaterialManager* material_manager;
 	DrawingHelper* drawing_helper;
+	owned<yrenderer::LineHelper> line_helper;
 
 	Storage *storage;
 

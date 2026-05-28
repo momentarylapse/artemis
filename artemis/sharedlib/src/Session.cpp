@@ -18,6 +18,7 @@
 #include <lib/os/msg.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>
+#include <lib/yrenderer/helper/LineHelper.h>
 #include "graph/Graph.h"
 
 Session* _current_session_ = nullptr;

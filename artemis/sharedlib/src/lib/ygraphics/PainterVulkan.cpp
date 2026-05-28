@@ -24,6 +24,23 @@ struct Parameters {
 	float radius, softness;
 };
 
+void draw_simple(DrawingHelperData* aux, const Array<Vertex1>& p, const mat4& mat, const color& _color, bool use_z) {
+	auto vb = aux->get_line_vb();
+	vb->update(p);
+	Parameters params;
+	params.matrix = mat;
+	params.col = _color;
+	params.size = {(float)1000, (float)1000};
+	params.radius = 0;//line_width;
+	params.softness = 0;//softness;
+
+	auto cb = aux->cb;
+	cb->bind_pipeline(use_z ? aux->pipeline_z : aux->pipeline);
+	cb->push_constant(0, sizeof(params), &params);
+	cb->bind_descriptor_set(0, aux->dset);
+	cb->draw(vb);
+}
+
 void Painter::clear(const color &c) {
 	cb->clear(native_area, {context->color_input_to_shaders(c)}, 1);
 }
@@ -117,29 +134,13 @@ void Painter::draw_line(const vec2 &a, const vec2 &b) {
 		// NO geometry shaders on M1... :(
 		// CPU lines then...
 
-		auto vb = aux->get_line_vb();
 		Array<Vertex1> p;
 		add_vb_line(p, a, b, line_width);
-		vb->update(p);
-		Parameters params;
-		params.matrix = mat_pixel_to_rel;
-		params.col = _color;
-		params.size = {(float)width, (float)height};
-		params.radius = 0;//line_width;
-		params.softness = 0;//softness;
-
-		cb->bind_pipeline(aux->pipeline);
-		cb->push_constant(0, sizeof(params), &params);
-		cb->bind_descriptor_set(0, aux->dset);
-		cb->draw(vb);
+		draw_simple(aux, p, mat_pixel_to_rel, _color, false);
 	//}
 }
 
 void Painter::draw_lines(const Array<vec2> &p) {
-	/*for (int i=0; i<p.num-1; i++)
-		draw_line(p[i], p[i+1]);*/
-
-	auto vb = aux->get_line_vb();
 	Array<Vertex1> vertices;
 	if (contiguous) {
 		for (int i=0; i<p.num-1; i++)
@@ -148,18 +149,7 @@ void Painter::draw_lines(const Array<vec2> &p) {
 		for (int i=0; i<p.num-1; i+=2)
 			add_vb_line(vertices, p[i], p[i+1], line_width);
 	}
-	vb->update(vertices);
-	Parameters params;
-	params.matrix = mat_pixel_to_rel;
-	params.col = _color;
-	params.size = {(float)width, (float)height};
-	params.radius = 0;//line_width;
-	params.softness = 0;//softness;
-
-	cb->bind_pipeline(aux->pipeline);
-	cb->push_constant(0, sizeof(params), &params);
-	cb->bind_descriptor_set(0, aux->dset);
-	cb->draw(vb);
+	draw_simple(aux, vertices, mat_pixel_to_rel, _color, false);
 }
 
 

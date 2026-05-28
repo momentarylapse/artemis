@@ -20,42 +20,11 @@
 
 static float ui_scale = 1.0f;
 
-
-yrenderer::Material* create_material(yrenderer::Context* ctx, const color& albedo, float roughness, float metal, const color& emission, bool transparent = false) {
-	auto material = ctx->material_manager->load("");
-	material->albedo = albedo;
-	material->roughness = roughness;
-	material->metal = metal;
-	material->emission = emission;
-	material->textures = {ctx->tex_white};
-	if (transparent) {
-		material->pass0.cull_mode = ygfx::CullMode::NONE;
-		material->pass0.mode = yrenderer::TransparencyMode::FUNCTIONS;
-		material->pass0.source = ygfx::Alpha::SOURCE_ALPHA;
-		material->pass0.destination = ygfx::Alpha::SOURCE_INV_ALPHA;
-		material->pass0.z_write = false;
-	}
-	return material;
-}
-
 DrawingHelper::DrawingHelper(xhui::Context* _ctx1, yrenderer::Context* _ctx2) {
 	xhui_ctx = _ctx1;
 	ctx = _ctx2;
 
 	ui_scale = xhui_ctx->window->ui_scale;
-
-	/*light = new Light(White, -1, -1);
-	light->owner = new Entity;
-	light->owner->ang = quaternion::rotation({1,0,0}, 0.5f);
-	light->light.harshness = 0.5f;*/
-
-	try {
-		material_hover = create_material(ctx, {0.3f, 0,0,0}, 0.9f, 0, White, true);
-		material_selection = create_material(ctx, {0.3f, 0,0,0}, 0.9f, 0, Red, true);
-		material_creation = create_material(ctx, {0.3f, 0,0.5f,0}, 0.9f, 0, color(1,0,0.5f,0), true);
-	} catch(Exception& e) {
-		msg_error(e.message());
-	}
 
 #ifdef USING_VULKAN
 	shader = vulkan::Shader::create(
@@ -190,18 +159,6 @@ void DrawingHelper::draw_lines(const Array<vec3>& points, bool contiguous) {
 #endif
 }
 
-void DrawingHelper::draw_circle(const vec3& center, const vec3& axis, float r) {
-	int N = 128;
-	Array<vec3> points;
-	vec3 e1 = axis.ortho() * r;
-	vec3 e2 = vec3::cross(axis, e1);
-	for (int i=0; i<=N; i++) {
-		float w = (float)i / (float)N * 2 * pi;
-		points.add(center + e1 * cos(w) + e2 * sin(w));
-	}
-	draw_lines(points);
-}
-
 
 void DrawingHelper::clear(const yrenderer::RenderParams& params, const color& c) {
 #ifdef USING_VULKAN
@@ -210,47 +167,6 @@ void DrawingHelper::clear(const yrenderer::RenderParams& params, const color& c)
 #else
 	nix::clear(c);
 #endif
-}
-
-void DrawingHelper::draw_mesh(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd, const mat4& matrix, ygfx::VertexBuffer* vertex_buffer, yrenderer::Material* material, int pass_no, const string& vertex_module) {
-	auto shader = rvd.get_shader(material, pass_no, vertex_module, "");
-	auto& rd = rvd.start(params, matrix, shader, material, pass_no, ygfx::PrimitiveTopology::TRIANGLES, vertex_buffer);
-	rd.draw_triangles(params, vertex_buffer);
-}
-
-void DrawingHelper::draw_boxed_str(Painter* p, const vec2& _pos, const string& str, int align) {
-	vec2 size = p->get_str_size(str);
-	vec2 pos = _pos;
-	if (align == 0)
-		pos.x -= size.x / 2;
-	if (align == 1)
-		pos.x -= size.x;
-	p->set_color(xhui::Theme::_default.background_button);
-	p->set_roundness(7);
-	p->draw_rect(rect(pos, pos + size).grow(7));
-	p->set_color(xhui::Theme::_default.text_label);
-	p->set_roundness(0);
-	p->draw_str(pos, str);
-}
-
-/*void DrawingHelper::draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& _a, MultiViewType kind, const base::optional<Hover>& hover) {
-	int _hover = -1;
-	if (hover and hover->type == kind)
-		_hover = hover->index;
-	auto& a = const_cast<DynamicArray&>(_a);
-	for (int i=0; i<a.num; i++) {
-		const auto v = static_cast<multiview::SingleData*>(a.simple_element(i));
-		p->set_color(v->is_selected ? Red : Blue);
-		auto p1 = win->project(v->pos);
-		float r = 2;
-		if (i == _hover)
-			r = 4;
-		p->draw_rect({p1.x - r,p1.x + r, p1.y - r,p1.y + r});
-	}
-}*/
-
-void DrawingHelper::draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d) {
-	p->draw_lines(spline(a, b, c, d));
 }
 
 Array<vec2> DrawingHelper::spline(const vec2& a, const vec2& b, const vec2& c, const vec2& d) {

@@ -35,14 +35,6 @@ public:
 	void clear(const yrenderer::RenderParams& params, const color& c);
 
 	void draw_lines(const Array<vec3>& points, bool contiguous = true);
-	void draw_circle(const vec3& center, const vec3& axis, float r);
-
-	void draw_mesh(const yrenderer::RenderParams& params, yrenderer::RenderViewData& rvd, const mat4& matrix, ygfx::VertexBuffer* vb, yrenderer::Material* material, int pass_no = 0, const string& vertex_module = "default");
-
-	static void draw_boxed_str(Painter* p, const vec2& pos, const string& str, int align = -1);
-
-	//static void draw_data_points(Painter* p, MultiViewWindow* win, const DynamicArray& a, MultiViewType kind, const base::optional<Hover>& hover);
-	static void draw_spline(Painter* p, const vec2& a, const vec2& b, const vec2& c, const vec2& d);
 
 	static Array<vec2> spline(const vec2& a, const vec2& b, const vec2& c, const vec2& d);
 
@@ -57,10 +49,6 @@ public:
 	vulkan::GraphicsPipeline* pipeline = nullptr;
 	vulkan::DescriptorSet* dset = nullptr;
 #endif
-
-	yrenderer::Material* material_hover;
-	yrenderer::Material* material_selection;
-	yrenderer::Material* material_creation;
 };
 
 
