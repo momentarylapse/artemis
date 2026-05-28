@@ -192,10 +192,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("iso_surface", &processing::iso_surface);
 
-	ext->link_class_func("future[ColorMap].__delete__", &kaba::generic_delete<base::future<data::ColorMap>>);
-	ext->link_class_func("future[ColorMap].then", &kaba::KabaFuture<data::ColorMap>::kaba_then);
-	ext->link_class_func("future[ColorMap].then_or_fail", &kaba::KabaFuture<data::ColorMap>::kaba_then_or_fail);
-
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
 	ext->link_class_func("Mesh.__delete__", &kaba::generic_delete<PolygonMesh>);
@@ -214,6 +210,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("ColorMap.get", &data::ColorMap::get);
 	ext->link_class_func("ColorMap.min", &data::ColorMap::min);
 	ext->link_class_func("ColorMap.max", &data::ColorMap::max);
+	ext->link_class_func("ColorMap.sort", &data::ColorMap::sort);
 	ext->link("default_color_map", (void*)&data::ColorMap::_default);
 	ext->link("default_color_map_transparent", (void*)&data::ColorMap::_default_transparent);
 
@@ -466,6 +463,20 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 
 	ext->declare_class_size("ColorMapDialog", sizeof(ColorMapDialog));
 	ext->link_func("ColorMapDialog.ask", &ColorMapDialog::ask);
+
+	ext->declare_class_size("ColorMapFuture", sizeof(base::future<data::ColorMap>));
+	ext->link_class_func("ColorMapFuture.__init__", &kaba::generic_init<kaba::KabaFuture<data::ColorMap>>);
+	ext->link_class_func("ColorMapFuture.__delete__", &kaba::generic_delete<base::future<data::ColorMap>>);
+	ext->link_class_func("ColorMapFuture.__assign__", &kaba::KabaFuture<data::ColorMap>::assign);
+	ext->link_class_func("ColorMapFuture.then", &kaba::KabaFuture<data::ColorMap>::kaba_then);
+	ext->link_class_func("ColorMapFuture.then_or_fail", &kaba::KabaFuture<data::ColorMap>::kaba_then_or_fail);
+
+	ext->declare_class_size("ColorMapPromise", sizeof(base::promise<data::ColorMap>));
+	ext->link_class_func("ColorMapPromise.__init__", &kaba::generic_init<base::promise<data::ColorMap>>);
+	ext->link_class_func("ColorMapPromise.__delete__", &kaba::generic_delete<base::promise<data::ColorMap>>);
+	ext->link_class_func("ColorMapPromise.call", &base::promise<data::ColorMap>::operator());
+	ext->link_class_func("ColorMapPromise.fail", &base::promise<data::ColorMap>::fail);
+	ext->link_class_func("ColorMapPromise.get_future", &base::promise<data::ColorMap>::get_future);
 
 	// TODO remove when switching to external package!
 	_export_package_yrenderer_internal(ext);

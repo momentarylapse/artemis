@@ -111,8 +111,8 @@ class SettingPanelColorMap extends SettingPanel
 		event_x("area", "hui:left-button-up", on_click)
 	func on_draw(out p: Painter)
 		draw_color_map_background(p, cm, cm.min(), cm.max(), p.area())
-	func on_click()
-		ColorMapDialog.ask(&self, cm).then(on_select)
+	func mut on_click()
+		ColorMapDialog.ask(self, cm).then(on_select)
 	func mut on_select(new_cm: ColorMap)
 		cm = new_cm
 		g.node_set_setting(s.owner, s.name, dyn(cm))

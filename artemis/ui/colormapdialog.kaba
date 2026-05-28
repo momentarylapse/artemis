@@ -30,5 +30,155 @@ func draw_color_map_background(out p: Painter, color_map: ColorMap, value_min: f
 	p.set_clip(clip)
 
 
+class extern ColorMapFuture
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut __assign__(o: ColorMapFuture)
+	func extern mut then(f: ColorMap->void)
+	func extern mut then_or_fail(f: ColorMap->void, ff: void->void)
+
+
+class extern ColorMapPromise
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut call(cm: ColorMap)
+	func extern mut fail()
+	func extern mut get_future() -> ColorMapFuture
+
+
 class extern ColorMapDialog extends xhui.Dialog
-	func extern static ask(parent: xhui.Panel&, color_map: ColorMap) -> future[ColorMap]
+	var _area: Rect
+	var value_min, value_max: f32
+	var mouse_moved_since_click = 0.0
+	var hover: i32?
+	var selected: i32?
+
+	var promise: ColorMapPromise
+	var color_map: ColorMap
+	var answer: ColorMap?
+
+
+	func __init__(parent: xhui.Panel&, _color_map: ColorMap)
+		super.__init__("Question", 400, 300, parent, xhui.DialogFlags.CLOSE_BY_ESCAPE)
+		from_source("
+Dialog color-map-dialog 'Color map'
+	Grid ? ''
+		DrawingArea area '' expandx expandy
+		---|
+		Grid ? ''
+			Button ok 'Ok'
+			Button cancel 'Cancel'
+")
+		color_map = _color_map
+		value_min = color_map.min()
+		value_max = color_map.max()
+
+		event_x("area", "hui:draw", _on_draw)
+		event_x("area", "hui:mouse-move", func() _on_mouse_move(get_window()!.get_mouse_position(), get_window()!.get_mouse_delta()))
+		event_x("area", "hui:left-button-down", func() _on_left_button_down(get_window()!.get_mouse_position()))
+		event_x("area", "hui:left-button-up", func() _on_left_button_up(get_window()!.get_mouse_position()))
+		event_x("area", "hui:key-down", func() _on_key_down(get_window()!.get_key_code()))
+		event_x("area", "hui:mouse-leave", func() hover = nil)
+		event("ok", on_ok)
+		event("cancel", request_destroy)
+		event("hui:close", request_destroy)
+
+
+	func mut on_ok()
+		answer = color_map
+		request_destroy()
+
+
+	func mut _on_draw(out p: Painter)
+		_area = p.area()
+		draw_color_map_background(p, color_map, value_min, value_max, _area)
+	
+		for i in 0:len(color_map.colors)
+			p.set_color(Color.BLACK)
+			for h in hover
+				if h == i
+					p.set_color(Color.GRAY)
+			p.draw_circle(handle_pos(i), 10)
+			p.set_color(Color.WHITE)
+			p.draw_circle(handle_pos(i), 7)
+
+
+	func mut _on_left_button_down(m: vec2)
+		hover = get_hover(m)
+		selected = hover
+		mouse_moved_since_click = 0
+
+
+	func mut _on_left_button_up(m: vec2)
+		for s in selected
+			if mouse_moved_since_click < 10
+				xhui.color_dialog(&self, "Color", color_map.colors[s].with_alpha(1), []).then(on_select_color)
+		else
+			if mouse_moved_since_click < 10
+				color_map.colors.add(Color.WHITE.with_alpha(clamp(1 - (m.y - _area.y1) / _area.height(), 0.0, 1.0)))
+				color_map.values.add(value_min + (m.x - _area.x1) / _area.width() * (value_max - value_min))
+		color_map.sort()
+		value_min = color_map.min()
+		value_max = color_map.max()
+		request_redraw()
+
+	func mut on_select_color(c: Color)
+		for s in selected
+			color_map.colors[s] = c.with_alpha(color_map.colors[s].a)
+			request_redraw()
+
+
+	func mut _on_mouse_move(m: vec2, d: vec2)
+		if get_window()!.left_button()
+			for s in selected
+				mouse_moved_since_click += len(d)
+				color_map.values[s] = value_min + (m.x - _area.x1) / _area.width() * (value_max - value_min)
+				color_map.colors[s].a = clamp(1 - (m.y - _area.y1) / _area.height(), 0.0, 1.0)
+			else
+				hover = get_hover(m)
+		else
+			hover = get_hover(m)
+		request_redraw()
+
+
+	func mut _on_key_down(key: i32)
+		if key == xhui.KEY_DELETE or key == xhui.KEY_BACKSPACE
+			for s in selected
+				if get_window()!.left_button()
+					color_map.colors.remove(s)
+					color_map.values.remove(s)
+					hover = nil
+					selected = nil
+					mouse_moved_since_click = 999 # hack to prevent new color...
+					request_redraw()
+
+
+	func handle_pos(index: i32) -> vec2
+		let t0 = (color_map.values[index] - value_min) / (value_max - value_min)
+		return _area.p00() + vec2(_area.width() * t0, _area.height() * (1 - color_map.colors[index].a))
+
+
+	func get_hover(m: vec2) -> i32?
+		for i=>_ in color_map.colors
+			if len(handle_pos(i) - m) < 20
+				return i
+		return nil
+
+
+	func mut on_close()
+		for a in answer
+			promise(a)
+		else
+			promise.fail()
+	
+	# FIXME ugh, some kaba lambda workaround...
+	func open(out parent: xhui.Panel, dlg: shared![xhui.Dialog])
+		parent.open_dialog(dlg).then(on_close)
+
+
+
+	#func extern static ask(parent: xhui.Panel&, color_map: ColorMap) -> future[ColorMap]
+	func static globalref ask(out parent: xhui.Panel, color_map: ColorMap) -> ColorMapFuture
+		var dlg = new shared ColorMapDialog(&parent, color_map)
+		dlg.open(parent, dlg)
+		return dlg.promise.get_future()

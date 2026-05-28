@@ -28,6 +28,7 @@ struct extern ColorMap
 	func extern get(t: f32) -> Color
 	func extern min() -> f32
 	func extern max() -> f32
+	func extern mut sort()
 var extern static default_color_map: ColorMap
 var extern static default_color_map_transparent: ColorMap
 
