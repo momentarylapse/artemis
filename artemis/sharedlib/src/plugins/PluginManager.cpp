@@ -13,7 +13,7 @@
 #include <lib/os/app.h>
 #include <lib/os/filesystem.h>
 #include <lib/os/msg.h>
-#include <lib/profiler/Profiler.h>
+#include <lib/profiler/_kaba_export.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
@@ -189,10 +189,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("laplace", &processing::laplace);
 	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("iso_surface", &processing::iso_surface);
-
-	ext->link_func("profiler.create_channel", &profiler::create_channel);
-	ext->link_func("profiler.begin", &profiler::begin);
-	ext->link_func("profiler.end", &profiler::end);
 
 	ext->declare_class_size("Mesh", sizeof(PolygonMesh));
 	ext->link_class_func("Mesh.__init__", &kaba::generic_init<PolygonMesh>);
@@ -455,6 +451,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 
 	// TODO remove when switching to external package!
 	_export_package_yrenderer_internal(ext);
+	_export_package_profiler_internal(ext);
 }
 
 template<class C>

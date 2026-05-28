@@ -1,5 +1,5 @@
 use artemis.*
-use artemis.profiler.*
+#use artemis.profiler.*
 
 
 class MaxwellFDTD extends Node

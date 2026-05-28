@@ -8,6 +8,7 @@ use .graph.*
 use .session.*
 use .render.*
 use .plot.*
+use .profiler.*
 
 let EXPORT_IMPORTS = true
 
@@ -25,8 +26,8 @@ class Artemis
 		session.win := weak(w)
 		xhui.fly(w)
 
-		xhui.run_repeated(f32(session.simulation_update_dt), update)
-		xhui.run_repeated(1.0, func() session.win.request_redraw())
+		xhui.run_repeated(f32(session.simulation_update_dt), iterate)
+		xhui.run_repeated(2.0, profile_frame)
 
 
 	func mut start(args: string[])
@@ -37,11 +38,16 @@ class Artemis
 			xhui.run_later(1.0, func() add_default_graph(session))
 
 
-	func mut update()
+	func mut iterate()
 		if session.simulation_active
 			iterate_simulation(session)
 		if session.graph.iterate()
 			session.win.request_redraw()
+
+
+	func mut profile_frame()
+		profiler.next_frame()
+		session.win.request_redraw()
 
 
 	func run()
