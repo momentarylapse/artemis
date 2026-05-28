@@ -2,7 +2,7 @@ use os
 use obs
 use xhui
 use image.Painter
-use async
+use async.*
 use .graph.*
 use .gfx
 use .yrenderer
@@ -170,6 +170,7 @@ Dialog x x padding=0
 		#auto pp = (xhui::Painter*)p;
 		session.ctx = yrenderer.api_init_xhui(&p)
 		init_graphics_stuff(session, p)
+		session.promise_started()
 
 	
 	func mut on_overlay_draw(out p: Painter)
@@ -226,7 +227,8 @@ class extern Session
 	var ctx: owned[yrenderer.Context]
 	var drawing_helper: DrawingHelper&
 	var win: ArtemisWindow&
-#	var promise_started: async.promise[Session]
+#	var promise_started: promise[Session]
+	var promise_started: promise[void]
 
 	struct Message
 		enum Type

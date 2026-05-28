@@ -1,5 +1,6 @@
 use kaba
 use os.Path
+use async.*
 use xhui
 use .data.*
 use .grid.*
@@ -22,6 +23,9 @@ class Artemis
 
 	func __init__()
 		session := create_session(false)
+
+
+	func mut create_window() -> future[void]
 		var w = new shared ArtemisWindow(session)
 		session.win := weak(w)
 		xhui.fly(w)
@@ -29,13 +33,15 @@ class Artemis
 		xhui.run_repeated(f32(session.simulation_update_dt), iterate)
 		xhui.run_repeated(2.0, profile_frame)
 
+		return session.promise_started.get_future()
+
 
 	func mut start(args: string[])
 		if len(args) >= 1
 			filename = args[0]
-			xhui.run_later(1.0, func() session_load_file(session, filename))
+			create_window().then(func() session_load_file(session, filename))
 		else
-			xhui.run_later(1.0, func() add_default_graph(session))
+			create_window().then(func() add_default_graph(session))
 
 
 	func mut iterate()
