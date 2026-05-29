@@ -87,7 +87,6 @@ public:
 	yrenderer::ShaderManager* shader_manager;
 	yrenderer::TextureManager* texture_manager;
 	yrenderer::MaterialManager* material_manager;
-	DrawingHelper* drawing_helper;
 	owned<yrenderer::LineHelper> line_helper;
 
 	Storage *storage;

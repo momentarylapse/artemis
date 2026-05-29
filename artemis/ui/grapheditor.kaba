@@ -29,7 +29,13 @@ func wash_f32(p: f32&) -> f32
 func wash_col(c: Color&) -> Color
 	return *c
 
-func extern spline_curve(a: vec2, b: vec2, c: vec2, d: vec2) -> vec2[]
+func spline_curve(a: vec2, b: vec2, c: vec2, d: vec2) -> vec2[]
+	let s = [a, b - a, d, d - c]
+	var points: vec2[]
+	for t in 0.0:1.0:0.05
+		points.add(cubic_spline(s, t))
+	points.add(d)
+	return points
 
 func spline_hover(points: vec2[], m: vec2) -> bool
 	for p in points

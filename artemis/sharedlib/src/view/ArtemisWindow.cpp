@@ -18,7 +18,6 @@
 #include <lib/yrenderer/Context.h>
 #include <lib/yrenderer/helper/LineHelper.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include "DrawingHelper.h"
 #include "GraphEditor.h"
 #include "CodeEditor.h"
 #include <lib/os/msg.h>
@@ -67,7 +66,6 @@ void init_graphics_stuff(Session* session, xhui::Painter* pp) {
 	session->shader_manager->default_shader = "default.shader";
 	session->material_manager = new yrenderer::MaterialManager(session->ctx->texture_manager, "");
 	session->ctx->material_manager = session->material_manager;
-	session->drawing_helper = new DrawingHelper(pp->context, session->ctx);
 	session->line_helper = new yrenderer::LineHelper();
 	try {
 		session->shader_manager->load_shader_module("module-basic-data.shader");

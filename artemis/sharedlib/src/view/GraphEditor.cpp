@@ -21,7 +21,7 @@
 #include <lib/xhui/Theme.h>
 #include <lib/xhui/TextLayout.h>
 #include <lib/profiler/Profiler.h>
-#include "DrawingHelper.h"
+#include <lib/math/interpolation.h>
 #include <cmath>
 
 
@@ -155,10 +155,21 @@ vec2 GraphEditor::from_screen(const vec2 &p) const {
 }
 
 
+
+Array<vec2> spline_curve(const vec2& a, const vec2& b, const vec2& c, const vec2& d) {
+	Array<vec2> s = {a, b - a, d, d - c};
+	Array<vec2> points;
+	for (float t=0; t<1; t+=0.05f)
+		points.add(cubic_spline(s, t));
+	points.add(d);
+	return points;
+}
+
+
 Array<vec2> GraphEditor::cable_spline(const dataflow::CableInfo& c) {
 	vec2 A = node_out_port_pos(c.source->owner, c.source_port_no());
 	vec2 B = node_in_port_pos(c.sink->owner, c.sink_port_no());
-	return DrawingHelper::spline(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B);
+	return spline_curve(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B);
 }
 
 void GraphEditor::draw_grid(Painter* p) {

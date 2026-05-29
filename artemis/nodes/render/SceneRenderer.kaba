@@ -123,14 +123,12 @@ Dialog x x padding=0
 		
 				for mut lh in session.line_helper
 					lh.start_frame(pp.ui_scale)
-				set_drawing_helper()
 		
 				rt.before_draw(&p)
 
 
 	func mut on_draw(out p: Painter)
 		for mut rt in render_target
-			set_drawing_helper()
 			rt.draw(&p)
 
 
@@ -172,14 +170,6 @@ Dialog x x padding=0
 	func mut set_content_bounding_box(b: Box)
 		if not view_port.defined_by_user
 			view_port.focus_on_box(b)
-
-
-	func mut set_drawing_helper()
-		session.drawing_helper.target_area = area
-		session.drawing_helper.projection = view_port.params().projection_matrix(area.width() / area.height())
-		session.drawing_helper.view = view_port.params().view_matrix()
-
-
 
 
 class SceneRenderer extends render.RendererNode

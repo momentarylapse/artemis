@@ -479,7 +479,6 @@ add_library(moduleartemis SHARED
 	src/view/ArtemisWindow.cpp
 	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
-	src/view/DrawingHelper.cpp
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp
 	src/view/NodeListPanel.cpp

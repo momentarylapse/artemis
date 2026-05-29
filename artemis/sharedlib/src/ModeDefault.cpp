@@ -13,7 +13,6 @@
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
 #include <view/ArtemisWindow.h>
-#include <view/DrawingHelper.h>
 #include <storage/Storage.h>
 
 ModeDefault::ModeDefault(Session* s) : Mode(s) {

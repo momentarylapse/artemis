@@ -34,7 +34,6 @@
 #include <lib/mesh/GeometryTeapot.h>
 #include <lib/yrenderer/_kaba_export.h>
 #include <lib/yrenderer/Context.h>
-#include <view/DrawingHelper.h>
 
 #include "view/ArtemisWindow.h"
 #include "view/dialog/ColorMapDialog.h"
@@ -178,7 +177,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("app_run", &app_run);
 	ext->link_func("tex_white", &get_tex_white);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
-	ext->link_func("spline_curve", &DrawingHelper::spline);
 	ext->link_func("iterate_simulation", &graph::iterate_simulation);
 	ext->link_func("enumerate_nodes", &graph::enumerate_nodes);
 	ext->link_func("port_type_match", &dataflow::port_type_match);
@@ -339,14 +337,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Grid.count", &data::Grid::count);
 	ext->link_class_func("Grid.bounding_box", &data::Grid::bounding_box);
 
-	ext->declare_class_size("DrawingHelper", sizeof(DrawingHelper));
-	ext->declare_class_element("DrawingHelper.target_area", &DrawingHelper::target_area);
-	ext->declare_class_element("DrawingHelper.projection", &DrawingHelper::projection);
-	ext->declare_class_element("DrawingHelper.view", &DrawingHelper::view);
-	ext->link_class_func("DrawingHelper.set_color", &DrawingHelper::set_color);
-	ext->link_class_func("DrawingHelper.set_line_width", &DrawingHelper::set_line_width);
-	ext->link_class_func("DrawingHelper.draw_lines", &DrawingHelper::draw_lines);
-
 	ext->declare_class_size("Session", sizeof(Session));
 	ext->declare_class_element("Session.graph", &Session::graph);
 	ext->declare_class_element("Session.graph_con", &Session::data);
@@ -354,7 +344,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("Session.dt", &Session::dt);
 	ext->declare_class_element("Session.simulation_active", &Session::simulation_active);
 	ext->declare_class_element("Session.simulation_update_dt", &Session::simulation_update_dt);
-	ext->declare_class_element("Session.drawing_helper", &Session::drawing_helper);
 	ext->declare_class_element("Session.line_helper", &Session::line_helper);
 	ext->declare_class_element("Session.ctx", &Session::ctx);
 	ext->declare_class_element("Session.win", &Session::win);
