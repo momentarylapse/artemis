@@ -10,6 +10,20 @@
 
 namespace ygfx {
 
+
+void draw_simple(DrawingHelperData* aux, const Array<Vertex1>& p, const mat4& mat, const color& _color, bool use_z) {
+	auto vb = aux->get_line_vb();
+	vb->update(p);
+
+	nix::set_model_matrix(mat);
+	nix::set_shader(aux->shader);
+	nix::set_z(use_z, use_z);
+	aux->shader->set_color("_color_", _color);
+	aux->shader->set_default_data();
+	nix::bind_texture(0, aux->tex_text);
+	nix::draw_triangles(aux->vb);
+}
+
 void Painter::clear(const color &c) {
 	nix::clear(context->color_input_to_shaders(c));
 }

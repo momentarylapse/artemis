@@ -31,26 +31,6 @@ vulkan::DescriptorSet* DrawingHelperData::get_descriptor_set(Texture* texture) {
 	return dset;
 }
 
-vulkan::VertexBuffer* DrawingHelperData::get_line_vb(bool with_color) {
-	if (with_color) {
-		if (num_line_vbs_with_color_used < line_vbs_with_color.num)
-			return line_vbs_with_color[num_line_vbs_with_color_used ++];
-
-		auto vb = new vulkan::VertexBuffer("3f,3f,2f,4f");
-		line_vbs_with_color.add(vb);
-		num_line_vbs_with_color_used ++;
-		return vb;
-	} else {
-		if (num_line_vbs_used < line_vbs.num)
-			return line_vbs[num_line_vbs_used ++];
-
-		auto vb = new vulkan::VertexBuffer("3f,3f,2f");
-		line_vbs.add(vb);
-		num_line_vbs_used ++;
-		return vb;
-	}
-}
-
 void DrawingHelperData::create_basic() {
 	pool = new vulkan::DescriptorPool("buffer:4096,sampler:4096", 65536);
 

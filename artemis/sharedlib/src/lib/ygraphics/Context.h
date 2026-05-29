@@ -46,12 +46,6 @@ struct DrawingHelperData {
 	vulkan::DescriptorSet* dset_lines = nullptr;
 
 
-	Array<vulkan::VertexBuffer*> line_vbs;
-	int num_line_vbs_used = 0;
-	Array<vulkan::VertexBuffer*> line_vbs_with_color;
-	int num_line_vbs_with_color_used = 0;
-	vulkan::VertexBuffer* get_line_vb(bool with_color = false);
-
 	Array<vulkan::DescriptorSet*> descriptor_sets;
 	int descriptor_sets_used = 0;
 	vulkan::DescriptorSet* get_descriptor_set(Texture* texture);
@@ -60,6 +54,13 @@ struct DrawingHelperData {
 	Texture* tex_xxx = nullptr;
 	Shader* shader_round = nullptr;
 #endif
+
+	Array<VertexBuffer*> line_vbs;
+	int num_line_vbs_used = 0;
+	Array<VertexBuffer*> line_vbs_with_color;
+	int num_line_vbs_with_color_used = 0;
+	VertexBuffer* get_line_vb(bool with_color = false);
+
 	void reset_frame();
 
 	Array<TextCache> text_caches;
