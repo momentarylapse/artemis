@@ -28,7 +28,10 @@ void draw_simple(DrawingHelperData* aux, const Array<Vertex1>& p, const mat4& ma
 	auto vb = aux->get_line_vb();
 	vb->update(p);
 	Parameters params;
-	params.matrix = mat;
+	if (aux->projection_matrix)
+		params.matrix = *aux->projection_matrix * mat;
+	else
+		params.matrix = mat;
 	params.col = _color;
 	params.size = {(float)1000, (float)1000};
 	params.radius = 0;//line_width;
@@ -107,49 +110,6 @@ void Painter::draw_rect(const rect &r) {
 		draw_line({r.x1, r.y1}, {r.x1, r.y2});
 		draw_line({r.x2, r.y1}, {r.x2, r.y2});
 	}
-}
-
-static void add_vb_line(Array<Vertex1>& vertices, const vec2& a, const vec2& b, float line_width) {
-	vec2 dir = (b - a).normalized();
-	vec2 r = dir.ortho() * line_width / 2;
-	dir *= line_width * 0.2f;
-	vec2 a0 = a - r - dir;
-	vec2 a1 = a + r - dir;
-	vec2 b0 = b - r + dir;
-	vec2 b1 = b + r + dir;
-	vertices.add({{a0.x, a0.y, 0}, v_0, 0,0});
-	vertices.add({{a1.x, a1.y, 0}, v_0, 0,0});
-	vertices.add({{b0.x, b0.y, 0}, v_0, 0,0});
-	vertices.add({{b0.x, b0.y, 0}, v_0, 0,0});
-	vertices.add({{a1.x, a1.y, 0}, v_0, 0,0});
-	vertices.add({{b1.x, b1.y, 0}, v_0, 0,0});
-}
-
-void Painter::draw_line(const vec2 &a, const vec2 &b) {
-	/*if (a.x == b.x) {
-		fill_rect(context, rect(a.x + 0.5f - line_width/2, a.x + 0.5f + line_width/2, a.y, b.y), _color, 0, 0);
-	} else if (a.y == b.y) {
-		fill_rect(context, rect(a.x, b.x, a.y + 0.5f - line_width/2, a.y + 0.5f + line_width/2), _color, 0, 0);
-	} else {*/
-		// NO geometry shaders on M1... :(
-		// CPU lines then...
-
-		Array<Vertex1> p;
-		add_vb_line(p, a, b, line_width);
-		draw_simple(aux, p, mat_pixel_to_rel, _color, false);
-	//}
-}
-
-void Painter::draw_lines(const Array<vec2> &p) {
-	Array<Vertex1> vertices;
-	if (contiguous) {
-		for (int i=0; i<p.num-1; i++)
-			add_vb_line(vertices, p[i], p[i+1], line_width);
-	} else {
-		for (int i=0; i<p.num-1; i+=2)
-			add_vb_line(vertices, p[i], p[i+1], line_width);
-	}
-	draw_simple(aux, vertices, mat_pixel_to_rel, _color, false);
 }
 
 

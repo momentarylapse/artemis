@@ -7,6 +7,7 @@
 
 enum class ColorSpace;
 struct color;
+struct mat4;
 
 namespace ygfx {
 
@@ -60,6 +61,7 @@ struct DrawingHelperData {
 	Array<VertexBuffer*> line_vbs_with_color;
 	int num_line_vbs_with_color_used = 0;
 	VertexBuffer* get_line_vb(bool with_color = false);
+	mat4* projection_matrix = nullptr;
 
 	void reset_frame();
 

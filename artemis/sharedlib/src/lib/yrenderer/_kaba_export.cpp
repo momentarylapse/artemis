@@ -32,6 +32,21 @@ using namespace ygfx;
 
 KABA_LINK_GROUP_BEGIN
 
+enum class Api {
+	None,
+	OpenGL,
+	Vulkan
+};
+
+Api get_api() {
+#ifdef USING_VULKAN
+	return Api::Vulkan;
+#endif
+#ifdef USING_OPENGL
+	return Api::OpenGL;
+#endif
+	return Api::None;
+}
 
 void framebuffer_init(FrameBuffer *fb, const shared_array<Texture> &tex) {
 #ifdef USING_VULKAN
@@ -237,6 +252,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->link_class_func("YLight.init", &Light::init);
 	}
 
+	ext->link_func("api", &get_api);
 
 	ext->declare_enum("PrimitiveTopology.TRIANGLES", PrimitiveTopology::TRIANGLES);
 	ext->declare_enum("PrimitiveTopology.TRIANGLE_FAN", PrimitiveTopology::TRIANGLE_FAN);
@@ -530,7 +546,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.12");
+	ext->package_info("yrenderer", "0.13");
 	_export_package_yrenderer_internal(ext);
 }
 

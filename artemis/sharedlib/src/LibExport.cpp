@@ -4,6 +4,7 @@
 #include <lib/os/msg.h>
 
 bool app_init();
+bool app_init_core();
 
 extern "C" {
 	__attribute__ ((visibility ("default")))
@@ -12,8 +13,9 @@ extern "C" {
 
 		artemis::PluginManager::export_kaba(e);
 
-		if (!app_init())
-			msg_error("failed to initialize...");
+		app_init_core();
+	//	if (!app_init())
+	//		msg_error("failed to initialize...");
 	}
 }
 

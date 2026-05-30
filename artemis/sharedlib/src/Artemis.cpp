@@ -80,6 +80,15 @@ void start_session_load_file(Session* parent, const Path& filename) {
 	});
 }
 
+void app_init_core() {
+	try {
+		artemis::PluginManager::init();
+	} catch (Exception &e) {
+		msg_error(e.message());
+	}
+	artemis::graph::init_factory();
+}
+
 bool app_init() {
 	try {
 		xhui::init({}, "artemis");
@@ -90,12 +99,7 @@ bool app_init() {
 
 	//kaba::init();
 	syntaxhighlight::init();
-	try {
-		artemis::PluginManager::init();
-	} catch (Exception &e) {
-		msg_error(e.message());
-	}
-	artemis::graph::init_factory();
+	app_init_core();
 	return true;
 }
 

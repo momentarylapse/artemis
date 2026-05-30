@@ -30,6 +30,12 @@ void LineHelper::begin_draw(const RenderParams& params, RenderViewData& _rvd) {
 		render_pass = params.render_pass;
 	}
 	aux->cb = params.command_buffer;
+#else
+	nix::set_view_matrix(mat4::ID);
+	if (params.target_is_window)
+		nix::set_projection_matrix(mat4::scale(1,-1,1));
+	else
+		nix::set_projection_matrix(mat4::ID);
 #endif
 	area = params.area;
 	mat = rvd->scene_view->main_camera_params.projection_matrix(params.desired_aspect_ratio) * rvd->scene_view->main_camera_params.view_matrix();
