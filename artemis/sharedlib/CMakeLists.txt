@@ -466,7 +466,6 @@ add_library(moduleartemis SHARED
 	src/view/Mode.cpp
 	src/Artemis.cpp
 	src/LibExport.cpp
-	src/ModeDefault.cpp
 	src/Session.cpp)
 target_include_directories(moduleartemis PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(moduleartemis PUBLIC ${LINK_DIRECTORIES})

@@ -1,5 +1,4 @@
 
-#include <ModeDefault.h>
 #include <lib/dataflow/Node.h>
 #include <graph/NodeFactory.h>
 #include <graph/Graph.h>
