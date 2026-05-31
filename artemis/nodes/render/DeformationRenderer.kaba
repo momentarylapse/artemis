@@ -16,7 +16,7 @@ class DeformationRenderer extends RenderEmitterNode
 	var vertex_buffer: owned![gfx.VertexBuffer]
 	var material: owned![yrenderer.Material]
 
-	
+
 	func __init__()
 		super.__init__("DeformationRenderer")
 		vertex_buffer = new gfx.VertexBuffer("3f,3f,2f")
@@ -35,16 +35,16 @@ class DeformationRenderer extends RenderEmitterNode
 		for d in in_diff.value()
 			send_out()
 
-	
+
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		for d in in_diff.value()
 			let mesh = Mesh.create_sphere([0,0,0], 1, 2)
 			mesh.build(weak(vertex_buffer))
-		
+
 			let s = scale() as f32
 			let r = radius() as f32
 			let g = d.grid
-		
+
 			if show_balls()
 				material.emission = color()
 				for i=>p in g.points(d.sampling_mode)
@@ -52,7 +52,7 @@ class DeformationRenderer extends RenderEmitterNode
 					draw_mesh(params, rvd,
 						mat4.translation(pos) * mat4.scale(r, r, r),
 						weak(vertex_buffer), weak(material))
-		
+
 			match d.sampling_mode
 				SamplingMode.PER_CELL =>
 					if show_grid()
@@ -69,10 +69,10 @@ class DeformationRenderer extends RenderEmitterNode
 									points.add(g.cell_center(i, j + 1, k) + d._value(i, j + 1, k) * s)
 						for i in 0:g.nx-1
 							for j in 0:g.ny
-								for k in 0:g.nz-1
+								for k in 0:g.nz
 									points.add(g.cell_center(i, j, k) + d._value(i, j, k) * s)
 									points.add(g.cell_center(i + 1, j, k) + d._value(i + 1, j, k) * s)
-			
+
 						for mut lh in session.line_helper
 							lh.begin_draw(params, rvd)
 							lh.set_color(color())
@@ -85,7 +85,7 @@ class DeformationRenderer extends RenderEmitterNode
 						for e in g.edges()
 							points.add(p0[e[0]] + d.value(e[0]) * s)
 							points.add(p0[e[1]] + d.value(e[1]) * s)
-			
+
 						for mut lh in session.line_helper
 							lh.begin_draw(params, rvd)
 							lh.set_color(color())
@@ -97,5 +97,5 @@ class DeformationRenderer extends RenderEmitterNode
 		for d in in_diff.value()
 			return d.grid.bounding_box()
 		return nil
-		
-	
+
+

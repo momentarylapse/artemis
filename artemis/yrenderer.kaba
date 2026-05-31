@@ -73,11 +73,21 @@ class extern Material
 struct extern CameraParams
 	var pos: vec3
 	var ang: Quaternion
-	
+
 	var fov: f32
 	var min_depth, max_depth: f32
 	func extern projection_matrix(aspect_ratio: f32) -> mat4
 	func extern view_matrix() -> mat4
+
+
+class extern TextureManager
+#	func extern __init__(ctx: GfxContext, dir: os.Path)
+class extern ShaderManager
+	var default_shader: string
+#	func extern __init__(ctx: GfxContext, dir: os.Path)
+	func extern mut load_shader_module(filename: os.Path)
+class extern MaterialManager
+#	func extern __init__(tm: TextureManager, dir: os.Path)
 
 
 #---------------------------
@@ -85,7 +95,10 @@ struct extern CameraParams
 
 # "yrenderer.Context"
 class extern Context as @noauto
-	var context: void& # "ygfx.Context"
+	var context: GfxContext& # "ygfx.Context"
+	var texture_manager: TextureManager*
+	var shader_manager: ShaderManager*
+	var material_manager: MaterialManager*
 	var tex_white: shared![Texture]
 	func extern create_managers(texture_dir: os.Path, shader_dir: os.Path, material_dir: os.Path)
 	func extern load_shader(path: os.Path) -> shared![Shader]
@@ -275,11 +288,11 @@ class extern HDRResolver extends Renderer
 	var depth_buffer: shared![DepthBuffer]
 	var exposure: f32
 	var bloom_factor: f32
-	
+
 	class BloomLevel
 		tex_out: shared![Texture]
 	var bloom_levels: BloomLevel[4]
-	
+
 	var light_meter: LightMeter&
 
 

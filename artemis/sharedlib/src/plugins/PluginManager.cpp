@@ -38,7 +38,6 @@
 extern Session* _current_session_;
 
 void session_load_file(Session* s, const Path& filename);
-void init_graphics_stuff(Session* session, xhui::Painter* pp);
 void add_default_graph(Session* s);
 
 namespace artemis {
@@ -164,7 +163,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("current_session", &current_session);
 	ext->link_func("create_session", &create_session);
 	ext->link_func("session_load_file", &session_load_file);
-	ext->link_func("init_graphics_stuff", &init_graphics_stuff);
 	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("add_default_graph", &add_default_graph);
 	ext->link_func("tex_white", &get_tex_white);

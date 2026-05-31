@@ -93,3 +93,6 @@ class extern UniformBuffer extends Buffer
 class extern ShaderStorageBuffer extends Buffer
 	func extern __init__(size: i32)
 
+
+class extern GfxContext
+
