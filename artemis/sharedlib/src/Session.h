@@ -22,11 +22,13 @@
 class Storage;
 class Progress;
 class DrawingHelper;
-class ArtemisWindow;
 namespace yrenderer {
 	class TextureManager;
 	class ShaderManager;
 	class LineHelper;
+}
+namespace xhui {
+	class Window;
 }
 
 namespace dataflow {
@@ -66,7 +68,7 @@ public:
 
 	base::future<void> allow_termination();
 
-	ArtemisWindow *win;
+	xhui::Window* win;
 
 	yrenderer::Context* ctx;
 	yrenderer::ShaderManager* shader_manager;

@@ -3,7 +3,6 @@
 #include <graph/NodeFactory.h>
 #include <graph/Graph.h>
 #include "Session.h"
-#include <view/ArtemisWindow.h>
 #include <plugins/PluginManager.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>

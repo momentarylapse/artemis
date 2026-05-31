@@ -35,7 +35,6 @@
 #include <lib/yrenderer/_kaba_export.h>
 #include <lib/yrenderer/Context.h>
 
-#include "view/ArtemisWindow.h"
 #include "view/dialog/ColorMapDialog.h"
 
 extern Session* _current_session_;
@@ -348,9 +347,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("Session.warning", &Session::warning);
 	ext->link_class_func("Session.error", &Session::error);
 	ext->link_class_func("Session.remove_message", &Session::remove_message);
-
-	ext->declare_class_size("ArtemisWindow", sizeof(ArtemisWindow));
-	ext->declare_class_element("ArtemisWindow.ind", &ArtemisWindow::_internal_node_data);
 
 
 	{

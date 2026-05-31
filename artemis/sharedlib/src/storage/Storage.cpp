@@ -13,7 +13,6 @@
 #include "../lib/os/msg.h"
 #include "../lib/xhui/xhui.h"
 #include "../Session.h"
-#include "../view/ArtemisWindow.h"
 
 
 Path Storage::CANONICAL_SUB_DIR[NUM_FDS];

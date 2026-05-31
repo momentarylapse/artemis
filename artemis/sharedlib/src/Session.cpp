@@ -6,7 +6,6 @@
  */
 
 #include "Session.h"
-#include "view/ArtemisWindow.h"
 #include "Artemis.h"
 #include "data/Data.h"
 #include "storage/format/Format.h"
@@ -18,19 +17,57 @@
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/target/XhuiRenderer.h>
 #include <lib/yrenderer/helper/LineHelper.h>
+#include <lib/yrenderer/TextureManager.h>
+#include <lib/yrenderer/Context.h>
+#include <lib/xhui/xhui.h>
 #include "graph/Graph.h"
+#include <plugins/PluginManager.h>
 
 Session* _current_session_ = nullptr;
+
+namespace yrenderer {
+rect dynamicly_scaled_area(ygfx::FrameBuffer *fb) {
+	return rect(0, fb->width, 0, fb->height);
+}
+rect dynamicly_scaled_source() {
+	return rect::ID;
+}
+}
+
+void init_graphics_stuff(Session* session, xhui::Painter* pp) {
+
+	auto dir = artemis::PluginManager::directory() | "static";
+	session->texture_manager = new yrenderer::TextureManager(session->ctx->context, dir);
+	session->shader_manager = new yrenderer::ShaderManager(session->ctx->context, dir | "shader");
+	session->ctx->shader_manager = session->shader_manager;
+	session->ctx->texture_manager = session->texture_manager;
+	session->shader_manager->default_shader = "default.shader";
+	session->material_manager = new yrenderer::MaterialManager(session->ctx->texture_manager, "");
+	session->ctx->material_manager = session->material_manager;
+	session->line_helper = new yrenderer::LineHelper();
+	try {
+			session->shader_manager->load_shader_module("module-basic-data.shader");
+			session->shader_manager->load_shader_module("module-basic-interface.shader");
+			session->shader_manager->load_shader_module("module-vertex-default.shader");
+			session->shader_manager->load_shader_module("module-vertex-animated.shader");
+			session->shader_manager->load_shader_module("module-light-sources-default.shader");
+			session->shader_manager->load_shader_module("module-shadows-pcf.shader");
+			session->shader_manager->load_shader_module("module-lighting-pbr.shader");
+			session->shader_manager->load_shader_module("forward/module-surface.shader");
+		} catch(Exception& e) {
+				msg_error(e.message());
+			}
+
+	//		engine.file_errors_are_critical = false;
+	//		engine.ignore_missing_files = true;
+	//		engine.resource_manager = session->resource_manager;
+}
 
 Session *create_session(bool with_window) {
 	auto s = new Session;
 	s->storage = new Storage(s);
 	s->data = new artemis::graph::DataGraph(s);
 	s->graph = s->data->graph.get();
-	if (with_window) {
-		s->win = new ArtemisWindow(s);
-		xhui::fly(s->win);
-	}
 	_current_session_ = s;
 	artemis::processing::pool::init();
 	return s;
