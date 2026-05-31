@@ -43,8 +43,6 @@ base::future<Session*> emit_new_session() {
 }
 
 bool session_is_empty(Session *s) {
-	if (s->cur_mode == s->mode_none)
-		return true;
 	return false;
 }
 
@@ -57,12 +55,6 @@ base::future<Session*> emit_empty_session(Session* parent) {
 
 Session::Session() {
 	ctx = nullptr;
-	mode_none = nullptr;
-#if 0
-	mode_none = new ModeNone(this);
-	cur_mode = mode_none;
-	progress = new Progress;
-#endif
 
 	storage = nullptr;
 	shader_manager = nullptr;
@@ -186,91 +178,6 @@ base::future<void> mode_switch_allowed(Mode *m) {
 //	}
 }
 
-void Session::set_mode(Mode *m) {
-	if (cur_mode == m)
-		return;
-	mode_switch_allowed(m).then([this, m] {
-		set_mode_now(m);
-	});
-}
-
-void Session::set_mode_now(Mode *m) {
-	if (cur_mode == m)
-		return;
-
-#if 0
-	// recursive use...
-	mode_queue.add(m);
-	if (mode_queue.num > 1)
-		return;
-#endif
-	if (cur_mode) {
-		cur_mode->on_leave();
-		if (cur_mode->get_data()) {
-			cur_mode->get_data()->unsubscribe(win);
-			cur_mode->get_data()->action_manager->unsubscribe(win);
-		}
-		cur_mode->unsubscribe(win);
-	}
-
-#if 0
-	m = mode_queue[0];
-	while (m) {
-
-		// close current modes
-		while (cur_mode) {
-			if (cur_mode->is_ancestor_of(m))
-				break;
-			//msg_write("end " + cur_mode->name);
-			cur_mode->on_leave_rec();
-		//	if (cur_mode->multi_view)
-		//		cur_mode->multi_view->pop_settings();
-			cur_mode = cur_mode->get_parent();
-		}
-
-		//multi_view_3d->ResetMouseAction();
-		//multi_view_2d->ResetMouseAction();
-
-		// start new modes
-		while (cur_mode != m) {
-			cur_mode = cur_mode->get_next_child_to(m);
-		//	msg_write("start " + cur_mode->name);
-		//	if (cur_mode->multi_view)
-		//		cur_mode->multi_view->push_settings();
-			cur_mode->on_enter_rec();
-		}
-		cur_mode->on_enter();
-		cur_mode->on_set_multi_view();
-
-		// nested set calls?
-		mode_queue.erase(0);
-		m = nullptr;
-		if (mode_queue.num > 0)
-			m = mode_queue[0];
-	}
-
-	//win->set_menu(hui::create_resource_menu(cur_mode->menu_id, win));
-	win->update_menu();
-#endif
-
-	cur_mode = m;
-
-	cur_mode->on_enter();
-
-
-	//cur_mode->on_enter(); // ????
-	cur_mode->out_redraw >> win->in_redraw;
-	if (cur_mode->get_data()) {
-		cur_mode->get_data()->out_changed >> win->in_data_changed;
-		auto *am = cur_mode->get_data()->action_manager;
-		am->out_failed >> win->in_action_failed;
-		am->out_saved >> win->in_saved;
-	}
-
-	win->request_redraw();
-}
-
-
 void Session::remove_message() {
 	messages.erase(0);
 	win->request_redraw();
@@ -297,20 +204,6 @@ void Session::info(const string &message) {
 
 void Session::warning(const string &message) {
 	add_message(Message::Type::Warning, message);
-}
-
-Mode *Session::get_mode(int preferred_type) {
-#if 0
-	if (preferred_type == FD_MODEL)
-		return mode_model;
-	if (preferred_type == FD_WORLD)
-		return mode_world;
-	if (preferred_type == FD_MATERIAL)
-		return mode_material;
-	if (preferred_type == FD_FONT)
-		return mode_font;
-#endif
-	return mode_none;
 }
 
 
@@ -347,59 +240,6 @@ base::future<void> Session::allow_termination() {
 	promise();
 #endif
 	return promise.get_future();
-}
-
-string Session::get_tex_image(ygfx::Texture *tex) {
-#if 0
-	if (icon_image.contains(tex))
-		return icon_image[tex];
-
-	string img;
-	if (tex) {
-		Image im;
-#if HAS_LIB_GL
-		tex->read(im);
-#endif
-		auto *small = im.scale(48, 48);
-		img = hui::set_image(small);
-		delete small;
-	} else {
-		Image empty;
-		empty.create(48, 48, White);
-		img = hui::set_image(&empty);
-	}
-	icon_image.set(tex, img);
-	return img;
-#endif
-	return "";
-}
-
-Mode *Session::find_mode_base(const string &name) {
-#if 0
-	if (name == "model")
-		return mode_model;
-	if (name == "model-mesh")
-		return mode_model->mode_model_mesh;
-	if (name == "model-mesh-texture")
-		return (ModeBase*)mode_model->mode_model_mesh->mode_model_mesh_texture;
-	if (name == "model-mesh-deform")
-		return (ModeBase*)mode_model->mode_model_mesh->mode_model_mesh_deform;
-	if (name == "model-mesh-material")
-		return (ModeBase*)mode_model->mode_model_mesh->mode_model_mesh_material;
-	if (name == "model-mesh-paint")
-		return (ModeBase*)mode_model->mode_model_mesh->mode_model_mesh_paint;
-	if (name == "model-skeleton")
-		return (ModeBase*)mode_model->mode_model_skeleton;
-	if (name == "model-animation")
-		return (ModeBase*)mode_model->mode_model_animation;
-	if (name == "material")
-		return mode_material;
-	if (name == "font")
-		return mode_font;
-	if (name == "world")
-		return mode_world;
-#endif
-	return mode_none;
 }
 
 

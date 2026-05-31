@@ -19,7 +19,6 @@
 #include "lib/yrenderer/MaterialManager.h"
 
 
-class Mode;
 class Storage;
 class Progress;
 class DrawingHelper;
@@ -46,13 +45,8 @@ public:
 
 	void create_initial_resources(yrenderer::Context *ctx);
 
-	void set_mode(Mode *m);
-	void set_mode_now(Mode *m);
-
 	void on_command(const string &id);
 	void on_close();
-
-	Mode *get_mode(int type);
 
 	struct Message {
 		enum class Type {
@@ -74,15 +68,6 @@ public:
 
 	ArtemisWindow *win;
 
-	Mode *mode_none;
-	Mode *cur_mode = nullptr;
-	Array<Mode*> mode_queue;
-	Mode *find_mode_base(const string &name);
-	template<class M>
-	M *find_mode(const string &name) {
-		return static_cast<M*>(find_mode_base(name));
-	}
-
 	yrenderer::Context* ctx;
 	yrenderer::ShaderManager* shader_manager;
 	yrenderer::TextureManager* texture_manager;
@@ -92,9 +77,6 @@ public:
 	Storage *storage;
 
 	Progress *progress;
-
-	base::map<ygfx::Texture*, string> icon_image;
-	string get_tex_image(ygfx::Texture *tex);
 
 	os::Timer timer;
 	double t, dt;

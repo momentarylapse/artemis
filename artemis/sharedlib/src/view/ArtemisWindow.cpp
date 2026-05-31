@@ -27,6 +27,7 @@
 
 #include "Artemis.h"
 #include "Session.h"
+#include "graph/Graph.h"
 #include "lib/base/iter.h"
 #include "plugins/PluginManager.h"
 #include "storage/Storage.h"
@@ -101,7 +102,7 @@ ArtemisWindow::ArtemisWindow(Session* _session) : obs::Node<xhui::Window>(AppNam
 		update_menu();
 	}),
 	in_action_failed(this, [this] {
-		auto am = session->cur_mode->get_data()->action_manager;
+		auto am = session->data->action_manager;
 		session->error(format("Action failed: %s\nReason: %s", am->error_location.c_str(), am->error_message.c_str()));
 	}),
 	in_saved(this, [this] {
@@ -162,26 +163,8 @@ Dialog x x padding=0
 	set_key_code("undo", mod + xhui::KEY_Z);
 	set_key_code("redo", mod + xhui::KEY_Y);
 	set_key_code("show-profiling", mod + xhui::KEY_T);
-	event("open", [this] {
-		session->cur_mode->on_command("open");
-	});
-	event("save", [this] {
-		session->cur_mode->on_command("save");
-	});
-	event("save-as", [this] {
-		session->cur_mode->on_command("save-as");
-	});
 	event("exit", [this] {
 		request_destroy();
-	});
-	event("undo", [this] {
-		session->cur_mode->on_command("undo");
-	});
-	event("redo", [this] {
-		session->cur_mode->on_command("redo");
-	});
-	event("show-profiling", [this] {
-		session->cur_mode->on_command("show-profiling");
 	});
 
 	event_xp("canvas-overlay", xhui::event_id::Initialize, [this] (Painter* p) {
@@ -190,10 +173,6 @@ Dialog x x padding=0
 		init_graphics_stuff(session, pp);
 
 		session->promise_started(session);
-	});
-	event_xp("canvas-overlay", xhui::event_id::Draw, [this] (Painter* p) {
-		if (session->cur_mode)
-			session->cur_mode->on_draw_post(p);
 	});
 
 
@@ -218,12 +197,6 @@ Dialog x x padding=0
 		}
 	});
 	event_x(id, xhui::event_id::Close, [this] {
-		if (!session->cur_mode->get_data() or session->cur_mode->get_data()->action_manager->is_save())
-			request_destroy();
-		else xhui::QuestionDialog::ask(this, "Question", "You have unsaved changes. Do you want to close?").then([this] (xhui::Answer a) {
-			if (a == xhui::Answer::Yes)
-				request_destroy();
-		});
 	});
 }
 
@@ -231,10 +204,6 @@ void ArtemisWindow::on_key_down(int key) {
 }
 
 void ArtemisWindow::update_menu() {
-	if (session->cur_mode->get_data()) {
-		enable("undo", session->cur_mode->get_data()->action_manager->undoable());
-		enable("redo", session->cur_mode->get_data()->action_manager->redoable());
-	}
 }
 
 

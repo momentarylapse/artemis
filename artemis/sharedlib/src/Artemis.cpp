@@ -48,13 +48,6 @@ void add_default_graph(Session* s) {
 	}
 }
 
-void start_session_empty(Session* parent) {
-	emit_empty_session(parent).then([] (Session* s) {
-		add_default_graph(s);
-		s->set_mode(new ModeDefault(s));
-	});
-}
-
 void session_load_file(Session* s, const Path& filename) {
 	string ext = filename.extension();
 	if (ext == "artemis") {
@@ -72,13 +65,6 @@ void session_load_file(Session* s, const Path& filename) {
 	}
 }
 
-void start_session_load_file(Session* parent, const Path& filename) {
-	emit_empty_session(parent).then([filename] (Session* s) {
-		s->set_mode(new ModeDefault(s));
-		session_load_file(s, filename);
-	});
-}
-
 void app_init_core() {
 	try {
 		artemis::PluginManager::init();
@@ -88,54 +74,8 @@ void app_init_core() {
 	artemis::graph::init_factory();
 }
 
-void legacy_init() {
-	try {
-		xhui::init({}, "artemis");
-	} catch (Exception &e) {
-		msg_error(e.message());
-		return;
-	}
-}
-
-bool app_init() {
-	legacy_init();
-	app_init_core();
-	return true;
-}
-
-void app_run() {
-	try {
-		xhui::run();
-	} catch (Exception& e) {
-		msg_error(e.message());
-	}
-}
-
 namespace os::app {
-	int main(const Array<string>& args) {
-		try {
-			xhui::init(args, "artemis");
-		} catch (Exception &e) {
-			msg_error(e.message());
-			return 1;
-		}
-
-		kaba::init();
-		try {
-			artemis::PluginManager::init();
-		} catch (Exception &e) {
-			msg_error(e.message());
-		}
-		artemis::graph::init_factory();
-
-		auto s = create_session();
-		if (args.num >= 2) {
-			start_session_load_file(s, args[1]);
-		} else {
-			start_session_empty(s);
-		}
-
-		app_run();
+	int main(const Array<string>&) {
 		return 0;
 	}
 }
