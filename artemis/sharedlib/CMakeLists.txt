@@ -461,7 +461,6 @@ add_library(moduleartemis SHARED
 	src/storage/format/Format.cpp
 	src/storage/format/FormatArtemis.cpp
 	src/storage/Storage.cpp
-	src/view/dialog/ColorMapDialog.cpp
 	src/Artemis.cpp
 	src/LibExport.cpp
 	src/Session.cpp)

@@ -35,8 +35,6 @@
 #include <lib/yrenderer/_kaba_export.h>
 #include <lib/yrenderer/Context.h>
 
-#include "view/dialog/ColorMapDialog.h"
-
 extern Session* _current_session_;
 
 void session_load_file(Session* s, const Path& filename);
@@ -436,10 +434,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("GraphController.group_nodes", &graph::DataGraph::group_nodes);
 	ext->link_class_func("GraphController.move_nodes", &graph::DataGraph::move_nodes);
 	ext->link_class_func("GraphController.node_set_setting", &graph::DataGraph::node_set_setting);
-
-
-	ext->declare_class_size("ColorMapDialog", sizeof(ColorMapDialog));
-	ext->link_func("ColorMapDialog.ask", &ColorMapDialog::ask);
 
 	ext->declare_class_size("ColorMapFuture", sizeof(base::future<data::ColorMap>));
 	ext->link_class_func("ColorMapFuture.__init__", &kaba::generic_init<kaba::KabaFuture<data::ColorMap>>);
