@@ -3,7 +3,6 @@
 //
 
 #include "ArtemisWindow.h"
-#include "Mode.h"
 #include "lib/xhui/xhui.h"
 #include "lib/xhui/Painter.h"
 #include <lib/xhui/Context.h>

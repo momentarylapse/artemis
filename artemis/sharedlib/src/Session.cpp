@@ -8,7 +8,6 @@
 #include "Session.h"
 #include "view/ArtemisWindow.h"
 #include "Artemis.h"
-#include "view/Mode.h"
 #include "data/Data.h"
 #include "storage/format/Format.h"
 #include <processing/helper/GlobalThreadPool.h>
@@ -96,87 +95,6 @@ Session::~Session() {
 	app->end();
 }
 
-#ifdef ksdjfhskjdfhkjsdhfj
-void Session::create_initial_resources(yrenderer::Context *_ctx) {
-
-	ctx = _ctx;
-
-	// initialize engine
-	resource_manager = new ResourceManager(ctx, "", "", "");
-///	drawing_helper = new DrawingHelper(ctx, resource_manager, app->directory_static);
-
-	engine.ignore_missing_files = true;
-	engine.set_context(ctx, resource_manager);
-	resource_manager->shader_manager->load_shader("module-vertex-default.shader");
-	//ResourceManager::default_shader
-
-	CameraInit();
-	GodInit(0);
-
-#if 0
-	multi_view_3d = new MultiView::MultiView(this, true);
-	multi_view_2d = new MultiView::MultiView(this, false);
-	mode_model = new ModeModel(this, multi_view_3d, multi_view_2d);
-	mode_world = new ModeWorld(this, multi_view_3d);
-	mode_font = new ModeFont(this, multi_view_2d);
-	mode_admin = new ModeAdministration(this);
-#endif
-
-	storage = new Storage(this);
-	storage->set_root_directory(xhui::config.get_str("RootDir", ""));
-
-#if 0
-	mode_material = new ModeMaterial(this, multi_view_3d);
-
-	/*mmodel->FFVBinary = mobject->FFVBinary = mitem->FFVBinary = mmaterial->FFVBinary = mworld->FFVBinary = mfont->FFVBinary = false;
-	mworld->FFVBinaryMap = true;*/
-
-	multi_view_3d->out_settings_changed >> create_sink([this] {
-		win->update_menu();
-	});
-	multi_view_3d->out_selection_changed >> create_sink([this] {
-		cur_mode->on_selection_change();
-		win->update_menu();
-	});
-	multi_view_3d->out_viewstage_changed >> create_sink([this] {
-		cur_mode->on_view_stage_change();
-		win->update_menu();
-	});
-	multi_view_3d->out_redraw >> create_sink([this] {
-		win->redraw("nix-area");
-	});
-
-	multi_view_2d->out_settings_changed >> create_sink([this]{
-		win->update_menu();
-	});
-	multi_view_2d->out_selection_changed >> create_sink([this] {
-		cur_mode->on_selection_change();
-		win->update_menu();
-	});
-	multi_view_2d->out_viewstage_changed >> create_sink([this] {
-		cur_mode->on_view_stage_change();
-		win->update_menu();
-	});
-	multi_view_2d->out_redraw >> create_sink([this] {
-		win->redraw("nix-area");
-	});
-#endif
-
-	promise_started(this);
-}
-#endif
-
-// do we change roots?
-//  -> data loss?
-base::future<void> mode_switch_allowed(Mode *m) {
-//	if (!m->session->cur_mode or m->equal_roots(m->session->cur_mode)) {
-		base::promise<void> promise;
-		promise();
-		return promise.get_future();
-//	} else {
-//		return m->session->allow_termination();
-//	}
-}
 
 void Session::remove_message() {
 	messages.erase(0);
