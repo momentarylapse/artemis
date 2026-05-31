@@ -187,8 +187,6 @@ add_library(moduleartemis SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
-	src/lib/codeeditor/_kaba_export.cpp
-	src/lib/codeeditor/CodeEditor.cpp
 	src/lib/dataflow/Graph.cpp
 	src/lib/dataflow/Node.cpp
 	src/lib/dataflow/Port.cpp
@@ -332,18 +330,6 @@ add_library(moduleartemis SHARED
 	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
-	src/lib/syntaxhighlight/_kaba_export.cpp
-	src/lib/syntaxhighlight/AutoComplete.cpp
-	src/lib/syntaxhighlight/BaseParser.cpp
-	src/lib/syntaxhighlight/ParserC.cpp
-	src/lib/syntaxhighlight/ParserCmake.cpp
-	src/lib/syntaxhighlight/ParserHui.cpp
-	src/lib/syntaxhighlight/ParserIni.cpp
-	src/lib/syntaxhighlight/ParserKaba.cpp
-	src/lib/syntaxhighlight/ParserPython.cpp
-	src/lib/syntaxhighlight/ParserShader.cpp
-	src/lib/syntaxhighlight/ParserText.cpp
-	src/lib/syntaxhighlight/Theme.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -477,7 +463,6 @@ add_library(moduleartemis SHARED
 	src/storage/Storage.cpp
 	src/view/dialog/ColorMapDialog.cpp
 	src/view/ArtemisWindow.cpp
-	src/view/CodeEditor.cpp
 	src/view/DefaultNodePanel.cpp
 	src/view/GraphEditor.cpp
 	src/view/Mode.cpp

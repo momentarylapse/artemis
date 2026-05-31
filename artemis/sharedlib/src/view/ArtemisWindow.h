@@ -14,7 +14,6 @@ namespace xhui {
 class Session;
 
 namespace artemis::view {
-	class CodeEditor;
 	class Canvas;
 	class GraphEditor;
 }
@@ -33,7 +32,6 @@ public:
 	xhui::Toolbar* toolbar;
 
 	artemis::view::GraphEditor* graph_editor;
-	artemis::view::CodeEditor* code_editor;
 
 	explicit ArtemisWindow(Session* session);
 

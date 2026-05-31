@@ -19,7 +19,6 @@
 #include <lib/yrenderer/helper/LineHelper.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include "GraphEditor.h"
-#include "CodeEditor.h"
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/yrenderer/ShaderManager.h>
@@ -154,8 +153,6 @@ Dialog x x padding=0
 	graph_editor = new artemis::view::GraphEditor(session);
 	embed("left-grid", 0, 0, graph_editor);
 
-	code_editor = new artemis::view::CodeEditor(session, this, "code-editor-grid", artemis::PluginManager::directory());
-
 #ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;
 #else
@@ -205,9 +202,6 @@ Dialog x x padding=0
 
 
 
-	event("code-run", [this] {
-		code_editor->run();
-	});
 	event("close-code-editor", [this] {
 		set_visible("code-editor-panel", false);
 	});
