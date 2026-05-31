@@ -18,7 +18,6 @@
 #include <lib/yrenderer/Context.h>
 #include <lib/yrenderer/helper/LineHelper.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include "GraphEditor.h"
 #include <lib/os/msg.h>
 #include <lib/xhui/Theme.h>
 #include <lib/yrenderer/ShaderManager.h>
@@ -149,9 +148,6 @@ Dialog x x padding=0
 	Panel::set_option("padding", "0");
 
 	//toolbar = (xhui::Toolbar*)get_control("toolbar");
-
-	graph_editor = new artemis::view::GraphEditor(session);
-	embed("left-grid", 0, 0, graph_editor);
 
 #ifdef OS_MAC
 	int mod = xhui::KEY_SUPER;

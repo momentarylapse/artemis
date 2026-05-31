@@ -9,10 +9,9 @@
 #include <lib/os/msg.h>
 #include <lib/profiler/Profiler.h>
 
-// TODO remove dependency
-#include <view/DefaultNodePanel.h>
 
 namespace artemis {
+	class Session;
 	Session* current_session();
 }
 
@@ -87,7 +86,7 @@ bool Node::has_necessary_inputs() const {
 
 
 xhui::Panel* Node::create_panel() {
-	return new DefaultNodePanel(artemis::current_session(), this);
+	return nullptr;
 }
 
 }

@@ -144,7 +144,7 @@ Dialog x x padding=0
 
 		event("show-profiling", on_show_profiling)
 
-	
+
 		let mod = if os.system_type == os.SystemType.MAC
 			xhui.KEY_SUPER
 		else
@@ -182,7 +182,7 @@ Dialog x x padding=0
 		init_graphics_stuff(session, p)
 		session.promise_started()
 
-	
+
 	func mut on_overlay_draw(out p: Painter)
 		for i=>m in session.messages
 			var fg = wash_col(&xhui.theme.text_label)
@@ -205,7 +205,7 @@ Dialog x x padding=0
 		p.set_font_size(wash_f32(&xhui.theme.font_size) * 1.3)
 		draw_str_right(p, p.area().p11() - vec2(320, 55), "t = {{nice_time(session.t, session.dt)}}")
 		p.set_font_size(wash_f32(&xhui.theme.font_size))
-	
+
 		if show_profiling
 			p.set_font_size(wash_f32(&xhui.theme.font_size) * 0.85)
 			let report = profiler.digest_report(profiler.previous_frame_timing)
@@ -225,7 +225,7 @@ Dialog x x padding=0
 	func mut on_show_profiling()
 		show_profiling = not show_profiling
 		session.win.request_redraw()
-	
+
 
 class extern Session
 	var graph: owned![Graph]
@@ -268,14 +268,10 @@ func extern current_session() -> Session&
 
 
 func extern create_session(with_window=true) -> Session&
-func extern start_session_empty(s: Session&)
-func extern start_session_load_file(s: Session&, filename: os.Path)
 func extern session_load_file(s: Session&, filename: os.Path)
 func extern add_default_graph(s: Session&)
 func extern init_graphics_stuff(s: Session&, p: Painter)
 func extern iterate_simulation(s: Session&)
 func extern plugin_directory() -> os.Path
-func extern legacy_init()
-func extern app_run()
 func extern test_done()
 

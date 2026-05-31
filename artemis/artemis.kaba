@@ -60,24 +60,7 @@ class Artemis
 		xhui.run()
 
 
-func main_new(args: string[])
+func main(args: string[])
 	var a = new Artemis()
 	a.start(args)
-
 	a.run()
-
-
-func main(args: string[])
-	if args[:1] == ["-x"]
-		main_new(args[1:])
-		return
-
-
-	print("LEGACY-------------------------------")
-	legacy_init()
-	var s = create_session()
-	if len(args) >= 1
-		start_session_load_file(s, args[0])
-	else
-		start_session_empty(s)
-	app_run()

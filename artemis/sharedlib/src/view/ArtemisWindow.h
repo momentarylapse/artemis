@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "GraphEditor.h"
 #include <lib/xhui/xhui.h>
 #include <lib/pattern/Observable.h>
 
@@ -12,11 +11,6 @@ namespace xhui {
 	class Toolbar;
 }
 class Session;
-
-namespace artemis::view {
-	class Canvas;
-	class GraphEditor;
-}
 
 class ArtemisWindow : public obs::Node<xhui::Window> {
 public:
@@ -30,8 +24,6 @@ public:
 	obs::sink in_saved;
 
 	xhui::Toolbar* toolbar;
-
-	artemis::view::GraphEditor* graph_editor;
 
 	explicit ArtemisWindow(Session* session);
 
