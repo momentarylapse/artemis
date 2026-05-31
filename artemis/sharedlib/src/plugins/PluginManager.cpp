@@ -46,6 +46,7 @@ void session_load_file(Session* s, const Path& filename);
 void init_graphics_stuff(Session* session, xhui::Painter* pp);
 void add_default_graph(Session* s);
 void app_run();
+void legacy_init();
 
 namespace artemis {
 
@@ -173,7 +174,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("start_session_empty", &start_session_empty);
 	ext->link_func("session_load_file", &session_load_file);
 	ext->link_func("init_graphics_stuff", &init_graphics_stuff);
+	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("add_default_graph", &add_default_graph);
+	ext->link_func("legacy_init", &legacy_init);
 	ext->link_func("app_run", &app_run);
 	ext->link_func("tex_white", &get_tex_white);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);

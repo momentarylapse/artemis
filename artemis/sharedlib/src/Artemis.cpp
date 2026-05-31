@@ -89,16 +89,19 @@ void app_init_core() {
 	artemis::graph::init_factory();
 }
 
-bool app_init() {
+void legacy_init() {
 	try {
 		xhui::init({}, "artemis");
 	} catch (Exception &e) {
 		msg_error(e.message());
-		return false;
+		return;
 	}
 
-	//kaba::init();
 	syntaxhighlight::init();
+}
+
+bool app_init() {
+	legacy_init();
 	app_init_core();
 	return true;
 }

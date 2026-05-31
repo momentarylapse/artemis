@@ -8,6 +8,7 @@ use .gfx
 use .yrenderer
 use .profiler.*
 use .ui.grapheditor.*
+use .ui.codeeditor.*
 
 # :( TODO kaba internal
 func in_list[X](x: X, list: X[]) -> bool
@@ -73,6 +74,7 @@ func draw_str_right(out p: Painter, pos: vec2, str: string)
 class extern ArtemisWindow extends xhui.Window as obs.Node
 	var session: Session&
 	var graph_editor: shared![GraphEditor]
+	var code_editor: shared![CodeEditor]
 	var show_profiling = false
 
 
@@ -120,9 +122,20 @@ Dialog x x padding=0
 
 		graph_editor.out_info >> create_data_sink[string](func(s: string) session.info(s))
 		graph_editor.out_error >> create_data_sink[string](func(s: string) session.error(s))
+		graph_editor.out_show_code_editor >> create_sink(func() set_visible("code-editor-panel", true))
+
+		code_editor = new CodeEditor(plugin_directory())
+		embed("code-editor-grid", 0, 0, code_editor)
+
+		code_editor.out_info >> create_data_sink[string](func(s: string) session.info(s))
+		code_editor.out_error >> create_data_sink[string](func(s: string) session.error(s))
 
 		event_x("canvas-overlay", "hui:initialize", on_initialize)
 		event_x("canvas-overlay", "hui:draw", on_overlay_draw)
+
+
+		event("code-run", code_editor.run)
+		event("close-code-editor", func() set_visible("code-editor-panel", false))
 
 		event("simulation-start", on_sim_start)
 		event("simulation-pause", on_sim_pause)
@@ -261,6 +274,8 @@ func extern session_load_file(s: Session&, filename: os.Path)
 func extern add_default_graph(s: Session&)
 func extern init_graphics_stuff(s: Session&, p: Painter)
 func extern iterate_simulation(s: Session&)
+func extern plugin_directory() -> os.Path
+func extern legacy_init()
 func extern app_run()
 func extern test_done()
 

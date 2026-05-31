@@ -74,6 +74,7 @@ func main(args: string[])
 
 
 	print("LEGACY-------------------------------")
+	legacy_init()
 	var s = create_session()
 	if len(args) >= 1
 		start_session_load_file(s, args[0])

@@ -70,6 +70,7 @@ func port_description[P](p: P&, direction: string) -> string
 class GraphEditor extends xhui.Panel as obs.Node
 	var out_info = obs.XSource[string](&self, &ind, "info")
 	var out_error = obs.XSource[string](&self, &ind, "error")
+	var out_show_code_editor = obs.Source(&self, &ind, "show-code-editor")
 	var graph: Graph&
 	var graph_con: GraphController&
 	var channel: i32
@@ -143,6 +144,8 @@ Dialog x ''
 		event_x("graph", "hui:key-down", _on_key_down)
 		event_x("graph", "hui:drag-drop", on_drag_drop)
 		event("add-node", open_node_list_panel)
+
+		event("show-code-editor", func() out_show_code_editor())
 
 
 	func mut _on_mouse_move()

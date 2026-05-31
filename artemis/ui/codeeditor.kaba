@@ -1,0 +1,46 @@
+use os
+use xhui
+use obs
+use kaba
+use codeeditor
+
+
+class CodeEditor extends codeeditor.CodeEditor
+	var package_dir: os.Path
+
+
+	func mut __init__(_package_dir: os.Path)
+		package_dir = _package_dir
+	
+		filename = "dummy.kaba"
+		set_visible("structure", false)
+	
+		set_string(id_edit, "use artemis.*
+	
+func main()
+	var g = weak(current_session().graph)
+	print(\"hi\")
+")
+		update_highlight_all()
+	
+#		editor.out_info >> create_data_sink<string>([this] (const string& m) {
+#			session->info(m);
+#		});
+#		editor->out_error >> create_data_sink<string>([this] (const string& m) {
+#			session->error(m);
+#		});
+
+
+	func mut run()
+		let source = edit.text
+	
+		try
+#			let filename = package_dir | "from-code-editor.kaba"
+			var m = kaba.default_context.create_module_for_source(source, false)
+#			typedef void t_f();
+#			if (auto f = (t_f*)m->match_function("main", "void", {}))
+#				(*f)();
+		except Exception as e
+			out_error(str(e))
+
+
