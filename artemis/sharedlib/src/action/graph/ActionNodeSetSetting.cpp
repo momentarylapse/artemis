@@ -14,25 +14,21 @@ ActionNodeSetSetting::ActionNodeSetSetting(dataflow::Node* node, const string& k
 	this->value = value;
 }
 
-void* ActionNodeSetSetting::execute(Data* d) {
+void* ActionNodeSetSetting::execute(history::Data* d) {
 	const auto temp = node->get(key);
 	node->set(key, value);
 	value = temp;
 	return node;
 }
 
-void ActionNodeSetSetting::undo(Data* d) {
+void ActionNodeSetSetting::undo(history::Data* d) {
 	execute(d);
 }
 
-bool ActionNodeSetSetting::try_merge_into(Action* previous) {
+bool ActionNodeSetSetting::absorb(Action* previous) {
 	if (auto a = dynamic_cast<ActionNodeSetSetting*>(previous); a) {
-		if (!a->is_recent_enough())
-			return false;
 		if (a->node != node or a->key != key)
 			return false;
-
-		a->time_stamp = time_stamp;
 		return true;
 	}
 	return false;

@@ -7,12 +7,12 @@
 
 #include "Data.h"
 
-Data::Data(Session *_session, int _type) {
-	session = _session;
+namespace history {
+
+Data::Data(int _type) {
 	type = _type;
 	action_manager = new ActionManager(this);
 	file_time = 0;
-	binary_file_format = false;
 }
 
 Data::~Data() {
@@ -29,12 +29,12 @@ void Data::end_action_group() {
 	action_manager->end_group();
 }
 
-void Data::redo() {
-	action_manager->redo();
+bool Data::redo() {
+	return action_manager->redo();
 }
 
-void Data::undo() {
-	action_manager->undo();
+bool Data::undo() {
+	return action_manager->undo();
 }
 
 bool Data::undoable() const {
@@ -55,4 +55,34 @@ void Data::reset_history() {
 	action_manager->reset();
 }
 
+bool Data::history_enabled() {
+	return action_manager->is_enabled();
+}
+
+// "low level" -> don't use ActionManager.lock()!
+void Data::lock() {
+	mtx.lock();
+}
+
+bool Data::try_lock() {
+	return mtx.try_lock();
+}
+
+void Data::unlock() {
+	mtx.unlock();
+}
+
+void Data::lock_shared() {
+	mtx.lock_shared();
+}
+
+bool Data::try_lock_shared() {
+	return mtx.try_lock_shared();
+}
+
+void Data::unlock_shared() {
+	mtx.unlock_shared();
+}
+
+}
 

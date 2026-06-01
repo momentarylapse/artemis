@@ -6,17 +6,18 @@
 
 #include <lib/dataflow/Graph.h>
 #include <lib/base/pointer.h>
-#include <data/Data.h>
+#include <lib/history/Data.h>
 
 namespace artemis::graph {
 
 void iterate_simulation(Session* s);
 
-class DataGraph : public Data {
+class DataGraph : public history::Data {
 public:
 	explicit DataGraph(Session* session);
 	void reset() override;
 
+	Session* session;
 	owned<dataflow::Graph> graph;
 
 	// actions

@@ -31,7 +31,8 @@ void iterate_simulation(Session* s) {
 }
 
 
-DataGraph::DataGraph(Session* session) : Data(session, -1) {
+DataGraph::DataGraph(Session* _session) : Data(-1) {
+	session = _session;
 	graph = new dataflow::Graph();
 }
 

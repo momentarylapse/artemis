@@ -7,7 +7,7 @@
 
 #include "Session.h"
 #include "Artemis.h"
-#include "data/Data.h"
+#include <lib/history/Data.h>
 #include "storage/format/Format.h"
 #include <processing/helper/GlobalThreadPool.h>
 #include <storage/Storage.h>

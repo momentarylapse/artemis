@@ -7,7 +7,9 @@
 
 #pragma once
 
-#include "../data/Data.h"
+#include "Data.h"
+
+namespace history {
 
 class Data;
 class ActionManager;
@@ -28,8 +30,7 @@ public:
 	Action();
 	virtual ~Action();
 
-	virtual string name() const = 0;
-	//virtual const string &message();
+	virtual string name() const { return "???"; }
 
 	virtual bool allowed(Data* d) {
 		return true;
@@ -37,11 +38,11 @@ public:
 	virtual void abort(Data* d) {
 		undo_logged(d);
 	}
-	virtual bool was_trivial() const {
+	virtual bool is_trivial() const {
 		return false;
 	}
 
-	virtual void *execute(Data* d) = 0;
+	virtual void* execute(Data* d) = 0;
 	virtual void undo(Data* d) = 0;
 	virtual void redo(Data* d) {
 		execute(d);
@@ -51,3 +52,5 @@ public:
 	void undo_logged(Data* d);
 	void redo_logged(Data* d);
 };
+
+}

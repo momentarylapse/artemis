@@ -13,7 +13,7 @@ ActionNodesMove::ActionNodesMove(const Array<dataflow::Node*>& nodes, const vec2
 	this->offset = offset;
 }
 
-void* ActionNodesMove::execute(Data* d) {
+void* ActionNodesMove::execute(history::Data* d) {
 	pos.clear();
 	for (auto n: nodes) {
 		pos.add(n->pos);
@@ -22,21 +22,18 @@ void* ActionNodesMove::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionNodesMove::undo(Data* d) {
+void ActionNodesMove::undo(history::Data* d) {
 	for (auto&& [i, n]: enumerate(nodes)) {
 		n->pos = pos[i];
 	}
 }
 
-bool ActionNodesMove::try_merge_into(Action* previous) {
+bool ActionNodesMove::absorb(Action* previous) {
 	if (auto a = dynamic_cast<ActionNodesMove*>(previous); a) {
-		if (!a->is_recent_enough())
-			return false;
 		if (a->nodes != nodes)
 			return false;
 
 		a->offset += offset;
-		a->time_stamp = time_stamp;
 		return true;
 	}
 	return false;

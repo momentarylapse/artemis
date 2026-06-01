@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <action/MergableAction.h>
+#include <lib/history/MergableAction.h>
 #include <lib/any/any.h>
 
 namespace dataflow {
@@ -13,14 +13,14 @@ namespace dataflow {
 
 namespace artemis {
 
-class ActionNodeSetSetting : public MergableAction {
+class ActionNodeSetSetting : public history::MergableAction {
 public:
 	explicit ActionNodeSetSetting(dataflow::Node* node, const string& key, const Any& value);
 	string name() const override { return "graph-node-set-setting"; }
-	void* execute(Data* d) override;
-	void undo(Data* d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
-	bool try_merge_into(Action* previous) override;
+	bool absorb(Action* previous) override;
 
 	dataflow::Node* node;
 	string key;

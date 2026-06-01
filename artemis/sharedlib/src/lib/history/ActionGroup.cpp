@@ -7,20 +7,17 @@
 
 #include "ActionGroup.h"
 
+namespace history {
+
 ActionGroup::ActionGroup() = default;
+ActionGroup::~ActionGroup() = default;
 
-ActionGroup::~ActionGroup() {
-	for (Action *a: action)
-		delete(a);
-	action.clear();
-}
-
-void *ActionGroup::add_sub_action(Action* a, Data* d) {
-	void *r = nullptr;
+void *ActionGroup::add_sub_action(xfer<Action> a, Data* d) {
+	void* r = nullptr;
 	try {
 		r = a->execute_logged(d);
-		if (!a->was_trivial())
-			action.add(a);
+		if (!a->is_trivial())
+			actions.add(a);
 	} catch(ActionException& e) {
 		e.add_parent(a->name());
 		a->abort(d);
@@ -42,24 +39,26 @@ void *ActionGroup::execute(Data* d) {
 
 
 void ActionGroup::undo(Data* d) {
-	foreachb(Action* a, action)
+	foreachb(Action* a, weak(actions))
 		a->undo_logged(d);
 }
 
 
 
 void ActionGroup::redo(Data* d) {
-	for (Action* a: action)
+	for (Action* a: weak(actions))
 		a->redo_logged(d);
 }
 
 void ActionGroup::abort(Data* d) {
-	foreachb(Action* a, action)
+	foreachb(Action* a, weak(actions))
 		a->undo_logged(d);
 }
 
-bool ActionGroup::was_trivial() const {
-	return action.num == 0;
+bool ActionGroup::is_trivial() const {
+	return actions.num == 0;
+}
+
 }
 
 

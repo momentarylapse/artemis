@@ -13,13 +13,13 @@ ActionGraphUnconnect::ActionGraphUnconnect(dataflow::OutPortBase* source, datafl
 	this->sink = sink;
 }
 
-void* ActionGraphUnconnect::execute(Data* d) {
+void* ActionGraphUnconnect::execute(history::Data* d) {
 	auto g = dynamic_cast<graph::DataGraph*>(d);
 	g->graph->unconnect({source, sink});
 	return nullptr;
 }
 
-void ActionGraphUnconnect::undo(Data* d) {
+void ActionGraphUnconnect::undo(history::Data* d) {
 	auto g = dynamic_cast<graph::DataGraph*>(d);
 	g->graph->connect({source, sink});
 }

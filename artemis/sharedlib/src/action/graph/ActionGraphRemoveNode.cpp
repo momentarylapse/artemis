@@ -12,13 +12,13 @@ ActionGraphRemoveNode::ActionGraphRemoveNode(dataflow::Node* node) {
 	this->node = node;
 }
 
-void* ActionGraphRemoveNode::execute(Data* d) {
+void* ActionGraphRemoveNode::execute(history::Data* d) {
 	auto g = dynamic_cast<graph::DataGraph*>(d);
 	g->graph->remove_node(node);
 	return nullptr;
 }
 
-void ActionGraphRemoveNode::undo(Data* d) {
+void ActionGraphRemoveNode::undo(history::Data* d) {
 	auto g = dynamic_cast<graph::DataGraph*>(d);
 	g->graph->add_node(node);
 }

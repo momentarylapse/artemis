@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <action/Action.h>
+#include <lib/history/Action.h>
 
 namespace dataflow {
 	class Node;
@@ -12,12 +12,12 @@ namespace dataflow {
 
 namespace artemis {
 
-class ActionGraphRemoveNode : public Action {
+class ActionGraphRemoveNode : public history::Action {
 public:
 	explicit ActionGraphRemoveNode(dataflow::Node* node);
 	string name() const override { return "graph-remove-node"; }
-	void* execute(Data* d) override;
-	void undo(Data* d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	dataflow::Node* node;
 };

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <action/Action.h>
+#include <lib/history/Action.h>
 
 namespace dataflow {
 	class Node;
@@ -15,13 +15,13 @@ namespace dataflow {
 
 namespace artemis {
 
-class ActionGraphConnect : public Action {
+class ActionGraphConnect : public history::Action {
 public:
 	ActionGraphConnect(dataflow::OutPortBase* source, dataflow::InPortBase* sink);
 	string name() const override { return "connect"; }
 
-	void* execute(Data* d) override;
-	void undo(Data* d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	dataflow::OutPortBase* source;
 	dataflow::InPortBase* sink;

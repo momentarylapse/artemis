@@ -9,6 +9,8 @@
 
 #include "Action.h"
 
+namespace history {
+
 class Data;
 class ActionManager;
 
@@ -22,30 +24,18 @@ public:
 		return nullptr;
 	}
 
-	void *execute(Data* d) override;
+	void* execute(Data* d) override;
 	void undo(Data* d) override;
 	void redo(Data* d) override;
 
 	void abort(Data* d) override;
-	bool was_trivial() const override;
+	bool is_trivial() const override;
 
 protected:
-	void* add_sub_action(Action* a, Data* d);
+	void* add_sub_action(xfer<Action> a, Data* d);
 
 private:
-	Array<Action*> action;
+	owned_array<Action> actions;
 };
 
-class ActionGroupManual : public ActionGroup {
-	friend class ActionManager;
-public:
-	explicit ActionGroupManual(const string &name) {
-		_name_ = name;
-	}
-
-	virtual string name() const {
-		return _name_;
-	}
-private:
-	string _name_;
-};
+}
