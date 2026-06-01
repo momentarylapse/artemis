@@ -16,6 +16,7 @@
 #include <lib/os/msg.h>
 #include <lib/profiler/_kaba_export.h>
 #include <lib/ygraphics/graphics-impl.h>
+#include <lib/ygraphics/Context.h>
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
@@ -32,8 +33,6 @@
 #include <lib/mesh/GeometryCube.h>
 #include <lib/mesh/GeometrySphere.h>
 #include <lib/mesh/GeometryTeapot.h>
-#include <lib/yrenderer/_kaba_export.h>
-#include <lib/yrenderer/Context.h>
 
 extern Session* _current_session_;
 
@@ -141,10 +140,6 @@ const kaba::Class* field_get_type(const T& field) {
 	return type_data_to_kaba(field.type);
 }
 
-shared<ygfx::Texture> get_tex_white() {
-	return current_session()->ctx->tex_white;
-}
-
 typedef float(f_f32_f32)(float);
 Array<float> eval_f32_f32_list(f_f32_f32* f, const Array<float>& list) {
 	Array<float> out;
@@ -157,6 +152,10 @@ dataflow::Node* xxx_create_node(const string& name) {
 	return graph::create_node(current_session(), name);
 }
 
+void publish_gfx_context(ygfx::Context* ctx) {
+	ctx->make_current();
+}
+
 void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
@@ -165,7 +164,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("session_load_file", &session_load_file);
 	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("add_default_graph", &add_default_graph);
-	ext->link_func("tex_white", &get_tex_white);
+	ext->link_func("publish_gfx_context", &publish_gfx_context);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
 	ext->link_func("iterate_simulation", &graph::iterate_simulation);
 	ext->link_func("enumerate_nodes", &graph::enumerate_nodes);
@@ -448,7 +447,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("ColorMapPromise.get_future", &base::promise<data::ColorMap>::get_future);
 
 	// TODO remove when switching to external package!
-	_export_package_yrenderer_internal(ext);
 	_export_package_profiler_internal(ext);
 }
 

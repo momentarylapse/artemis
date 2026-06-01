@@ -4,8 +4,8 @@ use xhui
 use image.Painter
 use async.*
 use .graph.*
-use .gfx
-use .yrenderer
+use yrenderer.gfx
+use yrenderer
 use .profiler.*
 use .ui.grapheditor.*
 use .ui.codeeditor.*
@@ -269,9 +269,12 @@ class extern Session
 
 func extern current_session() -> Session&
 
+func extern publish_gfx_context(ctx: gfx.GfxContext)
+
 func init_graphics_stuff(out session: Session)
 	let dir = plugin_directory() | "static"
 	for mut ctx in session.ctx
+		publish_gfx_context(ctx.context)
 		ctx.create_managers(dir, dir | "shader", "")
 		session.shader_manager = ctx.shader_manager
 		session.texture_manager = ctx.texture_manager

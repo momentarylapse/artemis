@@ -1,6 +1,6 @@
 use artemis.*
-use artemis.yrenderer
-use artemis.gfx
+use yrenderer
+use yrenderer.gfx
 use image
 
 
@@ -10,7 +10,7 @@ class ImageRenderer extends RenderEmitterNode
 	var vertex_buffer: owned![gfx.VertexBuffer]
 	var material: owned![yrenderer.Material]
 
-	
+
 	func __init__()
 		super.__init__("ImageRenderer")
 		material = new yrenderer.Material()
@@ -31,7 +31,7 @@ class ImageRenderer extends RenderEmitterNode
 
 			send_out()
 
-	
+
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		draw_mesh(params, rvd, mat4.rotation_x(pi), weak(vertex_buffer), weak(material))
 
@@ -40,5 +40,5 @@ class ImageRenderer extends RenderEmitterNode
 		for image in in_image.value()
 			return Box([0, 0, 0], [f32(image.width), f32(image.height), 0])
 		return nil
-		
-	
+
+

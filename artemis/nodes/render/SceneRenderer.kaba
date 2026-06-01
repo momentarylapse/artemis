@@ -1,7 +1,7 @@
 use artemis.render
 use artemis.data.*
 use artemis.graph.*
-use artemis.yrenderer
+use yrenderer
 use image.Painter
 use xhui
 
@@ -120,10 +120,10 @@ Dialog x x padding=0
 				rp.set_view(view_port.params())
 				lights[0].ang = view_port.ang
 				rp.set_lights([&lights[0]])
-		
+
 				for mut lh in session.line_helper
 					lh.start_frame(pp.ui_scale)
-		
+
 				rt.before_draw(&p)
 
 
@@ -195,7 +195,7 @@ class SceneRenderer extends render.RendererNode
 		for mut rp in scene_renderer.render_path
 			rp.remove_all_emitters()
 			rp.background_color = background()
-	
+
 			var box: Box?
 			for x in in_draw.values()
 				if x.active
@@ -204,16 +204,16 @@ class SceneRenderer extends render.RendererNode
 							rp.add_transparent_emitter(x.emitter!)
 						else
 							rp.add_opaque_emitter(x.emitter!)
-	
+
 						for b in x.bounding_box
 							for bb in box
 								box = bb or b
 							else
 								box = b
-		
+
 			for b in box
 				scene_renderer.set_content_bounding_box(b)
-		
+
 			var d: RenderData
 			d.render_node = weak(scene_renderer)
 			out_draw.set(d)

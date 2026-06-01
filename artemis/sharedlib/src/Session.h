@@ -14,17 +14,16 @@
 #include <lib/os/path.h>
 #include <lib/pattern/Observable.h>
 #include <lib/ygraphics/graphics-fwd.h>
-#include <lib/yrenderer/regions/RegionRenderer.h>
-
-#include "lib/yrenderer/MaterialManager.h"
 
 
 class Storage;
 class Progress;
 class DrawingHelper;
 namespace yrenderer {
+	class Context;
 	class TextureManager;
 	class ShaderManager;
+	class MaterialManager;
 	class LineHelper;
 }
 namespace xhui {
@@ -68,17 +67,17 @@ public:
 
 	base::future<void> allow_termination();
 
-	xhui::Window* win;
+	xhui::Window* win = nullptr;
 
-	yrenderer::Context* ctx;
-	yrenderer::ShaderManager* shader_manager;
-	yrenderer::TextureManager* texture_manager;
-	yrenderer::MaterialManager* material_manager;
-	owned<yrenderer::LineHelper> line_helper;
+	yrenderer::Context* ctx = nullptr;
+	yrenderer::ShaderManager* shader_manager = nullptr;
+	yrenderer::TextureManager* texture_manager = nullptr;
+	yrenderer::MaterialManager* material_manager = nullptr;
+	yrenderer::LineHelper* line_helper = nullptr;
 
-	Storage *storage;
+	Storage* storage = nullptr;
 
-	Progress *progress;
+	Progress* progress = nullptr;
 
 	os::Timer timer;
 	double t, dt;

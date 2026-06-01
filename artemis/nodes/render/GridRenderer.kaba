@@ -1,6 +1,5 @@
 use artemis.*
-use artemis.yrenderer
-use artemis.gfx
+use yrenderer
 
 
 enum RenderMode
@@ -14,7 +13,7 @@ class GridRenderer extends RenderEmitterNode
 	var color = Setting[Color](self, "color", Color.GRAY)
 	var mode = Setting[RenderMode](self, "mode", RenderMode.FULL)
 
-	
+
 	func __init__()
 		super.__init__("GridRenderer")
 
@@ -23,11 +22,11 @@ class GridRenderer extends RenderEmitterNode
 		for g in in_grid.value()
 			send_out()
 
-	
+
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		for g in in_grid.value()
 			var points: vec3[]
-	
+
 			if g.type == GridType.REGULAR
 				var r = g.regular!
 				match mode()
@@ -63,7 +62,7 @@ class GridRenderer extends RenderEmitterNode
 			#	for a,b in g.edges()
 			#		points.add(vertices[a])
 			#		points.add(vertices[b])
-		
+
 			for mut lh in session.line_helper
 				lh.begin_draw(params, rvd)
 				lh.set_color(color())
@@ -75,5 +74,5 @@ class GridRenderer extends RenderEmitterNode
 		for g in in_grid.value()
 			return g.bounding_box()
 		return nil
-		
-	
+
+

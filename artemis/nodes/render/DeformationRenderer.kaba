@@ -1,6 +1,6 @@
 use artemis.*
-use artemis.yrenderer
-use artemis.gfx
+use yrenderer
+use yrenderer.gfx
 
 
 class DeformationRenderer extends RenderEmitterNode

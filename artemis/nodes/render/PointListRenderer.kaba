@@ -1,6 +1,6 @@
 use artemis.*
-use artemis.yrenderer
-use artemis.gfx
+use yrenderer
+use yrenderer.gfx
 
 
 func point_list_bounding_box(points: vec3[]) -> Box?
@@ -25,7 +25,7 @@ class PointListRenderer extends RenderEmitterNode
 
 	var trails: vec3[][]
 
-	
+
 	func __init__()
 		super.__init__("PointListRenderer")
 		vertex_buffer = new gfx.VertexBuffer("3f,3f,2f")
@@ -45,7 +45,7 @@ class PointListRenderer extends RenderEmitterNode
 			trails.clear()
 		send_out()
 
-	
+
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		for m in in_mesh.value()
 			m.build(weak(vertex_buffer))
@@ -73,5 +73,5 @@ class PointListRenderer extends RenderEmitterNode
 		for points in in_points.value()
 			return point_list_bounding_box(points)
 		return nil
-		
-	
+
+

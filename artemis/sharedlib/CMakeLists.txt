@@ -406,53 +406,6 @@ add_library(moduleartemis SHARED
 	src/lib/ygraphics/Painter.cpp
 	src/lib/ygraphics/PainterGL.cpp
 	src/lib/ygraphics/PainterVulkan.cpp
-	src/lib/yrenderer/helper/Bindable.cpp
-	src/lib/yrenderer/helper/ComputeTask.cpp
-	src/lib/yrenderer/helper/CubeMapSource.cpp
-	src/lib/yrenderer/helper/jitter.cpp
-	src/lib/yrenderer/helper/LightMeter.cpp
-	src/lib/yrenderer/helper/LineHelper.cpp
-	src/lib/yrenderer/helper/Pipeline.cpp
-	src/lib/yrenderer/helper/PipelineManager.cpp
-	src/lib/yrenderer/post/HDRResolver.cpp
-	src/lib/yrenderer/post/MultisampleResolver.cpp
-	src/lib/yrenderer/post/PostProcessor.cpp
-	src/lib/yrenderer/post/PostProcessorGL.cpp
-	src/lib/yrenderer/post/PostProcessorVulkan.cpp
-	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
-	src/lib/yrenderer/regions/RegionRenderer.cpp
-	src/lib/yrenderer/regions/RegionRendererGL.cpp
-	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
-	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
-	src/lib/yrenderer/scene/pass/CubeMapRenderer.cpp
-	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
-	src/lib/yrenderer/scene/path/RenderPath.cpp
-	src/lib/yrenderer/scene/path/RenderPathDeferred.cpp
-	src/lib/yrenderer/scene/path/RenderPathForward.cpp
-	src/lib/yrenderer/scene/CameraParams.cpp
-	src/lib/yrenderer/scene/Light.cpp
-	src/lib/yrenderer/scene/MeshEmitter.cpp
-	src/lib/yrenderer/scene/RenderViewData.cpp
-	src/lib/yrenderer/scene/SceneRenderer.cpp
-	src/lib/yrenderer/scene/SceneView.cpp
-	src/lib/yrenderer/target/HeadlessRenderer.cpp
-	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
-	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
-	src/lib/yrenderer/target/TargetRenderer.cpp
-	src/lib/yrenderer/target/TextureRendererGL.cpp
-	src/lib/yrenderer/target/TextureRendererVulkan.cpp
-	src/lib/yrenderer/target/WindowRendererGL.cpp
-	src/lib/yrenderer/target/WindowRendererVulkan.cpp
-	src/lib/yrenderer/target/XhuiRenderer.cpp
-	src/lib/yrenderer/_kaba_export.cpp
-	src/lib/yrenderer/Context.cpp
-	src/lib/yrenderer/ContextGL.cpp
-	src/lib/yrenderer/ContextVulkan.cpp
-	src/lib/yrenderer/Material.cpp
-	src/lib/yrenderer/MaterialManager.cpp
-	src/lib/yrenderer/Renderer.cpp
-	src/lib/yrenderer/ShaderManager.cpp
-	src/lib/yrenderer/TextureManager.cpp
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp

@@ -15,10 +15,6 @@
 #include <lib/image/image.h>
 #include <lib/os/msg.h>
 #include <lib/ygraphics/graphics-impl.h>
-#include <lib/yrenderer/target/XhuiRenderer.h>
-#include <lib/yrenderer/helper/LineHelper.h>
-#include <lib/yrenderer/TextureManager.h>
-#include <lib/yrenderer/Context.h>
 #include <lib/xhui/xhui.h>
 #include "graph/Graph.h"
 #include <plugins/PluginManager.h>

@@ -2,11 +2,13 @@ use xhui
 use .graph.*
 use .session.*
 use .data.*
-use .yrenderer # TODO switch to external package!
-use .gfx
+use yrenderer
+use yrenderer.gfx
 use .profiler.*
 
-func extern tex_white() -> shared![gfx.Texture]
+func tex_white() -> shared![gfx.Texture]
+#shared<ygfx::Texture> get_tex_white() {
+	return current_session().ctx!.tex_white
 
 
 # basic canvas / layout

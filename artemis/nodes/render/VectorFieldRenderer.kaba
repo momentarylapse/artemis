@@ -1,6 +1,6 @@
 use artemis.*
-use artemis.yrenderer
-use artemis.gfx
+use yrenderer
+use yrenderer.gfx
 
 
 class VectorFieldRenderer extends RenderEmitterNode
@@ -9,7 +9,7 @@ class VectorFieldRenderer extends RenderEmitterNode
 	var scale = Setting[f64](self, "scale", 1.0)
 	var color = Setting[Color](self, "color", Color.GREEN)
 
-	
+
 	func __init__()
 		super.__init__("VectorFieldRenderer")
 
@@ -18,7 +18,7 @@ class VectorFieldRenderer extends RenderEmitterNode
 		for f in in_field.value()
 			send_out()
 
-	
+
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		for f in in_field.value()
 			let s = scale() as f32
@@ -26,7 +26,7 @@ class VectorFieldRenderer extends RenderEmitterNode
 			for i=>p in f.grid.points(f.sampling_mode)
 				points.add(p)
 				points.add(p + f.value(i) * s)
-		
+
 			for mut lh in session.line_helper
 				lh.begin_draw(params, rvd)
 				lh.set_color(color())
@@ -38,5 +38,5 @@ class VectorFieldRenderer extends RenderEmitterNode
 		for f in in_field.value()
 			return f.grid.bounding_box()
 		return nil
-		
-	
+
+

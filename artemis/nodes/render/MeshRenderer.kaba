@@ -1,6 +1,6 @@
 use artemis.*
-use artemis.yrenderer
-use artemis.gfx
+use yrenderer
+use yrenderer.gfx
 
 
 class MeshRenderer extends RenderEmitterNode
@@ -13,7 +13,7 @@ class MeshRenderer extends RenderEmitterNode
 	var vertex_buffer: owned![gfx.VertexBuffer]
 	var material: owned![yrenderer.Material]
 
-	
+
 	func __init__()
 		super.__init__("MeshRenderer")
 		material = new yrenderer.Material()
@@ -33,7 +33,7 @@ class MeshRenderer extends RenderEmitterNode
 
 			send_out()
 
-	
+
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		draw_mesh(params, rvd, mat4.ID, weak(vertex_buffer), weak(material))
 
@@ -42,5 +42,5 @@ class MeshRenderer extends RenderEmitterNode
 		for m in in_mesh.value()
 			return m.bounding_box()
 		return nil
-		
-	
+
+
