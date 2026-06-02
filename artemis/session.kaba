@@ -142,6 +142,9 @@ Dialog x x padding=0
 		event("simulation-stop", on_sim_stop)
 		event("simulation-step", on_sim_step)
 
+		event("open", on_open)
+		event("save", on_save)
+		event("save-as", on_save_as)
 		event("show-profiling", on_show_profiling)
 
 
@@ -150,7 +153,22 @@ Dialog x x padding=0
 		else
 			xhui.KEY_CONTROL
 
+		set_key_code("open", mod + xhui.KEY_O)
+		set_key_code("save", mod + xhui.KEY_S)
+		set_key_code("save-as", mod + xhui.KEY_SHIFT + xhui.KEY_S)
 		set_key_code("show-profiling", mod + xhui.KEY_T)
+
+
+	func mut on_open()
+		xhui.file_dialog(&self, "Open workspace", os.fs.current_directory(), ["filter=*.artemis;*.kaba"]).then(func(p: os.Path) load_file(session, p))
+
+
+	func mut on_save()
+		on_save_as()
+
+
+	func mut on_save_as()
+		xhui.file_dialog(&self, "Save workspace", os.fs.current_directory(), ["filter=*.artemis", "save"]).then(func(p: os.Path) save_artemis_file(session.graph_con, p))
 
 
 	func mut on_sim_start()
@@ -297,6 +315,13 @@ func init_graphics_stuff(out session: Session)
 	#		engine.file_errors_are_critical = false;
 	#		engine.ignore_missing_files = true;
 	#		engine.resource_manager = session->resource_manager;
+
+
+func load_file(out s: Session, filename: os.Path)
+	match filename.extension()
+		"artemis" => load_artemis_file(s.graph_con, filename)
+		"kaba" => execute_script_file(&s, filename)
+		else => pass
 
 
 func extern create_session(with_window=true) -> Session&
