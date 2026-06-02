@@ -97,6 +97,10 @@ BasisFields create_basis_fields(const RegularGrid& grid) {
 	b.phi_dy_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_d_phi), bz.phi_phi);
 	b.phi_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_phi, by.phi_phi), bz.phi_d_phi);
 
+	b.dx = linalg::mul(b.phi_phi_inv, b.phi_dx_phi.to_matrix());
+	b.dy = linalg::mul(b.phi_phi_inv, b.phi_dy_phi.to_matrix());
+	b.dz = linalg::mul(b.phi_phi_inv, b.phi_dz_phi.to_matrix());
+
 	b.phi_dx_dx_phi = linalg::outer_product(linalg::outer_product(bx.phi_dd_phi, by.phi_phi), bz.phi_phi);
 	b.phi_dx_dy_phi = linalg::outer_product(linalg::outer_product(bx.phi_d_phi, by.phi_d_phi), bz.phi_phi);
 	b.phi_dx_dz_phi = linalg::outer_product(linalg::outer_product(bx.phi_d_phi, by.phi_phi), bz.phi_d_phi);

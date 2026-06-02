@@ -3,10 +3,15 @@ use artemis.*
 class Gradient extends Node
 	var in_field = InPort[ScalarField](self, "in")
 	var out_field = OutPort[VectorField](self, "out")
-	
+	var method = Setting[DerivativeMethod](self, "method", DerivativeMethod.FORWARD)
+
 	func __init__()
 		super.__init__("Gradient")
-	
+
 	func override on_process()
 		for f in in_field.value()
-			out_field.set(gradient(f))
+			match method()
+				DerivativeMethod.FORWARD => out_field.set(gradient_fw(f))
+				DerivativeMethod.BACKWARD => out_field.set(gradient_bw(f))
+				DerivativeMethod.CENTRAL => out_field.set(gradient_cn(f))
+				DerivativeMethod.BASIS_FUNCTIONS => out_field.set(gradient_x(f))

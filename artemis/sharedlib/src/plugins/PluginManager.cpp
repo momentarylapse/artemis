@@ -177,7 +177,10 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("port_type_match", &dataflow::port_type_match);
 	ext->link_func("create_node", &xxx_create_node);
 	ext->link_func("test_done", &test_done);
-	ext->link_func("gradient", &processing::gradient);
+	ext->link_func("gradient_fw", &processing::gradient_fw);
+	ext->link_func("gradient_bw", &processing::gradient_bw);
+	ext->link_func("gradient_cn", &processing::gradient_cn);
+	ext->link_func("gradient_x", &processing::gradient_x);
 	ext->link_func("divergence", &processing::divergence);
 	ext->link_func("rotation_fw", &processing::rotation_fw);
 	ext->link_func("rotation_bw", &processing::rotation_bw);

@@ -33,7 +33,7 @@ struct extern ScalarField
 	func extern mut __imul__(o: f64)
 	func extern __mul__(o: ScalarField) -> ScalarField
 	func extern __mul__(o: f64) -> ScalarField
-	
+
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> ScalarField
 
 
@@ -62,7 +62,7 @@ struct extern VectorField
 	func extern mut __imul__(o: f64)
 	func extern __mul__(o: f64) -> VectorField
 	func extern cwise_product(o: VectorField) -> VectorField
-	
+
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode) -> VectorField
 	func extern split() -> (ScalarField, ScalarField, ScalarField)
 	func extern get_component(i: i32) -> ScalarField
@@ -96,13 +96,21 @@ struct extern MultiComponentField
 	func extern mut __imul__(o: f64)
 	func extern __mul__(o: f64) -> MultiComponentField
 	func extern cwise_product(o: MultiComponentField) -> MultiComponentField
-	
+
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiComponentField
 
 
+enum DerivativeMethod
+	FORWARD
+	BACKWARD
+	CENTRAL
+	BASIS_FUNCTIONS
 
 
-func extern gradient(f: ScalarField) -> VectorField
+func extern gradient_fw(f: ScalarField) -> VectorField
+func extern gradient_bw(f: ScalarField) -> VectorField
+func extern gradient_cn(f: ScalarField) -> VectorField
+func extern gradient_x(f: ScalarField) -> VectorField
 func extern divergence(f: VectorField) -> ScalarField
 func extern rotation_fw(f: VectorField) -> VectorField
 func extern rotation_bw(f: VectorField) -> VectorField

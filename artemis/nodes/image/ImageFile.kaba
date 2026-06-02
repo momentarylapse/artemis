@@ -5,13 +5,15 @@ use image
 class ImageFile extends Node
 	var out_image = OutPort[image.Image](self, "out", PortFlags.MUTABLE)
 	var file = Setting[os.Path](self, "file", "")
-	
+
 	func __init__()
 		super.__init__("ImageFile")
 		flags = NodeFlags.RESOURCE
-	
+
 	func override on_process()
 		let i = image.Image.load(file())
-		out_image.set(i)
-		
-	
+		if weak(i) # ...
+			out_image.set(i)
+		else
+			error("failed to load {{file()}}")
+

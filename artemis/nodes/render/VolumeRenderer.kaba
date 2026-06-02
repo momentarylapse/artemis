@@ -51,6 +51,9 @@ class VolumeRenderer extends RenderEmitterNode
 			tex.set_options("wrap=clamp,magfilter=nearest")
 			if f.type() == f32
 				tex.write_float(f.raw() as f32[]&)
+			else
+				error("input must be a f32 field")
+				return
 			material.textures[0] = tex
 			material_solid.textures[0] = tex
 
@@ -67,7 +70,7 @@ class VolumeRenderer extends RenderEmitterNode
 				_material := weak(material_solid)
 
 			#let matrix = mat4(f.grid.dx * f32(f.grid.nx), f.grid.dy * f32(f.grid.ny), f.grid.dz * f32(f.grid.nz))
-			let matrix = mat4.scale(f32(f.grid.nx), f32(f.grid.ny), f32(f.grid.nz))
+			let matrix = mat4.scale(len(f.grid.dx) * f32(f.grid.nx), len(f.grid.dy) * f32(f.grid.ny), len(f.grid.dz) * f32(f.grid.nz))
 
 			var shader = rvd.get_shader(_material, 0, "default")
 			var rd = rvd.start(params, matrix, shader, _material, 0, gfx.PrimitiveTopology.TRIANGLES, weak(vertex_buffer))

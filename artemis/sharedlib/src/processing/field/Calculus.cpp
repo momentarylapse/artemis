@@ -3,14 +3,15 @@
 //
 
 #include "Calculus.h"
+#include <data/field/BasisFields.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
-#include <data/field/BasisFields.h>
 #include "../helper/GlobalThreadPool.h"
+#include "lib/os/msg.h"
 
 namespace artemis::processing {
 
-data::VectorField gradient(const data::ScalarField& f) {
+data::VectorField gradient_fw(const data::ScalarField& f) {
 	data::VectorField v(f.grid, f.type, f.sampling_mode);
 	ivec3 end = {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1};
 	if (v.sampling_mode == data::SamplingMode::PerVertex)
@@ -24,6 +25,58 @@ data::VectorField gradient(const data::ScalarField& f) {
 		v._set(i, j, k, dvec3(fx - f0, fy - f0, fz - f0));
 	}, 200);
 
+	return v;
+}
+
+data::VectorField gradient_bw(const data::ScalarField& f) {
+	data::VectorField v(f.grid, f.type, f.sampling_mode);
+	ivec3 end = {v.grid.nx,v.grid.ny,v.grid.nz};
+	if (v.sampling_mode == data::SamplingMode::PerVertex)
+		end = {v.grid.nx+1,v.grid.ny+1,v.grid.nz+1};
+
+	pool::run({1,1,1}, end, [&f, &v] (int i, int j, int k) {
+		double f0 = f._value(i, j, k);
+		double fx = f._value(i-1, j, k);
+		double fy = f._value(i, j-1, k);
+		double fz = f._value(i, j, k-1);
+		v._set(i, j, k, dvec3(f0 - fx, f0 - fy, f0 - fz));
+	}, 200);
+
+	return v;
+}
+
+data::VectorField gradient_cn(const data::ScalarField& f) {
+	data::VectorField v(f.grid, f.type, f.sampling_mode);
+	ivec3 end = {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1};
+	if (v.sampling_mode == data::SamplingMode::PerVertex)
+		end = {v.grid.nx,v.grid.ny,v.grid.nz};
+
+	pool::run({1,1,1}, end, [&f, &v] (int i, int j, int k) {
+		double fx0 = f._value(i-1, j, k);
+		double fx1 = f._value(i+1, j, k);
+		double fy0 = f._value(i, j-1, k);
+		double fy1 = f._value(i, j+1, k);
+		double fz0 = f._value(i, j, k-1);
+		double fz1 = f._value(i, j, k+1);
+		v._set(i, j, k, dvec3(fx1 - fx0, fy1 - fy0, fz1 - fz0) / 2);
+	}, 200);
+
+	return v;
+}
+
+data::VectorField gradient_x(const data::ScalarField& f) {
+	if (f.type == data::ScalarType::Float32) {
+		auto& b = data::get_basis_fields(f.grid);
+		data::ScalarField dx(f.grid, f.type, f.sampling_mode);
+		data::ScalarField dy(f.grid, f.type, f.sampling_mode);
+		data::ScalarField dz(f.grid, f.type, f.sampling_mode);
+		dx.v32.v = linalg::mul(b.dx, f.v32.v);
+		dy.v32.v = linalg::mul(b.dy, f.v32.v);
+		dz.v32.v = linalg::mul(b.dz, f.v32.v);
+		return data::VectorField::merge(dx, dy, dz);
+	}
+
+	data::VectorField v(f.grid, f.type, f.sampling_mode);
 	return v;
 }
 

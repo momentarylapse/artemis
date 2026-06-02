@@ -21,6 +21,9 @@ struct BasisFields {
 	linalg::SparseMatrix<float> phi_dx_phi;
 	linalg::SparseMatrix<float> phi_dy_phi;
 	linalg::SparseMatrix<float> phi_dz_phi;
+	linalg::Matrix<float> dx;
+	linalg::Matrix<float> dy;
+	linalg::Matrix<float> dz;
 	linalg::SparseMatrix<float> phi_dx_dx_phi;
 	linalg::SparseMatrix<float> phi_dx_dy_phi;
 	linalg::SparseMatrix<float> phi_dx_dz_phi;
