@@ -362,9 +362,11 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 		ext->declare_class_element("Node.channel", &dataflow::Node::channel);
 		ext->declare_class_element("Node._state", &dataflow::Node::state);
 		ext->declare_class_element("Node.flags", &dataflow::Node::flags);
+		ext->declare_class_element("Node.error_message", &dataflow::Node::error_message);
 		ext->link_class_func("Node.__init__", &node_init);
 		ext->link_class_func("Node.set", &dataflow::Node::set);
 		ext->link_class_func("Node.process", &dataflow::Node::process);
+		ext->link_class_func("Node.error", &dataflow::Node::error);
 		ext->link_virtual("Node.__delete__", &GenericVDeleter<dataflow::Node>::__delete__, &n);
 		ext->link_virtual("Node.additional_init", &dataflow::Node::additional_init, &n);
 		ext->link_virtual("Node.on_process", &dataflow::Node::on_process, &n);

@@ -174,7 +174,7 @@ Dialog x ''
 #>				hover = get_hover(m)
 		else
 			hover = get_hover(m)
-	
+
 		request_redraw()
 
 
@@ -184,7 +184,7 @@ Dialog x ''
 		let mm = from_screen(m)
 		view_scale = clamp(view_scale * exp(0.2 * d.y), 0.5, 10.0)
 		view_offset -= to_screen(mm) - m
-	
+
 		hover = get_hover(m)
 		request_redraw()
 
@@ -210,12 +210,12 @@ Dialog x ''
 		mode = Mode.DEFAULT
 
 		open_node_panel(nil)
-	
+
 		for s in selection
 			if s.type == HoverType.NODE
 				if len(selected_nodes) == 1
 					open_node_panel(s.node)
-	
+
 				mode = Mode.MOVING_NODES
 				moving_last_pos = from_screen(m)
 			else if s.type == HoverType.OUT_PORT or s.type == HoverType.IN_PORT
@@ -223,7 +223,7 @@ Dialog x ''
 		else
 			mode = Mode.SELECTING
 			selection_start = from_screen(m)
-	
+
 		request_redraw()
 
 
@@ -274,14 +274,14 @@ Dialog x ''
 			open_node_list_panel()
 		if key == xhui.KEY_G
 			if len(selected_nodes) >= 2
-	
+
 				let group = graph_con.group_nodes(selected_nodes)
-	
+
 			#	const Path dir = artemis::PluginManager::template_directory();
 			#	os::fs::create_directory(dir);
 			#	artemis::graph::DataGraph data_group(session);
 			#	session->storage->save(dir | "a.artemis", &data_group);
-	
+
 				out_info("node group created")
 
 
@@ -311,26 +311,23 @@ Dialog x ''
 		profiler.begin(channel)
 		let clip0 = p.clip()
 		p.set_clip(area)
-	
+
 		draw_grid(p)
 
 		for i=>c in graph.cables()
-			p.set_color(Color.GRAY)
-			p.set_line_width(3 * view_scale)
-			for h in hover
-				if h.type == HoverType.CABLE and h.index == i
-					p.set_color(Color.mix(Color.GRAY, Color.WHITE, 0.3))
-					p.set_line_width(3 * view_scale)
-			for s in selection
-				if s.type == HoverType.CABLE and s.index == i
-					p.set_color(Color.WHITE)
-					p.set_line_width(4 * view_scale)
-			p.draw_lines(cable_spline(c))
+			draw_cable(p, c, i)
 
 		for n in graph.nodes
 			draw_node(p, n)
-			
+
 		p.set_font("", wash_f32(&xhui.theme.font_size), false, false)
+
+
+		for n in graph.nodes
+			if n._state == NodeState.ERROR
+				let l = xhui.TextLayout.from_format_string(p, "<b>Error:</b> {{n.error_message}}")
+				let bg = Color.mix(Color(0.7, 0.2, 0.2, 1), xhui.theme.background_low, 0.3)
+				xhui.draw_text_layout_with_box(p, node_area(n).p00() + vec2(-10, -30), l, xhui.theme.text_label, bg)
 
 
 		let m = get_window()!.get_mouse_position()
@@ -363,7 +360,7 @@ Dialog x ''
 			if h.type == HoverType.CABLE
 				let c = graph.cables()[h.index]
 				tip = "<big>cable</big>\n<soft>type:</soft> <b>{{type_name(c.source.type)}}</b>"
-	
+
 		if tip != ""
 			let l = xhui.TextLayout.from_format_string(p, tip)
 #			let fg = xhui.theme.text_label
@@ -401,7 +398,7 @@ Dialog x ''
 		p.draw_rect(area)
 		p.set_line_width(max(1.0 * view_scale, 1.0))
 		p.set_contiguous(false)
-	
+
 		let view_area = Rect(from_screen(area.p00()), from_screen(area.p11()))
 		let c0 = Color.mix(xhui.theme.background, xhui.theme.text_disabled, 0.07 * min(view_scale, 1.0))
 		let c1 = Color.mix(xhui.theme.background, xhui.theme.text_disabled, 0.15 * min(view_scale, 1.0))
@@ -421,8 +418,8 @@ Dialog x ''
 			points.add([x, area.y2])
 		p.set_color(c0)
 		p.draw_lines(points)
-	
-	
+
+
 		points.clear()
 		for i in i32(floor(view_area.y1 / (D*5))):i32(ceil(view_area.y2 / (D*5)))
 			let y = to_screen([0, f32(i)*D*5]).y
@@ -439,7 +436,8 @@ Dialog x ''
 
 	func draw_node(out p: Painter, n: Node)
 		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, true, false)
-	
+
+		# background
 		if in_list(&n, selected_nodes)
 			p.set_color(Color.RED.with_alpha(0.7))
 			p.set_roundness(14 * view_scale)
@@ -451,13 +449,16 @@ Dialog x ''
 			bg = Color.mix(Color(0, 0.7, 0, 1), xhui.theme.background_low, 0.3)
 		else if i32(n.flags & NodeFlags.META) > 0
 			bg = Color.mix(Color(0.5, 0.5, 0.5, 1), xhui.theme.background_low, 0.3)
+		else if n._state == NodeState.ERROR
+			bg = Color.mix(Color(0.7, 0.2, 0.2, 1), xhui.theme.background_low, 0.3)
 		for h in hover
 			if h.type == HoverType.NODE and h.node == &n
 				bg = Color.mix(bg, Color.WHITE, 0.2)
 		p.set_color(bg)
 		p.set_roundness(10 * view_scale)
 		p.draw_rect(node_area(n))
-	
+
+		# type
 		p.set_color(Color.WHITE)
 		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, true, false)
 		if true
@@ -469,14 +470,15 @@ Dialog x ''
 			else if n._state == NodeState.DIRTY
 				p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2, 35)), "*")
 		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, false, false)
-	
+
+		# name?
 		for _ in n.name.find(":")
 			p.set_color(Color.WHITE.with_alpha(0.7))
 			let class_name = n.name.explode(":")[0]
 			let w = p.get_str_width(class_name) / view_scale
 			p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2 - w/2, 20)), class_name)
 
-	
+		# ports
 		for i=>_ in n.in_ports
 			p.set_color(Color.GRAY)
 			for h in hover
@@ -489,6 +491,20 @@ Dialog x ''
 				if h.type == HoverType.OUT_PORT and h.node == &n and h.index == i
 					p.set_color(Color.WHITE)
 			p.draw_circle(node_out_port_pos(n, i), 5 * view_scale)
+
+
+	func draw_cable(out p: Painter, c: CableInfo, i: i32)
+		p.set_color(Color.GRAY)
+		p.set_line_width(3 * view_scale)
+		for h in hover
+			if h.type == HoverType.CABLE and h.index == i
+				p.set_color(Color.mix(Color.GRAY, Color.WHITE, 0.3))
+				p.set_line_width(3 * view_scale)
+		for s in selection
+			if s.type == HoverType.CABLE and s.index == i
+				p.set_color(Color.WHITE)
+				p.set_line_width(4 * view_scale)
+		p.draw_lines(cable_spline(c))
 
 
 	func mut open_node_list_panel()
@@ -508,7 +524,7 @@ Dialog x ''
 			node_panel = nil
 
 		_node_panel_node = n
-	
+
 		var nn = n # FIXME kaba work-around - making n mutable :P
 		for mut _n in nn
 			node_panel = new DefaultNodePanel(&_n, graph_con)#_n.create_panel()

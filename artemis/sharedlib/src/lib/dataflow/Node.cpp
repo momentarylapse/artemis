@@ -49,7 +49,7 @@ void Node::on_settings_changed(SettingBase*) {
 
 void Node::on_input_changed(InPortBase* port) {
 	//msg_write("  <" + name + "  INPUT CHANGED>");
-	if (state == NodeState::Complete)
+	if (state != NodeState::Uninitialized)
 		state = NodeState::Dirty;
 	if (port->link_partner)
 		port->link_partner->mutated();
@@ -89,4 +89,9 @@ xhui::Panel* Node::create_panel() {
 	return nullptr;
 }
 
+void Node::error(const string& message) {
+	state = NodeState::Error;
+	error_message = message;
 }
+
+} // namespace dataflow

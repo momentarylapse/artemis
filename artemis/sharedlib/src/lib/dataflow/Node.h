@@ -44,7 +44,8 @@ bool operator&(NodeFlags a, NodeFlags b);
 enum class NodeState {
 	Uninitialized,
 	Dirty,
-	Complete
+	Complete,
+	Error
 };
 
 class Node : public obs::Node<VirtualBase> {
@@ -56,6 +57,8 @@ public:
 
 	virtual void on_process() {}
 	void process();
+
+	void error(const string& message);
 
 	virtual xhui::Panel* create_panel();
 
@@ -71,6 +74,7 @@ public:
 	int channel;
 	NodeState state = NodeState::Uninitialized;
 	NodeFlags flags = NodeFlags::None;
+	string error_message;
 
 	bool has_necessary_inputs() const;
 

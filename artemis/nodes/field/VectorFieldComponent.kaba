@@ -4,13 +4,15 @@ class VectorFieldComponent extends Node
 	var in_field = InPort[VectorField](self, "in")
 	var out_field = OutPort[ScalarField](self, "out")
 	var component = Setting[i32](self, "component", 0)
-	
+
 	func __init__()
 		super.__init__("VectorFieldComponent")
-	
+
 	func override on_process()
 		let n = component()
 		if n < 0 or n >= 3
+			error("component must be in [0,1,2]")
 			return
+
 		for f in in_field.value()
 			out_field.set(f.get_component(n))

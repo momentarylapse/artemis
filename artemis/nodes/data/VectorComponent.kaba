@@ -4,14 +4,16 @@ class VectorComponent extends Node
 	var in_vector = InPort[vec3](self, "in")
 	var out_float = OutPort[f64](self, "out")
 	var component = Setting[i32](self, "component", 0)
-	
+
 	func __init__()
 		super.__init__("VectorComponent")
-	
+
 	func override on_process()
 		for v in in_vector.value()
 			let c = component()
 			if c >= 0 and c <= 2
 				out_float.set(v._e[c])
-		
-	
+			else
+				error("component must be in [0,1,2]")
+
+

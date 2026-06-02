@@ -16,6 +16,7 @@ enum NodeState
 	UNINITIALIZED
 	DIRTY
 	COMPLETE
+	ERROR
 
 
 class extern Node
@@ -23,6 +24,7 @@ class extern Node
 	func extern virtual __delete__()
 	func extern virtual mut additional_init()
 	func extern mut process()
+	func extern mut error(message: string)
 	func extern virtual mut on_process()
 	func extern virtual mut create_panel() -> void*
 	func extern mut set(key: string, value: Any)
@@ -35,6 +37,7 @@ class extern Node
 	var flags: NodeFlags
 	var _state: NodeState
 	var graph: Graph*
+	var error_message: string
 
 
 enum PortFlags
@@ -92,7 +95,7 @@ class OutPort[X] extends OutPortBase
 		generic_set(&_value)
 	func selfref value() -> X&
 		return &_value
-		
+
 
 
 
@@ -103,7 +106,7 @@ class extern SettingBase
 	func extern mut generic_set(p: void&)
 	func selfref to[X]() -> Setting[X]&
 		return &self as Setting[X]&
-	
+
 	var name: string
 	var type: kaba.Class&
 	var options: string
@@ -113,7 +116,7 @@ class extern SettingBase
 
 class Setting[X] extends SettingBase
 	var value: X
-	
+
 	func override __init__()
 	func mut __init__(node: Node, name: string, value: X, options = "")
 		super.__init2__(node, name, X, &self.value, options)

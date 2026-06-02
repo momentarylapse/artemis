@@ -169,12 +169,14 @@ bool Graph::iterate() {
 		} else if (n->state == NodeState::Dirty and n->has_necessary_inputs()) {
 			db_out("  PROC " + n->name);
 			n->process();
-			n->state = NodeState::Complete;
-			updated_any = true;
+			if (n->state != NodeState::Error) {
+				n->state = NodeState::Complete;
+				updated_any = true;
+			}
 		}
 	}
 
-	if (!updated_any)
+	if (!updated_any) // TODO errors?
 		state = NodeState::Complete;
 
 
