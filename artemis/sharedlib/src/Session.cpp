@@ -8,11 +8,8 @@
 #include "Session.h"
 #include "Artemis.h"
 #include <lib/history/Data.h>
-#include "storage/format/Format.h"
 #include <processing/helper/GlobalThreadPool.h>
-#include <storage/Storage.h>
 #include <lib/xhui/config.h>
-#include <lib/image/image.h>
 #include <lib/os/msg.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/xhui/xhui.h>
@@ -30,9 +27,8 @@ rect dynamicly_scaled_source() {
 }
 }
 
-Session *create_session(bool with_window) {
+Session* create_session() {
 	auto s = new Session;
-	s->storage = new Storage(s);
 	s->data = new artemis::graph::DataGraph(s);
 	s->graph = s->data->graph.get();
 	_current_session_ = s;
@@ -58,12 +54,11 @@ base::future<Session*> emit_empty_session(Session* parent) {
 
 Session::Session() {
 	ctx = nullptr;
-
-	storage = nullptr;
 	shader_manager = nullptr;
 	texture_manager = nullptr;
 	material_manager = nullptr;
 	win = nullptr;
+	graph = nullptr;
 	t = 0;
 	dt = 0.1;
 }
@@ -128,40 +123,5 @@ void Session::warning(const string &message) {
 	add_message(Message::Type::Warning, message);
 }
 
-
-base::future<void> Session::allow_termination() {
-	base::promise<void> promise;
-#if 0
-
-	if (!cur_mode) {
-		promise();
-		return promise.get_future();
-	}
-	Data *d = cur_mode->get_data();
-	if (!d) {
-		promise();
-		return promise.get_future();
-	}
-	if (d->action_manager->is_save()) {
-		promise();
-		return promise.get_future();
-	}
-	hui::question_box(win,_("Quite a polite question"),_("You increased entropy. Do you wish to save your work?"), true)
-		.then([promise] (bool answer) mutable {
-			if (!answer) {
-				promise();
-			} else {
-				//bool saved = cur_mode->save();
-				//return saved;
-				promise.fail();
-			}
-		}).on_fail([promise] () mutable {
-			promise.fail();
-		});
-#else
-	promise();
-#endif
-	return promise.get_future();
-}
 
 

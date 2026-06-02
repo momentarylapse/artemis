@@ -28,6 +28,7 @@
 #include <graph/NodeFactory.h>
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
+#include <storage/FormatArtemis.h>
 
 #include <lib/mesh/PolygonMesh.h>
 #include <lib/mesh/GeometryCube.h>
@@ -40,6 +41,8 @@ void session_load_file(Session* s, const Path& filename);
 void add_default_graph(Session* s);
 
 namespace artemis {
+
+void execute_script_file(Session* s, const Path& filename);
 
 base::map<string, Path> PluginManager::plugin_classes;
 Array<string> PluginManager::template_classes;
@@ -162,6 +165,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("current_session", &current_session);
 	ext->link_func("create_session", &create_session);
 	ext->link_func("session_load_file", &session_load_file);
+	ext->link_func("load_artemis_file", &load_artemis_file);
+	ext->link_func("save_artemis_file", &save_artemis_file);
+	ext->link_func("execute_script_file", &execute_script_file);
 	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("add_default_graph", &add_default_graph);
 	ext->link_func("publish_gfx_context", &publish_gfx_context);

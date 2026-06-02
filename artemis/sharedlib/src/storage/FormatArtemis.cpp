@@ -19,11 +19,6 @@
 static string _(const string &s) { return s; }
 string f642s_clean(double f, int dez);
 
-FormatArtemis::FormatArtemis(Session *s) : TypedFormat<artemis::graph::DataGraph>(s, -1, "artemis", _("Artemis workspace"), Flag::CANONICAL_READ_WRITE) {
-}
-
-
-
 static string v2s(const vec2 &v) {
 	return format("%.3f %.3f", v.x, v.y);
 }
@@ -35,7 +30,9 @@ static vec2 s2v(const string &s) {
 	return {0,0};
 }
 
-void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data, bool deep) {
+namespace artemis {
+
+void load_artemis_file(graph::DataGraph* data, const Path &filename) {
 	data->reset();
 
 	xml::Parser p;
@@ -66,8 +63,7 @@ void FormatArtemis::_load(const Path &filename, artemis::graph::DataGraph* data,
 	}
 }
 
-
-void FormatArtemis::_save(const Path &filename, artemis::graph::DataGraph *data) {
+void save_artemis_file(graph::DataGraph *data, const Path &filename) {
 
 	xml::Parser p;
 	p.elements.add(xml::Element("workspace"));
@@ -117,4 +113,6 @@ void FormatArtemis::_save(const Path &filename, artemis::graph::DataGraph *data)
 	}
 
 	p.save(filename);
+}
+	
 }

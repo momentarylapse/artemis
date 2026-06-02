@@ -8,15 +8,12 @@
 #pragma once
 
 #include <lib/base/base.h>
-#include <lib/base/map.h>
 #include <lib/base/future.h>
 #include <lib/os/time.h>
 #include <lib/os/path.h>
 #include <lib/pattern/Observable.h>
-#include <lib/ygraphics/graphics-fwd.h>
 
 
-class Storage;
 class Progress;
 class DrawingHelper;
 namespace yrenderer {
@@ -65,8 +62,6 @@ public:
 	void error(const string &message);
 	Array<Message> messages;
 
-	base::future<void> allow_termination();
-
 	xhui::Window* win = nullptr;
 
 	yrenderer::Context* ctx = nullptr;
@@ -74,8 +69,6 @@ public:
 	yrenderer::TextureManager* texture_manager = nullptr;
 	yrenderer::MaterialManager* material_manager = nullptr;
 	yrenderer::LineHelper* line_helper = nullptr;
-
-	Storage* storage = nullptr;
 
 	Progress* progress = nullptr;
 
@@ -91,5 +84,5 @@ public:
 	double simulation_update_dt = 0.1; // "outside" / how often to perform steps
 };
 
-Session *create_session(bool with_window=true);
+Session* create_session();
 

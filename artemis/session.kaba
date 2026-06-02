@@ -301,6 +301,9 @@ func init_graphics_stuff(out session: Session)
 
 func extern create_session(with_window=true) -> Session&
 func extern session_load_file(s: Session&, filename: os.Path)
+func extern load_artemis_file(g: GraphController&, filename: os.Path)
+func extern save_artemis_file(g: GraphController&, filename: os.Path)
+func extern execute_script_file(s: Session&, filename: os.Path)
 func extern add_default_graph(s: Session&)
 func extern iterate_simulation(s: Session&)
 func extern plugin_directory() -> os.Path

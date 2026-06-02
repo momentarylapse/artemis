@@ -6,10 +6,9 @@
 #include <plugins/PluginManager.h>
 #include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
+#include "storage/FormatArtemis.h"
 
-#include "storage/Storage.h"
-
-string AppVersion = "0.0.1";
+string AppVersion = "0.1.0";
 string AppName = "Artemis";
 
 void* app = nullptr;
@@ -46,18 +45,24 @@ void add_default_graph(Session* s) {
 	}
 }
 
+namespace artemis {
+void execute_script_file(Session* s, const Path& filename) {
+	auto m = kaba::default_context->load_module(filename.absolute(), false);
+	typedef void (*f_p)();
+	if (auto f = (f_p)m->match_function("main", "void", {})) {
+		f();
+	} else {
+		s->error(format("script %s does not contain 'func main()'", filename));
+	}
+}
+}
+
 void session_load_file(Session* s, const Path& filename) {
 	string ext = filename.extension();
 	if (ext == "artemis") {
-		s->storage->load(filename, s->data.get());
+		artemis::load_artemis_file(s->data.get(), filename);
 	} else if (ext == "kaba") {
-		auto m = kaba::default_context->load_module(filename.absolute(), false);
-		typedef void (*f_p)();
-		if (auto f = (f_p)m->match_function("main", "void", {})) {
-			f();
-		} else {
-			s->error(format("script %s does not contain 'func main()'", filename));
-		}
+		artemis::execute_script_file(s, filename.absolute());
 	} else {
 		s->error(format("unknown file extension: %s", filename));
 	}
