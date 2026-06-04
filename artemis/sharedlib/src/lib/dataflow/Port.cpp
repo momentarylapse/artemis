@@ -30,6 +30,11 @@ string OutPortBase::full_name() const {
 	return owner->name + "/" + name;
 }
 
+void OutPortBase::clear() {
+	generic_value_pointer = nullptr;
+	has_value = false;
+	mutated();
+}
 
 void OutPortBase::generic_set(void *p) {
 	generic_value_pointer = p;

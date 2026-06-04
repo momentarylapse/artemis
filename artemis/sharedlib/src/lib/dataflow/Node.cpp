@@ -43,7 +43,7 @@ void Node::process() {
 }
 
 void Node::on_settings_changed(SettingBase*) {
-	if (state == NodeState::Complete)
+	if (state != NodeState::Uninitialized)
 		state = NodeState::Dirty;
 }
 
@@ -92,6 +92,8 @@ xhui::Panel* Node::create_panel() {
 void Node::error(const string& message) {
 	state = NodeState::Error;
 	error_message = message;
+	for (auto p: out_ports)
+		p->clear();
 }
 
 } // namespace dataflow

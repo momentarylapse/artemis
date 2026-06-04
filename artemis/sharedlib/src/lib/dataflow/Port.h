@@ -35,6 +35,7 @@ public:
 	Array<InPortBase*> targets;
 	InPortBase* link_partner = nullptr;
 	void generic_set(void* p);
+	void clear();
 	void mutated(); // send new value, notify connected sinks
 	bool has_value = false;
 	void* generic_value_pointer = nullptr;

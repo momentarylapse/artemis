@@ -51,7 +51,7 @@ func f(p: vec3, t: f32) -> f32[]
 					if (!f_p)
 						msg_write("not found");
 				} catch (kaba::Exception& e) {
-					msg_error(e.message());
+					error(e.message());
 					return;
 				}
 			}
