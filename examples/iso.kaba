@@ -16,23 +16,25 @@ func main()
 	gr.set("line-width", 2.0)
 	gr.set("color", dyn([0.5,0.5,0.5,1]))
 	gr.set("mode", "OUTLINES")
-	
+
 	var field = g.add_node("ScalarField", [370,250])
 	field.set("formula", "sin(0.8 * len(p-vec3(4.5,4.5,15)) + t)")
 	field.set("time-dependent", true)
-	
+	field.set("sampling-mode", dyn(SamplingMode.PER_VERTEX))
+
 	var vol = g.add_node("VolumeRenderer", [250, 550])
-	
+
 	var iso = g.add_node("IsoSurface", [450, 400])
 	iso.set("iso-value", -0.3)
 	var mr = g.add_node("MeshRenderer", [450, 550])
 	mr.set("albedo", dyn([0.4, 0.4, 0.9, 1]))
 	mr.set("emission", dyn([0.2, 0.2, 0.2, 1]))
 	mr.set("roughness", 0.7)
-	
+
 	var grad = g.add_node("Gradient", [650, 400])
+	grad.set("method", dyn(DerivativeMethod.NATURAL))
 	var vec = g.add_node("VectorFieldRenderer", [650, 550])
-	
+
 	var scene = g.add_node("SceneRenderer", [300, 700])
 	var canvas = g.add_node("Canvas", [300, 850])
 
@@ -41,10 +43,10 @@ func main()
 	g.connect(field, 0, vol, 0)
 	g.connect(field, 0, grad, 0)
 	g.connect(grad, 0, vec, 0)
-	
+
 	g.connect(field, 0, iso, 0)
 	g.connect(iso, 0, mr, 0)
-	
+
 	g.connect(gr, 0, scene, 0)
 	g.connect(vol, 0, scene, 0)
 	g.connect(vec, 0, scene, 0)

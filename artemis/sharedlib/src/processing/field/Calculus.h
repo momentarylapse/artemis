@@ -13,6 +13,7 @@ namespace artemis::processing {
 data::VectorField gradient_fw(const data::ScalarField& f);
 data::VectorField gradient_bw(const data::ScalarField& f);
 data::VectorField gradient_cn(const data::ScalarField& f);
+data::VectorField gradient_nat(const data::ScalarField& f);
 data::VectorField gradient_x(const data::ScalarField& f);
 data::ScalarField laplace(const data::ScalarField& f);
 data::ScalarField divergence(const data::VectorField& f);

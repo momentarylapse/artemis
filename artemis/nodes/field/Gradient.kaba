@@ -14,4 +14,5 @@ class Gradient extends Node
 				DerivativeMethod.FORWARD => out_field.set(gradient_fw(f))
 				DerivativeMethod.BACKWARD => out_field.set(gradient_bw(f))
 				DerivativeMethod.CENTRAL => out_field.set(gradient_cn(f))
+				DerivativeMethod.NATURAL => out_field.set(gradient_nat(f))
 				DerivativeMethod.BASIS_FUNCTIONS => out_field.set(gradient_x(f))

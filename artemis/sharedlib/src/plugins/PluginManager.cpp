@@ -180,6 +180,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("gradient_fw", &processing::gradient_fw);
 	ext->link_func("gradient_bw", &processing::gradient_bw);
 	ext->link_func("gradient_cn", &processing::gradient_cn);
+	ext->link_func("gradient_nat", &processing::gradient_nat);
 	ext->link_func("gradient_x", &processing::gradient_x);
 	ext->link_func("divergence", &processing::divergence);
 	ext->link_func("rotation_fw", &processing::rotation_fw);

@@ -104,12 +104,14 @@ enum DerivativeMethod
 	FORWARD
 	BACKWARD
 	CENTRAL
+	NATURAL
 	BASIS_FUNCTIONS
 
 
 func extern gradient_fw(f: ScalarField) -> VectorField
 func extern gradient_bw(f: ScalarField) -> VectorField
 func extern gradient_cn(f: ScalarField) -> VectorField
+func extern gradient_nat(f: ScalarField) -> VectorField
 func extern gradient_x(f: ScalarField) -> VectorField
 func extern divergence(f: VectorField) -> ScalarField
 func extern rotation_fw(f: VectorField) -> VectorField

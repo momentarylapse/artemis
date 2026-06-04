@@ -14,7 +14,7 @@ namespace artemis::processing {
 data::VectorField gradient_fw(const data::ScalarField& f) {
 	data::VectorField v(f.grid, f.type, f.sampling_mode);
 	ivec3 end = {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1};
-	if (v.sampling_mode == data::SamplingMode::PerVertex)
+	if (f.sampling_mode == data::SamplingMode::PerVertex)
 		end = {v.grid.nx,v.grid.ny,v.grid.nz};
 
 	pool::run({0,0,0}, end, [&f, &v] (int i, int j, int k) {
@@ -31,7 +31,7 @@ data::VectorField gradient_fw(const data::ScalarField& f) {
 data::VectorField gradient_bw(const data::ScalarField& f) {
 	data::VectorField v(f.grid, f.type, f.sampling_mode);
 	ivec3 end = {v.grid.nx,v.grid.ny,v.grid.nz};
-	if (v.sampling_mode == data::SamplingMode::PerVertex)
+	if (f.sampling_mode == data::SamplingMode::PerVertex)
 		end = {v.grid.nx+1,v.grid.ny+1,v.grid.nz+1};
 
 	pool::run({1,1,1}, end, [&f, &v] (int i, int j, int k) {
@@ -48,7 +48,7 @@ data::VectorField gradient_bw(const data::ScalarField& f) {
 data::VectorField gradient_cn(const data::ScalarField& f) {
 	data::VectorField v(f.grid, f.type, f.sampling_mode);
 	ivec3 end = {v.grid.nx-1,v.grid.ny-1,v.grid.nz-1};
-	if (v.sampling_mode == data::SamplingMode::PerVertex)
+	if (f.sampling_mode == data::SamplingMode::PerVertex)
 		end = {v.grid.nx,v.grid.ny,v.grid.nz};
 
 	pool::run({1,1,1}, end, [&f, &v] (int i, int j, int k) {
@@ -60,6 +60,39 @@ data::VectorField gradient_cn(const data::ScalarField& f) {
 		double fz1 = f._value(i, j, k+1);
 		v._set(i, j, k, dvec3(fx1 - fx0, fy1 - fy0, fz1 - fz0) / 2);
 	}, 200);
+
+	return v;
+}
+
+data::VectorField gradient_nat(const data::ScalarField& f) {
+	data::VectorField v(f.grid, f.type, (f.sampling_mode == data::SamplingMode::PerVertex) ? data::SamplingMode::PerCell : data::SamplingMode::PerVertex);
+	if (f.sampling_mode == data::SamplingMode::PerVertex) {
+		ivec3 end = {v.grid.nx,v.grid.ny,v.grid.nz};
+		pool::run({0,0,0}, end, [&f, &v] (int i, int j, int k) {
+			double f000 = f._value(i, j, k);
+			double f001 = f._value(i, j, k+1);
+			double f010 = f._value(i, j+1, k);
+			double f011 = f._value(i, j+1, k+1);
+			double f100 = f._value(i+1, j, k);
+			double f101 = f._value(i+1, j, k+1);
+			double f110 = f._value(i+1, j+1, k);
+			double f111 = f._value(i+1, j+1, k+1);
+			v._set(i, j, k, dvec3((f100+f101+f110+f111-f000-f001-f010-f011) / 4, (f010+f011+f110+f111-f000-f001-f100-f101) / 4, (f001+f011+f101+f111-f000-f010-f100-f110) / 4));
+		}, 200);
+	} else {
+		ivec3 end = {v.grid.nx,v.grid.ny,v.grid.nz};
+		pool::run({1,1,1}, end, [&f, &v] (int i, int j, int k) {
+			double f000 = f._value(i-1, j-1, k-1);
+			double f001 = f._value(i-1, j-1, k);
+			double f010 = f._value(i-1, j, k-1);
+			double f011 = f._value(i-1, j, k);
+			double f100 = f._value(i, j-1, k-1);
+			double f101 = f._value(i, j-1, k);
+			double f110 = f._value(i, j, k-1);
+			double f111 = f._value(i, j, k);
+			v._set(i, j, k, dvec3((f100+f101+f110+f111-f000-f001-f010-f011) / 4, (f010+f011+f110+f111-f000-f001-f100-f101) / 4, (f001+f011+f101+f111-f000-f010-f100-f110) / 4));
+		}, 200);
+	}
 
 	return v;
 }
