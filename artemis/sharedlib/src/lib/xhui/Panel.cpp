@@ -195,11 +195,13 @@ bool match_event(Panel::EventHandler& e, const string &id, const string &msg, bo
 	return e.msg == msg;
 }
 
-bool Panel::handle_event(const string &id, const string &msg, bool is_default) {
+bool Panel::handle_event(const string& _id, const string& _msg, bool is_default) {
 	if (_pointer_ref_counter == 0)
 		return false;
 	shared<Panel> _keep_alive = this;
 	bool any_match = false;
+	string id = _id; // in case we delete the event source :/
+	string msg = _msg;
 	const auto xxx = event_handlers; // in case we add/remove event handlers here...
 	for (auto& e: xxx)
 		if (match_event(e, id, msg, is_default) and e.f) {
@@ -620,7 +622,9 @@ base::future<void> Panel::open_dialog(shared<Dialog> dialog) {
 	dialog->owner = this;
 	if (auto w = get_window()) {
 		w->dialogs.add(dialog.get());
-		w->_clear_hover();
+		run_later(0.01f, [w] {
+			w->update_hover(w->mouse_position());
+		});
 	}
 	request_redraw();
 	return dialog->basic_promise.get_future();
@@ -636,6 +640,7 @@ void Panel::close_dialog(Dialog* dialog) {
 	if (auto w = get_window()) {
 		w->dialogs.pop();
 		w->_clear_hover();
+		w->update_hover(w->mouse_position());
 		w->focus_control = nullptr;
 	}
 	dialog->basic_promise();

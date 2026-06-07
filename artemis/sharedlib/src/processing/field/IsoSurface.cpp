@@ -3,7 +3,7 @@
 //
 
 #include "IsoSurface.h"
-#include <lib/mesh/PolygonMesh.h>
+#include <lib/polymesh/Mesh.h>
 #include <data/field/ScalarField.h>
 #include <lib/base/sort.h>
 #include <lib/math/mat4.h>
@@ -12,7 +12,7 @@
 namespace artemis::processing {
 
 
-void iso_cell(const artemis::data::ScalarField& f, PolygonMesh& mesh, int i, int j, int k, float t0) {
+void iso_cell(const artemis::data::ScalarField& f, polymesh::Mesh& mesh, int i, int j, int k, float t0) {
 	float v[8];
 	v[0] = f._value32(i, j, k) - t0;
 	v[1] = f._value32(i, j, k+1) - t0;
@@ -76,7 +76,7 @@ void iso_cell(const artemis::data::ScalarField& f, PolygonMesh& mesh, int i, int
 }
 
 // lazy-man's method :D
-void iso_cell_approx(const artemis::data::ScalarField& f, PolygonMesh& mesh, int i, int j, int k, float t0) {
+void iso_cell_approx(const artemis::data::ScalarField& f, polymesh::Mesh& mesh, int i, int j, int k, float t0) {
 	float v[8];
 	v[0] = f._value32(i, j, k) - t0;
 	v[1] = f._value32(i, j, k+1) - t0;
@@ -140,8 +140,8 @@ void iso_cell_approx(const artemis::data::ScalarField& f, PolygonMesh& mesh, int
 	mesh.add_polygon_auto_texture(indices); // range(nv, nv+points.num)
 }
 
-PolygonMesh iso_surface(const data::ScalarField& f, float t0) {
-	PolygonMesh mesh;
+polymesh::Mesh iso_surface(const data::ScalarField& f, float t0) {
+	polymesh::Mesh mesh;
 	if (f.sampling_mode == artemis::data::SamplingMode::PerCell) {
 		for (int i=0; i<f.grid.nx-1; i++)
 			for (int j=0; j<f.grid.ny-1; j++)

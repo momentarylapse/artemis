@@ -4,12 +4,14 @@
 
 #pragma once
 
-struct PolygonMesh;
+namespace polymesh {
+	struct Mesh;
+}
 
 namespace artemis::data {
 struct ScalarField;
 }
 
 namespace artemis::processing {
-PolygonMesh iso_surface(const data::ScalarField& f, float t0);
+polymesh::Mesh iso_surface(const data::ScalarField& f, float t0);
 }
