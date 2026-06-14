@@ -1,6 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
+use polymesh.*
 
 
 class VolumeRenderer extends RenderEmitterNode
@@ -57,8 +58,10 @@ class VolumeRenderer extends RenderEmitterNode
 			material.textures[0] = tex
 			material_solid.textures[0] = tex
 
-			let cube = Mesh.create_cube([[0,0,0], [1,1,1]], [1, 1, 1])
-			cube.build(weak(vertex_buffer))
+			let cube = create_cube([[0,0,0], [1,1,1]], [1, 1, 1])
+			var vertices: gfx.Vertex[]
+			cube.build(vertices)
+			vertex_buffer.update(vertices)
 
 			send_out()
 

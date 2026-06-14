@@ -2,6 +2,7 @@ version 0.5
 build xmake sharedlib moduleartemis
 requires fem
 requires fft
+requires polymesh
 requires xhui
 requires yrenderer
 

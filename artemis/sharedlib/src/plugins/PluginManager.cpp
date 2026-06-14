@@ -189,18 +189,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("iso_surface", &processing::iso_surface);
 
-	ext->declare_class_size("Mesh", sizeof(polymesh::Mesh));
-	ext->link_class_func("Mesh.__init__", &kaba::generic_init<polymesh::Mesh>);
-	ext->link_class_func("Mesh.__delete__", &kaba::generic_delete<polymesh::Mesh>);
-	ext->link_class_func("Mesh.__assign__", &kaba::generic_assign<polymesh::Mesh>);
-	ext->link_class_func("Mesh.smoothen", &polymesh::Mesh::smoothen);
-	ext->link_class_func("Mesh.build", &polymesh::Mesh::build);
-	ext->link_class_func("Mesh.bounding_box", &polymesh::Mesh::bounding_box);
-
-	ext->link_func("Mesh.create_teapot", &polymesh::create_teapot);
-	ext->link_func("Mesh.create_sphere", &polymesh::create_sphere);
-	ext->link_func("Mesh.create_cube", &polymesh::create_cube);
-
 	ext->declare_class_size("ColorMap", sizeof(data::ColorMap));
 	ext->declare_class_element("ColorMap.colors", &data::ColorMap::colors);
 	ext->declare_class_element("ColorMap.values", &data::ColorMap::values);
@@ -484,7 +472,6 @@ void PluginManager::import_kaba() {
 	auto mgraph = kaba::default_context->load_module(dir | "graph.kaba", false);
 	auto mrender = kaba::default_context->load_module(dir | "render.kaba", false);
 	auto mplot = kaba::default_context->load_module(dir | "plot.kaba", false);
-	import_component_class<polymesh::Mesh>(mdata, "Mesh");
 	import_component_class<data::Grid>(mgrid, "Grid");
 	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
 	import_component_class<data::ScalarField>(mfields, "ScalarField");

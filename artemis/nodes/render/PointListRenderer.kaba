@@ -1,6 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
+use polymesh.*
 
 
 func point_list_bounding_box(points: vec3[]) -> Box?
@@ -47,11 +48,13 @@ class PointListRenderer extends RenderEmitterNode
 
 
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		var vertices: gfx.Vertex[]
 		for m in in_mesh.value()
-			m.build(weak(vertex_buffer))
+			m.build(vertices)
 		else
-			let mm = Mesh.create_sphere([0,0,0], radius() as f32, 4)
-			mm.build(weak(vertex_buffer))
+			let mm = create_sphere([0,0,0], radius() as f32, 4)
+			mm.build(vertices)
+		vertex_buffer.update(vertices)
 
 		material.albedo = Color.BLACK
 		material.emission = color()

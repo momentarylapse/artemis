@@ -1,6 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
+use polymesh.*
 
 
 class DeformationRenderer extends RenderEmitterNode
@@ -38,8 +39,10 @@ class DeformationRenderer extends RenderEmitterNode
 
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		for d in in_diff.value()
-			let mesh = Mesh.create_sphere([0,0,0], 1, 2)
-			mesh.build(weak(vertex_buffer))
+			let mesh = create_sphere([0,0,0], 1, 2)
+			var vertices: Vertex[]
+			mesh.build(vertices)
+			vertex_buffer.update(vertices)
 
 			let s = scale() as f32
 			let r = radius() as f32

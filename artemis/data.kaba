@@ -3,19 +3,6 @@ use yrenderer.gfx
 use yrenderer
 
 
-struct extern Mesh
-	func extern __init__()
-	func extern __delete__()
-	func extern mut __assign__(o: Mesh)
-	func extern mut smoothen()
-	func extern build(vb: gfx.VertexBuffer&)
-	func extern bounding_box() -> Box?
-
-	func extern static create_teapot(pos: vec3, radius: f32, samples: i32) -> Mesh
-	func extern static create_sphere(pos: vec3, radius: f32, num: i32) -> Mesh
-	func extern static create_cube(box: Box, slices: gfx.ivec3) -> Mesh
-
-
 struct RenderData
 	var active = true
 	var bounding_box: Box?

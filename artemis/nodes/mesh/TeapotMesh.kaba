@@ -1,19 +1,20 @@
 use artemis.*
+use polymesh.*
 
 class TeapotMesh extends Node
 	var out_mesh = OutPort[Mesh](self, "out", PortFlags.MUTABLE)
 	var radius = Setting[f64](self, "radius", 1.0)
 	var samples = Setting[i32](self, "samples", 8)
 	var smooth = Setting[bool](self, "smooth", true)
-	
+
 	func __init__()
 		super.__init__("TeapotMesh")
 		flags = NodeFlags.RESOURCE
-	
+
 	func override on_process()
-		var m = Mesh.create_teapot([0,0,0], f32(radius()), samples())
+		var m = create_teapot([0,0,0], f32(radius()), samples())
 		if smooth()
 			m.smoothen()
 		out_mesh.set(m)
-		
-	
+
+

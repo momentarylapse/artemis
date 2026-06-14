@@ -46,7 +46,7 @@ MeshEdit kaba_wrap_bevel_edges(const Mesh& mesh, const Array<int>& selv, const A
 }
 
 void export_package_polymesh(kaba::IExporter* ext) {
-	ext->package_info("polymesh", "0.2");
+	ext->package_info("polymesh", "0.3");
 
 	ext->declare_class_size("PMVertex", sizeof(Vertex));
 	ext->declare_class_element("PMVertex.pos", &Vertex::pos);
@@ -72,24 +72,24 @@ void export_package_polymesh(kaba::IExporter* ext) {
 	ext->declare_class_element("Polygon.material", &Polygon::material);
 	ext->link_class_func("Polygon.get_vertices", &Polygon::get_vertices);
 
-	ext->declare_class_size("PolygonMesh", sizeof(Mesh));
-	ext->link_class_func("PolygonMesh.__init__", &kaba::generic_init<Mesh>);
-	ext->link_class_func("PolygonMesh.__delete__", &kaba::generic_delete<Mesh>);
-	ext->link_class_func("PolygonMesh.__assign__", &kaba::generic_assign<Mesh>);
-	ext->link_class_func("PolygonMesh.add_vertex", &Mesh::add_vertex);
-	ext->link_class_func("PolygonMesh.add_polygon", &Mesh::add_polygon);
-	ext->link_class_func("PolygonMesh.add_polygon_auto_texture", &Mesh::add_polygon_auto_texture);
-	ext->link_class_func("PolygonMesh.bounding_box", &Mesh::bounding_box);
-	ext->link_class_func("PolygonMesh.add", &Mesh::add);
-	ext->link_class_func("PolygonMesh.smoothen", &Mesh::smoothen);
-	ext->link_class_func("PolygonMesh.update_normals", &Mesh::update_normals);
-	ext->link_class_func("PolygonMesh.transform", &Mesh::transform);
-	ext->link_class_func("PolygonMesh.invert", &Mesh::invert);
-	ext->link_class_func("PolygonMesh.build", &Mesh::build_x);
-	ext->declare_class_element("PolygonMesh.vertices", &Mesh::vertices);
-	ext->declare_class_element("PolygonMesh.polygons", &Mesh::polygons);
-	ext->declare_class_element("PolygonMesh.spheres", &Mesh::spheres);
-	ext->declare_class_element("PolygonMesh.cylinders", &Mesh::cylinders);
+	ext->declare_class_size("Mesh", sizeof(Mesh));
+	ext->link_class_func("Mesh.__init__", &kaba::generic_init<Mesh>);
+	ext->link_class_func("Mesh.__delete__", &kaba::generic_delete<Mesh>);
+	ext->link_class_func("Mesh.__assign__", &kaba::generic_assign<Mesh>);
+	ext->link_class_func("Mesh.add_vertex", &Mesh::add_vertex);
+	ext->link_class_func("Mesh.add_polygon", &Mesh::add_polygon);
+	ext->link_class_func("Mesh.add_polygon_auto_texture", &Mesh::add_polygon_auto_texture);
+	ext->link_class_func("Mesh.bounding_box", &Mesh::bounding_box);
+	ext->link_class_func("Mesh.add", &Mesh::add);
+	ext->link_class_func("Mesh.smoothen", &Mesh::smoothen);
+	ext->link_class_func("Mesh.update_normals", &Mesh::update_normals);
+	ext->link_class_func("Mesh.transform", &Mesh::transform);
+	ext->link_class_func("Mesh.invert", &Mesh::invert);
+	ext->link_class_func("Mesh.build", &Mesh::build_x);
+	ext->declare_class_element("Mesh.vertices", &Mesh::vertices);
+	ext->declare_class_element("Mesh.polygons", &Mesh::polygons);
+	ext->declare_class_element("Mesh.spheres", &Mesh::spheres);
+	ext->declare_class_element("Mesh.cylinders", &Mesh::cylinders);
 
 	ext->declare_class_size("MeshEdit", sizeof(MeshEdit));
 	ext->declare_class_element("MeshEdit._del_vertices", &MeshEdit::_del_vertices);

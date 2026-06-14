@@ -1,6 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
+use polymesh.*
 
 
 class MeshRenderer extends RenderEmitterNode
@@ -24,7 +25,9 @@ class MeshRenderer extends RenderEmitterNode
 	func override mut on_process()
 		for m in in_mesh.value()
 
-			m.build(vertex_buffer)
+			var vertices: gfx.Vertex[]
+			m.build(vertices)
+			vertex_buffer.update(vertices)
 
 			material.roughness = f32(roughness())
 			material.metal = f32(metal())

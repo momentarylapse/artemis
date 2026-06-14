@@ -182,7 +182,7 @@ void Polygon::update_triangulation(const Array<Vertex> &vertex) {
 
 struct DummyVertex {
 	vec3 pos, n;
-	vec2 u, v;
+	vec2 uv;
 };
 
 void Polygon::add_to_vertex_buffer(const Array<Vertex> &vertex, DynamicArray& buf) {
