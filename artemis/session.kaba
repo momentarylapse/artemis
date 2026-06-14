@@ -94,7 +94,7 @@ Dialog x x padding=0
 					Grid overlay-code-grid '' margin=25
 						Grid ? ''
 							Label ? '' ignorehover expandx
-							Button close-code-editor 'X' noexpandx
+							Button close-code-editor 'X' 'tooltip=Close editor' noexpandx
 						---|
 						Label ? '' ignorehover expandy
 						---|
@@ -108,10 +108,10 @@ Dialog x x padding=0
 					---|
 					Grid overlay-button-grid-bottom '' spacing=20
 						Label ? '' ignorehover expandx
-						Button simulation-start 'Start' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-						Button simulation-pause 'Pause' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-						Button simulation-stop 'Stop' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-						Button simulation-step 'Step' height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-start 'Start' 'tooltip=Start simulation / time progression' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-pause 'Pause' 'tooltip=Pause simulation / time progression' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-stop 'Stop' 'tooltip=Stop and reset simulation / time progression' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-step 'Step' 'tooltip=Single simulation / time step' height=50 width=50 padding=7 noexpandx ignorefocus
 		DrawingArea overlay-area '' ignorehover
 ")
 		set_option("padding", "0")

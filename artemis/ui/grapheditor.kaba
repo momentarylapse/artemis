@@ -124,8 +124,8 @@ Dialog x ''
 		Grid overlay-grid '' margin=25
 			Grid ? '' spacing=20
 				Label ? '' ignorehover expandx
-				Button add-node '+' height=50 width=50 padding=7 noexpandx ignorefocus
-				Button show-code-editor 'E' height=50 width=50 padding=7 noexpandx ignorefocus
+				Button add-node '+' 'tooltip=Add node from list' height=50 width=50 padding=7 noexpandx ignorefocus
+				Button show-code-editor 'E' 'tooltip=Open code editor' height=50 width=50 padding=7 noexpandx ignorefocus
 			---|
 			Grid ? ''
 				Label ? '' ignorehover expandy
