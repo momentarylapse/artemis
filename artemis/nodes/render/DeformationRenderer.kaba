@@ -40,7 +40,7 @@ class DeformationRenderer extends RenderEmitterNode
 	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 		for d in in_diff.value()
 			let mesh = create_sphere([0,0,0], 1, 2)
-			var vertices: Vertex[]
+			var vertices: gfx.Vertex[]
 			mesh.build(vertices)
 			vertex_buffer.update(vertices)
 
