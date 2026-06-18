@@ -97,10 +97,6 @@ struct Mesh {
 
 	void update_normals();
 
-#if __has_include(<view/MultiView.h>)
-	bool is_mouse_over(MultiViewWindow* win, const mat4 &matrix, const vec2& m, vec3 &tp, int& index, bool any_hit);
-#endif
-
 	void build_x(DynamicArray& buf) const;
 #if __has_include(<lib/ygraphics/graphics-fwd.h>)
 	void build(ygfx::VertexBuffer *vb) const;
