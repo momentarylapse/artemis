@@ -1,6 +1,7 @@
 use os
 use obs
 use xhui
+use kaba
 use image.Painter
 use async.*
 use .graph.*
@@ -293,7 +294,7 @@ func init_graphics_stuff(out session: Session)
 	let dir = plugin_directory() | "static"
 	for mut ctx in session.ctx
 		publish_gfx_context(ctx.context)
-		ctx.create_managers(dir, dir | "shader", "")
+		ctx.create_managers([dir], [dir | "shader", kaba.packages_root() | "yrenderer" | "shader"], [])
 		session.shader_manager = ctx.shader_manager
 		session.texture_manager = ctx.texture_manager
 		session.material_manager = ctx.material_manager
@@ -308,6 +309,7 @@ func init_graphics_stuff(out session: Session)
 			sm.load_shader_module("module-light-sources-default.shader")
 			sm.load_shader_module("module-shadows-pcf.shader")
 			sm.load_shader_module("module-lighting-pbr.shader")
+			sm.load_shader_module("module-fog-simple.shader")
 			sm.load_shader_module("forward/module-surface.shader")
 	except Exception as e
 		print(str(e))
