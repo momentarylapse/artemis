@@ -10,11 +10,9 @@
 #include <lib/kaba/kaba.h>
 #include <lib/kaba/lib/future.h>
 #include <lib/math/vec2.h>
-#include <lib/math/rect.h>
 #include <lib/os/app.h>
 #include <lib/os/filesystem.h>
 #include <lib/os/msg.h>
-#include <lib/profiler/_kaba_export.h>
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/ygraphics/Context.h>
 #include <Session.h>
@@ -29,11 +27,6 @@
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
 #include <storage/FormatArtemis.h>
-
-#include <lib/polymesh/Mesh.h>
-#include <lib/polymesh/create/Cube.h>
-#include <lib/polymesh/create/Sphere.h>
-#include <lib/polymesh/create/Teapot.h>
 
 extern Session* _current_session_;
 
@@ -448,9 +441,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("ColorMapPromise.call", &base::promise<data::ColorMap>::operator());
 	ext->link_class_func("ColorMapPromise.fail", &base::promise<data::ColorMap>::fail);
 	ext->link_class_func("ColorMapPromise.get_future", &base::promise<data::ColorMap>::get_future);
-
-	// TODO remove when switching to external package!
-	_export_package_profiler_internal(ext);
 }
 
 template<class C>

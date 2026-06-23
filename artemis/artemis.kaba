@@ -3,6 +3,7 @@ use os.Path
 use async.*
 use xhui
 use polymesh.*
+use profiler.*
 use .data.*
 use .grid.*
 use .fields.*
@@ -10,7 +11,6 @@ use .graph.*
 use .session.*
 use .render.*
 use .plot.*
-use .profiler.*
 
 let EXPORT_IMPORTS = true
 

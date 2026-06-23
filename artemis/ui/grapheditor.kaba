@@ -3,8 +3,8 @@ use obs
 use xhui
 use kaba
 use image.Painter
+use profiler.*
 use ..graph.*
-use ..profiler.*
 use .nodelistpanel.NodeListPanel
 use .defaultnodepanel.DefaultNodePanel
 

@@ -7,7 +7,7 @@ use async.*
 use .graph.*
 use yrenderer.gfx
 use yrenderer
-use .profiler.*
+use profiler.*
 use .ui.grapheditor.*
 use .ui.codeeditor.*
 

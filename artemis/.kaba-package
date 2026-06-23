@@ -3,6 +3,7 @@ build xmake sharedlib moduleartemis
 requires fem
 requires fft
 requires polymesh
+requires profiler
 requires xhui
 requires yrenderer
 
