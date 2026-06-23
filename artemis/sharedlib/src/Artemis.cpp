@@ -4,20 +4,10 @@
 #include <graph/Graph.h>
 #include "Session.h"
 #include <plugins/PluginManager.h>
-#include <lib/kaba/kaba.h>
 #include <lib/os/msg.h>
-#include "storage/FormatArtemis.h"
 
 string AppVersion = "0.1.0";
 string AppName = "Artemis";
-
-void* app = nullptr;
-
-namespace hui {
-	string get_language_s(const string& lang) {
-		return "";
-	}
-}
 
 base::future<Session*> emit_empty_session(Session* parent);
 void add_default_graph(Session* s) {
@@ -42,29 +32,6 @@ void add_default_graph(Session* s) {
 		s->graph->connect(teapot, 0, renderer, 0);
 		s->graph->connect(renderer, 0, scene, 0);
 		s->graph->connect(scene, 0, canvas, 0);
-	}
-}
-
-namespace artemis {
-void execute_script_file(Session* s, const Path& filename) {
-	auto m = kaba::default_context->load_module(filename.absolute(), false);
-	typedef void (*f_p)();
-	if (auto f = (f_p)m->match_function("main", "void", {})) {
-		f();
-	} else {
-		s->error(format("script %s does not contain 'func main()'", filename));
-	}
-}
-}
-
-void session_load_file(Session* s, const Path& filename) {
-	string ext = filename.extension();
-	if (ext == "artemis") {
-		artemis::load_artemis_file(s->data.get(), filename);
-	} else if (ext == "kaba") {
-		artemis::execute_script_file(s, filename.absolute());
-	} else {
-		s->error(format("unknown file extension: %s", filename));
 	}
 }
 

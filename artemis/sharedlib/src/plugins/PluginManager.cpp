@@ -37,7 +37,6 @@
 
 extern Session* _current_session_;
 
-void session_load_file(Session* s, const Path& filename);
 void add_default_graph(Session* s);
 
 namespace artemis {
@@ -69,6 +68,15 @@ void PluginManager::init() {
 
 Session* current_session() {
 	return _current_session_;
+}
+
+bool execute_main(kaba::Module* m) {
+	typedef void (*f_p)();
+	if (auto f = (f_p)m->match_function("main", "void", {})) {
+		f();
+		return true;
+	}
+	return false;
 }
 
 dataflow::Node* graph_add_node_by_class(dataflow::Graph* g, const string& _class, const vec2& pos) {
@@ -164,10 +172,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 
 	ext->link_func("current_session", &current_session);
 	ext->link_func("create_session", &create_session);
-	ext->link_func("session_load_file", &session_load_file);
 	ext->link_func("load_artemis_file", &load_artemis_file);
 	ext->link_func("save_artemis_file", &save_artemis_file);
-	ext->link_func("execute_script_file", &execute_script_file);
+	ext->link_func("execute_main", &execute_main);
 	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("add_default_graph", &add_default_graph);
 	ext->link_func("publish_gfx_context", &publish_gfx_context);
@@ -336,10 +343,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("Session.win", &Session::win);
 	ext->declare_class_element("Session.promise_started", &Session::promise_started);
 	ext->declare_class_element("Session.messages", &Session::messages);
-	ext->link_class_func("Session.info", &Session::info);
-	ext->link_class_func("Session.warning", &Session::warning);
-	ext->link_class_func("Session.error", &Session::error);
-	ext->link_class_func("Session.remove_message", &Session::remove_message);
 
 
 	{

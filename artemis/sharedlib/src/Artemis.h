@@ -8,20 +8,5 @@
 #ifndef ARTEMIS_H_
 #define ARTEMIS_H_
 
-#include "lib/xhui/Application.h"
-
-class PluginManager;
-
-
-class ArtemisApp : public xhui::Application {
-public:
-	ArtemisApp();
-	//hui::AppStatus on_startup(const Array<string> &arg) override;
-
-
-	PluginManager *plugins;
-};
-
-extern ArtemisApp *app;
 
 #endif /* ARTEMIS_H_ */

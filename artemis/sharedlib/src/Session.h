@@ -41,11 +41,6 @@ public:
 	Session();
 	~Session() override;
 
-	void create_initial_resources(yrenderer::Context *ctx);
-
-	void on_command(const string &id);
-	void on_close();
-
 	struct Message {
 		enum class Type {
 			Info,
@@ -55,11 +50,6 @@ public:
 		Type type;
 		string text;
 	};
-	void add_message(Message::Type type, const string &message);
-	void remove_message();
-	void info(const string &message);
-	void warning(const string &message);
-	void error(const string &message);
 	Array<Message> messages;
 
 	xhui::Window* win = nullptr;

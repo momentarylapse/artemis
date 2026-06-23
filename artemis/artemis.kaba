@@ -40,7 +40,7 @@ class Artemis
 	func mut start(args: string[])
 		if len(args) >= 1
 			filename = args[0]
-			create_window().then(func() session_load_file(session, filename))
+			create_window().then(func() load_file(session, filename))
 		else
 			create_window().then(func() add_default_graph(session))
 

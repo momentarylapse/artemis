@@ -323,14 +323,19 @@ func load_file(out s: Session, filename: os.Path)
 	match filename.extension()
 		"artemis" => load_artemis_file(s.graph_con, filename)
 		"kaba" => execute_script_file(&s, filename)
-		else => pass
+		else => s.error("unknown file extension: {{filename}}")
 
 
+func execute_script_file(out s: Session, filename: os.Path)
+	for m in kaba.default_context.load_module(filename, false)
+		if not execute_main(&m)
+			s.error("{{filename}} does not contain 'func main()'")
+
+
+func extern execute_main(m: kaba.Module&) -> bool
 func extern create_session(with_window=true) -> Session&
-func extern session_load_file(s: Session&, filename: os.Path)
 func extern load_artemis_file(g: GraphController&, filename: os.Path)
 func extern save_artemis_file(g: GraphController&, filename: os.Path)
-func extern execute_script_file(s: Session&, filename: os.Path)
 func extern add_default_graph(s: Session&)
 func extern iterate_simulation(s: Session&)
 func extern plugin_directory() -> os.Path
