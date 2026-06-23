@@ -270,8 +270,6 @@ add_library(moduleartemis SHARED
 	src/lib/kaba/kaba.cpp
 	src/lib/kaba/Module.cpp
 	src/lib/kapi/kapi.cpp
-	src/lib/layout/Grid.cpp
-	src/lib/layout/Node.cpp
 	src/lib/linalg/_kaba_export.cpp
 	src/lib/linalg/Matrix.cpp
 	src/lib/math/Box.cpp
@@ -356,54 +354,6 @@ add_library(moduleartemis SHARED
 	src/lib/vulkan/Texture.cpp
 	src/lib/vulkan/VertexBuffer.cpp
 	src/lib/vulkan/vulkan.cpp
-	src/lib/xhui/controls/Button.cpp
-	src/lib/xhui/controls/CheckBox.cpp
-	src/lib/xhui/controls/ColorButton.cpp
-	src/lib/xhui/controls/ComboBox.cpp
-	src/lib/xhui/controls/Control.cpp
-	src/lib/xhui/controls/DrawingArea.cpp
-	src/lib/xhui/controls/Edit.cpp
-	src/lib/xhui/controls/Expander.cpp
-	src/lib/xhui/controls/FileSelector.cpp
-	src/lib/xhui/controls/Grid.cpp
-	src/lib/xhui/controls/Group.cpp
-	src/lib/xhui/controls/HeaderBar.cpp
-	src/lib/xhui/controls/Image.cpp
-	src/lib/xhui/controls/Label.cpp
-	src/lib/xhui/controls/ListView.cpp
-	src/lib/xhui/controls/MenuBar.cpp
-	src/lib/xhui/controls/MultilineEdit.cpp
-	src/lib/xhui/controls/Overlay.cpp
-	src/lib/xhui/controls/RadioButton.cpp
-	src/lib/xhui/controls/Separator.cpp
-	src/lib/xhui/controls/Slider.cpp
-	src/lib/xhui/controls/SpinButton.cpp
-	src/lib/xhui/controls/TabControl.cpp
-	src/lib/xhui/controls/ToggleButton.cpp
-	src/lib/xhui/controls/Toolbar.cpp
-	src/lib/xhui/controls/Viewport.cpp
-	src/lib/xhui/dialogs/AboutDialog.cpp
-	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
-	src/lib/xhui/dialogs/FileSelectionDialog.cpp
-	src/lib/xhui/dialogs/MenuPopup.cpp
-	src/lib/xhui/dialogs/QuestionDialog.cpp
-	src/lib/xhui/_kaba_export.cpp
-	src/lib/xhui/Animator.cpp
-	src/lib/xhui/Application.cpp
-	src/lib/xhui/ContextGL.cpp
-	src/lib/xhui/ContextVulkan.cpp
-	src/lib/xhui/Dialog.cpp
-	src/lib/xhui/language.cpp
-	src/lib/xhui/Menu.cpp
-	src/lib/xhui/Painter.cpp
-	src/lib/xhui/PainterGL.cpp
-	src/lib/xhui/PainterVulkan.cpp
-	src/lib/xhui/Panel.cpp
-	src/lib/xhui/Resource.cpp
-	src/lib/xhui/TextLayout.cpp
-	src/lib/xhui/Theme.cpp
-	src/lib/xhui/Window.cpp
-	src/lib/xhui/xhui.cpp
 	src/lib/ygraphics/Context.cpp
 	src/lib/ygraphics/ContextGL.cpp
 	src/lib/ygraphics/ContextVulkan.cpp
