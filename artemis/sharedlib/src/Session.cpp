@@ -6,24 +6,11 @@
  */
 
 #include "Session.h"
-#include "Artemis.h"
 #include <lib/history/Data.h>
 #include <processing/helper/GlobalThreadPool.h>
-#include <lib/os/msg.h>
-#include <lib/ygraphics/graphics-impl.h>
 #include "graph/Graph.h"
-#include <plugins/PluginManager.h>
 
 Session* _current_session_ = nullptr;
-
-namespace yrenderer {
-rect dynamicly_scaled_area(ygfx::FrameBuffer *fb) {
-	return rect(0, fb->width, 0, fb->height);
-}
-rect dynamicly_scaled_source() {
-	return rect::ID;
-}
-}
 
 Session* create_session() {
 	auto s = new Session;
@@ -61,8 +48,7 @@ Session::Session() {
 	dt = 0.1;
 }
 
-Session::~Session() {
-}
+Session::~Session() = default;
 
 
 

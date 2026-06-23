@@ -30,8 +30,6 @@
 
 extern Session* _current_session_;
 
-void add_default_graph(Session* s);
-
 namespace artemis {
 
 void execute_script_file(Session* s, const Path& filename);
@@ -169,7 +167,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("save_artemis_file", &save_artemis_file);
 	ext->link_func("execute_main", &execute_main);
 	ext->link_func("plugin_directory", &PluginManager::directory);
-	ext->link_func("add_default_graph", &add_default_graph);
 	ext->link_func("publish_gfx_context", &publish_gfx_context);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
 	ext->link_func("iterate_simulation", &graph::iterate_simulation);

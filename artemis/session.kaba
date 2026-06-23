@@ -332,11 +332,21 @@ func execute_script_file(out s: Session, filename: os.Path)
 			s.error("{{filename}} does not contain 'func main()'")
 
 
+func add_default_graph(out s: Session)
+	var teapot = s.graph.add_node("TeapotMesh", [300, 200])
+	var renderer = s.graph.add_node("MeshRenderer", [300, 350])
+#	renderer.set("emission", dyn(Color.GREEN))
+	var scene = s.graph.add_node("SceneRenderer", [300, 500])
+	var canvas = s.graph.add_node("Canvas", [300, 650])
+	s.graph.connect(teapot, 0, renderer, 0)
+	s.graph.connect(renderer, 0, scene, 0)
+	s.graph.connect(scene, 0, canvas, 0)
+
+
 func extern execute_main(m: kaba.Module&) -> bool
 func extern create_session(with_window=true) -> Session&
 func extern load_artemis_file(g: GraphController&, filename: os.Path)
 func extern save_artemis_file(g: GraphController&, filename: os.Path)
-func extern add_default_graph(s: Session&)
 func extern iterate_simulation(s: Session&)
 func extern plugin_directory() -> os.Path
 func extern test_done()
