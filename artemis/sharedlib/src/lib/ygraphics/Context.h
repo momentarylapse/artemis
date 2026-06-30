@@ -12,34 +12,26 @@ struct mat4;
 namespace ygfx {
 
 class Context;
-
-struct TextCache {
-	string text;
-	font::Face* face;
-	float font_size;
-	int age;
-	Texture* texture;
-#if HAS_LIB_VULKAN
-	vulkan::DescriptorSet* dset;
-#endif
-	font::TextDimensions dimensions;
-};
+class FontManager;
 
 struct DrawingHelperData {
 	explicit DrawingHelperData(Context*);
 	void create_basic();
+	void _create_basic_internal();
 #ifdef USING_VULKAN
 	void rebuild(RenderPass* render_pass);
 #endif
 	Context* context;
 	VertexBuffer* vb = nullptr;
 	Shader* shader = nullptr;
+	Shader* shader_round = nullptr;
 	Shader* shader_lines = nullptr;
 #ifdef USING_VULKAN
 	vulkan::CommandBuffer* cb = nullptr;
 	vulkan::GraphicsPipeline* pipeline = nullptr;
 	vulkan::GraphicsPipeline* pipeline_z = nullptr;
 	vulkan::GraphicsPipeline* pipeline_alpha = nullptr;
+	vulkan::GraphicsPipeline* pipeline_round = nullptr;
 	vulkan::GraphicsPipeline* pipeline_lines = nullptr;
 	vulkan::DescriptorPool* pool = nullptr;
 
@@ -53,7 +45,6 @@ struct DrawingHelperData {
 #else
 	Texture* tex_text = nullptr;
 	Texture* tex_xxx = nullptr;
-	Shader* shader_round = nullptr;
 #endif
 
 	Array<VertexBuffer*> line_vbs;
@@ -61,13 +52,9 @@ struct DrawingHelperData {
 	Array<VertexBuffer*> line_vbs_with_color;
 	int num_line_vbs_with_color_used = 0;
 	VertexBuffer* get_line_vb(bool with_color = false);
-	mat4* projection_matrix = nullptr;
+	const mat4* projection_matrix = nullptr;
 
 	void reset_frame();
-
-	Array<TextCache> text_caches;
-	TextCache& get_text_cache(const string& text, font::Face* face, float font_size, float ui_scale);
-	void iterate_text_caches();
 };
 
 class Context {
@@ -85,6 +72,7 @@ public:
 #else
 	nix::Context* ctx = nullptr;
 #endif
+	Shader* create_shader(const string& source) const;
 
 	void make_current();
 
@@ -99,8 +87,6 @@ public:
 	Texture* tex_black = nullptr;
 	void _create_default_textures();
 };
-
-font::TextDimensions& get_cached_text_dimensions(const string& text, font::Face* face, float font_size, float ui_scale);
 
 }
 

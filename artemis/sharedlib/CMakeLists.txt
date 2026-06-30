@@ -187,10 +187,7 @@ add_library(moduleartemis SHARED
 	src/lib/dataflow/ResourceNode.cpp
 	src/lib/dataflow/Setting.cpp
 	src/lib/dataflow/Type.cpp
-	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
-	src/lib/doc/pdf.cpp
-	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
 	src/lib/history/Action.cpp
 	src/lib/history/ActionGroup.cpp
@@ -361,6 +358,9 @@ add_library(moduleartemis SHARED
 	src/lib/ygraphics/Painter.cpp
 	src/lib/ygraphics/PainterGL.cpp
 	src/lib/ygraphics/PainterVulkan.cpp
+	src/lib/ygraphics/ShaderManager.cpp
+	src/lib/ygraphics/TextCache.cpp
+	src/lib/ygraphics/TextureManager.cpp
 	src/plugins/PluginManager.cpp
 	src/processing/field/Calculus.cpp
 	src/processing/field/IsoSurface.cpp

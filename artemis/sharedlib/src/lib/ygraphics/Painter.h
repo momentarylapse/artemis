@@ -3,6 +3,7 @@
 #include <lib/image/ImagePainter.h>
 #include <lib/math/vec2.h>
 #include <lib/math/mat4.h>
+#include <lib/any/any.h>
 #include <lib/ygraphics/graphics-fwd.h>
 
 
@@ -13,19 +14,17 @@ namespace vulkan {
 }
 #endif
 
-namespace font {
-	struct Face;
-}
-
-
 namespace ygfx {
 
 struct DrawingHelperData;
 class Context;
+struct Face;
+class FontManager;
+class TextCache;
 
 class Painter : public ::Painter {
 public:
-	explicit Painter(DrawingHelperData* aux, const rect& native_area, const rect& area, float ui_scale, font::Face* _face);
+	explicit Painter(DrawingHelperData* aux, FontManager* fm, TextCache* tc, const rect& native_area, const rect& area);
 	//virtual ~Painter();
 
 	void set_color(const color &c) override;
@@ -60,6 +59,11 @@ public:
 		return _area;
 	}
 
+	void set_font_face(Face* f);
+	void set_texture(Texture* tex);
+	void set_shader(Shader* s);
+	void set_shader_data(const Any& data);
+
 	rect _area;
 	rect native_area;
 	rect native_area_window;
@@ -72,20 +76,26 @@ public:
 	//float dash_offset;
 	float line_width = 1;
 	//bool anti_aliasing;
-	float offset_x = 0, offset_y = 0;
+	vec2 offset = vec2(0, 0);
 	float corner_radius = 0;
 	float softness = 0;
 	bool fill = true;
-	font::Face* face;
+	Face* face;
+	Shader* user_shader = nullptr;
+	Texture* user_texture = nullptr;
+	Any user_shader_data;
 
 	bool accumulate_alpha = false;
 
 	Context* context = nullptr;
 	DrawingHelperData* aux;
+	FontManager* font_manager = nullptr;
+	TextCache* text_cache = nullptr;
 #if HAS_LIB_VULKAN
 	vulkan::CommandBuffer* cb;
 #endif
 };
 
+void draw_simple(DrawingHelperData* aux, const Array<VertexX>& p, const mat4& mat, const color& col, bool use_z, bool use_blending);
 
 }
