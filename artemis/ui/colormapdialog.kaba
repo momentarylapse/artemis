@@ -6,13 +6,14 @@ use ..data.*
 func draw_color_map_background(out p: Painter, color_map: ColorMap, value_min: f32, value_max: f32, area: Rect)
 	let clip = p.clip()
 	p.set_clip(area)
+	p.set_roundness(0)
 
 	let d = if area.height() > 50
 		20.0
 	else
 		12.0
-	for i in 0:i32(area.width()/d)
-		for j in 0:i32(area.height()/d)
+	for i in 0:i32(area.width()/d+1)
+		for j in 0:i32(area.height()/d+1)
 			var col = Color.WHITE
 			if ((i+j) % 2) == 0
 				col = Color.BLACK
@@ -92,7 +93,7 @@ Dialog color-map-dialog 'Color map'
 	func mut _on_draw(out p: Painter)
 		_area = p.area()
 		draw_color_map_background(p, color_map, value_min, value_max, _area)
-	
+
 		for i in 0:len(color_map.colors)
 			p.set_color(Color.BLACK)
 			for h in hover
@@ -170,7 +171,7 @@ Dialog color-map-dialog 'Color map'
 			promise(a)
 		else
 			promise.fail()
-	
+
 	# FIXME ugh, some kaba lambda workaround...
 	func open(out parent: xhui.Panel, dlg: shared![xhui.Dialog])
 		parent.open_dialog(dlg).then(on_close)

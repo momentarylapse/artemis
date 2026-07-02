@@ -336,6 +336,7 @@ Dialog x ''
 			p.set_color(c.with_alpha(0.2))
 			p.draw_rect(Rect(to_screen(selection_start), m).canonical())
 			p.set_color(c)
+			p.set_roundness(0)
 			p.set_fill(false)
 			p.draw_rect(Rect(to_screen(selection_start), m))
 			p.set_fill(true)

@@ -147,6 +147,7 @@ Dialog x x padding=0
 		event("save", on_save)
 		event("save-as", on_save_as)
 		event("show-profiling", on_show_profiling)
+		event("quit", request_destroy)
 
 
 		let mod = if os.system_type == os.SystemType.MAC
@@ -158,6 +159,7 @@ Dialog x x padding=0
 		set_key_code("save", mod + xhui.KEY_S)
 		set_key_code("save-as", mod + xhui.KEY_SHIFT + xhui.KEY_S)
 		set_key_code("show-profiling", mod + xhui.KEY_T)
+		set_key_code("quit", mod + xhui.KEY_Q)
 
 
 	func mut on_open()
