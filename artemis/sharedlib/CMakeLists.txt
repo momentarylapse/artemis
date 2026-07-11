@@ -27,12 +27,12 @@ list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
 
 # lib: vulkan or gl (mandatory)
 set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
-find_package(Vulkan COMPONENTS shaderc_combined)
+find_package(Vulkan COMPONENTS shaderc_combined glslang)
 if(VULKAN_FOUND)
 	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
 endif()
 find_package(OpenGL)
-if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
+if(OPENGL_FOUND AND NOT APPLE)
 	list(APPEND VULKAN_OR_GL_FOUND "gl")
 endif()
 if(VULKAN_OR_GL_FOUND)
@@ -42,31 +42,32 @@ if(VULKAN_OR_GL_FOUND)
 		message(WARNING "Choice for VULKAN_OR_GL invalid, using ${VULKAN_OR_GL} instead")
 	endif()
 else()
-	message(SEND_ERROR "Neither vulkan or gl found") #  or/nor..
+	message(SEND_ERROR "Neither vulkan nor gl found")
 	set(VULKAN_OR_GL "")
 endif()
 if(VULKAN_OR_GL STREQUAL "vulkan")
-	list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined)
+	if(WIN32)
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::glslang)
+	else()
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined Vulkan::glslang)
+	endif()
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
 endif()
 if(VULKAN_OR_GL STREQUAL "gl")
-	list(APPEND DEPS OpenGL::OpenGL)
+	list(APPEND DEPS OpenGL::GL)
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
 endif()
 
 
 # lib: glew (optional)
 set(LIB_GLEW_ENABLED true CACHE BOOL "Use glew library?")
-pkg_check_modules(GLEW glew)
+find_package(GLEW)
 if(GLEW_FOUND)
 else()
 	set(LIB_GLEW_ENABLED false CACHE BOOL "glew library not found" FORCE)
 endif()
 if(${LIB_GLEW_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${GLEW_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${GLEW_LIBRARY_DIRS})
-	list(APPEND DEPS ${GLEW_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${GLEW_CFLAGS_OTHER})
+	list(APPEND DEPS GLEW::GLEW)
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLEW=1)
 else()
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLEW=0)
@@ -293,6 +294,9 @@ add_library(moduleartemis SHARED
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/obs/_kaba_export.cpp
+	src/lib/obs/Log.cpp
+	src/lib/obs/Observable.cpp
 	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
@@ -305,8 +309,6 @@ add_library(moduleartemis SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
-	src/lib/pattern/_kaba_export.cpp
-	src/lib/pattern/Observable.cpp
 	src/lib/polymesh/create/Ball.cpp
 	src/lib/polymesh/create/Cube.cpp
 	src/lib/polymesh/create/Cylinder.cpp
@@ -329,6 +331,7 @@ add_library(moduleartemis SHARED
 	src/lib/polymesh/SkinGenerator.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
+	src/lib/threads/_kaba_export.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -388,7 +391,7 @@ target_include_directories(moduleartemis PUBLIC src/y)
 
 set(RESOURCE_DESTINATION share/artemis)
 
-# binaries	
+# binaries
 
 # resources
 install(FILES "static/icons" DESTINATION ${RESOURCE_DESTINATION})
