@@ -1,6 +1,6 @@
 use artemis.*
-#use artemis.profiler.*
 use xhui
+use plot.plotarea.*
 
 
 class PlotterRenderNode extends RenderNode
@@ -11,8 +11,6 @@ class PlotterRenderNode extends RenderNode
 		event_x("area", "hui:draw", func(out p: Painter) plotter.draw_2d(p))
 
 
-
-
 func lin_spacing(x_min: f32, x_max: f32, N: i32) -> f32[]
 	var xs: f32[]
 	for i in 0:N
@@ -20,20 +18,9 @@ func lin_spacing(x_min: f32, x_max: f32, N: i32) -> f32[]
 		xs.add(x)
 	return xs
 
-func ticks(x_min: f32, x_max: f32, scale: f32) -> f32[]
-	var xs: f32[]
-	let dx = pow(10.0, round(log10(40 / scale)))
-	let x_min0 = floor(x_min / dx) * dx
-	for x in x_min0:x_max:dx
-		xs.add(x)
-	return xs
 
-
-struct Projector
-	var x_offset, x_scale: f32
-	var y_offset, y_scale: f32
-	func call(v: vec2) -> vec2
-		return vec2(x_offset + v.x * x_scale, y_offset + v.y * y_scale)
+func brightness(c: Color) -> f32
+	return (c.r + c.g + c.b) / 3
 
 
 class Plotter extends RendererNode
@@ -47,6 +34,7 @@ class Plotter extends RendererNode
 	var background = Setting[Color](&self, "background", Color(-1,-1,-1,-1))
 
 	var render_node: shared![RenderNode]
+	var plot_area: PlotArea
 
 
 	func mut __init__()
@@ -66,15 +54,18 @@ class Plotter extends RendererNode
 		let area = p.area()
 		let clip0 = p.clip()
 		p.set_clip(area)
-	
-		p.set_color(background())
-		p.draw_rect(area)
+
+		plot_area.set_area(p.area())
+		plot_area.background_color = background()
+		if brightness(background()) > 0.5
+			plot_area.text_color = Color.BLACK
+		else
+			plot_area.text_color = Color.WHITE
 
 
+		plot_area.x_axis.range = [f32(x_min()), f32(x_max())]
+		plot_area.y_axis.range = [f32(y_min()), f32(y_max())]
 
-		let x_scale = area.width() / f32(x_max() - x_min())
-		let x_offset = area.x1 - f32(x_min()) * x_scale
-	
 		if auto_zoom()
 			var y0 = 0.0
 			var y1 = 0.0
@@ -88,42 +79,24 @@ class Plotter extends RendererNode
 						y0 = min(y0, pp.y)
 						y1 = max(y1, pp.y)
 			if y0 != y1
-				y_min.set(y0 - (y1-y0) * 0.1)
-				y_max.set(y1 + (y1-y0) * 0.1)
-				_state = NodeState.COMPLETE # don't trigger updates
-	
-		let y_scale = - area.height() / (f32(y_max()) - f32(y_min()))
-		let y_offset = area.y1 - f32(y_max()) * y_scale
+				plot_area.y_axis.range = [y0 - (y1-y0) * 0.1, y1 + (y1-y0) * 0.1]
 
 
-		let project = Projector(x_offset, x_scale, y_offset, y_scale)
-	
-		p.set_color(Color.mix(xhui.theme.text_disabled, xhui.theme.background_low, 0.75))
-		p.set_line_width(1)
-		for x in ticks(f32(x_min()), f32(x_max()), x_scale)
-			p.draw_line(project([x, f32(y_min())]), project([x, f32(y_max())]))
-		for y in ticks(f32(y_min()), f32(y_max()), -y_scale)
-			p.draw_line(project([f32(x_min()), y]), project([f32(x_max()), y]))
-	
+		plot_area.draw_background(p)
+
+
 		for d in in_plot.values()
-			var points: vec2[]
-	
+			var data: DataSet
+
 			if d.mode == PlotMode.FUNCTION
-				let xs = lin_spacing(f32(x_min()), f32(x_max()), 200)
-				let ys = d.source.plot_function(xs)
-	
-				for i=>x in xs
-					points.add(project([xs[i], ys[i]]))
+				data.x = lin_spacing(f32(x_min()), f32(x_max()), 200)
+				data.y = d.source.plot_function(data.x)
 			else if d.mode == PlotMode.POINTS
-				let points0 = d.source.plot_points()
-				for v in points0
-					points.add(project(v))
-	
-			p.set_color(d.source.color())
-			p.set_line_width(f32(d.source.line_width()))
-			p.draw_lines(points)
+				data.x = [for q in d.source.plot_points()  q.x]
+				data.y = [for q in d.source.plot_points()  q.y]
+
+			plot_area.plot(p, data, d.source.color())
 
 
-		p.set_clip(clip0)
 		profiler.end(channel_draw)
 
