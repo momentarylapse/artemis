@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+	<header>
+		<version>1.0</version>
+	</header>
+	<simulation>
+		<dt>0.1</dt>
+	</simulation>
+	<graph>
+		<node class="GenericPrint" pos="350.781 323.203" />
+		<node class="RandomNumber" pos="357.734 137.699" />
+		<cable source="1" source_port="0" sink="0" sink_port="0" />
+	</graph>
+</workspace>

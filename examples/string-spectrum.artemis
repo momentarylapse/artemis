@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+	<header>
+		<version>1.0</version>
+	</header>
+	<simulation>
+		<dt>0.00002</dt>
+	</simulation>
+	<graph>
+		<node class="RegularGrid" pos="148.584 -5.629">
+			<nx>50</nx>
+			<ny>0</ny>
+			<nz>0</nz>
+			<lx>0.648</lx>
+			<ly>8.0</ly>
+			<lz>1.0</lz>
+			<offset>[0.0, 0.0, 0.0]</offset>
+		</node>
+		<node class="VectorField:u" pos="248.584 144.371">
+			<formula>"[0.001 * exp( - 200.0 * (x-0.30)^2), 0, 0]"</formula>
+			<type>1</type>
+			<sampling-mode>1</sampling-mode>
+			<time-dependent>false</time-dependent>
+		</node>
+		<node class="VectorField:du/dt" pos="448.584 144.371">
+			<formula>"[0, exp( - 200.0 * (x-0.15)^2) * 2, 0]"</formula>
+			<type>1</type>
+			<sampling-mode>1</sampling-mode>
+			<time-dependent>false</time-dependent>
+		</node>
+		<node class="StringFEM" pos="458.527 270.454">
+			<tension>84.0</tension>
+			<diameter>0.000432</diameter>
+			<fixed-ends>true</fixed-ends>
+			<substeps>10</substeps>
+		</node>
+		<node class="GridRenderer" pos="39.898 503.698">
+			<active>true</active>
+			<line-width>1.0</line-width>
+			<color>[0.5, 0.5, 0.5, 1.0]</color>
+			<mode>1</mode>
+		</node>
+		<node class="DeformationRenderer" pos="210.984 514.338">
+			<active>true</active>
+			<scale>100.0</scale>
+			<radius>0.004</radius>
+			<show-balls>true</show-balls>
+			<show-grid>true</show-grid>
+			<line-width>3.0</line-width>
+			<color>[0.5, 0.5, 0.5, 1.0]</color>
+		</node>
+		<node class="Canvas" pos="55.185 1098.236" />
+		<node class="VectorFieldSample" pos="421.226 432.460">
+			<index>10</index>
+		</node>
+		<node class="VectorComponent" pos="454.218 546.426">
+			<component>1</component>
+		</node>
+		<node class="ListAccumulator" pos="589.042 703.454">
+			<capacity>10000</capacity>
+		</node>
+		<node class="ListPlot" pos="374.667 745.747">
+			<line-width>2.0</line-width>
+			<color>[1.0, 0.0, 0.0, 1.0]</color>
+			<x-scale>1.0</x-scale>
+		</node>
+		<node class="Plotter" pos="416.734 1066.412">
+			<auto-zoom>false</auto-zoom>
+			<x-min>0.0</x-min>
+			<x-max>100.0</x-max>
+			<y-min>-0.01</y-min>
+			<y-max>0.2</y-max>
+			<background>[0.141176, 0.141176, 0.141176, 1.0]</background>
+		</node>
+		<node class="ListSpectrum" pos="632.095 917.650" />
+		<node class="ListPlot" pos="526.246 992.351">
+			<line-width>2.0</line-width>
+			<color>[0.075769, 1.0, 0.0, 1.0]</color>
+			<x-scale>1.0</x-scale>
+		</node>
+		<node class="Plotter" pos="238.676 813.174">
+			<auto-zoom>true</auto-zoom>
+			<x-min>0.0</x-min>
+			<x-max>10000.0</x-max>
+			<y-min>-0.00089</y-min>
+			<y-max>0.000887</y-max>
+			<background>[0.141176, 0.141176, 0.141176, 1.0]</background>
+		</node>
+		<node class="LayoutNested" pos="76.050 987.865">
+			<mode>0</mode>
+		</node>
+		<node class="SceneRenderer" pos="82.648 633.438">
+			<background>[0.12, 0.12, 0.12, 1.0]</background>
+		</node>
+		<cable source="0" source_port="0" sink="1" sink_port="0" />
+		<cable source="0" source_port="0" sink="2" sink_port="0" />
+		<cable source="1" source_port="0" sink="3" sink_port="0" />
+		<cable source="2" source_port="0" sink="3" sink_port="1" />
+		<cable source="0" source_port="0" sink="4" sink_port="0" />
+		<cable source="1" source_port="0" sink="5" sink_port="0" />
+		<cable source="15" source_port="0" sink="6" sink_port="0" />
+		<cable source="1" source_port="0" sink="7" sink_port="0" />
+		<cable source="7" source_port="0" sink="8" sink_port="0" />
+		<cable source="8" source_port="0" sink="9" sink_port="0" />
+		<cable source="9" source_port="0" sink="10" sink_port="0" />
+		<cable source="13" source_port="0" sink="11" sink_port="0" />
+		<cable source="9" source_port="0" sink="12" sink_port="0" />
+		<cable source="12" source_port="0" sink="13" sink_port="0" />
+		<cable source="10" source_port="0" sink="14" sink_port="0" />
+		<cable source="16" source_port="0" sink="15" sink_port="0" />
+		<cable source="14" source_port="0" sink="15" sink_port="1" />
+		<cable source="11" source_port="0" sink="15" sink_port="2" />
+		<cable source="4" source_port="0" sink="16" sink_port="0" />
+		<cable source="5" source_port="0" sink="16" sink_port="0" />
+	</graph>
+</workspace>
