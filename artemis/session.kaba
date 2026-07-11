@@ -90,17 +90,17 @@ Dialog x x padding=0
 			Grid left-grid '' spacing=0
 				.
 				---|
-				Overlay code-editor-panel '' visible=no
-					Grid code-editor-grid '' greedfactory=0.5
+				Overlay code-editor-panel '' visible=no greedfactory=0.4
+					Grid code-editor-grid ''
 					Grid overlay-code-grid '' margin=25
 						Grid ? ''
 							Label ? '' ignorehover expandx
-							Button close-code-editor 'X' 'tooltip=Close editor' noexpandx
+							Button close-code-editor 'X' tooltip='Close editor' noexpandx
 						---|
 						Label ? '' ignorehover expandy
 						---|
 						Grid overlay-button-grid-code-bottom '' spacing=20
-							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+							Button code-run 'Run' image=media-playback-start-symbolic height=50 width=50 padding=7 ignorefocus
 			Overlay ? '' width=400 greedfactorx=1.6 expandx
 				Grid canvas-grid '' grabfocus
 				DrawingArea canvas-overlay '' ignorehover expandx
@@ -109,10 +109,10 @@ Dialog x x padding=0
 					---|
 					Grid overlay-button-grid-bottom '' spacing=20
 						Label ? '' ignorehover expandx
-						Button simulation-start 'Start' 'tooltip=Start simulation / time progression' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-						Button simulation-pause 'Pause' 'tooltip=Pause simulation / time progression' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-						Button simulation-stop 'Stop' 'tooltip=Stop and reset simulation / time progression' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
-						Button simulation-step 'Step' 'tooltip=Single simulation / time step' height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-start 'Start' tooltip='Start simulation / time progression' image=media-playback-start-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-pause 'Pause' tooltip='Pause simulation / time progression' image=media-playback-pause-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-stop 'Stop' tooltip='Stop and reset simulation / time progression' image=media-playback-stop-symbolic height=50 width=50 padding=7 noexpandx ignorefocus
+						Button simulation-step 'Step' tooltip='Single simulation / time step' height=50 width=50 padding=7 noexpandx ignorefocus
 		DrawingArea overlay-area '' ignorehover
 ")
 		set_option("padding", "0")

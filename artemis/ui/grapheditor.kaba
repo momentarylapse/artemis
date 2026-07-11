@@ -123,6 +123,7 @@ Dialog x ''
 		DrawingArea graph '' grabfocus width=400 expandx
 		Grid overlay-grid '' margin=25
 			Grid ? '' spacing=20
+				Button view-move 'M' 'tooltip=Drag button to scroll view' image=rf-translate height=50 width=50 padding=7 noexpandx ignorefocus
 				Label ? '' ignorehover expandx
 				Button add-node '+' 'tooltip=Add node from list' height=50 width=50 padding=7 noexpandx ignorefocus
 				Button show-code-editor 'E' 'tooltip=Open code editor' height=50 width=50 padding=7 noexpandx ignorefocus
@@ -134,6 +135,9 @@ Dialog x ''
 				Grid dock ''
 				.
 ")
+		event_x("view-move", "hui:left-button-down", func() get_window()!.set_mouse_mode(0))
+		event_x("view-move", "hui:left-button-up", func() get_window()!.set_mouse_mode(1))
+		event_x("view-move", "hui:mouse-move", on_view_move_mouse_move)
 
 		event_x("graph", "hui:draw", on_draw)
 		event_x("graph", "hui:mouse-move", _on_mouse_move)
@@ -146,6 +150,14 @@ Dialog x ''
 		event("add-node", open_node_list_panel)
 
 		event("show-code-editor", func() out_show_code_editor())
+
+
+	func mut on_view_move_mouse_move()
+		for w in get_window()
+			let d = w.get_mouse_delta()
+			if w.left_button()
+				view_offset += d
+				request_redraw()
 
 
 	func mut _on_mouse_move()
@@ -182,7 +194,7 @@ Dialog x ''
 		let d = get_window()!.get_scroll()
 		let m = get_window()!.get_mouse_position()
 		let mm = from_screen(m)
-		view_scale = clamp(view_scale * exp(0.2 * d.y), 0.5, 10.0)
+		view_scale = clamp(view_scale * exp(0.1 * d.y), 0.5, 10.0)
 		view_offset -= to_screen(mm) - m
 
 		hover = get_hover(m)

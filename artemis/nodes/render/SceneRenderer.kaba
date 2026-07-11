@@ -152,11 +152,11 @@ Dialog x x padding=0
 		for w in get_window()
 			let d = w.get_mouse_delta()
 			if w.left_button()
-					if w.is_key_pressed(xhui.KEY_SHIFT)
-						view_port.move(vec3(0,0,d.y) / 800.0)
-					else
-						view_port.move(vec3(-d.x, d.y, 0) / 800.0)
-					request_redraw()
+				if w.is_key_pressed(xhui.KEY_SHIFT)
+					view_port.move(vec3(0,0,d.y) / 800.0)
+				else
+					view_port.move(vec3(-d.x, d.y, 0) / 800.0)
+				request_redraw()
 
 
 	func mut on_cam_rotate_mouse_move()
