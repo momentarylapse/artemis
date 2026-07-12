@@ -228,8 +228,10 @@ Dialog x x padding=0
 		p.set_font_size(wash_f32(&xhui.theme.font_size))
 
 		if show_profiling
-			p.set_font_size(wash_f32(&xhui.theme.font_size) * 0.85)
 			let report = profiler.digest_report(profiler.previous_frame_timing())
+			p.set_font_size(wash_f32(&xhui.theme.font_size) * 0.85)
+			p.set_color(Color(0,0,0,0.7))
+			p.draw_rect([p.area().p00() + vec2(10, 10), p.area().p00() + vec2(285, 30 + 18 * f32(len(report)))])
 			for i=>c in report
 				let fraction = c.total / max(wash_f32(&profiler.previous_frame_timing().total_time), 0.01)
 				if fraction > 0.03
