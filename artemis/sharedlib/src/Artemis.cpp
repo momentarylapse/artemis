@@ -1,7 +1,4 @@
-
-#include <lib/dataflow/Node.h>
 #include <graph/NodeFactory.h>
-#include <graph/Graph.h>
 #include "Session.h"
 #include <plugins/PluginManager.h>
 #include <lib/os/msg.h>
@@ -20,9 +17,4 @@ void app_init_core() {
 	artemis::graph::init_factory();
 }
 
-namespace os::app {
-	int main(const Array<string>&) {
-		return 0;
-	}
-}
 

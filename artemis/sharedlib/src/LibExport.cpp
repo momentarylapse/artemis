@@ -2,20 +2,22 @@
 #include <lib/kaba/kaba.h>
 #include <plugins/PluginManager.h>
 #include <lib/os/msg.h>
+#include <lib/profiler/Profiler.h>
 
 bool app_init();
 bool app_init_core();
 
-extern "C" {
-	__attribute__ ((visibility ("default")))
-	void export_symbols(kaba::IExporter* e) {
-		kaba::make_context_public(e);
+KABA_PACKAGE_EXPORT_BEGIN
+KABA_PACKAGE_EXPORT void export_symbols(kaba::IExporter* e) {
+	kaba::make_context_public(e);
 
-		artemis::PluginManager::export_kaba(e);
+	profiler::init_external(kaba::default_context->get_global_symbol("profiler", "state"));
 
-		app_init_core();
-	//	if (!app_init())
-	//		msg_error("failed to initialize...");
-	}
+	artemis::PluginManager::export_kaba(e);
+
+	app_init_core();
+//	if (!app_init())
+//		msg_error("failed to initialize...");
 }
+KABA_PACKAGE_EXPORT_END
 

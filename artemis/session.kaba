@@ -229,9 +229,9 @@ Dialog x x padding=0
 
 		if show_profiling
 			p.set_font_size(wash_f32(&xhui.theme.font_size) * 0.85)
-			let report = profiler.digest_report(profiler.previous_frame_timing)
+			let report = profiler.digest_report(profiler.previous_frame_timing())
 			for i=>c in report
-				let fraction = c.total / max(wash_f32(&profiler.previous_frame_timing.total_time), 0.01)
+				let fraction = c.total / max(wash_f32(&profiler.previous_frame_timing().total_time), 0.01)
 				if fraction > 0.03
 					p.set_color(xhui.theme.text)
 				else
