@@ -11,7 +11,7 @@ KABA_PACKAGE_EXPORT_BEGIN
 KABA_PACKAGE_EXPORT void export_symbols(kaba::IExporter* e) {
 	kaba::make_context_public(e);
 
-	profiler::init_external(kaba::default_context->get_global_symbol("profiler", "state"));
+	profiler::init_external(e->context()->get_global_symbol("profiler", "state"));
 
 	artemis::PluginManager::export_kaba(e);
 
