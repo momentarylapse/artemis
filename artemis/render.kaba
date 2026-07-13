@@ -21,6 +21,8 @@ class RendererNode extends Node
 		session := current_session()
 		flags = NodeFlags.RENDERER
 		channel_draw = profiler.create_channel("{{name}}:draw", channel)
+	func override __delete__()
+		profiler.delete_channel(channel_draw)
 
 
 
@@ -38,7 +40,9 @@ class RenderEmitterNodeEmitter extends yrenderer.MeshEmitter
 		super.__init__(ctx, "em")
 		owner := o
 	func override emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+		profiler.begin(owner.channel_draw)
 		owner.on_emit(params, rvd, shadow_pass)
+		profiler.end(owner.channel_draw)
 
 
 # 3d rendering
@@ -47,12 +51,15 @@ class RenderEmitterNode extends Node
 	var out_draw = OutPort[DrawCall](&self, "draw")
 	var active = Setting[bool](&self, "active", true)
 	var emitter: shared![RenderEmitterNodeEmitter]
+	var channel_draw: i32
 
 	func override __init__(name: string)
 		session := current_session()
 		flags = NodeFlags.RENDERER
 		emitter = new RenderEmitterNodeEmitter(session.ctx!, &self)
+		channel_draw = profiler.create_channel("{{name}}:draw", channel)
 #	func extern override __delete__()
+#		profiler.delete_channel(channel_draw)
 	func virtual mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
 	func virtual bounding_box() -> Box?
 		return nil

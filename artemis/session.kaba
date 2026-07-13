@@ -231,17 +231,17 @@ Dialog x x padding=0
 			let report = profiler.digest_report(profiler.previous_frame_timing())
 			p.set_font_size(wash_f32(&xhui.theme.font_size) * 0.85)
 			p.set_color(Color(0,0,0,0.7))
-			p.draw_rect([p.area().p00() + vec2(10, 10), p.area().p00() + vec2(285, 30 + 18 * f32(len(report)))])
+			p.draw_rect([p.area().p00() + vec2(10, 10), p.area().p00() + vec2(315, 30 + 18 * f32(len(report)))])
 			for i=>c in report
 				let fraction = c.total / max(wash_f32(&profiler.previous_frame_timing().total_time), 0.01)
 				if fraction > 0.03
 					p.set_color(xhui.theme.text)
 				else
 					p.set_color(xhui.theme.text_disabled)
-				draw_str_right(p, p.area().p00() + vec2(140, 20 + 18 * f32(i)), profiler.get_name(c.channel))
-				draw_str_right(p, p.area().p00() + vec2(190, 20 + 18 * f32(i)), "{{fraction * 100|.1}}%")
-				draw_str_right(p, p.area().p00() + vec2(230, 20 + 18 * f32(i)), "{{c.average * 1000|.2}}")
-				draw_str_right(p, p.area().p00() + vec2(270, 20 + 18 * f32(i)), "{{c.count}}")
+				draw_str_right(p, p.area().p00() + vec2(170, 20 + 18 * f32(i)), profiler.get_name(c.channel))
+				draw_str_right(p, p.area().p00() + vec2(220, 20 + 18 * f32(i)), "{{fraction * 100|.1}}%")
+				draw_str_right(p, p.area().p00() + vec2(260, 20 + 18 * f32(i)), "{{c.average * 1000|.2}}")
+				draw_str_right(p, p.area().p00() + vec2(300, 20 + 18 * f32(i)), "{{c.count}}")
 			p.set_font_size(wash_f32(&xhui.theme.font_size))
 
 
