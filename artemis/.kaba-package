@@ -5,6 +5,7 @@ requires fft
 requires plot
 requires polymesh
 requires profiler
+requires simplevis
 requires xhui
 requires yrenderer
 

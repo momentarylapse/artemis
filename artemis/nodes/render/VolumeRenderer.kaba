@@ -2,14 +2,16 @@ use artemis.*
 use yrenderer
 use yrenderer.gfx
 use polymesh.*
+#use simplevis.volume as sv
 
 
-class VolumeRenderer extends RenderEmitterNode
+class VolumeRenderer extends Render3dNode
 	var in_field = InPort[ScalarField](self, "field")
 	var solid = Setting[bool](self, "solid", false)
 	var scale = Setting[f64](self, "scale", 1.0)
 	var color_map = Setting[ColorMap](self, "color-map", default_color_map_transparent)
 
+#	var volume_renderer: sv.VolumeRenderer
 	var vertex_buffer: owned![gfx.VertexBuffer]
 	var tex: shared![gfx.VolumeTexture]
 	var material: owned![yrenderer.Material]
@@ -66,7 +68,7 @@ class VolumeRenderer extends RenderEmitterNode
 			send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func override mut on_draw()
 		for f in in_field.value()
 			var _material = weak(material)
 			if solid()
@@ -75,8 +77,8 @@ class VolumeRenderer extends RenderEmitterNode
 			#let matrix = mat4(f.grid.dx * f32(f.grid.nx), f.grid.dy * f32(f.grid.ny), f.grid.dz * f32(f.grid.nz))
 			let matrix = mat4.scale(len(f.grid.dx) * f32(f.grid.nx), len(f.grid.dy) * f32(f.grid.ny), len(f.grid.dz) * f32(f.grid.nz))
 
-			var shader = rvd.get_shader(_material, 0, "default")
-			var rd = rvd.start(params, matrix, shader, _material, 0, gfx.PrimitiveTopology.TRIANGLES, weak(vertex_buffer))
+			var shader = ctx.cur_rvd.get_shader(_material, 0, "default")
+			var rd = ctx.cur_rvd.start(ctx.cur_params, matrix, shader, _material, 0, gfx.PrimitiveTopology.TRIANGLES, weak(vertex_buffer))
 
 			var cm = color_map()
 
@@ -93,8 +95,8 @@ class VolumeRenderer extends RenderEmitterNode
 				data["map_colors[{{i}}]:{{i*16}}"] = dyn(c)
 				data["map_values[{{i}}]:{{64+i*4}}"] = cm.values[i]
 			data["map_count:80"] = len(cm.colors)
-			yrenderer.apply_shader_data(params, shader, data)
-			rd.draw_triangles(params, weak(vertex_buffer))
+			yrenderer.apply_shader_data(ctx.cur_params, shader, data)
+			rd.draw_triangles(ctx.cur_params, weak(vertex_buffer))
 
 
 	func override bounding_box() -> Box?

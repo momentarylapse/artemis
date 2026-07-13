@@ -4,7 +4,7 @@ use yrenderer.gfx
 use polymesh.*
 
 
-class DeformationRenderer extends RenderEmitterNode
+class DeformationRenderer extends Render3dNode
 	var in_diff = InPort[VectorField](self, "diff")
 	var in_scalar = InPort[ScalarField](self, "scalar", PortFlags.OPTIONAL)
 	var scale = Setting[f64](self, "scale", 1.0)
@@ -37,7 +37,7 @@ class DeformationRenderer extends RenderEmitterNode
 			send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func override mut on_draw()
 		for d in in_diff.value()
 			let mesh = create_sphere([0,0,0], 1, 2)
 			var vertices: gfx.Vertex[]
@@ -52,9 +52,9 @@ class DeformationRenderer extends RenderEmitterNode
 				material.emission = color()
 				for i=>p in g.points(d.sampling_mode)
 					let pos = p + d.value(i) * s
-					draw_mesh(params, rvd,
+					ctx.draw_mesh(weak(vertex_buffer),
 						mat4.translation(pos) * mat4.scale(r, r, r),
-						weak(vertex_buffer), weak(material))
+						weak(material))
 
 			match d.sampling_mode
 				SamplingMode.PER_CELL =>
@@ -76,11 +76,9 @@ class DeformationRenderer extends RenderEmitterNode
 									points.add(g.cell_center(i, j, k) + d._value(i, j, k) * s)
 									points.add(g.cell_center(i + 1, j, k) + d._value(i + 1, j, k) * s)
 
-						for mut lh in session.line_helper
-							lh.begin_draw(params, rvd)
-							lh.set_color(color())
-							lh.set_line_width(line_width() as f32)
-							lh.draw_lines(points, false)
+						ctx.set_color(color())
+						ctx.set_line_width(line_width() as f32)
+						ctx.draw_lines(points, false)
 				SamplingMode.PER_VERTEX =>
 					if show_grid()
 						var points: vec3[]
@@ -89,11 +87,9 @@ class DeformationRenderer extends RenderEmitterNode
 							points.add(p0[e[0]] + d.value(e[0]) * s)
 							points.add(p0[e[1]] + d.value(e[1]) * s)
 
-						for mut lh in session.line_helper
-							lh.begin_draw(params, rvd)
-							lh.set_color(color())
-							lh.set_line_width(line_width() as f32)
-							lh.draw_lines(points, false)
+						ctx.set_color(color())
+						ctx.set_line_width(line_width() as f32)
+						ctx.draw_lines(points, false)
 
 
 	func override bounding_box() -> Box?

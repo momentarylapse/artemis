@@ -3,7 +3,7 @@ use yrenderer
 use yrenderer.gfx
 
 
-class VectorFieldRenderer extends RenderEmitterNode
+class VectorFieldRenderer extends Render3dNode
 	var in_field = InPort[VectorField](self, "field")
 	var line_width = Setting[f64](self, "line-width", 2.0, "range=0:99:0.1")
 	var scale = Setting[f64](self, "scale", 1.0)
@@ -19,7 +19,7 @@ class VectorFieldRenderer extends RenderEmitterNode
 			send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func override mut on_draw()
 		for f in in_field.value()
 			let s = scale() as f32
 			var points: vec3[]
@@ -27,11 +27,9 @@ class VectorFieldRenderer extends RenderEmitterNode
 				points.add(p)
 				points.add(p + f.value(i) * s)
 
-			for mut lh in session.line_helper
-				lh.begin_draw(params, rvd)
-				lh.set_color(color())
-				lh.set_line_width(line_width() as f32)
-				lh.draw_lines(points, false)
+			ctx.set_color(color())
+			ctx.set_line_width(line_width() as f32)
+			ctx.draw_lines(points, false)
 
 
 	func override bounding_box() -> Box?

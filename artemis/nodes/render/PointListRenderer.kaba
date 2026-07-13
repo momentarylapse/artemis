@@ -13,7 +13,7 @@ func point_list_bounding_box(points: vec3[]) -> Box?
 	return b
 
 
-class PointListRenderer extends RenderEmitterNode
+class PointListRenderer extends Render3dNode
 	var in_points = InPort[vec3[]](self, "points")
 	var in_mesh = InPort[Mesh](self, "mesh", PortFlags.OPTIONAL)
 	var radius = Setting[f64](self, "radius", 0.2, "range=0:99:0.1")
@@ -47,7 +47,7 @@ class PointListRenderer extends RenderEmitterNode
 		send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func override mut on_draw()
 		var vertices: gfx.Vertex[]
 		for m in in_mesh.value()
 			m.build(vertices)
@@ -61,15 +61,13 @@ class PointListRenderer extends RenderEmitterNode
 
 		for points in in_points.value()
 			for p in points
-				draw_mesh(params, rvd, mat4.translation(p), weak(vertex_buffer), weak(material))
+				ctx.draw_mesh(weak(vertex_buffer), mat4.translation(p), weak(material))
 
 		if trail_length() > 0
-			for mut lh in session.line_helper
-				lh.begin_draw(params, rvd)
-				for points in trails
-					lh.set_color(color())
-					lh.set_line_width(line_width() as f32)
-					lh.draw_lines(points, true)
+			for points in trails
+				ctx.set_color(color())
+				ctx.set_line_width(line_width() as f32)
+				ctx.draw_lines(points, true)
 
 
 	func override bounding_box() -> Box?

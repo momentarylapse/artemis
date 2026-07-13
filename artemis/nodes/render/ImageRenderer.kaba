@@ -4,7 +4,7 @@ use yrenderer.gfx
 use image
 
 
-class ImageRenderer extends RenderEmitterNode
+class ImageRenderer extends Render3dNode
 	var in_image = InPort[image.Image](self, "image")
 
 	var vertex_buffer: owned![gfx.VertexBuffer]
@@ -32,8 +32,8 @@ class ImageRenderer extends RenderEmitterNode
 			send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
-		draw_mesh(params, rvd, mat4.rotation_x(pi), weak(vertex_buffer), weak(material))
+	func override mut on_draw()
+		ctx.draw_mesh(weak(vertex_buffer), mat4.rotation_x(pi), weak(material))
 
 
 	func override bounding_box() -> Box?

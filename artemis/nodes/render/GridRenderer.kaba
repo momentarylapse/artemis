@@ -7,7 +7,7 @@ enum RenderMode
 	FULL
 
 
-class GridRenderer extends RenderEmitterNode
+class GridRenderer extends Render3dNode
 	var in_grid = InPort[Grid](self, "grid")
 	var line_width = Setting[f64](self, "line-width", 1.0, "range=0:99:0.1")
 	var color = Setting[Color](self, "color", Color.GRAY)
@@ -23,7 +23,7 @@ class GridRenderer extends RenderEmitterNode
 			send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
+	func override mut on_draw()
 		for g in in_grid.value()
 			var points: vec3[]
 
@@ -63,11 +63,9 @@ class GridRenderer extends RenderEmitterNode
 			#		points.add(vertices[a])
 			#		points.add(vertices[b])
 
-			for mut lh in session.line_helper
-				lh.begin_draw(params, rvd)
-				lh.set_color(color())
-				lh.set_line_width(line_width() as f32)
-				lh.draw_lines(points, false)
+			ctx.set_color(color())
+			ctx.set_line_width(line_width() as f32)
+			ctx.draw_lines(points, false)
 
 
 	func override bounding_box() -> Box?

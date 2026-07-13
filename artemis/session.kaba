@@ -261,7 +261,6 @@ class extern Session
 	var shader_manager: yrenderer.ShaderManager*
 	var texture_manager: yrenderer.TextureManager*
 	var material_manager: yrenderer.MaterialManager*
-	var line_helper: owned[yrenderer.LineHelper]
 	var drawing_helper: DrawingHelper&
 	var win: ArtemisWindow&
 #	var promise_started: promise[Session]
@@ -298,12 +297,11 @@ func init_graphics_stuff(out session: Session)
 	let dir = plugin_directory() | "static"
 	for mut ctx in session.ctx
 		publish_gfx_context(ctx.context)
-		ctx.create_managers([dir], [dir | "shader", kaba.packages_root() | "yrenderer" | "shader"], [])
+		ctx.create_managers([dir], [dir | "shader", kaba.packages_root() | "yrenderer" | "shader", kaba.packages_root() | "simplevis" | "shader"], [])
 		session.shader_manager = ctx.shader_manager
 		session.texture_manager = ctx.texture_manager
 		session.material_manager = ctx.material_manager
 	session.shader_manager!.default_shader = "default.shader"
-	session.line_helper = new yrenderer.LineHelper()
 	try
 		for mut sm in session.shader_manager
 			sm.load_shader_module("module-basic-data.shader")

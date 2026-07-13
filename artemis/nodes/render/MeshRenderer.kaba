@@ -4,7 +4,7 @@ use yrenderer.gfx
 use polymesh.*
 
 
-class MeshRenderer extends RenderEmitterNode
+class MeshRenderer extends Render3dNode
 	var in_mesh = InPort[Mesh](self, "in")
 	var roughness = Setting[f64](self, "roughness", 0.7)
 	var metal = Setting[f64](self, "metal", 0.05)
@@ -37,8 +37,8 @@ class MeshRenderer extends RenderEmitterNode
 			send_out()
 
 
-	func override mut on_emit(params: yrenderer.RenderParams, rvd: yrenderer.RenderViewData, shadow_pass: bool)
-		draw_mesh(params, rvd, mat4.ID, weak(vertex_buffer), weak(material))
+	func override mut on_draw()
+		ctx.draw_mesh(weak(vertex_buffer), mat4.ID, weak(material))
 
 
 	func override bounding_box() -> Box?
