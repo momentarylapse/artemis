@@ -275,6 +275,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("MultiComponentField.__isub__", &data::MultiComponentField::operator-=);
 	ext->link_class_func("MultiComponentField.__mul__", &data::MultiComponentField::operator*);
 	ext->link_class_func("MultiComponentField.__imul__", &data::MultiComponentField::operator*=);
+	ext->link_class_func("MultiComponentField.get_component", &data::MultiComponentField::get_component);
 	ext->link_class_func("MultiComponentField.cwise_product", &data::MultiComponentField::componentwise_product);
 	ext->link_func("MultiComponentField.create", &create_multi_component_field);
 

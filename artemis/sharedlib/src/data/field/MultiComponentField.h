@@ -10,6 +10,8 @@
 
 namespace artemis::data {
 
+	struct ScalarField;
+
 	struct MultiComponentField : Field {
 		MultiComponentField();
 		explicit MultiComponentField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode, int components);
@@ -26,6 +28,7 @@ namespace artemis::data {
 		void operator*=(double o);
 		MultiComponentField operator*(double o) const;
 
+		ScalarField get_component(int i) const;
 		MultiComponentField componentwise_product(const MultiComponentField& o) const;
 	};
 

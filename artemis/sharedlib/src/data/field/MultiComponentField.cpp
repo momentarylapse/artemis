@@ -3,6 +3,7 @@
 //
 
 #include "MultiComponentField.h"
+#include "ScalarField.h"
 #include <processing/helper/GlobalThreadPool.h>
 
 namespace artemis::data {
@@ -119,6 +120,24 @@ MultiComponentField MultiComponentField::operator*(double o) const {
 	auto r = *this;
 	r *= o;
 	return r;
+}
+
+ScalarField MultiComponentField::get_component(int component) const {;
+	ScalarField s(grid, type, sampling_mode);
+	if (component < 0 or component >= components)
+		return s;
+	if (type == ScalarType::Float32) {
+		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v32.v.num; i++) {
+			s.v32.v[i] = (float)value(i, component);
+		}
+	} else if (type == ScalarType::Float64) {
+		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
+		for (int i=0; i<s.v64.v.num; i++) {
+			s.v64.v[i] = value(i, component);
+		}
+	}
+	return s;
 }
 
 MultiComponentField MultiComponentField::componentwise_product(const MultiComponentField& o) const {

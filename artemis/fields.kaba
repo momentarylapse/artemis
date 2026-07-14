@@ -96,6 +96,7 @@ struct extern MultiComponentField
 	func extern __sub__(o: MultiComponentField) -> MultiComponentField
 	func extern mut __imul__(o: f64)
 	func extern __mul__(o: f64) -> MultiComponentField
+	func extern get_component(i: i32) -> ScalarField
 	func extern cwise_product(o: MultiComponentField) -> MultiComponentField
 
 	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiComponentField
