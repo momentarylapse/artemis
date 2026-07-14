@@ -26,29 +26,29 @@ base::expected<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, c
 	string source_name = kaba::default_context->type_name(source->type);
 	string sink_name = kaba::default_context->type_name(sink->type);
 	// TODO recursive "solver"
-	if (source_name == "Mesh" and sink_name == "DrawCall")
+	if (source_name == "Mesh" and sink_name == "DrawCall3d")
 		return R{"MeshRenderer"};
 	if (source_name == "Mesh" and sink_name == "RenderData")
 		return R{"MeshRenderer", "SceneRenderer"};
-	if (source_name == "Image" and sink_name == "DrawCall")
+	if (source_name == "Image" and sink_name == "DrawCall3d")
 		return R{"ImageRenderer"};
 	if (source_name == "Image" and sink_name == "RenderData")
 		return R{"ImageRenderer", "SceneRenderer"};
-	if (source_name == "DrawCall" and sink_name == "RenderData")
+	if (source_name == "DrawCall3d" and sink_name == "RenderData")
 		return R{"SceneRenderer"};
-	if (source_name == "Grid" and sink_name == "DrawCall")
+	if (source_name == "Grid" and sink_name == "DrawCall3d")
 		return R{"GridRenderer"};
 	if (source_name == "Grid" and sink_name == "RenderData")
 		return R{"GridRenderer", "SceneRenderer"};
-	if (source_name == "ScalarField" and sink_name == "DrawCall")
+	if (source_name == "ScalarField" and sink_name == "DrawCall3d")
 		return R{"VolumeRenderer"};
 	if (source_name == "ScalarField" and sink_name == "RenderData")
 		return R{"VolumeRenderer", "SceneRenderer"};
-	if (source_name == "VectorField" and sink_name == "DrawCall")
+	if (source_name == "VectorField" and sink_name == "DrawCall3d")
 		return R{"VectorFieldRenderer"};
 	if (source_name == "VectorField" and sink_name == "RenderData")
 		return R{"VectorFieldRenderer", "SceneRenderer"};
-	if (source_name == "vec3[]" and sink_name == "DrawCall")
+	if (source_name == "vec3[]" and sink_name == "DrawCall3d")
 		return R{"PointListRenderer"};
 	if (source_name == "vec3[]" and sink_name == "RenderData")
 		return R{"PointListRenderer", "SceneRenderer"};
