@@ -2,7 +2,7 @@
 // Created by michi on 8/31/25.
 //
 
-#include "MultiComponentField.h"
+#include "MultiField.h"
 #include <Session.h>
 #include <processing/helper/GlobalThreadPool.h>
 #include <lib/kaba/kaba.h>
@@ -16,7 +16,7 @@ namespace artemis {
 
 namespace artemis::graph {
 
-	MultiComponentField::MultiComponentField() : ResourceNode("MultiComponentField") {
+	MultiField::MultiField() : ResourceNode("MultiField") {
 		time_dependent.on_update = [this] {
 			if (time_dependent())
 				flags = dataflow::NodeFlags::Resource | dataflow::NodeFlags::TimeDependent;
@@ -25,7 +25,7 @@ namespace artemis::graph {
 		};
 	}
 
-	void MultiComponentField::on_process() {
+	void MultiField::on_process() {
 		if (auto g = in_grid.value()) {
 			if (g->type != data::GridType::Regular)
 				return;
@@ -62,7 +62,7 @@ func f(p: vec3, t: f32) -> f32[]
 				const auto v0 = f({0,0,0}, 0);
 				int components = v0.num;
 
-				data::MultiComponentField s(rg,
+				data::MultiField s(rg,
 					type(),
 					sampling_mode(), components);
 

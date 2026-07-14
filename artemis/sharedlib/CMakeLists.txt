@@ -164,14 +164,14 @@ add_library(moduleartemis SHARED
 	src/action/graph/ActionNodesMove.cpp
 	src/data/field/BasisFields.cpp
 	src/data/field/Field.cpp
-	src/data/field/MultiComponentField.cpp
+	src/data/field/MultiField.cpp
 	src/data/field/ScalarField.cpp
 	src/data/field/VectorField.cpp
 	src/data/grid/Grid.cpp
 	src/data/grid/RegularGrid.cpp
 	src/data/grid/UnstructuredGrid.cpp
 	src/data/util/ColorMap.cpp
-	src/graph/field/MultiComponentField.cpp
+	src/graph/field/MultiField.cpp
 	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
 	src/graph/AutoConnect.cpp
@@ -395,7 +395,6 @@ set(RESOURCE_DESTINATION share/artemis)
 
 # resources
 install(FILES "static/icons" DESTINATION ${RESOURCE_DESTINATION})
-install(FILES "static/shader" DESTINATION ${RESOURCE_DESTINATION})
 install(FILES "static/default.theme" DESTINATION ${RESOURCE_DESTINATION})
 install(FILES "static/hui_resources.txt" DESTINATION ${RESOURCE_DESTINATION})
 install(FILES "static/icon.svg" DESTINATION ${RESOURCE_DESTINATION})

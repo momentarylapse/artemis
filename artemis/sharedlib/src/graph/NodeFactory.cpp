@@ -5,7 +5,7 @@
 #include "NodeFactory.h"
 #include "field/ScalarField.h"
 #include "field/VectorField.h"
-#include "field/MultiComponentField.h"
+#include "field/MultiField.h"
 #include "../plugins/PluginManager.h"
 #include <lib/os/msg.h>
 
@@ -42,7 +42,7 @@ void register_node_class(const string& class_name, const Array<dataflow::NodeCat
 void init_factory() {
 	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});
 	register_node_class<VectorField>("VectorField", {dataflow::NodeCategory::Field});
-	register_node_class<MultiComponentField>("MultiComponentField", {dataflow::NodeCategory::Field});
+	register_node_class<MultiField>("MultiField", {dataflow::NodeCategory::Field});
 
 	for (const auto& [class_name, filename] : artemis::PluginManager::plugin_classes) {
 		node_class_db.add({

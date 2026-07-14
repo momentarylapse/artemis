@@ -1,12 +1,12 @@
 use artemis.*
 
-class MultiComponentFieldComponent extends Node
-	var in_field = InPort[MultiComponentField](self, "in")
+class MultiFieldComponent extends Node
+	var in_field = InPort[MultiField](self, "in")
 	var out_field = OutPort[ScalarField](self, "out")
 	var component = Setting[i32](self, "component", 0)
 
 	func __init__()
-		super.__init__("MultiComponentFieldComponent")
+		super.__init__("MultiFieldComponent")
 
 	func override on_process()
 		let n = component()

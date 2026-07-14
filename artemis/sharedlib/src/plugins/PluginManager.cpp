@@ -18,7 +18,7 @@
 #include <Session.h>
 #include <data/field/ScalarField.h>
 #include <data/field/VectorField.h>
-#include <data/field/MultiComponentField.h>
+#include <data/field/MultiField.h>
 #include <data/grid/Grid.h>
 #include <data/grid/RegularGrid.h>
 #include <data/util/ColorMap.h>
@@ -133,8 +133,8 @@ data::VectorField create_vector_field(const data::RegularGrid& grid, const kaba:
 	return data::VectorField(grid, type_kaba_to_data(type), mode);
 }
 
-data::MultiComponentField create_multi_component_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode, int components) {
-	return data::MultiComponentField(grid, type_kaba_to_data(type), mode, components);
+data::MultiField create_multi_component_field(const data::RegularGrid& grid, const kaba::Class* type, data::SamplingMode mode, int components) {
+	return data::MultiField(grid, type_kaba_to_data(type), mode, components);
 }
 
 template<class T>
@@ -250,34 +250,34 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("VectorField.set_component", &data::VectorField::set_component);
 	ext->link_func("VectorField.merge", &data::VectorField::merge);
 
-	ext->declare_class_size("MultiComponentField", sizeof(data::MultiComponentField));
-	ext->link_class_func("MultiComponentField.__init__", &kaba::generic_init<data::MultiComponentField>);
-	ext->link_class_func("MultiComponentField.__delete__", &kaba::generic_delete<data::MultiComponentField>);
-	ext->declare_class_element("MultiComponentField.grid", &data::MultiComponentField::grid);
-	ext->declare_class_element("MultiComponentField.sampling_mode", &data::MultiComponentField::sampling_mode);
-	ext->declare_class_element("MultiComponentField.components", &data::MultiComponentField::components);
-	ext->declare_class_element("MultiComponentField.buffer", &data::MultiComponentField::buffer);
-	ext->link_class_func("MultiComponentField.set", &data::MultiComponentField::set);
-	ext->link_class_func("MultiComponentField.value", &data::MultiComponentField::value);
-	ext->link_class_func("MultiComponentField.values", &data::MultiComponentField::values);
-	ext->link_class_func("MultiComponentField._set", &data::MultiComponentField::_set);
-	ext->link_class_func("MultiComponentField._value", &data::MultiComponentField::_value);
-	ext->link_class_func("MultiComponentField.raw", &data::MultiComponentField::raw);
-	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
-	ext->link_class_func("MultiComponentField.begin_edit_cpu", &data::MultiComponentField::begin_edit_cpu);
-	ext->link_class_func("MultiComponentField.begin_edit_gpu", &data::MultiComponentField::begin_edit_gpu);
-	ext->link_class_func("MultiComponentField.begin_read_cpu", &data::MultiComponentField::begin_read_cpu);
-	ext->link_class_func("MultiComponentField.begin_read_gpu", &data::MultiComponentField::begin_read_gpu);
-	ext->link_class_func("MultiComponentField.__assign__", &kaba::generic_assign<data::MultiComponentField>);
-	ext->link_class_func("MultiComponentField.__add__", &data::MultiComponentField::operator+);
-	ext->link_class_func("MultiComponentField.__iadd__", &data::MultiComponentField::operator+=);
-	ext->link_class_func("MultiComponentField.__sub__", &data::MultiComponentField::operator-);
-	ext->link_class_func("MultiComponentField.__isub__", &data::MultiComponentField::operator-=);
-	ext->link_class_func("MultiComponentField.__mul__", &data::MultiComponentField::operator*);
-	ext->link_class_func("MultiComponentField.__imul__", &data::MultiComponentField::operator*=);
-	ext->link_class_func("MultiComponentField.get_component", &data::MultiComponentField::get_component);
-	ext->link_class_func("MultiComponentField.cwise_product", &data::MultiComponentField::componentwise_product);
-	ext->link_func("MultiComponentField.create", &create_multi_component_field);
+	ext->declare_class_size("MultiField", sizeof(data::MultiField));
+	ext->link_class_func("MultiField.__init__", &kaba::generic_init<data::MultiField>);
+	ext->link_class_func("MultiField.__delete__", &kaba::generic_delete<data::MultiField>);
+	ext->declare_class_element("MultiField.grid", &data::MultiField::grid);
+	ext->declare_class_element("MultiField.sampling_mode", &data::MultiField::sampling_mode);
+	ext->declare_class_element("MultiField.components", &data::MultiField::components);
+	ext->declare_class_element("MultiField.buffer", &data::MultiField::buffer);
+	ext->link_class_func("MultiField.set", &data::MultiField::set);
+	ext->link_class_func("MultiField.value", &data::MultiField::value);
+	ext->link_class_func("MultiField.values", &data::MultiField::values);
+	ext->link_class_func("MultiField._set", &data::MultiField::_set);
+	ext->link_class_func("MultiField._value", &data::MultiField::_value);
+	ext->link_class_func("MultiField.raw", &data::MultiField::raw);
+	ext->link_class_func("MultiField.type", &field_get_type<data::MultiField>);
+	ext->link_class_func("MultiField.begin_edit_cpu", &data::MultiField::begin_edit_cpu);
+	ext->link_class_func("MultiField.begin_edit_gpu", &data::MultiField::begin_edit_gpu);
+	ext->link_class_func("MultiField.begin_read_cpu", &data::MultiField::begin_read_cpu);
+	ext->link_class_func("MultiField.begin_read_gpu", &data::MultiField::begin_read_gpu);
+	ext->link_class_func("MultiField.__assign__", &kaba::generic_assign<data::MultiField>);
+	ext->link_class_func("MultiField.__add__", &data::MultiField::operator+);
+	ext->link_class_func("MultiField.__iadd__", &data::MultiField::operator+=);
+	ext->link_class_func("MultiField.__sub__", &data::MultiField::operator-);
+	ext->link_class_func("MultiField.__isub__", &data::MultiField::operator-=);
+	ext->link_class_func("MultiField.__mul__", &data::MultiField::operator*);
+	ext->link_class_func("MultiField.__imul__", &data::MultiField::operator*=);
+	ext->link_class_func("MultiField.get_component", &data::MultiField::get_component);
+	ext->link_class_func("MultiField.cwise_product", &data::MultiField::componentwise_product);
+	ext->link_func("MultiField.create", &create_multi_component_field);
 
 
 	ext->declare_class_size("RegularGrid", sizeof(data::RegularGrid));
@@ -458,7 +458,7 @@ void PluginManager::import_kaba() {
 	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
 	import_component_class<data::ScalarField>(mfields, "ScalarField");
 	import_component_class<data::VectorField>(mfields, "VectorField");
-	import_component_class<data::MultiComponentField>(mfields, "MultiComponentField");
+	import_component_class<data::MultiField>(mfields, "MultiField");
 	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
 
 	//import_component_class<data::ColorMap>(mdata, "ColorMap");

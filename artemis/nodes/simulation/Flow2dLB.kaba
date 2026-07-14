@@ -23,14 +23,14 @@ let WEIGHTS = [4.0/9, 1.0/9, 1.0/36, 1.0/9, 1.0/36, 1.0/9, 1.0/36, 1.0/9, 1.0/36
 #	a = b
 #	b = x
 
-func swap(out f: MultiComponentField, i: i32, n1: i32, n2: i32)
+func swap(out f: MultiField, i: i32, n1: i32, n2: i32)
 	let x = f.value(i, n1)
 	let y = f.value(i, n2)
 	f.set(i, n1, y)
 	f.set(i, n2, x)
 
 
-func get_rho(f: MultiComponentField) -> ScalarField
+func get_rho(f: MultiField) -> ScalarField
 	var r = Ret.create(f.grid, f32, f.sampling_mode)
 	let N = f.grid.count(f.sampling_mode)
 	for i in 0:N
@@ -41,7 +41,7 @@ func get_rho(f: MultiComponentField) -> ScalarField
 	return r
 
 	
-func get_velocity(f: MultiComponentField, rho: ScalarField) -> VectorField
+func get_velocity(f: MultiField, rho: ScalarField) -> VectorField
 	var u = Ret.create(f.grid, f32, f.sampling_mode)
 	let N = u.grid.count(u.sampling_mode)
 	for i in 0:N
@@ -55,7 +55,7 @@ func get_velocity(f: MultiComponentField, rho: ScalarField) -> VectorField
 	return u
 
 
-func equilibrium(u: VectorField, rho: ScalarField) -> MultiComponentField
+func equilibrium(u: VectorField, rho: ScalarField) -> MultiField
 	var f = Ret.create(u.grid, f32, u.sampling_mode, NK)
 	let N = u.grid.count(u.sampling_mode)
 	for i in 0:N
@@ -68,7 +68,7 @@ func equilibrium(u: VectorField, rho: ScalarField) -> MultiComponentField
 	return f
 
 
-func drifted(f: MultiComponentField) -> MultiComponentField
+func drifted(f: MultiField) -> MultiField
 	var r = Ret.create(f.grid, f32, f.sampling_mode, NK)
 	#let N = f.grid.count(u.sampling_mode)
 	let NX = f.grid.nx
@@ -94,12 +94,12 @@ func drifted(f: MultiComponentField) -> MultiComponentField
 struct Obstacle
 	var p: i32[]
 	
-	func mut set_circle(f: MultiComponentField, c: vec2, R: f32)
+	func mut set_circle(f: MultiField, c: vec2, R: f32)
 		for i=>q in f.grid.points(f.sampling_mode)
 			let r = len(c - q._xy)
 			if r < R
 				p.add(i)
-	func mut set_plane(f: MultiComponentField, c: vec2, phi: f32, l: f32, thickness: f32)
+	func mut set_plane(f: MultiField, c: vec2, phi: f32, l: f32, thickness: f32)
 		let t = vec2(cos(phi), sin(phi))
 		for i=>q in f.grid.points(f.sampling_mode)
 			let p0 = q._xy - c
@@ -108,7 +108,7 @@ struct Obstacle
 			if r2 < l^2 and abs(z) < thickness/2
 				p.add(i)
 
-	func apply(out f: MultiComponentField)
+	func apply(out f: MultiField)
 		for i in p
 			swap(f, i, 1, 5)
 			swap(f, i, 2, 6)
@@ -116,7 +116,7 @@ struct Obstacle
 			swap(f, i, 4, 8)
 
 
-func apply_boundary(out f: MultiComponentField, state0: MultiComponentField, D: i32)
+func apply_boundary(out f: MultiField, state0: MultiField, D: i32)
 	let NX = f.grid.nx
 	let NY = f.grid.ny
 	for i in 0:NX
@@ -131,7 +131,7 @@ func apply_boundary(out f: MultiComponentField, state0: MultiComponentField, D: 
 
 
 class Flow2dLB extends Node
-	var in_f = InPort[MultiComponentField](self, "f", PortFlags.MUTABLE)
+	var in_f = InPort[MultiField](self, "f", PortFlags.MUTABLE)
 	var out_rho = OutPort[ScalarField](self, "rho")
 	var out_v = OutPort[VectorField](self, "v")
 	var tau = Setting[f64](self, "tau", 0.5)
@@ -140,7 +140,7 @@ class Flow2dLB extends Node
 	
 	var first = true
 	
-	var state0: MultiComponentField
+	var state0: MultiField
 	var obstacle: Obstacle
 	
 	var buffer: owned[gfx.ShaderStorageBuffer]

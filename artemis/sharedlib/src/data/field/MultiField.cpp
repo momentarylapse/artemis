@@ -2,27 +2,27 @@
 // Created by michi on 8/14/25.
 //
 
-#include "MultiComponentField.h"
+#include "MultiField.h"
 #include "ScalarField.h"
 #include <processing/helper/GlobalThreadPool.h>
 
 namespace artemis::data {
 
-MultiComponentField::MultiComponentField(const RegularGrid& g, ScalarType t, SamplingMode s, int n) {
+MultiField::MultiField(const RegularGrid& g, ScalarType t, SamplingMode s, int n) {
 	init(g, t, n, s);
 }
 
-MultiComponentField::MultiComponentField() : MultiComponentField(RegularGrid(), ScalarType::None, SamplingMode::PerCell, 1) {}
+MultiField::MultiField() : MultiField(RegularGrid(), ScalarType::None, SamplingMode::PerCell, 1) {}
 
-MultiComponentField::MultiComponentField(const MultiComponentField &other) {
+MultiField::MultiField(const MultiField &other) {
 	*this = other;
 }
 
-MultiComponentField::~MultiComponentField() = default;
+MultiField::~MultiField() = default;
 
 
 
-Array<double> MultiComponentField::values(int index) const {
+Array<double> MultiField::values(int index) const {
 	Array<double> r;
 	for (int i=0; i<components; i++)
 		r.add(value(index, i));
@@ -69,12 +69,12 @@ void list_mul(Field& r, const Field& a, const Field& b) {
 	}, 1024);
 }
 
-void MultiComponentField::operator=(const MultiComponentField &o) {
+void MultiField::operator=(const MultiField &o) {
 	this->Field::operator=(o);
 }
 
 
-void MultiComponentField::operator+=(const MultiComponentField& o) {
+void MultiField::operator+=(const MultiField& o) {
 	if (o.type != type or o.n != n or o.components != components)
 		return;
 	o.begin_read_cpu();
@@ -85,13 +85,13 @@ void MultiComponentField::operator+=(const MultiComponentField& o) {
 		list_iadd<double>(*this, o);
 }
 
-MultiComponentField MultiComponentField::operator+(const MultiComponentField& o) const {
+MultiField MultiField::operator+(const MultiField& o) const {
 	auto r = *this;
 	r += o;
 	return r;
 }
 
-void MultiComponentField::operator-=(const MultiComponentField& o) {
+void MultiField::operator-=(const MultiField& o) {
 	if (o.type != type or o.n != n or o.components != components)
 		return;
 	o.begin_read_cpu();
@@ -102,13 +102,13 @@ void MultiComponentField::operator-=(const MultiComponentField& o) {
 		list_isub<double>(*this, o);
 }
 
-MultiComponentField MultiComponentField::operator-(const MultiComponentField& o) const {
+MultiField MultiField::operator-(const MultiField& o) const {
 	auto r = *this;
 	r -= o;
 	return r;
 }
 
-void MultiComponentField::operator*=(double o) {
+void MultiField::operator*=(double o) {
 	begin_edit_cpu();
 	if (type == ScalarType::Float32)
 		list_imul_single<float>(*this, o);
@@ -116,13 +116,13 @@ void MultiComponentField::operator*=(double o) {
 		list_imul_single<double>(*this, o);
 }
 
-MultiComponentField MultiComponentField::operator*(double o) const {
+MultiField MultiField::operator*(double o) const {
 	auto r = *this;
 	r *= o;
 	return r;
 }
 
-ScalarField MultiComponentField::get_component(int component) const {;
+ScalarField MultiField::get_component(int component) const {;
 	ScalarField s(grid, type, sampling_mode);
 	if (component < 0 or component >= components)
 		return s;
@@ -140,8 +140,8 @@ ScalarField MultiComponentField::get_component(int component) const {;
 	return s;
 }
 
-MultiComponentField MultiComponentField::componentwise_product(const MultiComponentField& o) const {
-	auto r = MultiComponentField(grid, type, sampling_mode, min(components, o.components));
+MultiField MultiField::componentwise_product(const MultiField& o) const {
+	auto r = MultiField(grid, type, sampling_mode, min(components, o.components));
 	if (type != o.type or sampling_mode != o.sampling_mode or n != o.n or components != o.components)
 		return r;
 	o.begin_read_cpu();

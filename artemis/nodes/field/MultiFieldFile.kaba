@@ -2,13 +2,13 @@ use os
 use mri
 use artemis.*
 
-class MultiComponentFieldFile extends Node
-	var out_field = OutPort[MultiComponentField](self, "field")
+class MultiFieldFile extends Node
+	var out_field = OutPort[MultiField](self, "field")
 	var out_grid = OutPort[Grid](self, "grid")
 	var filename = Setting[os.Path](self, "filename", "")
 
 	func __init__()
-		super.__init__("MultiComponentFieldFile")
+		super.__init__("MultiFieldFile")
 
 	func override on_process()
 		if filename().is_empty()
@@ -23,7 +23,7 @@ class MultiComponentFieldFile extends Node
 			grid.ny = a.n[2]
 			grid.nz = a.n[3]
 
-			var f = MultiComponentField.create(grid, f32, SamplingMode.PER_CELL, a.n[0])
+			var f = MultiField.create(grid, f32, SamplingMode.PER_CELL, a.n[0])
 			f.begin_edit_cpu()
 			f.raw() = as_binary(&a.data[0], len(a.data) * 4)
 

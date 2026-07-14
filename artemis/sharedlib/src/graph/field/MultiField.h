@@ -9,14 +9,14 @@
 #include <lib/dataflow/Port.h>
 #include <lib/dataflow/Setting.h>
 #include <data/grid/Grid.h>
-#include <data/field/MultiComponentField.h>
+#include <data/field/MultiField.h>
 #include <lib/kaba/kaba.h>
 
 namespace artemis::graph {
 
-class MultiComponentField : public dataflow::ResourceNode<data::MultiComponentField> {
+class MultiField : public dataflow::ResourceNode<data::MultiField> {
 public:
-	MultiComponentField();
+	MultiField();
 
 	void on_process() override;
 

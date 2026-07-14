@@ -70,7 +70,7 @@ struct extern VectorField
 	func extern static merge(x: ScalarField, y: ScalarField, z: ScalarField) -> VectorField
 
 
-struct extern MultiComponentField
+struct extern MultiField
 	var grid: RegularGrid
 	var sampling_mode: SamplingMode
 	var components: i32
@@ -89,17 +89,17 @@ struct extern MultiComponentField
 	func extern mut begin_edit_gpu()
 	func extern begin_read_cpu()
 	func extern begin_read_gpu()
-	func extern mut __assign__(o: MultiComponentField)
-	func extern mut __iadd__(o: MultiComponentField)
-	func extern __add__(o: MultiComponentField) -> MultiComponentField
-	func extern mut __isub__(o: MultiComponentField)
-	func extern __sub__(o: MultiComponentField) -> MultiComponentField
+	func extern mut __assign__(o: MultiField)
+	func extern mut __iadd__(o: MultiField)
+	func extern __add__(o: MultiField) -> MultiField
+	func extern mut __isub__(o: MultiField)
+	func extern __sub__(o: MultiField) -> MultiField
 	func extern mut __imul__(o: f64)
-	func extern __mul__(o: f64) -> MultiComponentField
+	func extern __mul__(o: f64) -> MultiField
 	func extern get_component(i: i32) -> ScalarField
-	func extern cwise_product(o: MultiComponentField) -> MultiComponentField
+	func extern cwise_product(o: MultiField) -> MultiField
 
-	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiComponentField
+	func extern static create(g: RegularGrid, t: kaba.Class&, s: SamplingMode, components: i32) -> MultiField
 
 
 enum DerivativeMethod
