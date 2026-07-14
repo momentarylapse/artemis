@@ -23,6 +23,11 @@ struct extern RegularGrid
 	func extern edges() -> (i32,i32)[]
 	func extern count(mode: SamplingMode) -> i32
 	func extern bounding_box() -> Box
+	func to_grid() -> Grid
+		var r: Grid
+		r.type = GridType.REGULAR
+		r.regular = self
+		return r
 
 
 struct extern Grid

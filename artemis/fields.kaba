@@ -83,6 +83,7 @@ struct extern MultiComponentField
 	func extern values(index: i32) -> f64[]
 	func extern mut _set(i: i32, j: i32, k: i32, n: i32, v: f64)
 	func extern _value(i: i32, j: i32, k: i32, n: i32) -> f64
+	func extern selfref raw() -> bytes&
 	func extern type() -> kaba.Class&
 	func extern mut begin_edit_cpu()
 	func extern mut begin_edit_gpu()

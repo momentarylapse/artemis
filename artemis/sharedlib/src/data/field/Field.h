@@ -61,6 +61,8 @@ namespace artemis::data {
 		double _value(int i, int j, int k, int n) const;
 		void _set(int i, int j, int k, int n, double vv);
 
+		bytes& raw();
+
 		Field& operator=(const Field& o);
 
 		/*void cwise_product(const SampledData<S>& a, const SampledData<S>& b) {

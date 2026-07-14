@@ -1,0 +1,31 @@
+use os
+use mri
+use artemis.*
+
+class ScalarFieldFile extends Node
+	var out_field = OutPort[ScalarField](self, "field")
+	var out_grid = OutPort[Grid](self, "grid")
+	var filename = Setting[os.Path](self, "filename", "")
+
+	func __init__()
+		super.__init__("ScalarFieldFile")
+
+	func override on_process()
+		if filename().is_empty()
+			return
+		try
+			let a = mri.load(filename())
+			if len(a.n) != 3
+				error("not 3 dimensional: {{a.n}}")
+				return
+			var grid: RegularGrid
+			grid.nx = a.n[0]
+			grid.ny = a.n[1]
+			grid.nz = a.n[2]
+
+			var f = ScalarField.create(grid, f32, SamplingMode.PER_CELL)
+			var data = f.raw() as f32[]&
+			data = a.data
+
+			out_grid.set(grid.to_grid())
+			out_field.set(f)

@@ -99,6 +99,10 @@ void Field::_set(int i, int j, int k, int n, double vv) {
 		((double*)at(i, j, k))[n] = vv;
 }
 
+bytes& Field::raw() {
+	return data;
+}
+
 Field& Field::operator=(const Field &o) {
 	o.begin_read_cpu();
 	grid = o.grid;

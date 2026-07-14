@@ -1,0 +1,32 @@
+use os
+use mri
+use artemis.*
+
+class MultiComponentFieldFile extends Node
+	var out_field = OutPort[MultiComponentField](self, "field")
+	var out_grid = OutPort[Grid](self, "grid")
+	var filename = Setting[os.Path](self, "filename", "")
+
+	func __init__()
+		super.__init__("MultiComponentFieldFile")
+
+	func override on_process()
+		if filename().is_empty()
+			return
+		try
+			let a = mri.load(filename())
+			if len(a.n) != 4
+				error("not 4 dimensional: {{a.n}}")
+				return
+			var grid: RegularGrid
+			grid.nx = a.n[1]
+			grid.ny = a.n[2]
+			grid.nz = a.n[3]
+
+			var f = MultiComponentField.create(grid, f32, SamplingMode.PER_CELL, a.n[0])
+			f.begin_edit_cpu()
+			f.raw() = as_binary(&a.data[0], len(a.data) * 4)
+
+
+			out_grid.set(grid.to_grid())
+			out_field.set(f)

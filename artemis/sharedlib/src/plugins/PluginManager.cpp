@@ -262,6 +262,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("MultiComponentField.values", &data::MultiComponentField::values);
 	ext->link_class_func("MultiComponentField._set", &data::MultiComponentField::_set);
 	ext->link_class_func("MultiComponentField._value", &data::MultiComponentField::_value);
+	ext->link_class_func("MultiComponentField.raw", &data::MultiComponentField::raw);
 	ext->link_class_func("MultiComponentField.type", &field_get_type<data::MultiComponentField>);
 	ext->link_class_func("MultiComponentField.begin_edit_cpu", &data::MultiComponentField::begin_edit_cpu);
 	ext->link_class_func("MultiComponentField.begin_edit_gpu", &data::MultiComponentField::begin_edit_gpu);
