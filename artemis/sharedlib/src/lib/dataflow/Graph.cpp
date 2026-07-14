@@ -62,8 +62,8 @@ void Graph::remove_node(Node* node) {
 InPortBase* Graph::add_in_port_forward(InPortBase *target) {
 	auto p = new InPortBase(this, format("%s:%s", target->owner->name, target->name), target->type, target->flags | PortFlags::Forwarding);
 	auto pp = new OutPortBase(_hidden_in_forwarder.get(), ":fw:", target->type, nullptr, target->flags | PortFlags::Forwarding);
-	p->link_partner = pp;
-	pp->link_partner = p;
+	p->forwarding_link_partner = pp;
+	pp->forwarding_link_partner = p;
 	_in_ports_forward.add(p);
 
 	connect({pp, target});
@@ -74,8 +74,8 @@ InPortBase* Graph::add_in_port_forward(InPortBase *target) {
 OutPortBase* Graph::add_out_port_forward(OutPortBase *target) {
 	auto p = new OutPortBase(this, format("%s:%s", target->owner->name, target->name), target->type, target->generic_value_pointer, target->flags | PortFlags::Forwarding);
 	auto pp = new InPortBase(_hidden_out_forwarder.get(), target->name, target->type, target->flags | PortFlags::Forwarding);
-	p->link_partner = pp;
-	pp->link_partner = p;
+	p->forwarding_link_partner = pp;
+	pp->forwarding_link_partner = p;
 	_out_ports_forward.add(p);
 	connect({target, pp});
 	return p;

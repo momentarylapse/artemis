@@ -51,8 +51,8 @@ void Node::on_input_changed(InPortBase* port) {
 	//msg_write("  <" + name + "  INPUT CHANGED>");
 	if (state != NodeState::Uninitialized)
 		state = NodeState::Dirty;
-	if (port->link_partner)
-		port->link_partner->mutated();
+	if (port->forwarding_link_partner)
+		port->forwarding_link_partner->mutated();
 }
 
 void Node::set(const string& key, const Any& value) {

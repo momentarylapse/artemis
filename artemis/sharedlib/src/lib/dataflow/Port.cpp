@@ -62,8 +62,8 @@ string InPortBase::full_name() const {
 }
 
 void InPortBase::on_value_changed() {
-	if (link_partner)
-		link_partner->mutated();
+	if (forwarding_link_partner)
+		forwarding_link_partner->mutated();
 	owner->on_input_changed(this);
 }
 
@@ -84,9 +84,9 @@ bool InPortBase::has_value() const {
 Array<GenericData> InPortBase::generic_values() const {
 	Array<GenericData> r;
 	for (auto s: sources) {
-		if (s->link_partner) {
-			r.append(s->link_partner->generic_values());
-		} else {
+		if (s->forwarding_link_partner) {
+			r.append(s->forwarding_link_partner->generic_values());
+		} else if (s->has_value) {
 			r.add({s->type, s->generic_value_pointer});
 		}
 	}

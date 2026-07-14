@@ -33,7 +33,7 @@ public:
 	const kaba::Class* type; // never null!
 	PortFlags flags;
 	Array<InPortBase*> targets;
-	InPortBase* link_partner = nullptr;
+	InPortBase* forwarding_link_partner = nullptr;
 	void generic_set(void* p);
 	void clear();
 	void mutated(); // send new value, notify connected sinks
@@ -55,7 +55,7 @@ public:
 	const kaba::Class* type; // filter, can be null
 	PortFlags flags;
 	Array<OutPortBase*> sources;
-	OutPortBase* link_partner = nullptr;
+	OutPortBase* forwarding_link_partner = nullptr;
 	void mutated(); // for nodes that can overwrite input
 	bool has_value() const;
 	Array<GenericData> generic_values() const;
