@@ -150,6 +150,7 @@ Dialog x x padding=0
 class SceneRenderer extends render.RendererNode
 	var in_draw = InPort[render.DrawCall3d](&self, "draw", PortFlags.MULTI)
 	var background = Setting[Color](&self, "background", Color(0.12,0.12,0.12,1))
+	var brightness = Setting[f64](&self, "brightness", 1.0)
 
 	var scene_panel: shared![ScenePanel]
 
@@ -167,7 +168,8 @@ class SceneRenderer extends render.RendererNode
 
 	func override on_process()
 		if scene_panel.set_draw_calls(in_draw.values())
-			scene_panel.canvas.render_path!.background_color = background()
+			scene_panel.canvas.set_background(background())
+			scene_panel.canvas.set_hdr_exposure(brightness() as f32)
 			var d: RenderData
 			d.render_node = weak(scene_panel)
 			out_draw.set(d)
