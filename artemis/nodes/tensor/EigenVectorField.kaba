@@ -1,0 +1,38 @@
+use artemis.*
+
+
+# [xx, xy, xz, yy, yz, zz]
+func eigen(_m: f64[]) -> vec3
+	let m = [for x in _m  f32(x)]
+	var v = vec3.EX
+	var l = m[0]
+	if m[3] > l
+		v = vec3.EY
+		l = m[3]
+	if m[5] > l
+		v = vec3.EZ
+		l = m[5]
+
+	for i in 0:10
+		# v = m*v
+		v = vec3(m[0]*v.x+m[1]*v.y+m[2]*v.z, m[1]*v.x+m[3]*v.y+m[4]*v.z, m[2]*v.x+m[4]*v.y+m[5]*v.z).normalized()
+	return v
+
+
+class EigenVectorField extends Node
+	var in_field = InPort[MultiField](self, "in")
+	var out_field = OutPort[VectorField](self, "out")
+
+	func __init__()
+		super.__init__("EigenVectorField")
+
+	func override on_process()
+		for f in in_field.value()
+			if f.components != 7
+				error("requires 7 components")
+				return
+			var e = VectorField.create(f.grid, f.type(), f.sampling_mode)
+			let N = f.grid.count(f.sampling_mode)
+			for i in 0:N
+				e.set(i, eigen(f.values(i)[1:]))
+			out_field.set(e)

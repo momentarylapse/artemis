@@ -1,0 +1,29 @@
+use artemis.*
+
+
+class VectorFieldDownsample extends Node
+	var in_field = InPort[VectorField](self, "in")
+	var out_field = OutPort[VectorField](self, "out")
+	var step = Setting[i32](self, "step", 1)
+
+	func __init__()
+		super.__init__("VectorFieldDownsample")
+
+	func override on_process()
+		for f in in_field.value()
+			let N = step()
+			var g = f.grid.downsample(N)
+			var o = VectorField.create(g, f.type(), f.sampling_mode)
+
+			match f.sampling_mode
+				SamplingMode.PER_CELL =>
+					for k in 0:g.nz
+						for j in 0:g.ny
+							for i in 0:g.nx
+								o.set(g.cell_index(i,j,k), f.value(f.grid.cell_index(i*N,j*N,k*N)))
+				SamplingMode.PER_VERTEX =>
+					for k in 0:g.nz+1
+						for j in 0:g.ny+1
+							for i in 0:g.nx+1
+								o.set(g.vertex_index(i,j,k), f.value(f.grid.vertex_index(i*N,j*N,k*N)))
+			out_field.set(o)

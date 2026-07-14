@@ -23,10 +23,22 @@ struct extern RegularGrid
 	func extern edges() -> (i32,i32)[]
 	func extern count(mode: SamplingMode) -> i32
 	func extern bounding_box() -> Box
+	func extern cell_index(i: i32, j: i32, k: i32) -> i32
+	func extern vertex_index(i: i32, j: i32, k: i32) -> i32
+	func extern sample_index(i: i32, j: i32, k: i32, mode: SamplingMode) -> i32
 	func to_grid() -> Grid
 		var r: Grid
 		r.type = GridType.REGULAR
 		r.regular = self
+		return r
+	func downsample(step: i32) -> RegularGrid
+		var r = self
+		r.nx = nx / step
+		r.ny = ny / step
+		r.nz = nz / step
+		r.dx = dx * step
+		r.dy = dy * step
+		r.dz = dz * step
 		return r
 
 

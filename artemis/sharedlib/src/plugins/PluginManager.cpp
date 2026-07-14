@@ -297,6 +297,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("RegularGrid.edges", &data::RegularGrid::edges);
 	ext->link_class_func("RegularGrid.count", &data::RegularGrid::count);
 	ext->link_class_func("RegularGrid.bounding_box", &data::RegularGrid::bounding_box);
+	ext->link_class_func("RegularGrid.cell_index", &data::RegularGrid::cell_index);
+	ext->link_class_func("RegularGrid.vertex_index", &data::RegularGrid::vertex_index);
+	ext->link_class_func("RegularGrid.sample_index", &data::RegularGrid::sample_index);
 
 	ext->declare_enum("GridType.NONE", data::GridType::None);
 	ext->declare_enum("GridType.REGULAR", data::GridType::Regular);
