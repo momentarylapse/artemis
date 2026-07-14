@@ -186,16 +186,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("iso_surface", &processing::iso_surface);
 
-	ext->declare_class_size("ColorMap", sizeof(data::ColorMap));
-	ext->declare_class_element("ColorMap.colors", &data::ColorMap::colors);
-	ext->declare_class_element("ColorMap.values", &data::ColorMap::values);
-	ext->link_class_func("ColorMap.get", &data::ColorMap::get);
-	ext->link_class_func("ColorMap.min", &data::ColorMap::min);
-	ext->link_class_func("ColorMap.max", &data::ColorMap::max);
-	ext->link_class_func("ColorMap.sort", &data::ColorMap::sort);
-	ext->link("default_color_map", (void*)&data::ColorMap::_default);
-	ext->link("default_color_map_transparent", (void*)&data::ColorMap::_default_transparent);
-
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
 	ext->declare_class_element("ScalarField.sampling_mode", &data::ScalarField::sampling_mode);
@@ -467,8 +457,9 @@ void PluginManager::import_kaba() {
 	import_component_class<data::ScalarField>(mfields, "ScalarField");
 	import_component_class<data::VectorField>(mfields, "VectorField");
 	import_component_class<data::MultiComponentField>(mfields, "MultiComponentField");
-	import_component_class<data::ColorMap>(mdata, "ColorMap");
 	import_component_class<data::SamplingMode>(mgrid, "SamplingMode");
+
+	//import_component_class<data::ColorMap>(mdata, "ColorMap");
 }
 
 void PluginManager::find_plugins() {

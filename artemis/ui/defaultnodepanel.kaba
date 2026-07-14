@@ -1,6 +1,7 @@
 use os
 use xhui
 use image.Painter
+use simplevis.common.ColorMap
 use ..graph.*
 use ..data.*
 use .colormapdialog.*

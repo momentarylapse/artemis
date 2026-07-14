@@ -9,17 +9,6 @@ struct RenderData
 	var render_node: void* = nil
 
 
-struct extern ColorMap
-	var colors: Color[]
-	var values: f32[]
-	func extern get(t: f32) -> Color
-	func extern min() -> f32
-	func extern max() -> f32
-	func extern mut sort()
-var extern static default_color_map: ColorMap
-var extern static default_color_map_transparent: ColorMap
-
-
 struct extern GenericData
 	type: kaba.Class&
 	p: void&

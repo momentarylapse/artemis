@@ -1,6 +1,7 @@
 use xhui
 use image.Painter
 use async.*
+use simplevis.common.ColorMap
 use ..data.*
 
 func draw_color_map_background(out p: Painter, color_map: ColorMap, value_min: f32, value_max: f32, area: Rect)
