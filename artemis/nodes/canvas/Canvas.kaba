@@ -1,13 +1,13 @@
 use artemis.*
 
 
-class XCanvas extends RenderNode
-	var child: shared[RenderNode]
+class CanvasPanel extends UiPanel
+	var child: shared[UiPanel]
 
 	func override mut __init__()
 		add_control("Grid", "", 0, 0, "grid") # not sure we even need this...
 
-	func mut set_child(new_child: shared[RenderNode])
+	func mut set_child(new_child: shared[UiPanel])
 		if weak(new_child) == weak(child)
 			return
 		for c in child
@@ -19,20 +19,20 @@ class XCanvas extends RenderNode
 
 class Canvas extends Node
 	var in_draw = InPort[RenderData](&self, "draw", PortFlags.OPTIONAL)
-	var canvas: shared![XCanvas]
+	var canvas: shared![CanvasPanel]
 	var session: Session&
 
 
 	func __init__()
 		super.__init__("Canvas")
 		session := current_session()
-		canvas = new XCanvas()
+		canvas = new CanvasPanel()
 		session.win.embed("canvas-grid", 0, 0, canvas)
 
 
 	func override on_process()
-		var child: shared[RenderNode]
+		var child: shared[UiPanel]
 		for d in in_draw.value()
-			child = d.render_node
+			child = d.panel
 		canvas.set_child(child)
 

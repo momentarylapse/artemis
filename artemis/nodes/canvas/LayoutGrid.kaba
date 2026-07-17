@@ -1,15 +1,15 @@
 use artemis.*
 
 
-class XLayoutGrid extends RenderNode
+class LayoutGridPanel extends UiPanel
 	var horizontal = false
-	var children: shared[RenderNode][]
+	var children: shared[UiPanel][]
 
 	func override mut __init__()
 		add_control("Grid", "", 0, 0, "grid")
 		set_options("grid", "spacing=0")
 
-	func mut set_children(_children: shared[RenderNode][], _horizontal: bool)
+	func mut set_children(_children: shared[UiPanel][], _horizontal: bool)
 		if weak(_children) == weak(children) and _horizontal == horizontal
 			return
 		for c in children
@@ -28,7 +28,7 @@ class XLayoutGrid extends RenderNode
 		set_options("grid", "spacing={{spacing}},margin={{margin}}")
 
 
-class LayoutGrid extends RendererNode
+class LayoutGrid extends UiNode
 	var in_a = InPort[RenderData](&self, "a", PortFlags.OPTIONAL)
 	var in_b = InPort[RenderData](&self, "b", PortFlags.OPTIONAL)
 	var in_c = InPort[RenderData](&self, "c", PortFlags.OPTIONAL)
@@ -36,28 +36,28 @@ class LayoutGrid extends RendererNode
 	var horizontal = Setting[bool](&self, "horizontal", false)
 	var spacing = Setting[i32](&self, "spacing", 0)
 	var margin = Setting[i32](&self, "margin", 0)
-	var layout_grid: owned![XLayoutGrid]
+	var layout_grid: shared![LayoutGridPanel]
 
 
 	func __init__()
 		super.__init__("LayoutGrid")
-		layout_grid = new XLayoutGrid()
+		layout_grid = new LayoutGridPanel()
 
 	func override on_process()
 		var rd: RenderData
-	
-		var children: shared[RenderNode][]
+
+		var children: shared[UiPanel][]
 		children.resize(4)
 		for a in in_a.value()
-			children[0] = a.render_node
+			children[0] = a.panel
 		for b in in_b.value()
-			children[1] = b.render_node
+			children[1] = b.panel
 		for c in in_c.value()
-			children[2] = c.render_node
+			children[2] = c.panel
 		for d in in_d.value()
-			children[3] = d.render_node
+			children[3] = d.panel
 		layout_grid.set_children(children, horizontal())
 		layout_grid.configure(spacing(), margin())
-		rd.render_node = weak(layout_grid)
+		rd.panel = layout_grid
 		out_draw.set(rd)
 

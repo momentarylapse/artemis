@@ -3,7 +3,7 @@ use xhui
 use plot.plotarea.*
 
 
-class PlotterRenderNode extends RenderNode
+class PlotterPanel extends UiPanel
 	var plotter: Plotter&
 	func mut __init__(p: Plotter&)
 		plotter := p
@@ -23,7 +23,7 @@ func brightness(c: Color) -> f32
 	return (c.r + c.g + c.b) / 3
 
 
-class Plotter extends RendererNode
+class Plotter extends UiNode
 	var in_plot = InPort[PlotData](&self, "plot", PortFlags.MULTI)
 
 	var auto_zoom = Setting[bool](&self, "auto-zoom", true)
@@ -33,19 +33,19 @@ class Plotter extends RendererNode
 	var y_max = Setting[f64](&self, "y-max", 15.0)
 	var background = Setting[Color](&self, "background", Color(-1,-1,-1,-1))
 
-	var render_node: shared![RenderNode]
+	var panel: shared![UiPanel]
 	var plot_area: PlotArea
 
 
 	func mut __init__()
 		super.__init__("Plotter")
-		render_node = new PlotterRenderNode(&self)
+		panel = new PlotterPanel(&self)
 		background.set(xhui.theme.background_low)
 
 
 	func override on_process()
 		var d: RenderData
-		d.render_node = weak(render_node)
+		d.panel = panel
 		out_draw.set(d)
 
 

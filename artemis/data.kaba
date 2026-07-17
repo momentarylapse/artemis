@@ -1,12 +1,4 @@
 use kaba
-use yrenderer.gfx
-use yrenderer
-
-
-struct RenderData
-	var active = true
-	var bounding_box: Box?
-	var render_node: void* = nil
 
 
 struct extern GenericData

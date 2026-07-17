@@ -2,9 +2,9 @@ use artemis.*
 use xhui
 
 
-class XLayoutNested extends RenderNode
-	var _main: shared[RenderNode]
-	var children: shared[RenderNode][]
+class LayoutNestedPanel extends UiPanel
+	var _main: shared[UiPanel]
+	var children: shared[UiPanel][]
 	var dummies: shared[xhui.Panel][]
 
 	func override mut __init__()
@@ -20,7 +20,7 @@ Dialog ? x
 			Label ? '' expandy
 ")
 
-	func mut set_children(__main: shared[RenderNode], _children: shared[RenderNode][], mode: i32)
+	func mut set_children(__main: shared[UiPanel], _children: shared[UiPanel][], mode: i32)
 		if weak(_children) == weak(children) and weak(__main) == weak(_main)
 			return
 		for m in _main
@@ -46,34 +46,34 @@ Dialog ? x
 				dummies.add(d)
 
 
-class LayoutNested extends RendererNode
+class LayoutNested extends UiNode
 	var in_main = InPort[RenderData](&self, "main", PortFlags.OPTIONAL)
 	var in_a = InPort[RenderData](&self, "a", PortFlags.OPTIONAL)
 	var in_b = InPort[RenderData](&self, "b", PortFlags.OPTIONAL)
 	var in_c = InPort[RenderData](&self, "c", PortFlags.OPTIONAL)
 	var mode = Setting[i32](&self, "mode", 0)
-	var layout: owned![XLayoutNested]
+	var layout: shared![LayoutNestedPanel]
 
 
 	func __init__()
 		super.__init__("LayoutNested")
-		layout = new XLayoutNested()
+		layout = new LayoutNestedPanel()
 
 	func override on_process()
 		var rd: RenderData
-	
-		var _main: shared[RenderNode]
-		var children: shared[RenderNode][]
+
+		var _main: shared[UiPanel]
+		var children: shared[UiPanel][]
 		children.resize(3)
 		for m in in_main.value()
-			_main = m.render_node
+			_main = m.panel
 		for a in in_a.value()
-			children[0] = a.render_node
+			children[0] = a.panel
 		for b in in_b.value()
-			children[1] = b.render_node
+			children[1] = b.panel
 		for c in in_c.value()
-			children[2] = c.render_node
+			children[2] = c.panel
 		layout.set_children(_main, children, mode())
-		rd.render_node = weak(layout)
+		rd.panel = layout
 		out_draw.set(rd)
 

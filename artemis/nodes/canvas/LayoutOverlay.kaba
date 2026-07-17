@@ -1,13 +1,13 @@
 use artemis.*
 
 
-class XLayoutOverlay extends RenderNode
-	var children: shared[RenderNode][]
+class LayoutOverlayPanel extends UiPanel
+	var children: shared[UiPanel][]
 
 	func override mut __init__()
 		add_control("Overlay", "", 0, 0, "overlay")
 
-	func mut set_children(_children: shared[RenderNode][])
+	func mut set_children(_children: shared[UiPanel][])
 		if weak(_children) == weak(children)
 			return
 		for c in children
@@ -19,32 +19,32 @@ class XLayoutOverlay extends RenderNode
 				embed("overlay", i, 0, c)
 
 
-class LayoutOverlay extends RendererNode
+class LayoutOverlay extends UiNode
 	var in_a = InPort[RenderData](&self, "a", PortFlags.OPTIONAL)
 	var in_b = InPort[RenderData](&self, "b", PortFlags.OPTIONAL)
 	var in_c = InPort[RenderData](&self, "c", PortFlags.OPTIONAL)
 	var in_d = InPort[RenderData](&self, "d", PortFlags.OPTIONAL)
-	var layout: owned![XLayoutOverlay]
+	var layout: shared![LayoutOverlayPanel]
 
 
 	func __init__()
 		super.__init__("LayoutOverlay")
-		layout = new XLayoutOverlay()
+		layout = new LayoutOverlayPanel()
 
 	func override on_process()
 		var rd: RenderData
-	
-		var children: shared[RenderNode][]
+
+		var children: shared[UiPanel][]
 		children.resize(4)
 		for a in in_a.value()
-			children[0] = a.render_node
+			children[0] = a.panel
 		for b in in_b.value()
-			children[1] = b.render_node
+			children[1] = b.panel
 		for c in in_c.value()
-			children[2] = c.render_node
+			children[2] = c.panel
 		for d in in_d.value()
-			children[3] = d.render_node
+			children[3] = d.panel
 		layout.set_children(children)
-		rd.render_node = weak(layout)
+		rd.panel = layout
 		out_draw.set(rd)
 

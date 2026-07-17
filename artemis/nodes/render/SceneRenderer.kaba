@@ -1,5 +1,4 @@
 use artemis.render
-use artemis.data.*
 use artemis.graph.*
 use yrenderer
 use simplevis as sv
@@ -13,7 +12,7 @@ func scale_area(area: Rect, scale: f32) -> Rect
 
 
 
-class extern ScenePanel extends render.RenderNode as obs.Node
+class extern ScenePanel extends render.UiPanel as obs.Node
 	var canvas: sv.Canvas
 	var view_defined_by_user = false
 	var draw_calls: render.DrawCall3d&[]
@@ -147,7 +146,7 @@ Dialog x x padding=0
 			canvas.cam.focus_on_box(b)
 
 
-class SceneRenderer extends render.RendererNode
+class SceneRenderer extends render.UiNode
 	var in_draw = InPort[render.DrawCall3d](&self, "draw", PortFlags.MULTI)
 	var background = Setting[Color](&self, "background", Color(0.12,0.12,0.12,1))
 	var brightness = Setting[f64](&self, "brightness", 1.0)
@@ -170,6 +169,6 @@ class SceneRenderer extends render.RendererNode
 		if scene_panel.set_draw_calls(in_draw.values())
 			scene_panel.canvas.set_background(background())
 			scene_panel.canvas.set_hdr_exposure(brightness() as f32)
-			var d: RenderData
-			d.render_node = weak(scene_panel)
+			var d: render.RenderData
+			d.panel = scene_panel
 			out_draw.set(d)

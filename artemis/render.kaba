@@ -12,8 +12,19 @@ func tex_white() -> shared![gfx.Texture]
 	return current_session().ctx!.tex_white
 
 
+class UiPanel extends xhui.Panel
+	var session: Session&
+	func mut __init__()
+		super.__init__(p2s(&self))
+		session := current_session()
+
+
+struct RenderData
+	var panel: shared[UiPanel]
+
+
 # basic canvas / layout
-class RendererNode extends Node
+class UiNode extends Node
 	var out_draw = OutPort[RenderData](&self, "draw")
 	var session: Session&
 	var channel_draw: i32
@@ -24,7 +35,6 @@ class RendererNode extends Node
 		channel_draw = profiler.create_channel("{{name}}:draw", channel)
 	func override __delete__()
 		profiler.delete_channel(channel_draw)
-
 
 
 struct DrawCall3d
@@ -62,13 +72,5 @@ class Render3dNode extends Node
 		c.transparent = transparent
 		c.bounding_box = bounding_box()
 		out_draw.set(c)
-
-
-
-class RenderNode extends xhui.Panel
-	var session: Session&
-	func mut __init__()
-		super.__init__(p2s(&self))
-		session := current_session()
 
 
