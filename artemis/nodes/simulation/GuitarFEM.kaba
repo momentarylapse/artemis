@@ -12,52 +12,52 @@ class GuitarFEM extends Node
 #	let length = 0.648 # m  (implicit via grid)
 	var tension = Setting[f64](self, "tension", 84.0) # [N]
 	var diameter = Setting[f64](self, "diameter", 0.0004318) # [m] - gauge = 0.017 inch
-	
+
 	var mat_body: Material = maple()
 	var mat_string: Material = nickel()
-	
-	
+
+
 	func __init__()
 		super.__init__("GuitarFEM")
 		flags = NodeFlags.TIME_DEPENDENT
-	
+
 	func mut substep_body(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	print("---------------------")
-	
+
 	# i: C_ijkl d_j d_k u_l
-	
+
 		var ux = u.get_component(0)
 		var uy = u.get_component(1)
 		var uz = u.get_component(2)
-	
+
 		let dx_dx_ux = hessian_x(ux, 0, 0)
 		let dx_dx_uy = hessian_x(uy, 0, 0)
 		let dx_dx_uz = hessian_x(uz, 0, 0)
-	
+
 		let dx_dy_ux = hessian_x(ux, 0, 1)
 		let dx_dy_uy = hessian_x(uy, 0, 1)
 		let dx_dy_uz = hessian_x(uz, 0, 1)
-	
+
 		let dx_dz_ux = hessian_x(ux, 0, 2)
 		let dx_dz_uy = hessian_x(uy, 0, 2)
 		let dx_dz_uz = hessian_x(uz, 0, 2)
-	
+
 		let dy_dy_ux = hessian_x(ux, 1, 1)
 		let dy_dy_uy = hessian_x(uy, 1, 1)
 		let dy_dy_uz = hessian_x(uz, 1, 1)
-	
+
 		let dy_dz_ux = hessian_x(ux, 1, 2)
 		let dy_dz_uy = hessian_x(uy, 1, 2)
 		let dy_dz_uz = hessian_x(uz, 1, 2)
-	
+
 		let dz_dz_ux = hessian_x(ux, 2, 2)
 		let dz_dz_uy = hessian_x(uy, 2, 2)
 		let dz_dz_uz = hessian_x(uz, 2, 2)
-		
+
 		let C = mat_body.elastic_modulus()
-	
+
 		# C.xxyy etc will be ignored for now...
-		
+
 		var fx = dx_dx_ux * C.xxxx
 		fx += (dx_dy_uy + dy_dy_ux) * C.xyxy
 		fx += (dx_dz_uz + dz_dz_ux) * C.xzxz
@@ -68,12 +68,12 @@ class GuitarFEM extends Node
 		fz += (dx_dz_ux + dx_dx_uz) * C.xzxz
 		fz += (dy_dz_uy + dy_dy_uz) * C.yzyz
 		let f = VectorField.merge(fx, fy, fz)
-		
-	
+
+
 		dt_u += f * (dt / mat_body.density)
 		u += dt_u * dt
 
-		
+
 	func mut substep_string(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	var (ux, uy, uz) = u.split()
 		var ux = u.get_component(0)
@@ -83,12 +83,12 @@ class GuitarFEM extends Node
 		let laplace_uy = hessian_x(uy, 0, 0)
 		let laplace_uz = hessian_x(uz, 0, 0)
 		let laplace_u = VectorField.merge(laplace_ux, laplace_uy, laplace_uz)
-		
+
 		let radius = diameter() / 2
 		let A = f64(pi) * radius^2
 		let µ = mat_string.density * A # [kg/m]
 		let C = tension() / µ / 2 # [m²/s²]
-	
+
 		let dt_dt_u = laplace_u * C
 		dt_u += dt_dt_u * dt
 		u += dt_u * dt
@@ -99,7 +99,7 @@ class GuitarFEM extends Node
 		s.set(is, v)
 		b.set(ib, v)
 
-		
+
 	func sync(out us: VectorField, out dt_us: VectorField, out ub: VectorField, out dt_ub: VectorField)
 		let is0 = 0
 		let is1 = us.grid.nx
@@ -114,31 +114,28 @@ class GuitarFEM extends Node
 
 	func override on_process()
 		# assume PER_VERTEX
-		for mut ub in in_u_body.value()
-			for mut dt_ub in in_dt_u_body.value()
-				for mut us in in_u_string.value()
-					for mut dt_us in in_dt_u_string.value()
-		
-						let dt = current_session().dt
-						let N = substeps()
-						for i in 0:N
-							substep_body(dt / N, ub, dt_ub)
-							substep_string(dt / N, us, dt_us)
-							sync(us, dt_us, ub, dt_ub)
-							
-			
-			
-						let d = ub.average()
-						ub -= d
-				
-						in_u_body.mutated()
-						in_dt_u_body.mutated()
-						
-	
-						us -= d
-				
-	
-						in_u_string.mutated()
-						in_dt_u_string.mutated()
-						
-		
+		for mut ub in in_u_body.value(),  mut dt_ub in in_dt_u_body.value()
+			for mut us in in_u_string.value(),  mut dt_us in in_dt_u_string.value()
+
+				let dt = current_session().dt
+				let N = substeps()
+				for i in 0:N
+					substep_body(dt / N, ub, dt_ub)
+					substep_string(dt / N, us, dt_us)
+					sync(us, dt_us, ub, dt_ub)
+
+
+
+				let d = ub.average()
+				ub -= d
+
+				in_u_body.mutated()
+				in_dt_u_body.mutated()
+
+
+				us -= d
+
+
+				in_u_string.mutated()
+				in_dt_u_string.mutated()
+

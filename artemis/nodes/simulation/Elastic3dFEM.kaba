@@ -6,58 +6,58 @@ class Elastic3dFEM extends Node
 	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
 	var in_dt_u = InPort[VectorField](self, "dt-u", PortFlags.MUTABLE)
 	var substeps = Setting[i32](self, "substeps", 100)
-	
+
 	var mat: Material = nickel()
-	
+
 	var c1, c2, c3: i32
-	
-	
+
+
 	func __init__()
 		super.__init__("Elastic3dFEM")
 		flags = NodeFlags.TIME_DEPENDENT
 		c1 = profiler.create_channel("hessian", channel)
 		c2 = profiler.create_channel("force", channel)
 		c3 = profiler.create_channel("update", channel)
-	
+
 	func mut substep(dt: f64, out u: VectorField, out dt_u: VectorField)
 	#	print("---------------------")
-	
+
 	# i: C_ijkl d_j d_k u_l
-	
+
 		profiler.begin(c1)
 		var ux = u.get_component(0)
 		var uy = u.get_component(1)
 		var uz = u.get_component(2)
-	
+
 		let dx_dx_ux = hessian_x(ux, 0, 0)
 		let dx_dx_uy = hessian_x(uy, 0, 0)
 		let dx_dx_uz = hessian_x(uz, 0, 0)
-	
+
 		let dx_dy_ux = hessian_x(ux, 0, 1)
 		let dx_dy_uy = hessian_x(uy, 0, 1)
 		let dx_dy_uz = hessian_x(uz, 0, 1)
-	
+
 		let dx_dz_ux = hessian_x(ux, 0, 2)
 		let dx_dz_uy = hessian_x(uy, 0, 2)
 		let dx_dz_uz = hessian_x(uz, 0, 2)
-	
+
 		let dy_dy_ux = hessian_x(ux, 1, 1)
 		let dy_dy_uy = hessian_x(uy, 1, 1)
 		let dy_dy_uz = hessian_x(uz, 1, 1)
-	
+
 		let dy_dz_ux = hessian_x(ux, 1, 2)
 		let dy_dz_uy = hessian_x(uy, 1, 2)
 		let dy_dz_uz = hessian_x(uz, 1, 2)
-	
+
 		let dz_dz_ux = hessian_x(ux, 2, 2)
 		let dz_dz_uy = hessian_x(uy, 2, 2)
 		let dz_dz_uz = hessian_x(uz, 2, 2)
 		profiler.end(c1)
-		
+
 		let C = mat.elastic_modulus()
-	
+
 		# C.xxyy etc will be ignored for now...
-		
+
 		profiler.begin(c2)
 		var fx = dx_dx_ux * C.xxxx
 		fx += (dx_dy_uy + dy_dy_ux) * C.xyxy
@@ -70,25 +70,23 @@ class Elastic3dFEM extends Node
 		fz += (dy_dz_uy + dy_dy_uz) * C.yzyz
 		let f = VectorField.merge(fx, fy, fz)
 		profiler.begin(c2)
-		
-	
+
+
 		profiler.begin(c3)
 		dt_u += f * (dt / mat.density)
 		u += dt_u * dt
 		profiler.end(c3)
-	
+
 	func override on_process()
 		# assume PER_VERTEX
-		for mut u in in_u.value()
-			for mut dt_u in in_dt_u.value()
-		
-				let dt = current_session().dt
-				let N = substeps()
-				for i in 0:N
-					substep(dt / N, u, dt_u)
-			
-				u -= u.average()
-				in_u.mutated()
-				in_dt_u.mutated()
-	
-		
+		for mut u in in_u.value(),  mut dt_u in in_dt_u.value()
+
+			let dt = current_session().dt
+			let N = substeps()
+			for i in 0:N
+				substep(dt / N, u, dt_u)
+
+			u -= u.average()
+			in_u.mutated()
+			in_dt_u.mutated()
+

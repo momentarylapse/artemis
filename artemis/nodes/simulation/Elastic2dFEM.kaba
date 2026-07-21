@@ -4,40 +4,40 @@ use fem.material.*
 class Elastic2dFEM extends Node
 	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
 	var in_dt_u = InPort[VectorField](self, "dt-u", PortFlags.MUTABLE)
-	
+
 	var substeps = Setting[i32](self, "substeps", 100)
 	var thickness = Setting[f64](self, "thickness", 0.01)
-	
+
 	var mat: Material = nickel() # TODO in port
-	
-	
+
+
 	func __init__()
 		super.__init__("Elastic2dFEM")
 		flags = NodeFlags.TIME_DEPENDENT
-		
+
 		#grid.N = 0
-	
+
 	func mut substep(dt: f64, out ux: ScalarField, out uy: ScalarField, out uz: ScalarField, out dt_ux: ScalarField, out dt_uy: ScalarField, out dt_uz: ScalarField)
 	#	print("---------------------")
-		
+
 		let C = mat.elastic_modulus()
-	
+
 	# i: C_ijkl d_j d_k u_l
 
 		let dx_dx_ux = hessian_x(ux, 0, 0)
 		let dx_dx_uy = hessian_x(uy, 0, 0)
 		let dx_dx_uz = hessian_x(uz, 0, 0)
-		
+
 		let dx_dy_ux = hessian_x(ux, 0, 1)
 		let dx_dy_uy = hessian_x(uy, 0, 1)
 		let dx_dy_uz = hessian_x(uz, 0, 1)
-		
+
 		let dy_dy_ux = hessian_x(ux, 1, 1)
 		let dy_dy_uy = hessian_x(uy, 1, 1)
 		let dy_dy_uz = hessian_x(uz, 1, 1)
-		
+
 		# C.xxyy etc will be ignored for now...
-			
+
 		# xxxx + xxyy + (xxzz)   + xyxy + xyyx + (xzxz) + (xzzx)
 		var ddux = dx_dx_ux * C.xxxx
 		ddux += (dx_dy_uy + dy_dy_ux) * C.xyxy
@@ -46,39 +46,37 @@ class Elastic2dFEM extends Node
 		dduy += dx_dy_ux * C.xyxy + dx_dx_uy * C.xyxy
 		# (zzzz) + (zzxx) + (zzyy)   + (zxzx) + zxxz + (zyzy) + zyyz
 		let dduz = dx_dx_uz * C.xzxz + dy_dy_uz * C.yzyz
-			
+
 		dt_ux += ddux * dt
 		dt_uy += dduy * dt
 		dt_uz += dduz * dt
 		ux += dt_ux * dt
 		uy += dt_uy * dt
 		uz += dt_uz * dt
-	
+
 	func override on_process()
 		# assume PER_VERTEX
-		for mut u in in_u.value()
-			for mut dt_u in in_dt_u.value()
-				let g = u.grid
-				
-				var ux = u.get_component(0)
-				var uy = u.get_component(1)
-				var uz = u.get_component(2)
-				var dt_ux = dt_u.get_component(0)
-				var dt_uy = dt_u.get_component(1)
-				var dt_uz = dt_u.get_component(2)
-		
-				let dt = current_session().dt
-				let N = substeps()
-				for i in 0:N
-					substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
-			
-				u.set_component(0, ux)
-				u.set_component(1, uy)
-				u.set_component(2, uz)
-				dt_u.set_component(0, dt_ux)
-				dt_u.set_component(1, dt_uy)
-				dt_u.set_component(2, dt_uz)
-				in_u.mutated()
-				in_dt_u.mutated()
-	
-		
+		for mut u in in_u.value(),  mut dt_u in in_dt_u.value()
+			let g = u.grid
+
+			var ux = u.get_component(0)
+			var uy = u.get_component(1)
+			var uz = u.get_component(2)
+			var dt_ux = dt_u.get_component(0)
+			var dt_uy = dt_u.get_component(1)
+			var dt_uz = dt_u.get_component(2)
+
+			let dt = current_session().dt
+			let N = substeps()
+			for i in 0:N
+				substep(dt / N, ux, uy, uz, dt_ux, dt_uy, dt_uz)
+
+			u.set_component(0, ux)
+			u.set_component(1, uy)
+			u.set_component(2, uz)
+			dt_u.set_component(0, dt_ux)
+			dt_u.set_component(1, dt_uy)
+			dt_u.set_component(2, dt_uz)
+			in_u.mutated()
+			in_dt_u.mutated()
+

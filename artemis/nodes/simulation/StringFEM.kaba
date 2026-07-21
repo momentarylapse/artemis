@@ -6,16 +6,16 @@ class StringFEM extends Node
 	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
 	var in_dt_u = InPort[VectorField](self, "dt-u", PortFlags.MUTABLE)
 	var out_dt_dt_u = OutPort[VectorField](self, "dt-dt-u")
-	
+
 #	let length = 0.648 # m  (implicit via grid)
 	var tension = Setting[f64](self, "tension", 84.0) # [N]
 	var diameter = Setting[f64](self, "diameter", 0.0004318) # [m] - gauge = 0.017 inch
 	var fixed_ends = Setting[bool](self, "fixed-ends", true)
 	var substeps = Setting[i32](self, "substeps", 10)
-		
+
 	var mat: Material = nickel()
-	
-	
+
+
 	func __init__()
 		super.__init__("StringFEM")
 		flags = NodeFlags.TIME_DEPENDENT
@@ -30,16 +30,16 @@ class StringFEM extends Node
 		let laplace_uy = hessian_x(uy, 0, 0)
 		let laplace_uz = hessian_x(uz, 0, 0)
 		let laplace_u = VectorField.merge(laplace_ux, laplace_uy, laplace_uz)
-		
+
 		let radius = diameter() / 2
 		let A = f64(pi) * radius^2
 		let µ = mat.density * A # [kg/m]
 		let C = tension() / µ / 2 # [m²/s²]
-	
+
 		dt_dt_u = laplace_u * C
 		dt_u += dt_dt_u * dt
 		u += dt_u * dt
-			
+
 		# boundary
 		if not fixed_ends()
 			return
@@ -52,18 +52,16 @@ class StringFEM extends Node
 
 	func override on_process()
 		# assume PER_VERTEX
-		for mut u in in_u.value()
-			for mut dt_u in in_dt_u.value()
-			
-				var dt_dt_u = u # dummy
-		
-				let dt = current_session().dt
-				let N = substeps()
-				for i in 0:N
-					substep(dt / N, u, dt_u, dt_dt_u)
-			
-				in_u.mutated()
-				in_dt_u.mutated()
-				out_dt_dt_u.set(dt_dt_u)
-	
-		
+		for mut u in in_u.value(),  mut dt_u in in_dt_u.value()
+
+			var dt_dt_u = u # dummy
+
+			let dt = current_session().dt
+			let N = substeps()
+			for i in 0:N
+				substep(dt / N, u, dt_u, dt_dt_u)
+
+			in_u.mutated()
+			in_dt_u.mutated()
+			out_dt_dt_u.set(dt_dt_u)
+

@@ -10,7 +10,7 @@ class MaxwellFDTD extends Node
 	var in_me = InPort[VectorField](self, "me", PortFlags.OPTIONAL)
 	var in_mb = InPort[VectorField](self, "mb", PortFlags.OPTIONAL)
 	var c1, c2, c3, c4, c5: i32
-	
+
 	func __init__()
 		super.__init__("MaxwellFDTD")
 		flags = NodeFlags.TIME_DEPENDENT
@@ -19,62 +19,57 @@ class MaxwellFDTD extends Node
 		c3 = profiler.create_channel("c", channel)
 		c4 = profiler.create_channel("d", channel)
 		c5 = profiler.create_channel("e", channel)
-	
+
 	func override on_process()
-	
+
 		let N = 5
 		let dt = current_session().dt / N * 2
-		for mut E in in_e.value()
-			for mut B in in_b.value()
-				for step in 0:N
-					profiler.begin(c1)
-				
-					# E -> B
-					for mb in in_mb.value()
-						B += mb.cwise_product(rotation_fw(E) * dt)
-					else
-						B += rotation_fw(E) * dt
-					profiler.end(c1)
-					profiler.begin(c2)
-					dampen_y(B)
-					dampen_z(B)
-					profiler.end(c2)
-					
-					# B -> E
-					profiler.begin(c3)
-					for me in in_me.value()
-						E -= me.cwise_product(rotation_bw(B) * dt)
-					else
-						E -= rotation_bw(B) * dt
-					profiler.end(c3)
-					profiler.begin(c4)
-					dampen_y(E)
-					dampen_z(E)
-					profiler.end(c4)
-					
-					# source current?
-					profiler.begin(c5)
-					for j in in_j.value()
-						E -= j * dt
-					profiler.end(c5)
-				in_e.mutated()
-				in_b.mutated()
-	
+		for mut E in in_e.value(), mut B in in_b.value()
+			for step in 0:N
+				profiler.begin(c1)
+
+				# E -> B
+				for mb in in_mb.value()
+					B += mb.cwise_product(rotation_fw(E) * dt)
+				else
+					B += rotation_fw(E) * dt
+				profiler.end(c1)
+				profiler.begin(c2)
+				dampen_y(B)
+				dampen_z(B)
+				profiler.end(c2)
+
+				# B -> E
+				profiler.begin(c3)
+				for me in in_me.value()
+					E -= me.cwise_product(rotation_bw(B) * dt)
+				else
+					E -= rotation_bw(B) * dt
+				profiler.end(c3)
+				profiler.begin(c4)
+				dampen_y(E)
+				dampen_z(E)
+				profiler.end(c4)
+
+				# source current?
+				profiler.begin(c5)
+				for j in in_j.value()
+					E -= j * dt
+				profiler.end(c5)
+			in_e.mutated()
+			in_b.mutated()
+
 	func dampen_y(out v: VectorField)
-		for i in 0:v.grid.nx
-			for j in 0:10
-				for k in 0:v.grid.nz
-					let f = 1 - 0.2*exp(-0.2 * j^2)
-					v._set(i, j, k, v._value(i, j, k) * f)
-					let jj = v.grid.ny - j - 1
-					v._set(i, jj, k, v._value(i, jj, k) * f)
-	
+		for i in 0:v.grid.nx, j in 0:10, k in 0:v.grid.nz
+			let f = 1 - 0.2*exp(-0.2 * j^2)
+			v._set(i, j, k, v._value(i, j, k) * f)
+			let jj = v.grid.ny - j - 1
+			v._set(i, jj, k, v._value(i, jj, k) * f)
+
 	func dampen_z(out v: VectorField)
-		for i in 0:v.grid.nx
-			for j in 0:v.grid.ny
-				for k in 0:10
-					let f = 1 - 0.2*exp(-0.2 * k^2)
-					v._set(i, j, k, v._value(i, j, k) * f)
-					let kk = v.grid.nz - k - 1
-					v._set(i, j, kk, v._value(i, j, kk) * f)
-	
+		for i in 0:v.grid.nx, j in 0:v.grid.ny, k in 0:10
+			let f = 1 - 0.2*exp(-0.2 * k^2)
+			v._set(i, j, k, v._value(i, j, k) * f)
+			let kk = v.grid.nz - k - 1
+			v._set(i, j, kk, v._value(i, j, kk) * f)
+
