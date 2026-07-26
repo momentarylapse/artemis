@@ -15,6 +15,9 @@ struct RegularGrid {
 	RegularGrid();
 	RegularGrid(int nx, int ny, int nz, const vec3& dx = vec3::EX, const vec3& dy = vec3::EY, const vec3& dz = vec3::EZ, const vec3& offset = vec3::ZERO);
 
+	bool operator==(const RegularGrid& other) const;
+	bool operator!=(const RegularGrid& other) const;
+
 	int vertex_count() const;
 	int cell_count() const;
 	int count(SamplingMode mode) const;

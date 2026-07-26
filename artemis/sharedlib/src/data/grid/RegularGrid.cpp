@@ -19,6 +19,14 @@ RegularGrid::RegularGrid(int _nx, int _ny, int _nz, const vec3& _dx, const vec3&
 
 RegularGrid::RegularGrid() : RegularGrid(8, 8, 8) {}
 
+bool RegularGrid::operator==(const RegularGrid& other) const {
+	return nx == other.nx and ny == other.ny and nz == other.nz and dx == other.dx and dy == other.dy and dz == other.dz and offset == other.offset;
+}
+
+bool RegularGrid::operator!=(const RegularGrid& other) const {
+	return !(*this == other);
+}
+
 int RegularGrid::cell_count() const {
 	return nx * ny * nz;
 }

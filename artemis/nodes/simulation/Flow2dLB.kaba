@@ -7,7 +7,6 @@ let NK = 9
 
 #let h = 1.0
 
-let RHO0 = 10.0 as f64
 #let TAU = 0.6
 
 #let CYLINDER_R = 20.0
@@ -40,7 +39,7 @@ func get_rho(f: MultiField) -> ScalarField
 		r.set(i, rr)
 	return r
 
-	
+
 func get_velocity(f: MultiField, rho: ScalarField) -> VectorField
 	var u = Ret.create(f.grid, f32, f.sampling_mode)
 	let N = u.grid.count(u.sampling_mode)
@@ -90,26 +89,9 @@ func drifted(f: MultiField) -> MultiField
 	return r
 
 
-
-struct Obstacle
-	var p: i32[]
-	
-	func mut set_circle(f: MultiField, c: vec2, R: f32)
-		for i=>q in f.grid.points(f.sampling_mode)
-			let r = len(c - q._xy)
-			if r < R
-				p.add(i)
-	func mut set_plane(f: MultiField, c: vec2, phi: f32, l: f32, thickness: f32)
-		let t = vec2(cos(phi), sin(phi))
-		for i=>q in f.grid.points(f.sampling_mode)
-			let p0 = q._xy - c
-			let r2 = vec2.dot(p0, p0)
-			let z = p0.x * t.y - p0.y * t.x
-			if r2 < l^2 and abs(z) < thickness/2
-				p.add(i)
-
-	func apply(out f: MultiField)
-		for i in p
+func apply_obstacle(out f: MultiField, o: ScalarField)
+	for i in 0:f.grid.count(f.sampling_mode)
+		if o.value(i) > 0.5
 			swap(f, i, 1, 5)
 			swap(f, i, 2, 6)
 			swap(f, i, 3, 7)
@@ -127,25 +109,22 @@ func apply_boundary(out f: MultiField, state0: MultiField, D: i32)
 			let t = exp(-f64(d) / D)
 			for k in 0:NK
 				f._set(i, j, 0, k, (1-t) * f._value(i, j, 0, k) + t * state0._value(i, j, 0, k))
-		
 
 
 class Flow2dLB extends Node
-	var in_f = InPort[MultiField](self, "f", PortFlags.MUTABLE)
-	var out_rho = OutPort[ScalarField](self, "rho")
-	var out_v = OutPort[VectorField](self, "v")
+	var in_rho = InPort[ScalarField](self, "rho", PortFlags.MUTABLE)
+	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
+	var in_obs = InPort[ScalarField](self, "obstacle", PortFlags.OPTIONAL)
 	var tau = Setting[f64](self, "tau", 0.5)
-	
+
 	var c1, c2, c3, c4, c5, c6, c7: i32
-	
-	var first = true
-	
+
+	var state: MultiField
 	var state0: MultiField
-	var obstacle: Obstacle
-	
-	var buffer: owned[gfx.ShaderStorageBuffer]
-	
-	
+
+#	var buffer: owned[gfx.ShaderStorageBuffer]
+
+
 	func __init__()
 		super.__init__("Flow2dLB")
 		flags = NodeFlags.TIME_DEPENDENT
@@ -156,64 +135,51 @@ class Flow2dLB extends Node
 		c5 = profiler.create_channel("eq'", channel)
 		c6 = profiler.create_channel("bnd", channel)
 		c7 = profiler.create_channel("x", channel)
-	
-	
+
+
 	func override on_process()
 		# assume PER_CELL
-		for mut f in in_f.value()
-		
+		for mut rho in in_rho.value(), mut u in in_u.value()
+
 			#let dt = current_session().graph.dt
-			
-			if first
-				var rho0 = ScalarField.create(f.grid, f32, f.sampling_mode)
-			
-				rho0 = RHO0 as f64
-				var u0 = VectorField.create(f.grid, f32, f.sampling_mode)
-				u0 = vec3(0.1, 0, 0)
-				state0 = equilibrium(u0, rho0)
-				
-				#obstacle.set_circle(state0, [30,25], 5)
-				
-				obstacle.set_plane(state0, [30,25], pi/6, 10, 2)
-		
-				f = state0
-				
-				buffer = new gfx.ShaderStorageBuffer(f.grid.count(f.sampling_mode) * sizeof(f32) * NK)
-				
-				first = false
-			
+
+			if rho.grid != state.grid
+				state0 = equilibrium(u, rho)
+				state = state0
+
+			#	buffer = new gfx.ShaderStorageBuffer(f.grid.count(f.sampling_mode) * sizeof(f32) * NK)
+
 			profiler.begin(c1)
-			f = drifted(f)
+			state = drifted(state)
 			profiler.end(c1)
-			
+
 			profiler.begin(c2)
-			let rho = get_rho(f)
+			rho = get_rho(state)
 			profiler.end(c2)
 			profiler.begin(c3)
-			let u = get_velocity(f, rho)
+			u = get_velocity(state, rho)
 			profiler.end(c3)
-			
+
 			profiler.begin(c4)
 			let eq = equilibrium(u, rho)
 			profiler.end(c4)
 			profiler.begin(c5)
-			f += (eq - f) * (1.0/tau())
+			state += (eq - state) * (1.0/tau())
 			profiler.end(c5)
-			
+
 			profiler.begin(c6)
-			obstacle.apply(f)
-			
-			apply_boundary(f, state0, 5)
+			for obstacle in in_obs.value()
+				apply_obstacle(state, obstacle)
+
+			apply_boundary(state, state0, 3)
 			profiler.end(c6)
-			
+
 			profiler.begin(c7)
 		#	f.begin_edit_gpu()
 		#	f.begin_edit_cpu()
 			profiler.end(c7)
-			
-			
-			in_f.mutated()
-			out_rho.set(rho - RHO0)
-			out_v.set(u)
-	
-		
+
+
+			in_rho.mutated()
+			in_u.mutated()
+

@@ -289,6 +289,8 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_element("RegularGrid.dz", &data::RegularGrid::dz);
 	ext->declare_class_element("RegularGrid.offset", &data::RegularGrid::offset);
 	ext->link_class_func("RegularGrid.__init__", &kaba::generic_init<data::RegularGrid>);
+	ext->link_class_func("RegularGrid.__eq__", &kaba::generic_equal<data::RegularGrid>);
+	ext->link_class_func("RegularGrid.__neq__", &kaba::generic_not_equal<data::RegularGrid>);
 	ext->link_class_func("RegularGrid.vertices", &data::RegularGrid::vertices);
 	ext->link_class_func("RegularGrid.vertex", &data::RegularGrid::vertex);
 	ext->link_class_func("RegularGrid.cell_centers", &data::RegularGrid::cell_centers);
