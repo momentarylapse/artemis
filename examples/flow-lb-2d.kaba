@@ -36,6 +36,7 @@ func main()
 	var vecren = g.add_node("VectorFieldRenderer", [550, 550])
 	vecren.set("scale", 4)
 	vecren.set("color", dyn([1,1,1,1]))
+	vecren.set("active", false)
 
 	var scene = g.add_node("SceneRenderer", [400, 700])
 	var canvas = g.add_node("Canvas", [400, 850])

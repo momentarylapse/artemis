@@ -54,6 +54,8 @@ func get_velocity(f: MultiField, rho: ScalarField) -> VectorField
 	return u
 
 
+
+
 func equilibrium(u: VectorField, rho: ScalarField) -> MultiField
 	var f = Ret.create(u.grid, f32, u.sampling_mode, NK)
 	let N = u.grid.count(u.sampling_mode)
@@ -64,6 +66,29 @@ func equilibrium(u: VectorField, rho: ScalarField) -> MultiField
 		for k in 0:NK
 			let uv = vec3.dot(_u, vec3(RDX[k], RDY[k], 0))
 			f.set(i, k, _rho * WEIGHTS[k] * (1 + 3*uv + 4.5*(uv^2) - 1.5*uu))
+	return f
+
+
+func equilibrium_para(u: VectorField, rho: ScalarField) -> MultiField
+	var f = Ret.create(u.grid, f32, u.sampling_mode, NK)
+	var fr = &f
+	var ur = &u
+	var rhor = &rho
+	let N = u.grid.count(u.sampling_mode)
+
+	let ff = func(i: i32)
+		let _rho = rhor.value(i) as f32
+		let _u = ur.value(i)
+		let uu = vec3.dot(_u, _u)
+		for k in 0:NK
+			let uv = vec3.dot(_u, vec3(RDX[k], RDY[k], 0))
+			fr.set(i, k, _rho * WEIGHTS[k] * (1 + 3*uv + 4.5*(uv^2) - 1.5*uu))
+
+
+	run_parallel(N, ff, 200)
+
+	#for i in 0:N
+	#	ff(i)
 	return f
 
 
@@ -116,6 +141,7 @@ class Flow2dLB extends Node
 	var in_u = InPort[VectorField](self, "u", PortFlags.MUTABLE)
 	var in_obs = InPort[ScalarField](self, "obstacle", PortFlags.OPTIONAL)
 	var tau = Setting[f64](self, "tau", 0.5)
+	var steps = Setting[i32](self, "steps", 2)
 
 	var c1, c2, c3, c4, c5, c6, c7: i32
 
@@ -149,30 +175,32 @@ class Flow2dLB extends Node
 
 			#	buffer = new gfx.ShaderStorageBuffer(f.grid.count(f.sampling_mode) * sizeof(f32) * NK)
 
-			profiler.begin(c1)
-			state = drifted(state)
-			profiler.end(c1)
+			for i in 0:steps()
+				profiler.begin(c1)
+				state = drifted(state)
+				profiler.end(c1)
 
-			profiler.begin(c2)
-			rho = get_rho(state)
-			profiler.end(c2)
-			profiler.begin(c3)
-			u = get_velocity(state, rho)
-			profiler.end(c3)
+				profiler.begin(c2)
+				rho = get_rho(state)
+				profiler.end(c2)
+				profiler.begin(c3)
+				u = get_velocity(state, rho)
+				profiler.end(c3)
 
-			profiler.begin(c4)
-			let eq = equilibrium(u, rho)
-			profiler.end(c4)
-			profiler.begin(c5)
-			state += (eq - state) * (1.0/tau())
-			profiler.end(c5)
+				profiler.begin(c4)
+				let eq = equilibrium_para(u, rho)
+			#	let eq = equilibrium(u, rho)
+				profiler.end(c4)
+				profiler.begin(c5)
+				state += (eq - state) * (1.0/tau())
+				profiler.end(c5)
 
-			profiler.begin(c6)
-			for obstacle in in_obs.value()
-				apply_obstacle(state, obstacle)
+				profiler.begin(c6)
+				for obstacle in in_obs.value()
+					apply_obstacle(state, obstacle)
 
-			apply_boundary(state, state0, 3)
-			profiler.end(c6)
+				apply_boundary(state, state0, 3)
+				profiler.end(c6)
 
 			profiler.begin(c7)
 		#	f.begin_edit_gpu()

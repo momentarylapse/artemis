@@ -26,6 +26,7 @@
 #include <graph/NodeFactory.h>
 #include <processing/field/Calculus.h>
 #include <processing/field/IsoSurface.h>
+#include <processing/helper/GlobalThreadPool.h>
 #include <storage/FormatArtemis.h>
 
 extern Session* _current_session_;
@@ -158,6 +159,12 @@ void publish_gfx_context(ygfx::Context* ctx) {
 	ctx->make_current();
 }
 
+void thread_pool_run(int n, Callable<void(int)>& f, int cluster_size) {
+	processing::pool::thread_pool->run(n, [&f] (int i) {
+		f(i);
+	}, cluster_size);
+}
+
 void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
@@ -185,6 +192,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("laplace", &processing::laplace);
 	ext->link_func("hessian_x", &processing::hessian_x);
 	ext->link_func("iso_surface", &processing::iso_surface);
+	ext->link_func("run_parallel", &thread_pool_run);
 
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
