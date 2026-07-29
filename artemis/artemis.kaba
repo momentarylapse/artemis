@@ -4,15 +4,13 @@ use async.*
 use xhui
 use polymesh.*
 use profiler.*
-use .data.*
-use .grid.*
-use .fields.*
-use .graph.*
-use .session.*
-use .render.*
-use .plot.*
-
-let EXPORT_IMPORTS = true
+use out .data.*
+use out .grid.*
+use out .fields.*
+use out .graph.*
+use out .session.*
+use out .render.*
+use out .plot.*
 
 
 func extern iso_surface(s: ScalarField, t0: f32) -> Mesh

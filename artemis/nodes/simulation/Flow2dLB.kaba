@@ -1,7 +1,6 @@
 use artemis.*
-#use artemis.profiler.*
-use fem.material.*
 use yrenderer.gfx
+use profiler.*
 
 let NK = 9
 

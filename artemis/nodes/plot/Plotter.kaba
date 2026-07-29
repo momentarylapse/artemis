@@ -1,6 +1,8 @@
 use artemis.*
 use xhui
 use plot.plotarea.*
+use image.Painter
+use profiler.*
 
 
 class PlotterPanel extends UiPanel
