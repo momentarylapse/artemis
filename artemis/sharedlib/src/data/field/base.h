@@ -31,7 +31,8 @@ inline int scalar_size(ScalarType type) {
 // also basis functions
 enum class SamplingMode {
 	PerCell,
-	PerVertex
+	PerVertex,
+	PerEdge
 };
 
 template<class S>

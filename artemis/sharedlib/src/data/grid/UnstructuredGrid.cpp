@@ -13,13 +13,20 @@ int UnstructuredGrid::cell_count() const {
 }
 
 int UnstructuredGrid::vertex_count() const {
-	return _vertices.num;;
+	return _vertices.num;
 }
+
+int UnstructuredGrid::edge_count() const {
+	return edges().num;
+}
+
 int UnstructuredGrid::count(SamplingMode mode) const {
 	if (mode == SamplingMode::PerCell)
 		return cell_count();
 	if (mode == SamplingMode::PerVertex)
 		return vertex_count();
+	if (mode == SamplingMode::PerEdge)
+		return edge_count();
 	return 0;
 }
 

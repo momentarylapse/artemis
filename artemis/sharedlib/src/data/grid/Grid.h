@@ -23,8 +23,6 @@ struct Grid : Sharable<base::Empty> {
 	explicit Grid(const RegularGrid& g);
 	explicit Grid(const UnstructuredGrid& g);
 
-	int vertex_count() const;
-	int cell_count() const;
 	int count(SamplingMode mode) const;
 	Box bounding_box() const;
 

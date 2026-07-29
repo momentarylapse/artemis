@@ -61,22 +61,6 @@ Array<base::tuple<int, int> > Grid::edges() const {
 	return {};
 }
 
-int Grid::vertex_count() const {
-	if (type == GridType::Regular)
-		return regular->vertex_count();
-	if (type == GridType::Unstructured)
-		return unstructured->vertex_count();
-	return 0;
-}
-
-int Grid::cell_count() const {
-	if (type == GridType::Regular)
-		return regular->cell_count();
-	if (type == GridType::Unstructured)
-		return unstructured->cell_count();
-	return 0;
-}
-
 int Grid::count(SamplingMode mode) const {
 	if (type == GridType::Regular)
 		return regular->count(mode);

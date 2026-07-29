@@ -34,11 +34,21 @@ int RegularGrid::cell_count() const {
 int RegularGrid::vertex_count() const {
 	return (nx + 1) * (ny + 1) * (nz + 1);
 }
+
+int RegularGrid::edge_count() const {
+	return
+		(nx + 1) * (ny + 1) * nz +
+		(nx + 1) * ny * (nz + 1) +
+		nx * (ny + 1) * (nz + 1);
+}
+
 int RegularGrid::count(SamplingMode mode) const {
 	if (mode == SamplingMode::PerCell)
 		return cell_count();
 	if (mode == SamplingMode::PerVertex)
 		return vertex_count();
+	if (mode == SamplingMode::PerEdge)
+		return edge_count();
 	return 0;
 }
 
@@ -98,11 +108,21 @@ Array<vec3> RegularGrid::cell_centers() const {
 	return points;
 }
 
+Array<vec3> RegularGrid::edge_centers() const {
+	const auto _vertices = vertices();
+	Array<vec3> points;
+	for (const auto& e: edges())
+		points.add((_vertices[e.a] + _vertices[e.b])/ 2);
+	return points;
+}
+
 Array<vec3> RegularGrid::points(SamplingMode mode) const {
 	if (mode == SamplingMode::PerCell)
 		return cell_centers();
 	if (mode == SamplingMode::PerVertex)
 		return vertices();
+	if (mode == SamplingMode::PerEdge)
+		return edge_centers();
 	return {};
 }
 

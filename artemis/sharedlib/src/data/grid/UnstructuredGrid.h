@@ -18,6 +18,7 @@ struct UnstructuredGrid {
 
 	int vertex_count() const;
 	int cell_count() const;
+	int edge_count() const;
 	int count(SamplingMode mode) const;
 
 	Box bounding_box() const;

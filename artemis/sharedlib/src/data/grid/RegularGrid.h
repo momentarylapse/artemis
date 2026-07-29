@@ -20,6 +20,7 @@ struct RegularGrid {
 
 	int vertex_count() const;
 	int cell_count() const;
+	int edge_count() const;
 	int count(SamplingMode mode) const;
 
 	int cell_index(int i, int j, int k) const;
@@ -32,6 +33,7 @@ struct RegularGrid {
 
 	Array<vec3> vertices() const;
 	Array<vec3> cell_centers() const;
+	Array<vec3> edge_centers() const;
 	Array<vec3> points(SamplingMode mode) const;
 
 	Array<base::tuple<int, int>> edges() const;

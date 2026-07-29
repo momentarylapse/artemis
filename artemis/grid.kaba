@@ -2,6 +2,7 @@
 enum extern SamplingMode
 	PER_CELL
 	PER_VERTEX
+	PER_EDGE
 
 
 enum extern GridType
