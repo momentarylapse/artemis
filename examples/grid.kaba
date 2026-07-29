@@ -6,10 +6,10 @@ func main()
 	var grid = g.add_node("RegularGrid", [300,100])
 	
 	var vertices = g.add_node("GridPoints:Vertices", [300, 300])
-	vertices.set("cell-centers", false)
+	vertices.set("mode", i32(SamplingMode.PER_VERTEX))
 	
 	var cells = g.add_node("GridPoints:CellCenters", [500, 300])
-	cells.set("cell-centers", true)
+	cells.set("mode", i32(SamplingMode.PER_CELL))
 
 	var b = g.add_node("GridRenderer", [100,450])
 	b.set("line-width", 2.0)

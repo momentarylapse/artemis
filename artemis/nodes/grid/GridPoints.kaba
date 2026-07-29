@@ -3,14 +3,11 @@ use artemis.*
 class GridPoints extends Node
 	var in_grid = InPort[Grid](self, "in")
 	var out_points = OutPort[vec3[]](self, "out")
-	var cell_centers = Setting[bool](self, "cell-centers", false)
-	
+	var mode = Setting[SamplingMode](self, "mode", SamplingMode.PER_VERTEX)
+
 	func __init__()
 		super.__init__("GridPoints")
-	
+
 	func override on_process()
 		for g in in_grid.value()
-			if cell_centers()
-				out_points.set(g.points(SamplingMode.PER_CELL))
-			else
-				out_points.set(g.points(SamplingMode.PER_VERTEX))
+			out_points.set(g.points(mode()))
