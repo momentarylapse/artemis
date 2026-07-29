@@ -1,0 +1,56 @@
+use artemis.*
+use yrenderer
+use yrenderer.gfx
+use simplevis.cloudrenderer as cr
+
+
+func point_list_bounding_box(points: vec3[]) -> Box?
+	if len(points) == 0
+		return nil
+	var b = Box(points[0], points[0])
+	for p in points
+		b = b or Box(p, p)
+	return b
+
+
+class PointCloudRenderer extends Render3dNode
+	var in_points = InPort[vec3[]](self, "points")
+	var radius = Setting[f64](self, "radius", 5, "range=0:99:0.1")
+	var color_mode = Setting[cr.ColorMode](self, "color-mode", cr.ColorMode.FIXED)
+	var color = Setting[Color](self, "color", Color.GRAY)
+
+	var cloud_renderer: owned[cr.PointCloudRenderer]
+	var needs_update = false
+
+
+	func __init__()
+		super.__init__("PointCloudRenderer")
+
+
+	func override mut on_process()
+		for _ in in_points.value()
+			needs_update = true
+			send_out()
+
+
+	func override mut on_draw()
+		if not weak(cloud_renderer)
+			cloud_renderer = new cr.PointCloudRenderer(ctx)
+			cloud_renderer!.initialize()
+
+		for points in in_points.value()
+			if needs_update
+				needs_update = false
+				cloud_renderer!.set_points(points)
+			cloud_renderer!.color_mode = color_mode()
+			cloud_renderer!.color = color()
+			cloud_renderer!.R = radius() as f32
+			cloud_renderer!.draw()
+
+
+	func override bounding_box() -> Box?
+		for points in in_points.value()
+			return point_list_bounding_box(points)
+		return nil
+
+
