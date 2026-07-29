@@ -16,7 +16,7 @@ func point_list_bounding_box(points: vec3[]) -> Box?
 class PointCloudRenderer extends Render3dNode
 	var in_points = InPort[vec3[]](self, "points")
 	var radius = Setting[f64](self, "radius", 5, "range=0:99:0.1")
-	var color_mode = Setting[cr.ColorMode](self, "color-mode", cr.ColorMode.FIXED)
+	var color_mode = Setting[cr.ColorMode](self, "color-mode", cr.ColorMode.AUTO)
 	var color = Setting[Color](self, "color", Color.GRAY)
 
 	var cloud_renderer: owned[cr.PointCloudRenderer]

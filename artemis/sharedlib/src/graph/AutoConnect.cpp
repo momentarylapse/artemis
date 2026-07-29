@@ -49,9 +49,9 @@ base::expected<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, c
 	if (source_name == "VectorField" and sink_name == "RenderData")
 		return R{"VectorFieldRenderer", "SceneRenderer"};
 	if (source_name == "vec3[]" and sink_name == "DrawCall3d")
-		return R{"PointListRenderer"};
+		return R{"PointCloudRenderer"};
 	if (source_name == "vec3[]" and sink_name == "RenderData")
-		return R{"PointListRenderer", "SceneRenderer"};
+		return R{"PointCloudRenderer", "SceneRenderer"};
 	if (source_name == "PlotData" and sink_name == "RenderData")
 		return R{"Plotter"};
 	if (source_name == "f64[]" and sink_name == "RenderData")
