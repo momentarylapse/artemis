@@ -62,9 +62,9 @@ Session* current_session() {
 	return _current_session_;
 }
 
-bool execute_main(kaba::Module* m) {
+bool execute_void_function(kaba::Module* m, const string& name) {
 	typedef void (*f_p)();
-	if (auto f = (f_p)m->match_function("main", "void", {})) {
+	if (auto f = (f_p)m->match_function(name, "void", {})) {
 		f();
 		return true;
 	}
@@ -172,7 +172,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("create_session", &create_session);
 	ext->link_func("load_artemis_file", &load_artemis_file);
 	ext->link_func("save_artemis_file", &save_artemis_file);
-	ext->link_func("execute_main", &execute_main);
+	ext->link_func("execute_void_function", &execute_void_function);
 	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("publish_gfx_context", &publish_gfx_context);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
