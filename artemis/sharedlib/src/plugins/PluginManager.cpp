@@ -488,10 +488,14 @@ void PluginManager::find_plugins() {
 void* PluginManager::create_instance(const string& name) {
 	for (const auto& [n, f] : plugin_classes)
 		if (name == n) {
-			auto m = kaba::default_context->load_module(f, false);
-			for (const auto c: m->classes())
-				if (c->name == name)
-					return c->create_instance();
+			try {
+				auto m = kaba::default_context->load_module(f, false);
+				for (const auto c: m->classes())
+					if (c->name == name)
+						return c->create_instance();
+			} catch (kaba::Exception& e) {
+				msg_error(e.message());
+			}
 		}
 	msg_error("NOT FOUND: " + name);
 	return nullptr;

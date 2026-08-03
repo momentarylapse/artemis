@@ -295,6 +295,7 @@ Function *TemplateManager::instantiate_function_abstract(SyntaxTree *tree, Funct
 		for (int i=0; i<f->block_node->params.num; i++)
 			f->block_node->params[i] = node_replace(f->block_node->params[i], t.params, params);
 	}
+	f->auto_declared = true;
 
 	// (partially) concretify
 	try {
@@ -356,6 +357,8 @@ const Class* TemplateClassInstanceManager::create_instance(SyntaxTree *tree, con
 		msg_write("INSTANTIATE TEMPLATE CLASS  " + template_class->name + " ... " + params[0]->name);
 	ClassInstance ii;
 	ii.c = instantiator->create_new_instance(tree, params, array_size, token_id);
+	for (auto f: weak(ii.c->functions))
+		f->auto_declared = true;
 	ii.array_size = array_size;
 	ii.params = params;
 	instances.add(ii);

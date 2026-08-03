@@ -33,7 +33,7 @@ bool ActionNodesMove::absorb(Action* previous) {
 		if (a->nodes != nodes)
 			return false;
 
-		a->offset += offset;
+		offset += a->offset;
 		return true;
 	}
 	return false;

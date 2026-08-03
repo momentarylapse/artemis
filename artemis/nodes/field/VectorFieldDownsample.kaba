@@ -26,4 +26,5 @@ class VectorFieldDownsample extends Node
 						for j in 0:g.ny+1
 							for i in 0:g.nx+1
 								o.set(g.vertex_index(i,j,k), f.value(f.grid.vertex_index(i*N,j*N,k*N)))
+				else => pass
 			out_field.set(o)

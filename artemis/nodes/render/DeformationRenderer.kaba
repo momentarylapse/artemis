@@ -90,6 +90,7 @@ class DeformationRenderer extends Render3dNode
 						ctx.set_color(color())
 						ctx.set_line_width(line_width() as f32)
 						ctx.draw_lines(points, false)
+				else => pass
 
 
 	func override bounding_box() -> Box?
