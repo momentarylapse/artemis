@@ -17,7 +17,7 @@ namespace artemis {
 
 namespace artemis::graph {
 
-base::expected<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, const dataflow::CableInfo& c) {
+base::result<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, const dataflow::CableInfo& c) {
 	using R = Array<string>;
 	auto source = c.source;
 	auto sink = c.sink;
@@ -61,7 +61,7 @@ base::expected<Array<string>> find_auto_connect_glue_nodes(dataflow::Graph* g, c
 	return base::Error{format("can not connect  <b>%s</b>  to  <b>%s</b>", source_name, sink_name)};
 }
 
-base::expected<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {
+base::result<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {
 	auto glue_nodes = find_auto_connect_glue_nodes(g, c);
 	if (!glue_nodes)
 		return glue_nodes.error();
@@ -84,19 +84,17 @@ base::expected<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow
 	return update;
 }
 
-base::expected<int> auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {
+base::result_void auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c) {
 	// solve
-	auto update = find_auto_connect(g, c);
-	if (!update)
-		return update.error();
+	RESULT_PROPAGATE_ERROR(update, find_auto_connect(g, c), xx1);
 
 	// apply
-	for (auto n: update->nodes)
+	for (auto n: update.nodes)
 		g->add_node(n);
-	for (const auto& c: update->cables)
+	for (const auto& c: update.cables)
 		if (auto r = g->connect(c); !r)
 			return r;
-	return 0;
+	return base::result_success();
 }
 
 } // graph

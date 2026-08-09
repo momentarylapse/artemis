@@ -19,7 +19,7 @@ struct GraphUpdate {
 	Array<dataflow::CableInfo> cables;
 };
 
-base::expected<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c);
-base::expected<int> auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c);
+base::result<GraphUpdate> find_auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c);
+base::result_void auto_connect(dataflow::Graph* g, const dataflow::CableInfo& c);
 
 } // graph

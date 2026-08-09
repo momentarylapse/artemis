@@ -42,8 +42,8 @@ public:
 	InPortBase* add_in_port_forward(InPortBase* target);
 	OutPortBase* add_out_port_forward(OutPortBase* target);
 
-	base::expected<int> connect(Node* source, int source_port, Node* sink, int sink_port);
-	base::expected<int> connect(const CableInfo& c);
+	base::result_void connect(Node* source, int source_port, Node* sink, int sink_port);
+	base::result_void connect(const CableInfo& c);
 	void unconnect(OutPortBase& source, InPortBase& sink);
 	void unconnect(const CableInfo& c);
 

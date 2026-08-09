@@ -3,6 +3,7 @@
 #include "list.h"
 #include "dict.h"
 #include "optional.h"
+#include "future.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
 #include "../dynamic/sorting.h"
@@ -13,11 +14,11 @@
 #include "../../os/terminal.h"
 #include "../../base/callable.h"
 #include "../../base/map.h"
+#include "../../base/error.h"
+#include "../../base/sort.h"
 #include <math.h>
 #include <cstdio>
 
-#include "future.h"
-#include "../../base/sort.h"
 
 namespace kaba {
 
@@ -351,6 +352,7 @@ void SIAddPackageBase(Context *c) {
 	common_types.callable_base	= add_type  ("@CallableBase", sizeof(Callable<void()>));
 
 	common_types.no_value_error    = add_type  ("NoValueError", sizeof(KabaException));
+	common_types.error    = add_type  ("Error", config.target.dynamic_array_size);
 
 	// type aliases
 	cur_package_module->tree->base_class->type_aliases.add({"int", common_types.i32});
@@ -371,22 +373,19 @@ void SIAddPackageBase(Context *c) {
 	common_types.callable_fp_t = add_class_template("@CallableFP", {"T..."}, new TemplateClassInstantiatorCallableFP);
 	common_types.callable_bind_t = add_class_template("@Bind", {"T..."}, new TemplateClassInstantiatorCallableBind);
 	common_types.optional_t = add_class_template("@Optional", {"T"}, new TemplateClassInstantiatorOptional);
+	common_types.result_t = add_class_template("result", {"T"}, new TemplateClassInstantiatorResult);
 	common_types.product_t = add_class_template("@Product", {"T"}, new TemplateClassInstantiatorProduct);
-	common_types.struct_t = add_class_template("@Struct", {"T"}, nullptr);
 	common_types.enum_t = add_class_template("@Enum", {"T"}, new TemplateClassInstantiatorEnum);
-	common_types.interface_t = add_class_template("@Interface", {"T"}, nullptr);
-	common_types.namespace_t = add_class_template("@Namespace", {"T"}, nullptr);
-	common_types.trait_t = add_class_template("@Trait", {"T"}, nullptr);
 
 	add_const(":0", common_types.i32, nullptr);
 	auto c_zero = weak(cur_package_module->tree->base_class->constants).back();
 
 	// traits
 	common_types.noauto_trait	= add_type  ("@noauto", 0);
-		const_cast<Class*>(common_types.noauto_trait)->from_template = common_types.trait_t;
+		const_cast<Class*>(common_types.noauto_trait)->meta_class = MetaClass::TRAIT;
 	common_types.sharable_trait	= add_type  ("Sharable", 4);
 	add_class(common_types.sharable_trait);
-		const_cast<Class*>(common_types.sharable_trait)->from_template = common_types.trait_t;
+		const_cast<Class*>(common_types.sharable_trait)->meta_class = MetaClass::TRAIT;
 		class_add_element(Identifier::SharedCount, common_types.i32, 0);
 		const_cast<Class*>(common_types.sharable_trait)->initializers.add({0, add_node_const(c_zero, -1)});
 
@@ -936,10 +935,18 @@ void SIAddPackageBase(Context *c) {
 		class_add_func(Identifier::func::Delete, common_types._void, &KabaNoValueError::__delete__, Flags::Override | Flags::Mutable);
 		class_set_vtable(KabaNoValueError);
 
+	add_class(common_types.error);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init_ext<string, const string&>, Flags::Mutable);
+			func_add_param("message", common_types.string);
+
 	add_func(Identifier::Raise, common_types._void, &kaba_raise_exception, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("e", common_types.exception_xfer);
 	add_func("@die", common_types._void, &kaba_die, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("e", common_types.pointer);
+	add_func("@die_msg", common_types._void, &kaba_die_msg, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("s", common_types.string);
+	add_func("@die_id", common_types._void, &kaba_die_id, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("id", common_types.i32);
 	add_func(Identifier::Assert, common_types._void, &kaba_assert, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("b", common_types._bool);
 

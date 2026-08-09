@@ -364,6 +364,8 @@ void AutoImplementerInternal::implement_functions(const Class *t) {
 		_implement_functions_for_callable_bind(t);
 	} else if (t->is_optional()) {
 		_implement_functions_for_optional(t);
+	} else if (t->from_template == common_types.result_t) {
+		_implement_functions_for_result(t);
 	} else if (t->is_product()) {
 		_implement_functions_for_product(t);
 	} else {
@@ -376,5 +378,22 @@ void AutoImplementerInternal::implement_functions(const Class *t) {
 	//	implement_functions(c);
 }
 
+void AutoImplementer::implement_from_code(Function *f, const string &code) {
+	ExpressionBuffer xp;
+	xp.analyse(tree, code);
+	//xp.show();
+	AbstractParser abstract_parser(tree, xp);
+	xp.reset_walker();
+	f->block_node = abstract_parser.parse_abstract_block();
+	f->block_node->link_no = (int_p)f->block;
+	//f->block_node->show();
 
+	try {
+		parser->con.concretify_function_body(f);
+	} catch (Exception& e) {
+		msg_write(f->signature());
+		throw;
+	}
+	//f->block_node->show();
+}
 }

@@ -88,7 +88,7 @@ bool port_type_match(const OutPortBase& source, const InPortBase& sink) {
 	return source.type == sink.type;
 }
 
-base::expected<int> Graph::connect(const CableInfo& c) {
+base::result_void Graph::connect(const CableInfo& c) {
 	if (!port_type_match(*c.source, *c.sink))
 		return base::Error{format("failed to connect: %s  vs  %s",
 			kaba::default_context->type_name(c.source->type),
@@ -102,10 +102,10 @@ base::expected<int> Graph::connect(const CableInfo& c) {
 	c.source->targets.add(c.sink);
 	c.sink->owner->on_input_changed(c.sink);
 	out_changed();
-	return 0;
+	return base::result_success();
 }
 
-base::expected<int> Graph::connect(Node* source, int source_port, Node* sink, int sink_port) {
+base::result_void Graph::connect(Node* source, int source_port, Node* sink, int sink_port) {
 	return connect({source->out_ports[source_port], sink->in_ports[sink_port]});
 }
 
@@ -138,8 +138,9 @@ static string state2str(NodeState s) {
 		return "uninit";
 	case NodeState::Complete:
 		return "complete";
+	default:
+		return "?";
 	}
-	return "?";
 }
 
 

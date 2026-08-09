@@ -24,9 +24,9 @@ public:
 	void add_node(dataflow::Node* node);
 	void remove_nodes(const Array<dataflow::Node*>& nodes);
 	void node_set_setting(dataflow::Node* node, const string& key, const Any& value);
-	base::expected<int> connect(const dataflow::CableInfo& cable);
+	base::result_void connect(const dataflow::CableInfo& cable);
 	void unconnect(const dataflow::CableInfo& cable);
-	base::expected<int> auto_connect(const dataflow::CableInfo& c);
+	base::result_void auto_connect(const dataflow::CableInfo& c);
 	dataflow::Graph* group_nodes(const Array<dataflow::Node*>& selected_nodes);
 	void move_nodes(const Array<dataflow::Node*>& selected_nodes, const vec2& delta);
 };

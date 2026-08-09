@@ -58,36 +58,34 @@ void DataGraph::node_set_setting(dataflow::Node* node, const string& key, const 
 	execute(new ActionNodeSetSetting(node, key, value));
 }
 
-base::expected<int> DataGraph::connect(const dataflow::CableInfo& cable) {
+base::result_void DataGraph::connect(const dataflow::CableInfo& cable) {
 	try {
 		execute(new ActionGraphConnect(cable.source, cable.sink));
 	} catch (const Exception& e) {
 		return base::Error{e.message()};
 	}
-	return 0;
+	return base::result_success();
 }
 
 void DataGraph::unconnect(const dataflow::CableInfo& cable) {
 	execute(new ActionGraphUnconnect(cable.source, cable.sink));
 }
 
-base::expected<int> DataGraph::auto_connect(const dataflow::CableInfo& c) {
+base::result_void DataGraph::auto_connect(const dataflow::CableInfo& c) {
 	// solve
-	auto update = find_auto_connect(graph.get(), c);
-	if (!update)
-		return update.error();
+	RESULT_PROPAGATE_ERROR(update, find_auto_connect(graph.get(), c), xx1);
 
 	// apply
 	action_manager->begin_group("update");
-	for (auto n: update->nodes)
+	for (auto n: update.nodes)
 		add_node(n);
-	for (const auto& cc: update->cables)
+	for (const auto& cc: update.cables)
 		if (auto r = connect(cc); !r) {
 			action_manager->end_group(); // TODO abort!
 			return r;
 		}
 	action_manager->end_group();
-	return 0;
+	return base::result_success();
 }
 
 dataflow::Graph* DataGraph::group_nodes(const Array<dataflow::Node*>& selected_nodes) {
