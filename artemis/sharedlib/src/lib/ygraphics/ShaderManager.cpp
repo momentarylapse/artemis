@@ -58,7 +58,11 @@ base::result<shared<Shader>> ShaderManager::__load_shader(const Path& path, cons
 		return shared{s};
 	});
 #else
-	return ctx->ctx->load_shader(path);
+	try {
+		return shared{ctx->ctx->load_shader(path)};
+	} catch (Exception& e) {
+		return base::Error(e.message());
+	}
 #endif
 }
 
@@ -70,7 +74,11 @@ base::result<shared<Shader>> ShaderManager::__create_shader(const string& source
 		return shared{s};
 	});
 #else
-	return ctx->ctx->create_shader(source);
+	try {
+		return shared{ctx->ctx->create_shader(source)};
+	} catch (Exception& e) {
+		return base::Error(e.message());
+	}
 #endif
 }
 

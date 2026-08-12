@@ -3,15 +3,18 @@ use cloud
 use artemis.*
 
 class PointCloudFile extends Node
-	var out_points = OutPort[vec3[]](self, "points")
+	var out_points = OutPort[vec3[]](self, "points", PortFlags.MUTABLE)
 	var filename = Setting[os.Path](self, "filename", "")
 
 	func __init__()
 		super.__init__("PointCloudFile")
+		flags = NodeFlags.RESOURCE
 
 	func override on_process()
 		if filename().is_empty()
 			return
 		try
-			let a = cloud.load(filename())
+			let a = cloud.load(filename())!
 			out_points.set(cloud.get_points(a))
+		except Error as e
+			error(str(e))

@@ -11,9 +11,9 @@ class ImageFile extends Node
 		flags = NodeFlags.RESOURCE
 
 	func override on_process()
-		let i = image.Image.load(file())
-		if weak(i) # ...
+		try
+			let i = image.Image.load(file())!
 			out_image.set(i)
-		else
-			error("failed to load {{file()}}")
+		except Error as e
+			error("failed to load {{file()}}: {{e}}")
 

@@ -62,13 +62,13 @@ Session* current_session() {
 	return _current_session_;
 }
 
-bool execute_void_function(kaba::Module* m, const string& name) {
+base::result_void execute_void_function(kaba::Module* m, const string& name) {
 	typedef void (*f_p)();
 	if (auto f = (f_p)m->match_function(name, "void", {})) {
 		f();
-		return true;
+		return base::result_success();
 	}
-	return false;
+	return base::Error(format("could not find 'func %s()'", name));
 }
 
 dataflow::Node* graph_add_node_by_class(dataflow::Graph* g, const string& _class, const vec2& pos) {
@@ -460,13 +460,13 @@ void PluginManager::import_kaba() {
 
 	const auto dir = package->directory;
 
-	auto m = kaba::default_context->load_module(dir | "artemis.kaba", false);
-	auto mdata = kaba::default_context->load_module(dir | "data.kaba", false);
-	auto mgrid = kaba::default_context->load_module(dir | "grid.kaba", false);
-	auto mfields = kaba::default_context->load_module(dir | "fields.kaba", false);
-	auto mgraph = kaba::default_context->load_module(dir | "graph.kaba", false);
-	auto mrender = kaba::default_context->load_module(dir | "render.kaba", false);
-	auto mplot = kaba::default_context->load_module(dir | "plot.kaba", false);
+	auto m = kaba::default_context->_load_module_throw(dir | "artemis.kaba", false);
+	auto mdata = kaba::default_context->_load_module_throw(dir | "data.kaba", false);
+	auto mgrid = kaba::default_context->_load_module_throw(dir | "grid.kaba", false);
+	auto mfields = kaba::default_context->_load_module_throw(dir | "fields.kaba", false);
+	auto mgraph = kaba::default_context->_load_module_throw(dir | "graph.kaba", false);
+	auto mrender = kaba::default_context->_load_module_throw(dir | "render.kaba", false);
+	auto mplot = kaba::default_context->_load_module_throw(dir | "plot.kaba", false);
 	import_component_class<data::Grid>(mgrid, "Grid");
 	import_component_class<data::RegularGrid>(mgrid, "RegularGrid");
 	import_component_class<data::ScalarField>(mfields, "ScalarField");
@@ -489,7 +489,7 @@ void* PluginManager::create_instance(const string& name) {
 	for (const auto& [n, f] : plugin_classes)
 		if (name == n) {
 			try {
-				auto m = kaba::default_context->load_module(f, false);
+				auto m = kaba::default_context->_load_module_throw(f, false);
 				for (const auto c: m->classes())
 					if (c->name == name)
 						return c->create_instance();

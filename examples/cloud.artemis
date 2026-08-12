@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+	<header>
+		<version>1.0</version>
+	</header>
+	<simulation>
+		<dt>0.1</dt>
+	</simulation>
+	<graph>
+		<node class="RegularGrid" pos="300.000 100.000">
+			<nx>8</nx>
+			<ny>8</ny>
+			<nz>10</nz>
+			<lx>8.0</lx>
+			<ly>8.0</ly>
+			<lz>10.0</lz>
+			<offset>[0.0, 0.0, 0.0]</offset>
+		</node>
+		<node class="GridPoints:Vertices" pos="300.000 300.000">
+			<mode>1</mode>
+		</node>
+		<node class="GridPoints:CellCenters" pos="500.000 300.000">
+			<mode>0</mode>
+		</node>
+		<node class="GridRenderer" pos="100.000 450.000">
+			<active>true</active>
+			<line-width>2.0</line-width>
+			<color>[0.5, 0.5, 0.5, 1.0]</color>
+			<mode>0</mode>
+		</node>
+		<node class="PointListRenderer" pos="300.000 450.000">
+			<active>false</active>
+			<radius>0.1</radius>
+			<trail-length>0</trail-length>
+			<line-width>1.0</line-width>
+			<color>[0.7, 0.0, 1.0, 1.0]</color>
+		</node>
+		<node class="PointListRenderer" pos="500.000 450.000">
+			<active>false</active>
+			<radius>0.2</radius>
+			<trail-length>0</trail-length>
+			<line-width>1.0</line-width>
+			<color>[1.0, 1.0, 1.0, 1.0]</color>
+		</node>
+		<node class="SceneRenderer" pos="300.000 600.000">
+			<background>[0.12, 0.12, 0.12, 1.0]</background>
+			<brightness>1.0</brightness>
+		</node>
+		<node class="Canvas" pos="300.000 750.000" />
+		<node class="PointCloudRenderer" pos="666.457 555.789">
+			<active>true</active>
+			<radius>5.0</radius>
+			<color-mode>0</color-mode>
+			<color>[0.5, 0.5, 0.5, 1.0]</color>
+		</node>
+		<cable source="0" source_port="0" sink="1" sink_port="0" />
+		<cable source="0" source_port="0" sink="2" sink_port="0" />
+		<cable source="0" source_port="0" sink="3" sink_port="0" />
+		<cable source="1" source_port="0" sink="4" sink_port="0" />
+		<cable source="2" source_port="0" sink="5" sink_port="0" />
+		<cable source="3" source_port="0" sink="6" sink_port="0" />
+		<cable source="4" source_port="0" sink="6" sink_port="0" />
+		<cable source="5" source_port="0" sink="6" sink_port="0" />
+		<cable source="8" source_port="0" sink="6" sink_port="0" />
+		<cable source="6" source_port="0" sink="7" sink_port="0" />
+		<cable source="2" source_port="0" sink="8" sink_port="0" />
+	</graph>
+</workspace>

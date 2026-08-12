@@ -305,16 +305,16 @@ func init_graphics_stuff(out session: Session)
 	session.shader_manager!.default_shader = "default.shader"
 	try
 		for mut sm in session.shader_manager
-			sm.load_shader_module("module-basic-data.shader")
-			sm.load_shader_module("module-basic-interface.shader")
-			sm.load_shader_module("module-vertex-default.shader")
-			sm.load_shader_module("module-vertex-animated.shader")
-			sm.load_shader_module("module-light-sources-default.shader")
-			sm.load_shader_module("module-shadows-pcf.shader")
-			sm.load_shader_module("module-lighting-pbr.shader")
-			sm.load_shader_module("module-fog-simple.shader")
-			sm.load_shader_module("forward/module-surface.shader")
-	except Exception as e
+			sm.load_shader_module("module-basic-data.shader")!
+			sm.load_shader_module("module-basic-interface.shader")!
+			sm.load_shader_module("module-vertex-default.shader")!
+			sm.load_shader_module("module-vertex-animated.shader")!
+			sm.load_shader_module("module-light-sources-default.shader")!
+			sm.load_shader_module("module-shadows-pcf.shader")!
+			sm.load_shader_module("module-lighting-pbr.shader")!
+			sm.load_shader_module("module-fog-simple.shader")!
+			sm.load_shader_module("forward/module-surface.shader")!
+	except Error as e
 		print(str(e))
 
 	#		engine.file_errors_are_critical = false;
@@ -330,9 +330,11 @@ func load_file(out s: Session, filename: os.Path)
 
 
 func execute_script_file(out s: Session, filename: os.Path)
-	for m in kaba.default_context.load_module(filename, false)
-		if not execute_void_function(&m, "main")
-			s.error("{{filename}} does not contain 'func main()'")
+	try
+		let m = kaba.default_context.load_module(filename)!
+		execute_void_function(weak(m), "main")!
+	except Error as e
+		s.error("{{filename}} {{e}}")
 
 
 func add_default_graph(out s: Session)

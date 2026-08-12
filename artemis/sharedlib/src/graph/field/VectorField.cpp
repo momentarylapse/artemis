@@ -38,7 +38,7 @@ void VectorField::on_process() {
 			ctx = kaba::default_context->create_new_context();
 
 			try {
-				module = ctx->create_module_for_source(format(R"foodelim(
+				module = ctx->_create_module_for_source_throw(format(R"foodelim(
 func f(p: vec3, t: f32) -> vec3
 	let x = p.x
 	let y = p.y

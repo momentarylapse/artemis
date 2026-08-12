@@ -27,7 +27,7 @@ func f(x: f32) -> f32
 			try
 				#ctx = kaba.default_context.create_new_context()
 				ctx = kaba.Context.create()
-				module = ctx!.create_module_for_source(source, false)
+				module = ctx!.create_module_for_source(source)!
 				f_p = module!.match_function("f", f32, [f32])
 				if not f_p
 					print("ERROR not found...")

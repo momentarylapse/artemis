@@ -36,12 +36,10 @@ func main()
 
 		try
 #			let filename = package_dir | "from-code-editor.kaba"
-			var m = kaba.default_context.create_module_for_source(source, false)
-			if execute_void_function(weak(m)!, "main")
-				out_info("done")
-			else
-				out_error("could not find 'func main()'")
-		except Exception as e
+			var m = kaba.default_context.create_module_for_source(source)!
+			execute_void_function(weak(m), "main")!
+			out_info("done")
+		except Error as e
 			out_error(str(e))
 
 

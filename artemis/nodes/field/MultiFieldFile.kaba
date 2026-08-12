@@ -3,18 +3,19 @@ use mri
 use artemis.*
 
 class MultiFieldFile extends Node
-	var out_field = OutPort[MultiField](self, "field")
+	var out_field = OutPort[MultiField](self, "field", PortFlags.MUTABLE)
 	var out_grid = OutPort[Grid](self, "grid")
 	var filename = Setting[os.Path](self, "filename", "")
 
 	func __init__()
 		super.__init__("MultiFieldFile")
+		flags = NodeFlags.RESOURCE
 
 	func override on_process()
 		if filename().is_empty()
 			return
 		try
-			let a = mri.load(filename())
+			let a = mri.load(filename())!
 			if len(a.n) != 4
 				error("not 4 dimensional: {{a.n}}")
 				return
@@ -30,3 +31,5 @@ class MultiFieldFile extends Node
 
 			out_grid.set(grid.to_grid())
 			out_field.set(f)
+		except Error as e
+			error(str(e))

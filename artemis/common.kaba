@@ -3,4 +3,4 @@ use os
 
 func extern plugin_directory() -> os.Path
 func extern run_parallel(n: i32, f: i32->void, cluster_size=1)
-func extern execute_void_function(m: kaba.Module&, name: string) -> bool
+func extern execute_void_function(m: kaba.Module&, name: string) -> result[void]

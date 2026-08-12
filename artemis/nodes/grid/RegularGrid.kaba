@@ -2,7 +2,7 @@ use artemis.graph.*
 use artemis.grid
 
 class RegularGrid extends Node
-	var out_grid = OutPort[grid.Grid](self, "out")
+	var out_grid = OutPort[grid.Grid](self, "out", PortFlags.MUTABLE)
 	var nx = Setting[i32](self, "nx", 8)
 	var ny = Setting[i32](self, "ny", 8)
 	var nz = Setting[i32](self, "nz", 1)
@@ -13,6 +13,7 @@ class RegularGrid extends Node
 
 	func __init__()
 		super.__init__("RegularGrid")
+		flags = NodeFlags.RESOURCE
 
 	func override on_process()
 		var g = grid.RegularGrid()
