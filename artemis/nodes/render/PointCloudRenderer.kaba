@@ -1,7 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
-use simplevis.cloudrenderer as cr
+use simplevis.cloud as cr
 
 
 func point_list_bounding_box(points: vec3[]) -> Box?
