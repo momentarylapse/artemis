@@ -1,0 +1,53 @@
+use artemis.*
+use yrenderer
+use yrenderer.gfx
+
+
+func point_list_bounding_box(points: vec3[]) -> Box?
+	if len(points) == 0
+		return nil
+	var b = Box(points[0], points[0])
+	for p in points
+		b = b or Box(p, p)
+	return b
+
+
+class TrailRenderer extends Render3dNode
+	var in_points = InPort[vec3[]](self, "points")
+	var length = Setting[i32](self, "length", 10, "range=0:")
+	var line_width = Setting[f64](self, "line-width", 1.0, "range=0:99:0.1")
+	var color = Setting[Color](self, "color", Color.GRAY)
+
+	var trails: vec3[][]
+
+
+	func __init__()
+		super.__init__("TrailRenderer")
+
+
+	func override mut on_process()
+		if length() > 0
+			for points in in_points.value()
+				trails.resize(len(points))
+				for i=>v in points
+					trails[i].add(v)
+					while len(trails[i]) > length()
+						trails[i].remove(0)
+		else
+			trails.clear()
+		send_out()
+
+
+	func override mut on_draw()
+		for points in trails
+			ctx.set_color(color())
+			ctx.set_line_width(line_width() as f32)
+			ctx.draw_lines(points, true)
+
+
+	func override bounding_box() -> Box?
+		for points in in_points.value()
+			return point_list_bounding_box(points)
+		return nil
+
+
