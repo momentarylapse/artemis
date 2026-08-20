@@ -1,6 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
+use simplevis as sv
 
 
 func point_list_bounding_box(points: vec3[]) -> Box?
@@ -42,7 +43,7 @@ class TrailRenderer extends Render3dNode
 		for points in trails
 			ctx.set_color(color())
 			ctx.set_line_width(line_width() as f32)
-			ctx.draw_lines(points, true)
+			ctx.draw_lines(points, sv.LineMode.CONNECTED)
 
 
 	func override bounding_box() -> Box?

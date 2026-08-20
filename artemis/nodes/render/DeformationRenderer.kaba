@@ -1,6 +1,7 @@
 use artemis.*
 use yrenderer
 use yrenderer.gfx
+use simplevis as sv
 use polymesh.*
 
 
@@ -78,7 +79,7 @@ class DeformationRenderer extends Render3dNode
 
 						ctx.set_color(color())
 						ctx.set_line_width(line_width() as f32)
-						ctx.draw_lines(points, false)
+						ctx.draw_lines(points, sv.LineMode.SEPARATE)
 				SamplingMode.PER_VERTEX =>
 					if show_grid()
 						var points: vec3[]
@@ -89,7 +90,7 @@ class DeformationRenderer extends Render3dNode
 
 						ctx.set_color(color())
 						ctx.set_line_width(line_width() as f32)
-						ctx.draw_lines(points, false)
+						ctx.draw_lines(points, sv.LineMode.SEPARATE)
 				else => pass
 
 
