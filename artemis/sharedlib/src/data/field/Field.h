@@ -5,8 +5,16 @@
 #pragma once
 
 #include "base.h"
+#include "../grid/RegularGrid.h"
 #include <lib/base/pointer.h>
 #include <lib/ygraphics/graphics-fwd.h>
+
+
+template<class T>
+struct array_view {
+	T* data;
+	int num;
+};
 
 
 namespace artemis::data {
@@ -30,6 +38,8 @@ namespace artemis::data {
 		mutable owned<ygfx::ShaderStorageBuffer> buffer;
 
 		Field();
+		Field(const Field& o);
+		Field(Field&& o) noexcept;
 		~Field();
 
 		void init(const RegularGrid& _grid, ScalarType _type, int _components, SamplingMode mode);
@@ -64,15 +74,9 @@ namespace artemis::data {
 		bytes& raw();
 
 		Field& operator=(const Field& o);
+		Field& operator=(Field&& o) noexcept;
 
-		/*void cwise_product(const SampledData<S>& a, const SampledData<S>& b) {
-			//if (a.components != b.components or a.components != components)
-			//	return;
-			if (a.v.num != v.num or b.v.num != v.num)
-				return;
-			for (int i=0; i<v.num; i++)
-				v[i] = a.v[i] * b.v[i];
-		}*/
+		static void cwise_product(Field& o, const Field& a, const Field& b);
 };
 
 }

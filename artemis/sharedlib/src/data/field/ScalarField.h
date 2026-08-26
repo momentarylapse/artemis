@@ -5,19 +5,14 @@
 #pragma once
 
 #include "base.h"
+#include "Field.h"
 #include "../grid/RegularGrid.h"
 
 namespace artemis::data {
 
-struct ScalarField {
+struct ScalarField : Field {
 	ScalarField();
 	explicit ScalarField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode);
-
-	RegularGrid grid;
-	ScalarType type;
-	SamplingMode sampling_mode;
-	SampledData<float> v32;
-	SampledData<double> v64;
 
 	double value(int index) const;
 	void set(int index, double f);
@@ -25,11 +20,13 @@ struct ScalarField {
 	void _set(int i, int j, int k, double f);
 	float _value32(int i, int j, int k) const;
 	void _set32(int i, int j, int k, float f);
-	DynamicArray& raw();
 
 	double average() const;
 	double min() const;
 	double max() const;
+
+	Array<float> as_array32() const;
+	void from_array32(const Array<float>& array);
 
 	void operator=(double o);
 	void operator+=(const ScalarField& o);

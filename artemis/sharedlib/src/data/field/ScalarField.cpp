@@ -8,38 +8,21 @@
 
 namespace artemis::data {
 	ScalarField::ScalarField(const RegularGrid& g, ScalarType t, SamplingMode s) {
-		grid = g;
-		type = t;
-		sampling_mode = s;
-		if (type == ScalarType::Float32)
-			v32.init(grid, 1, sampling_mode);
-		else if (type == ScalarType::Float64)
-			v64.init(grid, 1, sampling_mode);
+		init(g, t, 1, s);
 	}
 
 	ScalarField::ScalarField() : ScalarField(RegularGrid(), ScalarType::None, SamplingMode::PerCell) {}
 
 	double ScalarField::_value(int i, int j, int k) const {
-		if (type == ScalarType::Float32)
-			return (double)*v32.at(grid, sampling_mode, i, j, k);
-		if (type == ScalarType::Float64)
-			return *v64.at(grid, sampling_mode, i, j, k);
-		return 0.0;
+		return value(grid.sample_index(i, j, k, sampling_mode));
 	}
 
 	double ScalarField::value(int index) const {
-		if (type == ScalarType::Float32)
-			return (double)*v32._at(index);
-		if (type == ScalarType::Float64)
-			return *v64._at(index);
-		return 0;
+		return Field::value(index, 0);
 	}
 
 	void ScalarField::_set(int i, int j, int k, double f) {
-		if (type == ScalarType::Float32)
-			*v32.at(grid, sampling_mode, i, j, k) = (float)f;
-		else if (type == ScalarType::Float64)
-			*v64.at(grid, sampling_mode, i, j, k) = f;
+		Field::_set(i, j, k, 0, f);
 	}
 
 	float ScalarField::_value32(int i, int j, int k) const {
@@ -51,28 +34,31 @@ namespace artemis::data {
 	}
 
 	void ScalarField::set(int index, double f) {
-		if (type == ScalarType::Float32)
-			*v32._at(index) = (float)f;
-		else if (type == ScalarType::Float64)
-			*v64._at(index) = f;
+		Field::set(index, 0, f);
 	}
 
-	DynamicArray& ScalarField::raw() {
-		if (type == ScalarType::Float32)
-			return v32.v;
-		//if (type == ScalarType::Float64)
-		return v64.v;
+	Array<float> ScalarField::as_array32() const {
+		Array<float> r;
+		if (type == ScalarType::Float32) {
+			r.num = n;
+			r.data = data.data;
+		}
+		return r;
+	}
+
+	void ScalarField::from_array32(const Array<float>& array) {
+
 	}
 
 #define CREATE_IMPLACE_SINGLE_OP(OP) \
 void ScalarField::operator OP(double o) { \
 	if (type == ScalarType::Float32) { \
-		processing::pool::run(v32.v.num, [this, o] (int i) { \
-			v32.v[i] OP o; \
+		processing::pool::run(n, [this, o] (int i) { \
+			((float*)data.data)[i] OP o; \
 		}, 1000); \
 	} else if (type == ScalarType::Float64) { \
-		processing::pool::run(v64.v.num, [this, o] (int i) { \
-			v64.v[i] OP o; \
+		processing::pool::run(n, [this, o] (int i) { \
+			((double*)data.data)[i] OP o; \
 		}, 1000); \
 	} \
 }
@@ -82,12 +68,12 @@ void ScalarField::operator OP(const ScalarField& o) { \
 	if (o.type != type or sampling_mode != o.sampling_mode) \
 		return; \
 	if (type == ScalarType::Float32) { \
-		processing::pool::run(v32.v.num, [this, &o] (int i) { \
-			v32.v[i] OP o.v32.v[i]; \
+		processing::pool::run(n, [this, &o] (int i) { \
+			((float*)data.data)[i] OP ((float*)o.data.data)[i]; \
 		}, 1000); \
 	} else if (type == ScalarType::Float64) { \
-		processing::pool::run(v64.v.num, [this, &o] (int i) { \
-			v64.v[i] OP v64.v[i]; \
+		processing::pool::run(n, [this, &o] (int i) { \
+			((double*)data.data)[i] OP ((double*)o.data.data)[i]; \
 		}, 1000); \
 	} \
 }

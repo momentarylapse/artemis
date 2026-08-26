@@ -5,6 +5,7 @@
 #pragma once
 
 #include "base.h"
+#include "Field.h"
 #include "../grid/RegularGrid.h"
 #include <lib/base/tuple.h>
 #include <lib/math/vec3.h>
@@ -32,15 +33,9 @@ namespace artemis::data {
 
 struct ScalarField;
 
-struct VectorField {
+struct VectorField : Field {
 	VectorField();
 	explicit VectorField(const RegularGrid& grid, ScalarType type, SamplingMode sampling_mode);
-
-	ScalarType type;
-	RegularGrid grid;
-	SamplingMode sampling_mode;
-	SampledData<float> v32;
-	SampledData<double> v64;
 
 	void set(int index, const dvec3& v);
 	void set32(int index, const vec3& v);
@@ -50,7 +45,11 @@ struct VectorField {
 	void _set(int i, int j, int k, const dvec3& v);
 	vec3 _value32(int i, int j, int k) const;
 	void _set32(int i, int j, int k, const vec3& v);
-	DynamicArray& raw();
+
+	array_view<vec3> as_v32();
+	array_view<dvec3> as_v64();
+	array_view<vec3> as_v32_const() const;
+	array_view<dvec3> as_v64_const() const;
 
 	dvec3 average() const;
 	vec3 average32() const;

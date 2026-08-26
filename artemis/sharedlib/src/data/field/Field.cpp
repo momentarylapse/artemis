@@ -10,6 +10,14 @@ namespace artemis::data {
 Field::Field() = default;
 Field::~Field() = default;
 
+Field::Field(const Field& o) {
+	*this = o;
+}
+
+Field::Field(Field&& o) noexcept {
+	*this = std::move(o);
+}
+
 
 void Field::init(const RegularGrid& _grid, ScalarType _type, int _components, SamplingMode mode) {
 	grid = _grid;
@@ -120,5 +128,32 @@ Field& Field::operator=(const Field &o) {
 	return *this;
 }
 
+Field& Field::operator=(Field&& o) noexcept {
+	grid = o.grid;
+	type = o.type;
+	components = o.components;
+	stride = components * scalar_size(type);
+	sampling_mode = o.sampling_mode;
+	n = grid.count(sampling_mode);
+	data.exchange(o.data);
+	location = o.location;
+	buffer = o.buffer.give();
 
+	return *this;
 }
+
+void Field::cwise_product(Field& o, const Field& a, const Field& b) {
+	if (a.n != b.n or a.type != b.type or a.components != b.components)
+		return;
+	if (a.n != o.n or a.type != o.type or a.components != o.components)
+		return;
+	if (a.type == ScalarType::Float32) {
+		for (int i=0; i<a.n*a.components; i++)
+			((float*)o.data.data)[i] = ((float*)a.data.data)[i] * ((float*)b.data.data)[i];
+	} else if (a.type == ScalarType::Float64) {
+		for (int i=0; i<a.n*a.components; i++)
+			((double*)o.data.data)[i] = ((double*)a.data.data)[i] * ((double*)b.data.data)[i];
+	}
+}
+
+} // namespace artemis::data

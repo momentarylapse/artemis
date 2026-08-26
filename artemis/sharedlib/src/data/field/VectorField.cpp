@@ -62,37 +62,31 @@
 namespace artemis::data {
 
 VectorField::VectorField(const RegularGrid& g, ScalarType t, SamplingMode s) {
-	grid = g;
-	type = t;
-	sampling_mode = s;
-	if (type == ScalarType::Float32)
-		v32.init(grid, 3, sampling_mode);
-	else if (type == ScalarType::Float64)
-		v64.init(grid, 3, sampling_mode);
+	init(g, t, 3, s);
 }
 
 VectorField::VectorField() : VectorField(RegularGrid(), ScalarType::None, SamplingMode::PerCell) {}
 
 dvec3 VectorField::_value(int i, int j, int k) const {
 	if (type == ScalarType::Float32)
-		return dvec3(*(vec3*)v32.at(grid, sampling_mode, i, j, k));
+		return dvec3(*(vec3*)at(i, j, k));
 	if (type == ScalarType::Float64)
-		return *(dvec3*)v64.at(grid, sampling_mode, i, j, k);
+		return *(dvec3*)at(i, j, k);
 	return {0,0,0};
 }
 
 void VectorField::_set(int i, int j, int k, const dvec3& vv) {
 	if (type == ScalarType::Float32)
-		*(vec3*)v32.at(grid, sampling_mode, i, j, k) = vv.to32();
+		*(vec3*)at(i, j, k) = vv.to32();
 	else if (type == ScalarType::Float64)
-		*(dvec3*)v64.at(grid, sampling_mode, i, j, k) = vv;
+		*(dvec3*)at(i, j, k) = vv;
 }
 
 void VectorField::set(int index, const dvec3& vv) {
 	if (type == ScalarType::Float32)
-		*(vec3*)v32._at(index) = vv.to32();
+		*(vec3*)at(index) = vv.to32();
 	else if (type == ScalarType::Float64)
-		*(dvec3*)v64._at(index) = vv;
+		*(dvec3*)at(index) = vv;
 }
 
 vec3 VectorField::_value32(int i, int j, int k) const {
@@ -101,9 +95,9 @@ vec3 VectorField::_value32(int i, int j, int k) const {
 
 dvec3 VectorField::value(int index) const {
 	if (type == ScalarType::Float32)
-		return dvec3(*(vec3*)v32._at(index));
+		return dvec3(*(vec3*)at(index));
 	if (type == ScalarType::Float64)
-		return *(dvec3*)v64._at(index);
+		return *(dvec3*)at(index);
 	return {0,0,0};
 }
 
@@ -119,13 +113,6 @@ void VectorField::set32(int index, const vec3& vv) {
 	set(index, dvec3(vv));
 }
 
-DynamicArray& VectorField::raw() {
-	if (type == ScalarType::Float32)
-		return v32.v;
-	//if (type == ScalarType::Float64)
-	return v64.v;
-}
-
 dvec3 VectorField::average() const {
 	dvec3 sum = {0,0,0};
 	int n = grid.count(sampling_mode);
@@ -138,46 +125,62 @@ vec3 VectorField::average32() const {
 	return average().to32();
 }
 
+array_view<vec3> VectorField::as_v32() {
+	return {(vec3*)data.data, n};
+}
+
+array_view<dvec3> VectorField::as_v64() {
+	return {(dvec3*)data.data, n};
+}
+
+array_view<vec3> VectorField::as_v32_const() const {
+	return {(vec3*)data.data, n};
+}
+
+array_view<dvec3> VectorField::as_v64_const() const {
+	return {(dvec3*)data.data, n};
+}
+
 template<class T, class V>
-void v_list_assign_single(T& a, const V& b) {
-	processing::pool::run(a.v.num / a.components, [&a, &b] (int i) {
-		*(V*)a._at(i) = b;
+void v_list_assign_single(T a, const V& b) {
+	processing::pool::run(a.num, [&a, &b] (int i) {
+		a.data[i] = b;
 	}, 1000);
 }
 
 template<class T>
-void v_list_add(T& a, const T& b) {
+void v_list_add(T a, const T& b) {
 	processing::pool::run(a.num, [&a, &b] (int i) {
-		a[i] += b[i];
+		a.data[i] += b.data[i];
 	}, 1000);
 }
 
 template<class T, class V>
-void v_list_add_single(T& a, const V& b) {
-	processing::pool::run(a.v.num / a.components, [&a, &b] (int i) {
-		*(V*)a._at(i) += b;
-	}, 1000);
-}
-
-template<class T>
-void v_list_sub(T& a, const T& b) {
+void v_list_add_single(T a, const V& b) {
 	processing::pool::run(a.num, [&a, &b] (int i) {
-		a[i] -= b[i];
+		a.data[i] += b;
 	}, 1000);
 }
 
 template<class T>
-void v_list_mul_single(T& a, double s) {
+void v_list_sub(T a, const T& b) {
+	processing::pool::run(a.num, [&a, &b] (int i) {
+		a.data[i] -= b.data[i];
+	}, 1000);
+}
+
+template<class T>
+void v_list_mul_single(T a, double s) {
 	processing::pool::run(a.num, [&a, s] (int i) {
-		a[i] *= s;
+		a.data[i] *= s;
 	}, 1000);
 }
 
 void VectorField::operator=(const dvec3& o) {
 	if (type == ScalarType::Float32)
-		v_list_assign_single(v32, o.to32());
+		v_list_assign_single(as_v32(), o.to32());
 	else if (type == ScalarType::Float64)
-		v_list_assign_single(v64, o);
+		v_list_assign_single(as_v64(), o);
 }
 
 void VectorField::operator=(const vec3& o) {
@@ -188,16 +191,16 @@ void VectorField::operator+=(const VectorField& o) {
 	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
-		v_list_add(v32.v, o.v32.v);
+		v_list_add(as_v32(), o.as_v32_const());
 	else if (type == ScalarType::Float64)
-		v_list_add(v64.v, o.v64.v);
+		v_list_add(as_v64(), o.as_v64_const());
 }
 
 void VectorField::iadd_single(const dvec3& o) {
 	if (type == ScalarType::Float32)
-		v_list_add_single(v32, o.to32());
+		v_list_add_single(as_v32(), o.to32());
 	else if (type == ScalarType::Float64)
-		v_list_add_single(v64, o);
+		v_list_add_single(as_v64(), o);
 }
 
 void VectorField::iadd_single32(const vec3& o) {
@@ -214,9 +217,9 @@ void VectorField::operator-=(const VectorField& o) {
 	if (o.type != type or sampling_mode != o.sampling_mode)
 		return;
 	if (type == ScalarType::Float32)
-		v_list_sub(v32.v, o.v32.v);
+		v_list_sub(as_v32(), o.as_v32_const());
 	else if (type == ScalarType::Float64)
-		v_list_sub(v64.v, o.v64.v);
+		v_list_sub(as_v64(), o.as_v64_const());
 }
 
 VectorField VectorField::operator-(const VectorField& o) const {
@@ -235,9 +238,9 @@ void VectorField::isub_single32(const vec3& o) {
 
 void VectorField::operator*=(double o) {
 	if (type == ScalarType::Float32)
-		v_list_mul_single(v32.v, o);
+		v_list_mul_single(as_v32(), o);
 	else if (type == ScalarType::Float64)
-		v_list_mul_single(v64.v, o);
+		v_list_mul_single(as_v64(), o);
 }
 
 VectorField VectorField::operator*(double o) const {
@@ -248,32 +251,19 @@ VectorField VectorField::operator*(double o) const {
 
 VectorField VectorField::componentwise_product(const VectorField& o) const {
 	auto r = VectorField(grid, type, sampling_mode);
-	if (type != o.type or sampling_mode != o.sampling_mode)
-		return r;
-	if (type == ScalarType::Float32) {
-		r.v32.cwise_product(v32, o.v32);
-	} else if (type == ScalarType::Float64) {
-		r.v64.cwise_product(v64, o.v64);
-	}
+	cwise_product(r, *this, o);
 	return r;
 }
 
 base::tuple3<ScalarField, ScalarField, ScalarField> VectorField::split() const {
 	base::tuple3<ScalarField, ScalarField, ScalarField> r = {ScalarField(grid, type, sampling_mode), ScalarField(grid, type, sampling_mode), ScalarField(grid, type, sampling_mode)};
 
-	if (type == ScalarType::Float32) {
-		processing::pool::run(v32.v.num, [this, &r] (int i) {
-			r.a.v32.v[i] = v32._at(i)[0];
-			r.b.v32.v[i] = v32._at(i)[1];
-			r.c.v32.v[i] = v32._at(i)[2];
-		}, 1000);
-	} else if (type == ScalarType::Float64) {
-		processing::pool::run(v64.v.num, [this, &r] (int i) {
-			r.a.v64.v[i] = v64._at(i)[0];
-			r.b.v64.v[i] = v64._at(i)[1];
-			r.c.v64.v[i] = v64._at(i)[2];
-		}, 1000);
-	}
+	processing::pool::run(n, [this, &r] (int i) {
+		const auto v = value(i);
+		r.a.set(i, v.x);
+		r.b.set(i, v.y);
+		r.c.set(i, v.z);
+	}, 1000);
 	return r;
 }
 
@@ -283,13 +273,13 @@ ScalarField VectorField::get_component(int axis) const {;
 		return s;
 	if (type == ScalarType::Float32) {
 		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
-		for (int i=0; i<s.v32.v.num; i++) {
-			s.v32.v[i] = v32._at(i)[axis];
+		for (int i=0; i<s.n; i++) {
+			((float*)s.data.data)[i] = ((float*)data.data)[i*3+axis];
 		}
 	} else if (type == ScalarType::Float64) {
 		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
-		for (int i=0; i<s.v64.v.num; i++) {
-			s.v64.v[i] = v64._at(i)[axis];
+		for (int i=0; i<n; i++) {
+			((double*)s.data.data)[i] = ((double*)data.data)[i*3+axis];
 		}
 	}
 	return s;
@@ -302,13 +292,13 @@ void VectorField::set_component(int axis, const ScalarField& s) {
 		return;
 	if (type == ScalarType::Float32) {
 		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
-		for (int i=0; i<s.v32.v.num; i++) {
-			v32._at(i)[axis] = s.v32.v[i];
+		for (int i=0; i<n; i++) {
+			((float*)at(i))[axis] = ((float*)s.data.data)[i];
 		}
 	} else if (type == ScalarType::Float64) {
 		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
-		for (int i=0; i<s.v64.v.num; i++) {
-			v64._at(i)[axis] = s.v64.v[i];
+		for (int i=0; i<n; i++) {
+			((double*)at(i))[axis] = ((double*)s.data.data)[i];
 		}
 	}
 }
@@ -317,19 +307,9 @@ void VectorField::set_component(int axis, const ScalarField& s) {
 VectorField VectorField::merge(const ScalarField &x, const ScalarField &y, const ScalarField &z) {
 	VectorField v(x.grid, x.type, x.sampling_mode);
 
-	if (v.type == ScalarType::Float32) {
-		processing::pool::run(x.v32.v.num, [&v, &x, &y, &z] (int i) {
-			v.v32._at(i)[0] = *x.v32._at(i);
-			v.v32._at(i)[1] = *y.v32._at(i);
-		//	v.v32._at(i)[2] = *z.v32._at(i);
-		}, 1000);
-	} else if (v.type == ScalarType::Float64) {
-		processing::pool::run(x.v64.v.num, [&v, &x, &y, &z] (int i) {
-			v.v64._at(i)[0] = *x.v64._at(i);
-			v.v64._at(i)[1] = *y.v64._at(i);
-			v.v64._at(i)[2] = *z.v64._at(i);
-		}, 1000);
-	}
+	processing::pool::run(x.n, [&v, &x, &y, &z] (int i) {
+		v.set(i, dvec3(x.value(i), y.value(i), z.value(i)));
+	}, 1000);
 	return v;
 }
 
@@ -338,13 +318,13 @@ ScalarField VectorField::length() const {;
 	ScalarField s(grid, type, sampling_mode);
 	if (type == ScalarType::Float32) {
 		//processing::pool::run(s.v32.v.num, [this, &s, axis] (int i) {
-		for (int i=0; i<s.v32.v.num; i++) {
-			s.v32.v[i] = ((vec3*)v32._at(i))->length();
+		for (int i=0; i<n; i++) {
+			((float*)s.data.data)[i] = ((vec3*)at(i))->length();
 		}
 	} else if (type == ScalarType::Float64) {
 		//processing::pool::run(s.v64.v.num, [this, &s, axis] (int i) {
-		for (int i=0; i<s.v64.v.num; i++) {
-			s.v64.v[i] = ((dvec3*)v64._at(i))->length();
+		for (int i=0; i<n; i++) {
+			((double*)s.data.data)[i] = ((dvec3*)at(i))->length();
 		}
 	}
 	return s;

@@ -99,13 +99,13 @@ data::VectorField gradient_nat(const data::ScalarField& f) {
 
 data::VectorField gradient_x(const data::ScalarField& f) {
 	if (f.type == data::ScalarType::Float32) {
-		auto& b = data::get_basis_fields(f.grid);
+		const auto& b = data::get_basis_fields(f.grid);
 		data::ScalarField dx(f.grid, f.type, f.sampling_mode);
 		data::ScalarField dy(f.grid, f.type, f.sampling_mode);
 		data::ScalarField dz(f.grid, f.type, f.sampling_mode);
-		dx.v32.v = linalg::mul(b.dx, f.v32.v);
-		dy.v32.v = linalg::mul(b.dy, f.v32.v);
-		dz.v32.v = linalg::mul(b.dz, f.v32.v);
+		dx.from_array32(linalg::mul(b.dx, f.as_array32()));
+		dy.from_array32(linalg::mul(b.dy, f.as_array32()));
+		dz.from_array32(linalg::mul(b.dz, f.as_array32()));
 		return data::VectorField::merge(dx, dy, dz);
 	}
 
@@ -238,25 +238,38 @@ data::VectorField rotation_bw(const data::VectorField& v) {
 }
 
 template<class T>
-void t_laplace(const data::RegularGrid& grid, const T& f, T& f_out) {
-	pool::run({1,1,1}, {grid.nx-1,grid.ny-1,grid.nz-1}, [&grid, &f, &f_out] (int i, int j, int k) {
-		const auto f0 = f.v[grid.cell_index(i, j, k)];
-		const auto fmx = f.v[grid.cell_index(i-1, j, k)];
-		const auto fx = f.v[grid.cell_index(i+1, j, k)];
-		const auto fmy = f.v[grid.cell_index(i, j-1, k)];
-		const auto fy = f.v[grid.cell_index(i, j+1, k)];
-		const auto fmz = f.v[grid.cell_index(i, j, k-1)];
-		const auto fz = f.v[grid.cell_index(i, j, k+1)];
-		f_out.v[grid.cell_index(i, j, k)] = fmx+fx + fmy+fy + fmz+fz - 6*f0;
-	}, 200);
+void t_laplace(const data::RegularGrid& grid, const T* f, T* f_out, data::SamplingMode sampling_mode) {
+	if (sampling_mode == data::SamplingMode::PerCell) {
+		pool::run({1,1,1}, {grid.nx-1,grid.ny-1,grid.nz-1}, [&grid, &f, &f_out] (int i, int j, int k) {
+			const auto f0 = f[grid.cell_index(i, j, k)];
+			const auto fmx = f[grid.cell_index(i-1, j, k)];
+			const auto fx = f[grid.cell_index(i+1, j, k)];
+			const auto fmy = f[grid.cell_index(i, j-1, k)];
+			const auto fy = f[grid.cell_index(i, j+1, k)];
+			const auto fmz = f[grid.cell_index(i, j, k-1)];
+			const auto fz = f[grid.cell_index(i, j, k+1)];
+			f_out[grid.cell_index(i, j, k)] = fmx+fx + fmy+fy + fmz+fz - 6*f0;
+		}, 200);
+	} else if (sampling_mode == data::SamplingMode::PerVertex) {
+		pool::run({1,1,1}, {grid.nx,grid.ny,grid.nz}, [&grid, &f, &f_out] (int i, int j, int k) {
+			const auto f0 = f[grid.vertex_index(i, j, k)];
+			const auto fmx = f[grid.vertex_index(i-1, j, k)];
+			const auto fx = f[grid.vertex_index(i+1, j, k)];
+			const auto fmy = f[grid.vertex_index(i, j-1, k)];
+			const auto fy = f[grid.vertex_index(i, j+1, k)];
+			const auto fmz = f[grid.vertex_index(i, j, k-1)];
+			const auto fz = f[grid.vertex_index(i, j, k+1)];
+			f_out[grid.vertex_index(i, j, k)] = fmx+fx + fmy+fy + fmz+fz - 6*f0;
+		}, 200);
+	}
 }
 
 data::ScalarField laplace(const data::ScalarField& f) {
 	data::ScalarField out(f.grid, f.type, f.sampling_mode);
 	if (f.type == data::ScalarType::Float32)
-		t_laplace(f.grid, f.v32, out.v32);
+		t_laplace(f.grid, (float*)f.data.data, (float*)out.data.data, f.sampling_mode);
 	else if (f.type == data::ScalarType::Float64)
-		t_laplace(f.grid, f.v64, out.v64);
+		t_laplace(f.grid, (double*)f.data.data, (double*)out.data.data, f.sampling_mode);
 	return out;
 }
 
@@ -266,17 +279,17 @@ data::ScalarField hessian_x(const data::ScalarField& f, int i, int j) {
 		auto& b = data::get_basis_fields(f.grid);
 		if (i == 0 and j == 0)
 			//out.v32.v = linalg::mul(b.phi_phi_inv, linalg::mul(b.phi_dx_dx_phi, f.v32.v));
-				out.v32.v = linalg::mul(b.dx_dx, f.v32.v);
+				out.from_array32(linalg::mul(b.dx_dx, f.as_array32()));
 		if (i == 1 and j == 1)
-				out.v32.v = linalg::mul(b.dy_dy, f.v32.v);
+				out.from_array32(linalg::mul(b.dy_dy, f.as_array32()));
 		if (i == 2 and j == 2)
-			out.v32.v = linalg::mul(b.dz_dz, f.v32.v);
+			out.from_array32(linalg::mul(b.dz_dz, f.as_array32()));
 		if ((i == 0 and j == 1) or (i == 1 and j == 0))
-			out.v32.v = linalg::mul(b.dx_dy, f.v32.v);
+			out.from_array32(linalg::mul(b.dx_dy, f.as_array32()));
 		if ((i == 0 and j == 2) or (i == 2 and j == 0))
-			out.v32.v = linalg::mul(b.dx_dz, f.v32.v);
+			out.from_array32(linalg::mul(b.dx_dz, f.as_array32()));
 		if ((i == 1 and j == 2) or (i == 2 and j == 1))
-			out.v32.v = linalg::mul(b.dy_dz, f.v32.v);
+			out.from_array32(linalg::mul(b.dy_dz, f.as_array32()));
 
 	}
 	return out;

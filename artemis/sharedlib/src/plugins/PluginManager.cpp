@@ -197,8 +197,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->declare_class_size("ScalarField", sizeof(data::ScalarField));
 	ext->declare_class_element("ScalarField.grid", &data::ScalarField::grid);
 	ext->declare_class_element("ScalarField.sampling_mode", &data::ScalarField::sampling_mode);
-	ext->declare_class_element("ScalarField.v32", &data::ScalarField::v32);
-	ext->declare_class_element("ScalarField.v64", &data::ScalarField::v64);
 	ext->link_class_func("ScalarField.__init__", &kaba::generic_init<data::ScalarField>);
 	ext->link_class_func("ScalarField.__delete__", &kaba::generic_delete<data::ScalarField>);
 	ext->link_class_func("ScalarField.value", &data::ScalarField::value);
@@ -231,8 +229,6 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("VectorField.__delete__", &kaba::generic_delete<data::VectorField>);
 	ext->declare_class_element("VectorField.grid", &data::VectorField::grid);
 	ext->declare_class_element("VectorField.sampling_mode", &data::VectorField::sampling_mode);
-	ext->declare_class_element("VectorField.v32", &data::VectorField::v32);
-	ext->declare_class_element("VectorField.v64", &data::VectorField::v64);
 	ext->link_class_func("VectorField.set", &data::VectorField::set32);
 	ext->link_class_func("VectorField.value", &data::VectorField::value32);
 	ext->link_class_func("VectorField._set", &data::VectorField::_set32);
