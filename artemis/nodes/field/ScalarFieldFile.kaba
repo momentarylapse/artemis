@@ -25,8 +25,8 @@ class ScalarFieldFile extends Node
 			grid.nz = a.n[2]
 
 			var f = ScalarField.create(grid, f32, SamplingMode.PER_CELL)
-			var data = f.raw() as f32[]&
-			data = a.data
+			f.begin_edit_cpu()
+			f.raw() = as_binary(&a.data[0], len(a.data) * 4)
 
 			out_grid.set(grid.to_grid())
 			out_field.set(f)
