@@ -1,0 +1,99 @@
+use artemis.*
+use yrenderer.gfx
+use yrenderer.ComputeTask
+use yrenderer.ComputeScheduler
+use profiler.*
+
+
+enum Mode
+	CPU
+	CPU_PARALLEL
+	GPU
+
+class GpuTest extends Node
+	var in_field = InPort[MultiField](self, "in", PortFlags.MUTABLE)
+	var mode = Setting[Mode](self, "mode", Mode.CPU)
+	var shader: shared![gfx.Shader]
+	var compute: owned![ComputeTask]
+	var scheduler: owned![ComputeScheduler]
+	var c1, c2, c3, c4, c5, c6, c7: i32
+
+
+	func __init__()
+		super.__init__("GpuTest")
+		flags = NodeFlags.TIME_DEPENDENT
+		c1 = profiler.create_channel("a", channel)
+		c2 = profiler.create_channel("b", channel)
+		c3 = profiler.create_channel("submit", channel)
+		c4 = profiler.create_channel("wait", channel)
+
+		shader = current_session().ctx!.create_shader("
+<Layout>
+	version = 430
+	bindings = [[buffer]]
+	pushsize = 4
+</Layout>
+<ComputeShader>
+
+#if vulkan
+layout(push_constant) uniform PushConstants { int nk; };
+#else
+uniform int nk;
+#endif
+layout(binding=0) buffer X {
+	float data[];
+};
+layout(local_size_x=256, local_size_y=1) in;
+
+void main() {
+	uint i = gl_GlobalInvocationID.x;
+	//for (int l=0;l<100;l++)
+	for (int k=0; k<nk; k++)
+		data[i*nk+k] = cos(data[i*nk+k]);
+}
+</ComputeShader>")!
+		compute = new ComputeTask(current_session().ctx!, "xxx", shader, [1,1,1])
+		scheduler = new ComputeScheduler(current_session().ctx!)
+
+
+	func override on_process()
+		for mut f in in_field.value()
+
+			match mode()
+				Mode.CPU =>
+					f.begin_edit_cpu()
+					for i in 0:f.n
+						for k in 0:f.components
+							let x = f.value(i, k)
+							f.set(i, k, cos(x))
+				Mode.CPU_PARALLEL =>
+					f.begin_edit_cpu()
+					let ff = func(i: i32)
+						for k in 0:f.components
+							let x = f.value(i, k)
+							f.set(i, k, cos(x))
+					run_parallel(f.n, ff, 2000)
+				Mode.GPU =>
+					profiler.begin(c1)
+					f.begin_edit_cpu()
+					profiler.end(c1)
+					profiler.begin(c2)
+					f.begin_edit_gpu()
+					var params = scheduler.start()
+					compute.bind_storage_buffer(0, f.buffer!)
+					compute.shader_data = dyn({"nk:0": f.components})
+					compute.nx = f.n / 256
+					compute.render(params)
+					profiler.end(c2)
+					profiler.begin(c3)
+					scheduler.submit(false)
+			#		f.begin_read_cpu()
+			#		print(f.values(0))
+					profiler.end(c3)
+					profiler.begin(c4)
+					scheduler.wait()
+					profiler.end(c4)
+
+
+			in_field.mutated()
+
