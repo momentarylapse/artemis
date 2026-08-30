@@ -1,0 +1,32 @@
+use artemis.*
+
+
+class MultiFieldDownsample extends Node
+	var in_field = InPort[MultiField](self, "in")
+	var out_field = OutPort[MultiField](self, "out")
+	var step = Setting[i32](self, "step", 1)
+
+	func __init__()
+		super.__init__("MultiFieldDownsample")
+
+	func override on_process()
+		for f in in_field.value()
+			let N = step()
+			var g = f.grid.downsample(N)
+			var o = MultiField.create(g, f.type(), f.sampling_mode, f.components)
+
+			match f.sampling_mode
+				SamplingMode.PER_CELL =>
+					for k in 0:g.nz
+						for j in 0:g.ny
+							for i in 0:g.nx
+								for l in 0:f.components
+									o.set(g.cell_index(i,j,k), l, f.value(f.grid.cell_index(i*N,j*N,k*N), l))
+				SamplingMode.PER_VERTEX =>
+					for k in 0:g.nz+1
+						for j in 0:g.ny+1
+							for i in 0:g.nx+1
+								for l in 0:f.components
+									o.set(g.vertex_index(i,j,k), l, f.value(f.grid.vertex_index(i*N,j*N,k*N), l))
+				else => pass
+			out_field.set(o)
