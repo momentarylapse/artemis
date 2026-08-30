@@ -43,6 +43,28 @@ struct extern RegularGrid
 		r.dy = dy * step
 		r.dz = dz * step
 		return r
+	func slice(axis: i32, _first: i32, _end: i32, _step: i32) -> RegularGrid
+		let n = match axis
+			0 => nx
+			1 => ny
+			else => nz
+		let first = clamp(_first, 0, n)
+		let end = clamp(_end, first, n)
+		let step = max(_step, 1)
+		var r = self
+		if axis == 0
+			r.nx = (end - first + step - 1) / step
+			r.dx = dx * step
+			r.offset += first * dx
+		else if axis == 1
+			r.ny = (end - first + step - 1) / step
+			r.dy = dy * step
+			r.offset += first * dy
+		else
+			r.nz = (end - first + step - 1) / step
+			r.dz = dz * step
+			r.offset += first * dz
+		return r
 
 
 struct extern Grid

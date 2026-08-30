@@ -1,0 +1,50 @@
+use artemis.*
+
+
+class MultiFieldSlice extends Node
+	var in_field = InPort[MultiField](self, "in")
+	var out_field = OutPort[MultiField](self, "out")
+	var axis = Setting[i32](self, "axis", 0)
+	var first = Setting[i32](self, "first", 0)
+	var end = Setting[i32](self, "end", 9999)
+	var step = Setting[i32](self, "step", 1)
+
+	func __init__()
+		super.__init__("MultiFieldSlice")
+
+	func override on_process()
+		for f in in_field.value()
+			var g = f.grid.slice(axis(), first(), end(), step())
+			var o = MultiField.create(g, f.type(), f.sampling_mode, f.components)
+			var i0 = 0
+			var j0 = 0
+			var k0 = 0
+			var di = 1
+			var dj = 1
+			var dk = 1
+			match axis()
+				0 =>
+					i0 = first()
+					di = step()
+				1 =>
+					j0 = first()
+					dj = step()
+				else =>
+					k0 = first()
+					dk = step()
+
+			match f.sampling_mode
+				SamplingMode.PER_CELL =>
+					for k in 0:g.nz
+						for j in 0:g.ny
+							for i in 0:g.nx
+								for l in 0:f.components
+									o.set(g.cell_index(i,j,k), l, f.value(f.grid.cell_index(i0+i*di,j0+j*dj,k0+k*dk), l))
+				SamplingMode.PER_VERTEX =>
+					for k in 0:g.nz+1
+						for j in 0:g.ny+1
+							for i in 0:g.nx+1
+								for l in 0:f.components
+									o.set(g.vertex_index(i,j,k), l, f.value(f.grid.vertex_index(i0+i*di,j0+j*dj,k0+k*dk), l))
+				else => pass
+			out_field.set(o)
