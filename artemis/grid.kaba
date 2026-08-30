@@ -34,7 +34,16 @@ struct extern RegularGrid
 		r.type = GridType.REGULAR
 		r.regular = self
 		return r
-	func downsample(step: i32) -> RegularGrid
+	func to_absolute(p: vec3) -> vec3
+		return offset + dx*p.x + dy*p.y + dz*p.z
+	# p relative!
+	func closest_index(p: vec3, mode: SamplingMode) -> i32
+		return match mode
+			SamplingMode.PER_CELL => cell_index(clamp(i32(p.x + 0.5), 0, nx-1), clamp(i32(p.y + 0.5), 0, ny-1), clamp(i32(p.z + 0.5), 0, nz-1))
+			SamplingMode.PER_VERTEX => vertex_index(clamp(i32(p.x), 0, nx), clamp(i32(p.y), 0, ny), clamp(i32(p.z), 0, nz))
+			else => 0
+	func downsample(_step: i32) -> RegularGrid
+		let step = max(_step, 1)
 		var r = self
 		r.nx = nx / step
 		r.ny = ny / step
