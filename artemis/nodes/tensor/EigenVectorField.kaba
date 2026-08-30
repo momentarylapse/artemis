@@ -1,8 +1,16 @@
 use artemis.*
 
+struct EigenResult
+	var e1, e2, e3: vec3
+	var l1, l2, l3: f32
+
+
+func mv_mul(m: f32[], v: vec3) -> vec3
+	return vec3(m[0]*v.x+m[1]*v.y+m[2]*v.z, m[1]*v.x+m[3]*v.y+m[4]*v.z, m[2]*v.x+m[4]*v.y+m[5]*v.z)
 
 # [xx, xy, xz, yy, yz, zz]
-func eigen(_m: f64[]) -> vec3
+func eigen(_m: f64[]) -> EigenResult
+	var r: Ret
 	let m = [for x in _m  f32(x)]
 	var v = vec3.EX
 	var l = m[0]
@@ -13,15 +21,77 @@ func eigen(_m: f64[]) -> vec3
 		v = vec3.EZ
 		l = m[5]
 
-	for i in 0:10
+	for i in 0:30
 		# v = m*v
 		v = vec3(m[0]*v.x+m[1]*v.y+m[2]*v.z, m[1]*v.x+m[3]*v.y+m[4]*v.z, m[2]*v.x+m[4]*v.y+m[5]*v.z).normalized()
-	return v
+	r.e1 = v
+	r.l1 = len(vec3(m[0]*v.x+m[1]*v.y+m[2]*v.z, m[1]*v.x+m[3]*v.y+m[4]*v.z, m[2]*v.x+m[4]*v.y+m[5]*v.z))
+	return r
+
+
+func det(m: f32[]) -> f32
+	return m[0]*m[3]*m[5] + m[1]*m[4]^2 + m[2]*m[1]*m[4] - m[3]*m[2]^2 - m[5]*m[1]^2 - m[0]*m[4]^2
+
+
+func find_evec(m: f32[], l: f32) -> vec3
+	let M = m - [l,0,0,l,0,l]
+	let a = vec3(M[0], M[1], M[2])
+	let b = vec3(M[1], M[3], M[4])
+	let c = vec3(M[2], M[4], M[5])
+	let la = len(a)
+	let lb = len(b)
+	let lc = len(c)
+	if la < lb and la < lc
+		return vec3.cross(b, c).normalized()
+	if lb < la and lb < lc
+		return vec3.cross(a, c).normalized()
+	return vec3.cross(a, b).normalized()
+
+# [xx, xy, xz, yy, yz, zz]
+func eigen2(_m: f64[]) -> EigenResult
+	# https://en.wikipedia.org/wiki/Eigenvalue_algorithm#Symmetric_3%C3%973_matrices
+	var r: Ret
+	let m = [for x in _m  f32(x)]
+
+	let p1 = m[1]^2 + m[2]^2 + m[4]^2
+	if p1 == 0
+		r.e1 = [1,0,0]
+		r.e2 = [0,1,0]
+		r.e3 = [0,0,1]
+		r.l1 = m[0]
+		r.l2 = m[3]
+		r.l3 = m[5]
+	else
+		let q = (m[0] + m[3] + m[5]) / 3 # trace(A)/3
+		let p2 = (m[0] - q)^2 + (m[3] - q)^2 + (m[5] - q)^2 + 2*p1
+		let p = sqrt(p2 / 6)
+		let B = (m - [q,0,0,q,0,q]) / p # (A - q E)/p
+		let _r = det(B) / 2
+		let phi = if _r <= -1
+			pi/3
+		else if _r >= 1
+			0.0
+		else
+			acos(_r) / 3
+		r.l1 = q + 2 * p * cos(phi)
+		r.l3 = q + 2 * p * cos(phi + (2*pi/3))
+		r.l2 = 3 * q - r.l1 - r.l3
+
+		r.e1 = find_evec(m, r.l1)
+		r.e2 = find_evec(m, r.l2)
+		r.e3 = find_evec(m, r.l3)
+	return r
 
 
 class EigenVectorField extends Node
 	var in_field = InPort[MultiField](self, "in")
-	var out_field = OutPort[VectorField](self, "out")
+	var out_e1 = OutPort[VectorField](self, "e1")
+	var out_e2 = OutPort[VectorField](self, "e2")
+	var out_e3 = OutPort[VectorField](self, "e3")
+	var out_l1 = OutPort[ScalarField](self, "l1")
+	var out_l2 = OutPort[ScalarField](self, "l2")
+	var out_l3 = OutPort[ScalarField](self, "l3")
+	var scaled = Setting[bool](self, "scaled", false)
 
 	func __init__()
 		super.__init__("EigenVectorField")
@@ -31,8 +101,31 @@ class EigenVectorField extends Node
 			if f.components != 7
 				error("requires 7 components")
 				return
-			var e = VectorField.create(f.grid, f.type(), f.sampling_mode)
-			let N = f.grid.count(f.sampling_mode)
+			var e1 = VectorField.create(f.grid, f.type(), f.sampling_mode)
+			var e2 = VectorField.create(f.grid, f.type(), f.sampling_mode)
+			var e3 = VectorField.create(f.grid, f.type(), f.sampling_mode)
+			var l1 = ScalarField.create(f.grid, f.type(), f.sampling_mode)
+			var l2 = ScalarField.create(f.grid, f.type(), f.sampling_mode)
+			var l3 = ScalarField.create(f.grid, f.type(), f.sampling_mode)
+			let N = f.n
 			for i in 0:N
-				e.set(i, eigen(f.values(i)[1:]))
-			out_field.set(e)
+				if f.value(i, 0) < 0.5
+					continue
+				let r = eigen2(f.values(i)[1:])
+				if scaled()
+					e1.set(i, r.e1 * r.l1)
+					e2.set(i, r.e2 * r.l2)
+					e3.set(i, r.e3 * r.l3)
+				else
+					e1.set(i, r.e1)
+					e2.set(i, r.e2)
+					e3.set(i, r.e3)
+				l1.set(i, r.l1)
+				l2.set(i, r.l2)
+				l3.set(i, r.l3)
+			out_e1.set(e1)
+			out_e2.set(e2)
+			out_e3.set(e3)
+			out_l1.set(l1)
+			out_l2.set(l2)
+			out_l3.set(l3)
