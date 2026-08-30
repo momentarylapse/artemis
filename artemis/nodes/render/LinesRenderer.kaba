@@ -1,0 +1,35 @@
+use artemis.*
+use yrenderer
+use yrenderer.gfx
+use simplevis as sv
+
+
+class LinesRenderer extends Render3dNode
+	var in_lines = InPort[vec3[][]](self, "lines")
+	var line_width = Setting[f64](self, "line-width", 2.0, "range=0:99:0.1")
+	var color = Setting[Color](self, "color", Color.WHITE)
+
+
+	func __init__()
+		super.__init__("LinesRenderer")
+
+
+	func override mut on_process()
+		for f in in_lines.value()
+			send_out()
+
+
+	func override mut on_draw()
+		for lines in in_lines.value()
+			for points in lines
+				ctx.set_color(color())
+				ctx.set_line_width(line_width() as f32)
+				ctx.draw_lines(points, sv.LineMode.CONNECTED)
+
+
+	func override bounding_box() -> Box?
+		#for f in in_field.value()
+		#	return f.grid.bounding_box()
+		return nil
+
+
