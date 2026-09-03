@@ -47,7 +47,13 @@ namespace artemis::data {
 	}
 
 	void ScalarField::from_array32(const Array<float>& array) {
-
+		if (type == ScalarType::Float32) {
+			if (array.num == n)
+				memcpy(data.data, array.data, n*sizeof(float));
+		} else if (type == ScalarType::Float64) {
+			for (int i=0; i<n; i++)
+				Field::set(i, 0, (double)array[i]);
+		}
 	}
 
 #define CREATE_IMPLACE_SINGLE_OP(OP) \

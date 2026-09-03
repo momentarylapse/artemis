@@ -12,9 +12,9 @@ func main()
 	grid.set("lx", 1.2)
 	grid.set("ly", 0.8)
 
-	var u = g.add_node("VectorField:ux", [200,200])
+	var u = g.add_node("VectorField:u", [200,200])
 	u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
-	
+
 	var dt_u = g.add_node("VectorField:du/dt", [400,200])
 	dt_u.set("sampling-mode", i32(SamplingMode.PER_VERTEX))
 	dt_u.set("formula", "[exp( - 50 * len(p - vec3(0,0.2,0))^2) *10000, 0, 0]")
@@ -24,7 +24,7 @@ func main()
 	var gr = g.add_node("GridRenderer", [100,500])
 	#gr.set("line-width", 2.0)
 	gr.set("color", dyn([0.3,0.3,0.3,1]))
-	
+
 	var dr = g.add_node("DeformationRenderer", [300,500])
 	dr.set("scale", 20.0)
 	dr.set("radius", 0.02)
@@ -39,7 +39,7 @@ func main()
 	g.connect(grid, 0, dt_u, 0)
 	g.connect(u, 0, sim, 0)
 	g.connect(dt_u, 0, sim, 1)
-	
+
 	g.connect(grid, 0, gr, 0)
 	g.connect(gr, 0, scene, 0)
 	g.connect(u, 0, dr, 0)
