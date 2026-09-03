@@ -3,7 +3,7 @@ use artemis.*
 func main()
 	var session = current_session()
 	var g = weak(session.graph)
-	session.dt = 0.00001
+	session.dt = 0.000003
 
 	var grid = g.add_node("RegularGrid", [100,50])
 	grid.set("nx", 8)
@@ -25,7 +25,7 @@ func main()
 	gr.set("mode", 0)
 	#gr.set("line-width", 2.0)
 	#gr.set("color", dyn([0.5,0.5,0.5,1]))
-	
+
 	var dr = g.add_node("DeformationRenderer", [300,500])
 	dr.set("scale", 20.0)
 	dr.set("radius", 0.005)
@@ -38,7 +38,7 @@ func main()
 	g.connect(grid, 0, dt_u, 0)
 	g.connect(u, 0, sim, 0)
 	g.connect(dt_u, 0, sim, 1)
-	
+
 	g.connect(grid, 0, gr, 0)
 	g.connect(gr, 0, scene, 0)
 	g.connect(u, 0, dr, 0)

@@ -45,7 +45,7 @@ Session::Session() {
 	win = nullptr;
 	graph = nullptr;
 	t = 0;
-	dt = 0.1;
+	dt = 0.01;
 }
 
 Session::~Session() = default;

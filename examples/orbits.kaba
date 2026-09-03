@@ -10,10 +10,10 @@ func main()
 	pos.set("list", dyn([-100,0,0, 0,0,0]))
 
 	var vel = g.add_node("List:Velocity", [500, 250])
-	vel.set("list", dyn([0,1,0, 0,-0.1,0]))
+	vel.set("list", dyn([0,5,0, 0,-0.5,0]))
 
 	var sim = g.add_node("OrbitRK", [500, 400])
-	sim.set("g", 250)
+	sim.set("g", 250*5^2)
 
 	var l2v = g.add_node("ListToVectors", [300, 400])
 

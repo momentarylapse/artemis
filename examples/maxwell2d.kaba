@@ -15,19 +15,19 @@ func main()
 	gr.set("line-width", 1.0)
 	gr.set("color", dyn([0.5,0.5,0.5,1]))
 	gr.set("mode", 0)
-	
+
 	var E = g.add_node("VectorField:E", [370,250])
 	#E.set("formula", "vec3(1,0,0) * exp( -(len(p - vec3(8,8,8))^2))")
 	#E.set("formula", "vec3(1,0,0) * exp( -(len(p - vec3(0.5,0.5,80.5))^2)/20)")
 	#field.set("time-dependent", true)
-	
+
 	var B = g.add_node("VectorField:B", [550,250])
 	#B.set("formula", "vec3(0,1,0) * exp( -(len(p - vec3(0.5,0.5,80))^2)/20)")
-	
+
 	var j = g.add_node("VectorField:j", [50,250])
-	j.set("formula", "vec3(20,0,0) * exp( -0.2*len(p - vec3(0,25,25))^2) * exp(-0.5*(t-3)^2)")
+	j.set("formula", "vec3(20,0,0) * exp( -0.2*len(p - vec3(0,25,25))^2) * exp(-0.5*(10*t-3)^2)")
 	j.set("time-dependent", true)
-	
+
 	var rE = g.add_node("VectorFieldRenderer", [370, 550])
 	rE.set("color", dyn([1,0,0,1]))
 	rE.set("line-width", 5)
@@ -36,17 +36,17 @@ func main()
 	rB.set("line-width", 5)
 	var rj = g.add_node("VectorFieldRenderer", [50, 550])
 	rj.set("color", dyn([0,1,0,1]))
-	
-	
+
+
 #	var me = g.add_node("VectorField", [150,350])
 #	me.set("formula", "vec3(1,1,1) * (1-exp( -((len(p - vec3(0,25,60))*0.15)^8)))")
-	
-	
+
+
 	var mw = g.add_node("MaxwellFDTD:Maxwell", [500, 400])
-	
+
 	var scene = g.add_node("SceneRenderer", [300, 700])
 	var canvas = g.add_node("Canvas", [300, 850])
-	
+
 	g.connect(grid, 0, gr, 0)
 	g.connect(grid, 0, E, 0)
 	g.connect(E, 0, rE, 0)
@@ -57,7 +57,7 @@ func main()
 	g.connect(E, 0, mw, 0)
 	g.connect(B, 0, mw, 1)
 	g.connect(j, 0, mw, 2)
-	
+
 #	g.connect(grid, 0, me, 0)
 #	g.connect(me, 0, mw, 3)
 

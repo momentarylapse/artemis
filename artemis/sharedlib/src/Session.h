@@ -71,7 +71,7 @@ public:
 	owned<artemis::graph::DataGraph> data;
 	dataflow::Graph* graph;
 
-	double simulation_update_dt = 0.1; // "outside" / how often to perform steps
+	double simulation_update_dt = 0.01; // "outside" / how often to perform steps
 };
 
 Session* create_session();

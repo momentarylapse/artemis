@@ -18,7 +18,7 @@ func main()
 	gr.set("mode", "OUTLINES")
 
 	var field = g.add_node("ScalarField", [370,250])
-	field.set("formula", "sin(0.8 * len(p-vec3(4.5,4.5,15)) + t)")
+	field.set("formula", "sin(0.8 * len(p-vec3(4.5,4.5,15)) + t*2)")
 	field.set("time-dependent", true)
 	field.set("sampling-mode", dyn(SamplingMode.PER_VERTEX))
 
