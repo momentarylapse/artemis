@@ -24,6 +24,8 @@ class VolumeRenderer extends Render3dNode
 
 
 	func override mut on_draw()
+		if ctx.shadow_pass and !solid()
+			return
 		if not weak(volume_renderer)
 			volume_renderer = new sv.VolumeRenderer(ctx)
 			volume_renderer!.initialize()

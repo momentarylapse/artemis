@@ -25,6 +25,8 @@ class GridRenderer extends Render3dNode
 
 
 	func override mut on_draw()
+		if ctx.shadow_pass
+			return
 		for g in in_grid.value()
 			var points: vec3[]
 

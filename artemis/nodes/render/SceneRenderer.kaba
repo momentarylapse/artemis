@@ -5,6 +5,7 @@ use simplevis as sv
 use image.Painter
 use xhui
 use obs
+use profiler.*
 
 
 func scale_area(area: Rect, scale: f32) -> Rect
@@ -62,11 +63,15 @@ Dialog x x padding=0
 		canvas.f_draw = func()
 			for mut x in draw_calls
 				if x.active
+					profiler.begin(x.node.channel_draw)
 					x.node.on_draw()
+					profiler.end(x.node.channel_draw)
 		canvas.f_draw_transparent = func()
 			for mut x in draw_calls
 				if x.active
+					profiler.begin(x.node.channel_draw)
 					x.node.on_draw_transparent()
+					profiler.end(x.node.channel_draw)
 
 
 	func mut build() -> bool

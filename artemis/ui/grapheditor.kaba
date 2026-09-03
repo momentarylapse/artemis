@@ -460,6 +460,8 @@ Dialog x ''
 			bg = Color.mix(Color(0.3, 0.4, 1, 1), xhui.theme.background_low, 0.3)
 		else if i32(n.flags & NodeFlags.TIME_DEPENDENT) > 0
 			bg = Color.mix(Color(0, 0.7, 0, 1), xhui.theme.background_low, 0.3)
+		else if i32(n.flags & NodeFlags.RENDERER) > 0
+			bg = Color.mix(Color(0.6, 0.3, 0.02, 1), xhui.theme.background_low, 0.3)
 		else if i32(n.flags & NodeFlags.META) > 0
 			bg = Color.mix(Color(0.5, 0.5, 0.5, 1), xhui.theme.background_low, 0.3)
 		else if n._state == NodeState.ERROR

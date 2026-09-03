@@ -37,34 +37,34 @@ class DrawingHelper
 func nice_time(t: f64, dt: f64) -> string
 	var s: string[]
 	if t >= 3600
-		s.add("{{i32(t / 3600)}} h")
+		s.add("{{i32(t / 3600)}}h")
 	if t >= 60
 		if t >= 3600
-			s.add("{{i32(t / 60) % 60|02}} min")
+			s.add("{{i32(t / 60) % 60|02}}min")
 		else
-			s.add("{{i32(t / 60) % 60}} min")
+			s.add("{{i32(t / 60) % 60}}min")
 	if t >= 1
 		if t >= 60
-			s.add("{{i32(t) % 60|02}} s")
+			s.add("{{i32(t) % 60|02}}s")
 		else
-			s.add("{{i32(t) % 60}} s")
+			s.add("{{i32(t) % 60}}s")
 	if t >= 0.001 and dt < 1
 		if t >= 1
-			s.add("{{i32(t * 1000) % 1000|03}} ms")
+			s.add("{{i32(t * 1000) % 1000|03}}ms")
 		else
-			s.add("{{i32(t * 1000) % 1000}} ms")
+			s.add("{{i32(t * 1000) % 1000}}ms")
 	if t >= 0.000001 and dt < 0.001
 		if t >= 0.001
-			s.add("{{i32(t * 1000000) % 1000|03}} us")
+			s.add("{{i32(t * 1000000) % 1000|03}}us")
 		else
-			s.add("{{i32(t * 1000000) % 1000}} us")
+			s.add("{{i32(t * 1000000) % 1000}}us")
 	if dt < 0.000001
 		if t >= 0.000001
-			s.add("{{i32(t * 1000000000) % 1000|03}} ns")
+			s.add("{{i32(t * 1000000000) % 1000|03}}ns")
 		else
-			s.add("{{i32(t * 1000000000) % 1000}} ns")
+			s.add("{{i32(t * 1000000000) % 1000}}ns")
 	if len(s) == 0
-		return "0 s"
+		return "0s"
 	return s.join(" ")
 
 
@@ -224,16 +224,16 @@ Dialog x x padding=0
 
 	func draw_post(out p: Painter)
 		p.set_color(xhui.theme.text_label)
+		p.set_font("monospace", -1, false, false)
 		p.set_font_size(wash_f32(&xhui.theme.font_size) * 1.3)
 		draw_str_right(p, p.area().p11() - vec2(320, 55), "t = {{nice_time(session.t, session.dt)}}")
-		p.set_font_size(wash_f32(&xhui.theme.font_size))
 
 		if show_profiling
 			let report = profiler.digest_report(profiler.previous_frame_timing())
 			p.set_font_size(wash_f32(&xhui.theme.font_size) * 0.85)
 			p.set_color(Color(0,0,0,0.7))
 			p.draw_rect([p.area().p00() + vec2(10, 10), p.area().p00() + vec2(315, 30 + 18 * f32(len(report)))])
-			for i=>c in report
+			for i=>c in report |> filter(c => c.count > 0 and profiler.get_name(c.channel) != "blur")
 				let fraction = c.total / max(wash_f32(&profiler.previous_frame_timing().total_time), 0.01)
 				if fraction > 0.03
 					p.set_color(xhui.theme.text)
@@ -243,7 +243,8 @@ Dialog x x padding=0
 				draw_str_right(p, p.area().p00() + vec2(220, 20 + 18 * f32(i)), "{{fraction * 100|.1}}%")
 				draw_str_right(p, p.area().p00() + vec2(260, 20 + 18 * f32(i)), "{{c.average * 1000|.2}}")
 				draw_str_right(p, p.area().p00() + vec2(300, 20 + 18 * f32(i)), "{{c.count}}")
-			p.set_font_size(wash_f32(&xhui.theme.font_size))
+		p.set_font("default", -1, false, false)
+		p.set_font_size(wash_f32(&xhui.theme.font_size))
 
 
 	func mut on_show_profiling()

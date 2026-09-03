@@ -21,6 +21,8 @@ class VectorFieldRenderer extends Render3dNode
 
 
 	func override mut on_draw()
+		if ctx.shadow_pass
+			return
 		for f in in_field.value()
 			let s = scale() as f32
 			var points: vec3[]
