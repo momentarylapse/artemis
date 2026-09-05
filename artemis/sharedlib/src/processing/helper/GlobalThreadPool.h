@@ -15,6 +15,7 @@ namespace artemis::processing::pool {
 extern ThreadPool* thread_pool;
 
 void init();
+int num_threads();
 
 template<class F> // int -> void
 void run(int n, F f, int cluster_size) {

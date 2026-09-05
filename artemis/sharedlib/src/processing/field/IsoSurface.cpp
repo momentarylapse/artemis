@@ -3,11 +3,13 @@
 //
 
 #include "IsoSurface.h"
-#include <lib/polymesh/Mesh.h>
+#include <cmath>
 #include <data/field/ScalarField.h>
 #include <lib/base/sort.h>
 #include <lib/math/mat4.h>
-#include <cmath>
+#include <lib/polymesh/Mesh.h>
+#include "../helper/GlobalThreadPool.h"
+#include "lib/os/msg.h"
 
 namespace artemis::processing {
 
@@ -98,7 +100,7 @@ void iso_cell_approx(const artemis::data::ScalarField& f, polymesh::Mesh& mesh, 
 		return;
 
 	auto inter = [&] (int n0, int n1) {
-		float t = fabs(v[n0]) / fabs(v[n1] - v[n0]);
+		float t = fabsf(v[n0]) / fabsf(v[n1] - v[n0]);
 		vec3 p0 = f.grid.index_to_pos(i + ((n0 >> 2) & 1), j + ((n0 >> 1) & 1), k + (n0 & 1));
 		vec3 p1 = f.grid.index_to_pos(i + ((n1 >> 2) & 1), j + ((n1 >> 1) & 1), k + (n1 & 1));
 		return p0 + (p1 - p0) * t;
@@ -125,7 +127,7 @@ void iso_cell_approx(const artemis::data::ScalarField& f, polymesh::Mesh& mesh, 
 
 	// sort by angle around cell_center
 	auto phi = [&] (const vec3 p) {
-		return atan2(vec3::dot(p - cell_center, e3), vec3::dot(p - cell_center, e2));
+		return atan2f(vec3::dot(p - cell_center, e3), vec3::dot(p - cell_center, e2));
 	};
 	points = base::sorted(points, [&] (const vec3& a, const vec3& b) {
 		return phi(a) <= phi(b);
@@ -142,18 +144,37 @@ void iso_cell_approx(const artemis::data::ScalarField& f, polymesh::Mesh& mesh, 
 
 polymesh::Mesh iso_surface(const data::ScalarField& f, float t0) {
 	polymesh::Mesh mesh;
-	if (f.sampling_mode == artemis::data::SamplingMode::PerCell) {
-		for (int i=0; i<f.grid.nx-1; i++)
-			for (int j=0; j<f.grid.ny-1; j++)
-				for (int k=0; k<f.grid.nz-1; k++)
-					iso_cell_approx(f, mesh, i, j, k, t0);
-		mesh = mesh.transform(mat4::translation(f.grid.cell_center(0,0,0) - f.grid.offset));
-	} else if (f.sampling_mode == artemis::data::SamplingMode::PerVertex) {
-		for (int i=0; i<f.grid.nx; i++)
-			for (int j=0; j<f.grid.ny; j++)
-				for (int k=0; k<f.grid.nz; k++)
-					iso_cell_approx(f, mesh, i, j, k, t0);
+	if (true) {
+		// thread pool
+		Array<polymesh::Mesh> thread_meshes;
+		thread_meshes.resize(pool::num_threads());
+		if (f.sampling_mode == artemis::data::SamplingMode::PerCell) {
+			pool::run({0,0,0}, {f.grid.nx-1,f.grid.ny-1,f.grid.nz-1}, [&f, &thread_meshes, t0] (int i, int j, int k) {
+				iso_cell_approx(f, thread_meshes[ThreadPool::worker_id], i, j, k, t0);
+			}, 100);
+		} else if (f.sampling_mode == artemis::data::SamplingMode::PerVertex) {
+			pool::run({0,0,0}, {f.grid.nx,f.grid.ny,f.grid.nz}, [&f, &thread_meshes, t0] (int i, int j, int k) {
+				iso_cell_approx(f, thread_meshes[ThreadPool::worker_id], i, j, k, t0);
+			}, 100);
+		}
+		for (const auto& m: thread_meshes)
+			mesh.add(m);
+	} else {
+		// single threaded
+		if (f.sampling_mode == artemis::data::SamplingMode::PerCell) {
+			for (int i=0; i<f.grid.nx-1; i++)
+				for (int j=0; j<f.grid.ny-1; j++)
+					for (int k=0; k<f.grid.nz-1; k++)
+						iso_cell_approx(f, mesh, i, j, k, t0);
+		} else if (f.sampling_mode == artemis::data::SamplingMode::PerVertex) {
+			for (int i=0; i<f.grid.nx; i++)
+				for (int j=0; j<f.grid.ny; j++)
+					for (int k=0; k<f.grid.nz; k++)
+						iso_cell_approx(f, mesh, i, j, k, t0);
+		}
 	}
+	if (f.sampling_mode == artemis::data::SamplingMode::PerCell)
+		mesh = mesh.transform(mat4::translation(f.grid.cell_center(0,0,0) - f.grid.offset));
 	return mesh;
 }
 
