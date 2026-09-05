@@ -1,0 +1,109 @@
+use kaba
+
+
+func product(list: i32[]) -> i32
+	var r = 1
+	for i in list
+		r = r * i
+	return r
+
+
+enum XType
+	FLOAT_32
+	FLOAT_64
+
+
+func xtype_size(t: XType) -> i32
+	return match t
+		XType.FLOAT_32 => 4
+		XType.FLOAT_64 => 8
+
+
+func type_to_xtype(t: kaba.Class&) -> XType
+	return match t
+		f32 => XType.FLOAT_32
+		f64 => XType.FLOAT_64
+		else => XType.FLOAT_32
+
+
+func xtype_to_type(t: XType) -> kaba.Class&
+	return match t
+		XType.FLOAT_32 => f32
+		XType.FLOAT_64 => f64
+
+
+struct Array
+	var data: bytes
+	var n: i32[] # n[0]=fast, n[last]=slow
+	var xtype = XType.FLOAT_32
+
+	func mut __init__()
+	func mut __init__(_n: i32[], t: kaba.Class&)
+		create(_n, t)
+
+	func mut create(_n: i32[], t: kaba.Class&)
+		n = _n
+		xtype = type_to_xtype(t)
+		data.resize(product(n) * xtype_size(xtype))
+
+	func type() -> kaba.Class&
+		return xtype_to_type(xtype)
+
+	func linear_index(list: i32[]) -> i32
+		if len(list) != len(n)
+			return 0
+		var index = 0
+		var m = 1
+		for k=>i in list
+			index += m * i
+			m = m * n[k]
+		return index
+
+	func selfref as_f32() -> f32[0]&
+		return &data[0] as Ret
+
+	func selfref as_f64() -> f64[0]&
+		return &data[0] as Ret
+
+	func mut set(i: i32[], value: f64)
+		match xtype
+			XType.FLOAT_32 => as_f32()[linear_index(i)] = value as f32
+			XType.FLOAT_64 => as_f64()[linear_index(i)] = value
+
+	func get(i: i32[]) -> f64
+		return match xtype
+			XType.FLOAT_32 => as_f32()[linear_index(i)] as f64
+			XType.FLOAT_64 => as_f64()[linear_index(i)]
+
+	func get_linear(index: i32) -> f64
+		return match xtype
+			XType.FLOAT_32 => as_f32()[index] as f64
+			XType.FLOAT_64 => as_f64()[index]
+
+	func slice(axis: i32, index: i32) -> Array
+		var r = Array(n[:axis] | n[axis+1:], type())
+		let step = product(n[:axis+1])
+		let offset = index * product(n[:axis])
+
+		let nn = product(r.n)
+		match xtype
+			XType.FLOAT_32 =>
+				var p = r.as_f32()
+				var q = as_f32()
+				for i in 0:nn
+					p[i] = q[i * step + offset]
+			XType.FLOAT_64 =>
+				var p = r.as_f64()
+				var q = as_f64()
+				for i in 0:nn
+					p[i] = q[i * step + offset]
+
+		return r
+
+	func __str__() -> string
+		let N = product(n)
+		var r = [for i in 0:N  get_linear(i)]
+		return str(r)
+
+
+

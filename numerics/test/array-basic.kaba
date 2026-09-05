@@ -1,0 +1,19 @@
+use numerics.array.*
+
+
+func main()
+	var a = Array([2,3], f32)
+	for j in 0:a.n[1]
+		for i in 0:a.n[0]
+			a.set([i,j], a.linear_index([i,j]))
+			print("{{i}} {{j}} {{a.linear_index([i,j])}}")
+
+	print(a)
+
+	print(a.slice(0,0))
+	print(a.slice(0,1))
+
+	print(a.slice(1,0))
+	print(a.slice(1,1))
+	print(a.slice(1,2))
+

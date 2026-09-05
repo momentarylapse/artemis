@@ -1,0 +1,30 @@
+use os
+use .array.*
+
+let EXPORT_IMPORTS = true
+
+
+func load_nrrd(filename: os.Path) -> result[Array]
+	var a: Array
+	var h = os.fs.open(filename, "rb")!
+	var header: string
+	while header.tail(2) != "\n\n"
+		header += h.read(1)
+
+	for l in header.explode("\n")
+		if l.head(6) == "sizes:"
+			a.n = [for x in l[7:].explode(" ")  i32(x)]
+
+	let n = product(a.n)
+	a.data.resize(n)
+
+	as_binary(&a.data[0], n*4) = h.read(n*4)
+
+	return a
+
+
+func load(filename: os.Path) -> result[Array]
+	match filename.extension()
+		"nrrd" => return load_nrrd(filename)
+		else => raise Error("unknown file extension")
+

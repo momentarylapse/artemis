@@ -1,0 +1,129 @@
+use os
+use kaba
+
+func product(list: i32[]) -> i32
+	var r = 1
+	for i in list
+		r = r * i
+	return r
+
+
+struct Array
+	var data: f32[]
+	var n: i32[] # n[0]=fast, n[last]=slow
+
+	func slice(axis: i32, index: i32) -> Array
+		var r: Array
+#		print("slice {{n}}->{{product(n)}}/{{len(data)}}  {{axis}} {{index}}")
+		r.n = n[:axis] | n[axis+1:]
+		r.data.resize(product(r.n))
+#		print("-> {{r.n}}->{{len(r.data)}}")
+		let step = product(n[:axis+1])
+		let offset = index * product(n[:axis])
+#		print("{{step}}  {{offset}}")
+
+		for mut i=>x in r.data
+			x = data[i * step + offset]
+
+		return r
+
+
+struct Header
+	var n: i32[]
+	var type: kaba.Class&
+	var file: os.Path
+
+
+func load_raw(out a: Array, out f: os.FileStream, h: Header)
+	a.n = h.n
+	let n = product(a.n)
+	a.data.resize(n)
+
+	match h.type
+		i16 =>
+			let data = f.read(n*2)
+			for i in 0:n
+				a.data[i] = f32(i32(*(&data[i*2] as i16&))) / 32000.0
+		f32 =>
+			as_binary(&a.data[0], n*4) = f.read(n*4)
+		else => raise Error("unhandled data type {{h.type}}")
+
+
+func load_nrrd_header(header: string, filename: os.Path) -> Header
+	var h: Header
+	for l in header.explode("\n")
+		if l.head(5) == "type:"
+			h.type := match l[6:]
+				"float" => f32
+				"short" => i16
+				else => void
+			if h.type == void
+				raise Error("unknown data type {{l[6:]}}")
+		if l.head(6) == "sizes:"
+			h.n = [for x in l[7:].explode(" ")  i32(x)]
+		if l.head(10) == "data file:"
+			h.file = filename.parent() | l[11:]
+	return h
+
+
+func load_nrrd(filename: os.Path) -> Array
+	var a: Array
+	var f = os.fs.open(filename, "rb")!
+	var _header: string
+	while _header.tail(2) != "\n\n"
+		_header += f.read(1)
+
+	let header = load_nrrd_header(_header, filename)
+	load_raw(a, f, header)
+	return a
+
+
+func load_nhdr(filename: os.Path) -> Array
+	var a: Array
+	let header = load_nrrd_header(os.fs.read_text(filename)!, filename)
+	var f = os.fs.open(header.file, "rb")!
+	load_raw(a, f, header)
+	return a
+
+
+func read_int(data: bytes) -> i32
+	var i: i32
+	as_binary(&i, len(data)) = data
+	return i
+
+
+func load_nifti_header(header: bytes) -> Header
+	var r: Header
+	let ndim = read_int(header[40:42])
+	for i in 0:ndim
+		r.n.add(read_int(header[42+i*2:44+i*2]))
+	let type = read_int(header[70:72])
+	r.type := match type
+		4 => i16
+		16 => f32
+		else => void # TODO raise ...
+	if r.type == void
+		raise Error("unhandled data type {{type}}")
+	return r
+
+
+func load_nifti(filename: os.Path) -> Array
+	var a: Array
+	var f = os.fs.open(filename, "rb")!
+	let header = load_nifti_header(f.read(348))
+	load_raw(a, f, header)
+	return a
+
+
+func load(filename: os.Path) -> result[Array]
+	match filename.extension()
+		"nrrd" => return load_nrrd(filename)
+		"nhdr" => return load_nhdr(filename)
+		"nii" => return load_nifti(filename)
+		else => raise Error("unknown file extension")
+
+
+func main(args: string[])
+	for a in args
+		let f = load(a)!
+		print(f.data |> filter(x => x != 0.0) |> len)

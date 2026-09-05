@@ -1,0 +1,37 @@
+use simplevis as sv
+use simplevis.volume.VolumeRenderer
+use .mri
+
+
+class Canvas extends sv.Canvas
+	var vr = VolumeRenderer(&ctx)
+	var data: mri.Array
+
+
+	func override on_initialize()
+		vr.initialize()
+		vr.color_map.colors = [[1,1,1,0], Color.WHITE]
+		vr.color_map.values = [0, 1]
+
+		vr.set(data.data, data.n)
+		cam.pos = [0.5,0.5,0.5]
+
+
+	func override on_draw()
+		vr.draw(mat4.ID)
+
+		ctx.set_color(Color.WHITE)
+		ctx.set_line_width(2)
+		ctx.draw_wire_box(Box.ID)
+
+
+func main(args: string[])
+	for a in args
+		var f = mri.load(a)!
+
+		if len(f.n) == 4
+			f = f.slice(0, 0)
+
+		var c = new shared Canvas()
+		c.data = f
+		sv.run(c, a)

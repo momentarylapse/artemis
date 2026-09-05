@@ -1,0 +1,79 @@
+use .array.*
+use kaba
+
+
+enum SamplingMode
+	PER_CELL
+	PER_VERTEX
+
+
+enum GridType
+	NONE
+	REGULAR
+	UNSTRUCTURED
+
+
+struct RegularGrid
+	var n = [0, 0, 0]
+	var d = [vec3.EX, vec3.EY, vec3.EZ]
+	var offset = vec3.0
+#	func extern vertices() -> vec3[]
+#	func extern vertex(i: i32, j: i32, k: i32) -> vec3
+#	func extern cell_centers() -> vec3[]
+#	func extern cell_center(i: i32, j: i32, k: i32) -> vec3
+#	func extern points(mode: SamplingMode) -> vec3[]
+#	func extern edges() -> (i32,i32)[]
+#	func extern count(mode: SamplingMode) -> i32
+#	func extern bounding_box() -> Box
+#	func extern cell_index(i: i32, j: i32, k: i32) -> i32
+#	func extern vertex_index(i: i32, j: i32, k: i32) -> i32
+#	func extern sample_index(i: i32, j: i32, k: i32, mode: SamplingMode) -> i32
+	func to_grid() -> Grid
+		var r: Grid
+		r.type = GridType.REGULAR
+		r.regular = self
+		return r
+	func downsample(step: i32) -> RegularGrid
+		var r = self
+		r.n = [for k in n  k/step]
+		r.d = [for e in d  e*step]
+		return r
+
+
+struct Grid
+	var type = GridType.NONE
+	var regular: RegularGrid?
+#	func extern __init__()
+#	func extern vertices() -> vec3[]
+#	func extern cell_centers() -> vec3[]
+#	func extern points(mode: SamplingMode) -> vec3[]
+#	func extern edges() -> (i32,i32)[]
+#	func extern count(mode: SamplingMode) -> i32
+#	func extern bounding_box() -> Box
+
+
+struct Field
+	var grid: RegularGrid
+	var data: Array
+
+	func mut __init__()
+	func mut __init__(grid: RegularGrid, type: kaba.Class&, components: i32)
+		self.grid = grid
+		data.__init__([components] | grid.n, type)
+	func mut set(index: i32, component: i32, v: f64)
+	func value(index: i32, component: i32) -> f64
+	func values(index: i32) -> f64[]
+	func mut _set(i: i32, j: i32, k: i32, component: i32, v: f64)
+	func _value(i: i32, j: i32, k: i32, component: i32) -> f64
+
+
+struct ScalarField extends Field
+	func override __init__()
+	func mut __init__(grid: RegularGrid, type: kaba.Class&)
+		super.__init__(grid, type, 1)
+
+
+struct VectorField extends Field
+	func override __init__()
+	func mut __init__(grid: RegularGrid, type: kaba.Class&)
+		super.__init__(grid, type, 3)
