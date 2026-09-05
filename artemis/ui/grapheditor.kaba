@@ -64,7 +64,15 @@ func port_description[P](p: P&, direction: string) -> string
 	if len(flags) > 0
 		sflags = flags.join(", ")
 	#return format("<big>%s: <b>%s</b></big>\n<soft>type:</soft> <b>%s</b>", direction, p->name, type) + sflags;
-	return "<big><b>{{p.name}}</b></big>  ({{direction}})\n<soft>type:</soft> <b>{{type}}</b>\n<soft>flags:</soft> {{sflags}}"
+	return "<big><b>{{p.name}}</b></big>\n{{direction}}\n<soft>type:</soft> <b>{{type}}</b>\n<soft>flags:</soft> {{sflags}}"
+
+
+func cable_description(c: CableInfo) -> string
+	return "<big>cable</big>\n<soft>type:</soft> <b>{{type_name(c.source.type)}}</b>"
+
+
+func node_description(n: Node) -> string
+	return "<big>{{n.name}}</big>\n<soft>node</soft>\n<soft>flags:</soft> <b>{{n.flags}}\n<soft>state:</soft> <b>{{n._state}}</b>"
 
 
 class GraphEditor extends xhui.Panel as obs.Node
@@ -366,13 +374,11 @@ Dialog x ''
 
 		var tip = ""
 		for h in hover
-			if h.type == HoverType.OUT_PORT
-				tip = port_description[OutPortBase](h.node.out_ports[h.index], "output")
-			if h.type == HoverType.IN_PORT
-				tip = port_description[InPortBase](h.node.in_ports[h.index], "input")
-			if h.type == HoverType.CABLE
-				let c = graph.cables()[h.index]
-				tip = "<big>cable</big>\n<soft>type:</soft> <b>{{type_name(c.source.type)}}</b>"
+			match h.type
+				HoverType.OUT_PORT => tip = port_description[OutPortBase](h.node.out_ports[h.index], "output")
+				HoverType.IN_PORT =>  tip = port_description[InPortBase](h.node.in_ports[h.index], "input")
+				HoverType.CABLE =>    tip = cable_description(graph.cables()[h.index])
+				HoverType.NODE =>     tip = node_description(h.node)
 
 		if tip != ""
 			let l = xhui.TextLayout.from_format_string(p, tip)
