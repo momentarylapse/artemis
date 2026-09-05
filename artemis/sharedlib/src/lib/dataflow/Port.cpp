@@ -31,9 +31,11 @@ string OutPortBase::full_name() const {
 }
 
 void OutPortBase::clear() {
-	generic_value_pointer = nullptr;
-	has_value = false;
-	mutated();
+	if (has_value) {
+		generic_value_pointer = nullptr;
+		has_value = false;
+		mutated();
+	}
 }
 
 void OutPortBase::generic_set(void *p) {
