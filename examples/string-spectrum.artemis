@@ -18,13 +18,13 @@
 		</node>
 		<node class="VectorField:u" pos="248.584 144.371">
 			<formula>"[0.001 * exp( - 200.0 * (x-0.30)^2), 0, 0]"</formula>
-			<type>1</type>
+			<type>0</type>
 			<sampling-mode>1</sampling-mode>
 			<time-dependent>false</time-dependent>
 		</node>
 		<node class="VectorField:du/dt" pos="448.584 144.371">
 			<formula>"[0, exp( - 200.0 * (x-0.15)^2) * 2, 0]"</formula>
-			<type>1</type>
+			<type>0</type>
 			<sampling-mode>1</sampling-mode>
 			<time-dependent>false</time-dependent>
 		</node>

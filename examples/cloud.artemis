@@ -31,15 +31,11 @@
 		<node class="PointListRenderer" pos="300.000 450.000">
 			<active>false</active>
 			<radius>0.1</radius>
-			<trail-length>0</trail-length>
-			<line-width>1.0</line-width>
 			<color>[0.7, 0.0, 1.0, 1.0]</color>
 		</node>
 		<node class="PointListRenderer" pos="500.000 450.000">
 			<active>false</active>
 			<radius>0.2</radius>
-			<trail-length>0</trail-length>
-			<line-width>1.0</line-width>
 			<color>[1.0, 1.0, 1.0, 1.0]</color>
 		</node>
 		<node class="SceneRenderer" pos="300.000 600.000">
