@@ -3,6 +3,17 @@ use .grid.*
 use yrenderer.gfx.ShaderStorageBuffer
 
 
+enum ScalarType
+	F32
+	F64
+
+
+func decode_scalar_type(t: ScalarType) -> kaba.Class&
+	return match t
+		ScalarType.F32 => f32
+		ScalarType.F64 => f64
+
+
 struct extern Field
 	var grid: RegularGrid
 	var sampling_mode: SamplingMode

@@ -151,6 +151,21 @@ Array<float> eval_f32_f32_list(f_f32_f32* f, const Array<float>& list) {
 	return out;
 }
 
+typedef float(f_vec3_f32_f32)(const vec3&, float);
+float eval_vec3_f32_f32(f_vec3_f32_f32* f, const vec3& p, float t) {
+	return (*f)(p, t);
+}
+
+typedef vec3(f_vec3_f32_vec3)(const vec3&, float);
+vec3 eval_vec3_f32_vec3(f_vec3_f32_vec3* f, const vec3& p, float t) {
+	return (*f)(p, t);
+}
+
+typedef Array<float>(f_vec3_f32_f32_list)(const vec3&, float);
+Array<float> eval_vec3_f32_f32_list(f_vec3_f32_f32_list* f, const vec3& p, float t) {
+	return (*f)(p, t);
+}
+
 dataflow::Node* xxx_create_node(const string& name) {
 	return graph::create_node(current_session(), name);
 }
@@ -165,6 +180,13 @@ void thread_pool_run(int n, Callable<void(int)>& f, int cluster_size) {
 	}, cluster_size);
 }
 
+class SettingBaseWrapper: public dataflow::SettingBase {
+public:
+	void set_on_update(Callable<void()>& f) {
+		on_update = [&f] { f(); };
+	}
+};
+
 void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->package_info("artemis", "0.5");
 
@@ -176,6 +198,9 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_func("plugin_directory", &PluginManager::directory);
 	ext->link_func("publish_gfx_context", &publish_gfx_context);
 	ext->link_func("eval_f32_f32_list", &eval_f32_f32_list);
+	ext->link_func("eval_vec3_f32_f32", &eval_vec3_f32_f32);
+	ext->link_func("eval_vec3_f32_vec3", &eval_vec3_f32_vec3);
+	ext->link_func("eval_vec3_f32_f32_list", &eval_vec3_f32_f32_list);
 	ext->link_func("iterate_simulation", &graph::iterate_simulation);
 	ext->link_func("enumerate_nodes", &graph::enumerate_nodes);
 	ext->link_func("port_type_match", &dataflow::port_type_match);
@@ -392,6 +417,7 @@ void PluginManager::export_kaba(kaba::IExporter* ext) {
 	ext->link_class_func("SettingBase.__init2__", &kaba::generic_init_ext<dataflow::SettingBase, dataflow::Node*, const string&, const kaba::Class*, void*, const string&>);
 	ext->link_class_func("SettingBase.__delete__", &kaba::generic_delete<dataflow::SettingBase>);
 	ext->link_class_func("SettingBase.generic_set", &dataflow::SettingBase::generic_set);
+	ext->link_class_func("SettingBase.on_update", &SettingBaseWrapper::set_on_update);
 
 
 	ext->declare_class_size("CableInfo", sizeof(dataflow::CableInfo));

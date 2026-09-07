@@ -104,6 +104,7 @@ class extern SettingBase
 	func extern __init2__(node: Node, name: string, type: kaba.Class&, p: void&, options = "")
 	func extern __delete__()
 	func extern mut generic_set(p: void&)
+	func extern mut on_update(f: void->void)
 	func selfref to[X]() -> Setting[X]&
 		return &self as Setting[X]&
 

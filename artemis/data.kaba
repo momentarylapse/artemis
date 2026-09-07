@@ -8,3 +8,10 @@ struct extern GenericData
 
 # f of type f32->f32...
 func extern eval_f32_f32_list(f: kaba.code&, x: f32[]) -> f32[]
+
+# (vec3, f32) -> f32
+func extern eval_vec3_f32_f32(f: kaba.code&, p: vec3, t: f32) -> f32
+# (vec3, f32) -> vec3
+func extern eval_vec3_f32_vec3(f: kaba.code&, p: vec3, t: f32) -> vec3
+# (vec3, f32) -> f32[]
+func extern eval_vec3_f32_f32_list(f: kaba.code&, p: vec3, t: f32) -> f32[]

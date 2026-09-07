@@ -181,7 +181,6 @@ add_library(moduleartemis SHARED
 	src/data/grid/UnstructuredGrid.cpp
 	src/data/util/ColorMap.cpp
 	src/graph/field/MultiField.cpp
-	src/graph/field/ScalarField.cpp
 	src/graph/field/VectorField.cpp
 	src/graph/AutoConnect.cpp
 	src/graph/Graph.cpp

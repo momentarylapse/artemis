@@ -3,7 +3,7 @@
 //
 
 #include "NodeFactory.h"
-#include "field/ScalarField.h"
+//#include "field/ScalarField.h"
 #include "field/VectorField.h"
 #include "field/MultiField.h"
 #include "../plugins/PluginManager.h"
@@ -40,7 +40,6 @@ void register_node_class(const string& class_name, const Array<dataflow::NodeCat
 }
 
 void init_factory() {
-	register_node_class<ScalarField>("ScalarField", {dataflow::NodeCategory::Field});
 	register_node_class<VectorField>("VectorField", {dataflow::NodeCategory::Field});
 	register_node_class<MultiField>("MultiField", {dataflow::NodeCategory::Field});
 

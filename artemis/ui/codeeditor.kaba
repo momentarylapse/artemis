@@ -36,7 +36,7 @@ func main()
 
 		try
 #			let filename = package_dir | "from-code-editor.kaba"
-			var m = kaba.default_context.create_module_for_source(source)!
+			var m = kaba.default_context.create_module_for_source(source, "<temp>")!
 			execute_void_function(weak(m), "main")!
 			out_info("done")
 		except Error as e
