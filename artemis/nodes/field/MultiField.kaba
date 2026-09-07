@@ -5,10 +5,10 @@ use artemis.data.*
 use artemis.fields
 use kaba
 
-class ScalarField extends Node
+class MultiField extends Node
 	var in_grid = InPort[Grid](self, "grid")
-	var out_field = OutPort[fields.ScalarField](self, "out", PortFlags.MUTABLE)
-	var formula = Setting[string](self, "formula", "0.0")
+	var out_field = OutPort[fields.MultiField](self, "out", PortFlags.MUTABLE)
+	var formula = Setting[string](self, "formula", "[0, 0, 0, 0]")
 	var type = Setting[fields.ScalarType](self, "type", fields.ScalarType.F32)
 	var sampling_mode = Setting[SamplingMode](self, "sampling-mode", SamplingMode.PER_CELL)
 	var time_dependent = Setting[bool](self, "time-dependent", false)
@@ -20,7 +20,7 @@ class ScalarField extends Node
 
 
 	func __init__()
-		super.__init__("ScalarField")
+		super.__init__("MultiField")
 		flags = NodeFlags.RESOURCE
 		time_dependent.on_update(on_update_time_dependent)
 
@@ -40,7 +40,7 @@ class ScalarField extends Node
 				ctx = kaba.Context.create()
 
 				let source = "
-func f(p: vec3, t: f32) -> f32
+func f(p: vec3, t: f32) -> f32[]
 	let x = p.x
 	let y = p.y
 	let z = p.z
@@ -48,17 +48,19 @@ func f(p: vec3, t: f32) -> f32
 
 				try
 					module = ctx!.create_module_for_source(source, "<temp>")!
-					f = module!.match_function("f", f32, [vec3, f32])!
+					f = module!.match_function("f", f32[], [vec3, f32])!
 				except Error as e
 					error(str(e))
 
 			for ff in  f
 				let t = current_session().t as f32
 				let rg = g.regular!
-				var s = fields.ScalarField.create(rg, fields.decode_scalar_type(type()),
-					sampling_mode())
+				let components = len(eval_vec3_f32_f32_list(&ff, [0,0,0], t))
+				var s = fields.MultiField.create(rg, fields.decode_scalar_type(type()),
+					sampling_mode(), components)
 
 				for i=>p in g.points(sampling_mode())
-					s.set(i, eval_vec3_f32_f32(&ff, p, t) as f64)
+					for k=>v in eval_vec3_f32_f32_list(&ff, p, t)
+						s.set(i, k, v as f64)
 
 				out_field.set(s)
