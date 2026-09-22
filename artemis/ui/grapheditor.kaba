@@ -374,11 +374,11 @@ Dialog x ''
 
 		var tip = ""
 		for h in hover
-			match h.type
-				HoverType.OUT_PORT => tip = port_description[OutPortBase](h.node.out_ports[h.index], "output")
-				HoverType.IN_PORT =>  tip = port_description[InPortBase](h.node.in_ports[h.index], "input")
-				HoverType.CABLE =>    tip = cable_description(graph.cables()[h.index])
-				HoverType.NODE =>     tip = node_description(h.node)
+			tip = match h.type
+				HoverType.OUT_PORT => port_description[OutPortBase](h.node.out_ports[h.index], "output")
+				HoverType.IN_PORT =>  port_description[InPortBase](h.node.in_ports[h.index], "input")
+				HoverType.CABLE =>    cable_description(graph.cables()[h.index])
+				HoverType.NODE =>     node_description(h.node)
 
 		if tip != ""
 			let l = xhui.TextLayout.from_format_string(p, tip)

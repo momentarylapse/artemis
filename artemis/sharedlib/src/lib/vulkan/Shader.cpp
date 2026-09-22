@@ -156,6 +156,8 @@ base::result<bytes> glslang_to_spirv(const string& source, VkShaderStageFlagBits
 		stage = EShLangAnyHit;
 	if (type == VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR)
 		stage = EShLangClosestHit;
+	if (type == VK_SHADER_STAGE_MISS_BIT_KHR)
+		stage = EShLangMiss;
 	if (type == VK_SHADER_STAGE_COMPUTE_BIT)
 		stage = EShLangCompute;
 
@@ -217,6 +219,7 @@ namespace vulkan {
 
 
 	string overwrite_bindings;
+	string overwrite_shader_version;
 	int overwrite_push_size = -1;
 
 
@@ -405,6 +408,8 @@ namespace vulkan {
 				}
 			}
 		}
+		if (overwrite_shader_version != "")
+			m.version = overwrite_shader_version;
 		if (overwrite_bindings != "")
 			m.bindings = overwrite_bindings;
 		if (overwrite_push_size >= 0)
