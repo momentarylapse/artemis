@@ -15,7 +15,7 @@ void draw_simple(DrawingHelperData* aux, const Array<VertexX>& p, const mat4& ma
 	auto vb = aux->get_line_vb(true);
 	vb->update(p);
 
-	auto s = aux->shader;
+	auto s = aux->shader.get();
 
 	nix::set_shader(s);
 	nix::set_z(use_z and !use_blending, use_z);
@@ -44,7 +44,7 @@ void Painter::draw_str(const vec2 &p, const string &str) {
 	float h = (float)tc.texture->height / ui_scale.y;
 	const auto mat = mat4::translation(vec3(p + offset, 0)) * mat4::scale(w, h, 1);
 
-	auto s = aux->shader;
+	auto s = aux->shader.get();
 	nix::set_shader(s);
 	nix::set_alpha_split(Alpha::SOURCE_ALPHA, Alpha::SOURCE_INV_ALPHA, Alpha::ZERO, Alpha::ONE);
 	s->set_color("color", _color);
@@ -57,9 +57,9 @@ void Painter::draw_str(const vec2 &p, const string &str) {
 void Painter::draw_rect(const rect &r) {
 	if (fill) {
 		const auto mat = mat4::translation(vec3(r.p00() + offset, 0)) * mat4::scale(r.width(), r.height(), 1);
-		auto s = aux->shader;
+		auto s = aux->shader.get();
 		if (corner_radius > 0) {
-			s = aux->shader_round;
+			s = aux->shader_round.get();
 			vec2 size = {r.width() * ui_scale.x, r.height() * ui_scale.y};
 			s->set_floats("size", &size.x, 2);
 			s->set_float("radius", corner_radius * ui_scale.y);
@@ -99,6 +99,21 @@ void Painter::draw_rect(const rect &r) {
 			draw_line({r.x2, r.y1}, {r.x2, r.y2});
 		}
 	}
+}
+
+void Painter::draw_image(const vec2& p, const Image* image) {
+	auto t = aux->get_image_texture(image);
+	t->write(*image);
+
+	const auto mat = mat4::translation(vec3(p + offset, 0)) * mat4::scale((float)image->width, (float)image->height, 1);
+	auto s = aux->shader.get();
+	nix::set_shader(s);
+	nix::set_alpha_split(Alpha::SOURCE_ALPHA, Alpha::SOURCE_INV_ALPHA, Alpha::ZERO, Alpha::ONE);
+	s->set_color("color", _color);
+	s->set_matrix("matrix", mat_pixel_to_rel * mat);
+	nix::bind_texture(0, t);
+	nix::draw_triangles(aux->vb);
+	nix::disable_alpha();
 }
 
 

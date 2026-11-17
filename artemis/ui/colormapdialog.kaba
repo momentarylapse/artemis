@@ -1,4 +1,4 @@
-use xhui
+use hui
 use image.Painter
 use async.*
 use simplevis.common.ColorMap
@@ -48,7 +48,7 @@ class extern ColorMapPromise
 	func extern mut get_future() -> ColorMapFuture
 
 
-class extern ColorMapDialog extends xhui.Dialog
+class extern ColorMapDialog extends hui.Dialog
 	var _area: Rect
 	var value_min, value_max: f32
 	var mouse_moved_since_click = 0.0
@@ -60,8 +60,8 @@ class extern ColorMapDialog extends xhui.Dialog
 	var answer: ColorMap?
 
 
-	func __init__(parent: xhui.Panel&, _color_map: ColorMap)
-		super.__init__("Question", 400, 300, parent, xhui.DialogFlags.CLOSE_BY_ESCAPE)
+	func __init__(parent: hui.Panel&, _color_map: ColorMap)
+		super.__init__("Question", 400, 300, parent, hui.DialogFlags.CLOSE_BY_ESCAPE)
 		from_source("
 Dialog color-map-dialog 'Color map'
 	Grid ? ''
@@ -105,16 +105,16 @@ Dialog color-map-dialog 'Color map'
 			p.draw_circle(handle_pos(i), 7)
 
 
-	func mut _on_left_button_down(m: vec2)
+	func mut on_left_button_down(m: vec2)
 		hover = get_hover(m)
 		selected = hover
 		mouse_moved_since_click = 0
 
 
-	func mut _on_left_button_up(m: vec2)
+	func mut on_left_button_up(m: vec2)
 		for s in selected
 			if mouse_moved_since_click < 10
-				xhui.color_dialog(&self, "Color", color_map.colors[s].with_alpha(1), []).then(on_select_color)
+				hui.color_dialog(&self, "Color", color_map.colors[s].with_alpha(1), []).then(on_select_color)
 		else
 			if mouse_moved_since_click < 10
 				color_map.colors.add(Color.WHITE.with_alpha(clamp(1 - (m.y - _area.y1) / _area.height(), 0.0, 1.0)))
@@ -143,8 +143,8 @@ Dialog color-map-dialog 'Color map'
 		request_redraw()
 
 
-	func mut _on_key_down(key: i32)
-		if key == xhui.KEY_DELETE or key == xhui.KEY_BACKSPACE
+	func mut on_key_down(key: i32)
+		if key == hui.KEY_DELETE or key == hui.KEY_BACKSPACE
 			for s in selected
 				if get_window()!.left_button()
 					color_map.colors.remove(s)
@@ -174,13 +174,13 @@ Dialog color-map-dialog 'Color map'
 			promise.fail()
 
 	# FIXME ugh, some kaba lambda workaround...
-	func open(out parent: xhui.Panel, dlg: shared![xhui.Dialog])
+	func open(out parent: hui.Panel, dlg: shared![hui.Dialog])
 		parent.open_dialog(dlg).then(on_close)
 
 
 
 	#func extern static ask(parent: xhui.Panel&, color_map: ColorMap) -> future[ColorMap]
-	func static globalref ask(out parent: xhui.Panel, color_map: ColorMap) -> ColorMapFuture
+	func static globalref ask(out parent: hui.Panel, color_map: ColorMap) -> ColorMapFuture
 		var dlg = new shared ColorMapDialog(&parent, color_map)
 		dlg.open(parent, dlg)
 		return dlg.promise.get_future()

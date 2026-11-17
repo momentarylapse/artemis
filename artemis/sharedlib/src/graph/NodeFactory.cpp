@@ -26,19 +26,6 @@ base::set<dataflow::NodeCategory> category_set(const Array<dataflow::NodeCategor
 	return r;
 }
 
-template<class T>
-void register_node_class(const string& class_name, const Array<dataflow::NodeCategory>& categories) {
-	node_class_db.add({
-		class_name,
-		category_set(categories),
-		[] (Session*, const string& name) {
-			auto node = new T();
-			node->name = name;
-			return node;
-		}
-	});
-}
-
 void init_factory() {
 	for (const auto& [class_name, filename] : artemis::PluginManager::plugin_classes) {
 		node_class_db.add({

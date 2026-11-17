@@ -8,6 +8,8 @@
 #include <lib/os/msg.h>
 #include <lib/os/app.h>
 
+#include "ShaderManager.h"
+
 namespace ygfx {
 
 color Context::color_input_to_shaders(const color& c) const {
@@ -44,7 +46,7 @@ void DrawingHelperData::create_basic() {
 						 {vec3(1,0,0), {0,0,0}, 1, 0, White}};
 	vb->update(vv);
 
-	auto mm = context->create_shader(
+	context->shader_manager->create_shader_module(
 			R"foodelim(
 <Layout>
 	name = ui-data
@@ -70,7 +72,7 @@ uniform float softness = 0;
 layout(binding=0) uniform sampler2D tex0;
 
 </Module>
-)foodelim");
+)foodelim", ":ui-dummy:");
 
 	shader = REQUIRED(context->create_shader(
 			R"foodelim(
@@ -183,6 +185,16 @@ VertexBuffer* DrawingHelperData::get_line_vb(bool with_color) {
 		num_line_vbs_used ++;
 		return _vb;
 	}
+}
+
+Texture* DrawingHelperData::get_image_texture(const Image* image) {
+	if (num_image_textures_used < image_textures.num)
+		return image_textures[num_image_textures_used ++].get();
+
+	auto t = new Texture(image->width, image->height, "rgba:i8");
+	image_textures.add(t);
+	num_image_textures_used ++;
+	return t;
 }
 
 void critical_error(const string& err) {

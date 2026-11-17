@@ -1,11 +1,11 @@
 use artemis.*
-use xhui
+use hui
 
 
 class LayoutNestedPanel extends UiPanel
 	var _main: shared[UiPanel]
 	var children: shared[UiPanel][]
-	var dummies: shared[xhui.Panel][]
+	var dummies: shared[hui.Panel][]
 
 	func override mut __init__()
 		from_source("
@@ -37,11 +37,11 @@ Dialog ? x
 			for _c in c
 				embed("grid-overlay", i, 0, c)
 			else
-				var d = new shared xhui.Panel("dummy{{i}}")
+				var d = new shared hui.Panel("dummy{{i}}")
 				d.set_option("expandx", "")
 				d.set_option("expandy", "")
-#				d.size_mode_x = xhui.SizeMode.Expand
-#				d.size_mode_y = xhui.SizeMode.Expand
+#				d.size_mode_x = hui.SizeMode.Expand
+#				d.size_mode_y = hui.SizeMode.Expand
 				embed("grid-overlay", i, 0, d)
 				dummies.add(d)
 

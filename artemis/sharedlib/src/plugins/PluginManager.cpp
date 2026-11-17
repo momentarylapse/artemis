@@ -476,6 +476,7 @@ void import_component_class(shared<kaba::Module> m, const string &name) {
 }
 
 void PluginManager::import_kaba() {
+	return;
 	dataflow::link_basic_types();
 
 	const auto dir = package->directory;
@@ -508,13 +509,14 @@ void PluginManager::find_plugins() {
 void* PluginManager::create_instance(const string& name) {
 	for (const auto& [n, f] : plugin_classes)
 		if (name == n) {
-			try {
-				auto m = kaba::default_context->_load_module_throw(f, false);
+			auto r = kaba::default_context->load_module(f, kaba::CompilerFlags::None);
+			if (r.has_value()) {
+				auto m = r.value();
 				for (const auto c: m->classes())
 					if (c->name == name)
 						return c->create_instance();
-			} catch (kaba::Exception& e) {
-				msg_error(e.message());
+			} else {
+				msg_error(r.error().msg);
 			}
 		}
 	msg_error("NOT FOUND: " + name);

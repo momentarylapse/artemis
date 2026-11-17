@@ -1,7 +1,7 @@
 use kaba
 use os.Path
 use async.*
-use xhui
+use hui
 use polymesh.*
 use profiler.*
 use out .common.*
@@ -28,10 +28,10 @@ class Artemis
 	func mut create_window() -> future[void]
 		var w = new shared ArtemisWindow(session)
 		session.win := weak(w)
-		xhui.fly(w)
+		hui.fly(w)
 
-		xhui.run_repeated(f32(session.simulation_update_dt), iterate)
-		xhui.run_repeated(2.0, profile_frame)
+		hui.run_repeated(f32(session.simulation_update_dt), iterate)
+		hui.run_repeated(2.0, profile_frame)
 
 		return session.promise_started.get_future()
 
@@ -57,7 +57,7 @@ class Artemis
 
 
 	func run()
-		xhui.run()
+		hui.run()
 
 
 func main(args: string[])

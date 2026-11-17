@@ -1,5 +1,4 @@
 use os
-use xhui
 use obs
 use kaba
 use codeeditor

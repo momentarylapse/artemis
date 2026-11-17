@@ -1,16 +1,16 @@
-use xhui
+use hui
 use ..graph.enumerate_nodes
 
 
-class NodeListPanel extends xhui.Panel
+class NodeListPanel extends hui.Panel
 	let list_id = "list"
 	var all_classes: string[]
 	var classes_filtered: string[]
 
-	func __init__()
+	func override __init__()
 		super.__init__("node-list-panel")
 		from_source("
-Dialog x ''
+Panel x ''
 	Grid ? '' class=card
 		Group node-list-group 'New node' height=500
 			Grid ? ''
@@ -18,7 +18,7 @@ Dialog x ''
 				---|
 				ListView list 'class' nobar expandy dragsource=new-node format=m
 ")
-	
+
 #		struct X {
 #			dataflow::NodeCategory category;
 #			string name, title;
@@ -33,12 +33,12 @@ Dialog x ''
 		all_classes = enumerate_nodes() #dataflow::NodeCategory.NONE)
 		classes_filtered = all_classes
 		fill_list()
-	
-		xhui.run_later(0.1, func() activate("filter"))
-	
+
+		hui.run_later(0.1, func() activate("filter"))
+
 		event("filter", on_filter)
 		event_x("list", "hui:drag-start", on_list_drag_start)
-	
+
 #		size_mode_x = SizeMode::Shrink
 #		size_mode_y = SizeMode::Shrink
 

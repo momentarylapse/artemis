@@ -150,7 +150,7 @@ shared<Node> AbstractParser::parse_abstract_operand_extension_callable(shared<No
 	auto node = new Node(NodeKind::AbstractTypeCallable, 0, common_types.unknown);
 	node->token_id = Exp.cur_token();
 	node->set_num_params(2);
-	node->set_param(0, operand);
+	node->set_param(0, operand); // might be a tuple of types...
 	node->set_param(1, parse_abstract_operand());
 	return node;
 }
@@ -1102,7 +1102,7 @@ shared<Node> AbstractParser::parse_abstract_special_function(SpecialFunction *s)
 }
 
 shared<Node> AbstractParser::parse_abstract_block() {
-	int indent0 = Exp.cur_line->indent;
+	int indent0 = Exp.cur_line->indent; // already "inside" block!
 
 	auto block = add_node_block(nullptr, common_types.unknown, Exp.cur_token());
 
@@ -1113,6 +1113,12 @@ shared<Node> AbstractParser::parse_abstract_block() {
 		if (Exp.next_line_indent() < indent0)
 			break;
 		Exp.next_line();
+	}
+
+	// optional "end"
+	if (!Exp.end_of_file() and Exp.next_line_indent() == indent0-1 and (Exp.cur_line+1)->tokens[0].name == "end") {
+		Exp.next_line();
+		Exp.next();
 	}
 
 	return block;

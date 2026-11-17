@@ -1,5 +1,5 @@
 use os
-use xhui
+use hui
 use image.Painter
 use simplevis.common.ColorMap
 use ..graph.*
@@ -20,7 +20,7 @@ func nice_path(p: os.Path) -> string
 
 
 
-class SettingPanel extends xhui.Panel
+class SettingPanel extends hui.Panel
 	var s: SettingBase&
 	var g: GraphController&
 	func __init__(_s: SettingBase&, _g: GraphController&)
@@ -87,7 +87,7 @@ class SettingPanelPath extends SettingPanel
 	func mut on_click()
 		var ss = s.to[os.Path]()
 		var dir = (*ss)().parent()
-		xhui.file_dialog(&self, "File...", dir, []).then(on_select)
+		hui.file_dialog(&self, "File...", dir, []).then(on_select)
 	func mut on_select(p: os.Path)
 		g.node_set_setting(s.owner, s.name, str(p))
 		set_string("edit", nice_path(p))
@@ -160,7 +160,7 @@ class SettingPanelEnumLegacy extends SettingPanel
 		event("box", func() g.node_set_setting(s.owner, s.name, values[get_int("box")]))
 
 
-class DefaultNodePanel extends xhui.Panel
+class DefaultNodePanel extends hui.Panel
 	var node: Node&
 
 	func __init__(n: Node&, g: GraphController&)

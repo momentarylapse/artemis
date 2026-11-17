@@ -1,6 +1,6 @@
 use os
 use obs
-use xhui
+use hui
 use kaba
 use image.Painter
 use profiler.*
@@ -75,7 +75,7 @@ func node_description(n: Node) -> string
 	return "<big>{{n.name}}</big>\n<soft>node</soft>\n<soft>flags:</soft> <b>{{n.flags}}\n<soft>state:</soft> <b>{{n._state}}</b>"
 
 
-class GraphEditor extends xhui.Panel as obs.Node
+class GraphEditor extends hui.Panel as obs.Node
 	var out_info = obs.XSource[string](&self, &ind, "info")
 	var out_error = obs.XSource[string](&self, &ind, "error")
 	var out_show_code_editor = obs.Source(&self, &ind, "show-code-editor")
@@ -105,7 +105,7 @@ class GraphEditor extends xhui.Panel as obs.Node
 		index: i32
 	hover: Hover?
 	selection: Hover?
-	var node_panel: shared[xhui.Panel]
+	var node_panel: shared[hui.Panel]
 	var _node_panel_node = nil as Node*
 
 	enum Mode
@@ -148,12 +148,12 @@ Dialog x ''
 		event_x("view-move", "hui:mouse-move", on_view_move_mouse_move)
 
 		event_x("graph", "hui:draw", on_draw)
-		event_x("graph", "hui:mouse-move", _on_mouse_move)
-		event_x("graph", "hui:mouse-wheel", _on_mouse_wheel)
-		event_x("graph", "hui:mouse-leave", _on_mouse_leave)
-		event_x("graph", "hui:left-button-down", _on_left_button_down)
-		event_x("graph", "hui:left-button-up", _on_left_button_up)
-		event_x("graph", "hui:key-down", _on_key_down)
+		event_x("graph", "hui:mouse-move", on_mouse_move)
+		event_x("graph", "hui:mouse-wheel", on_mouse_wheel)
+		event_x("graph", "hui:mouse-leave", on_mouse_leave)
+		event_x("graph", "hui:left-button-down", on_left_button_down)
+		event_x("graph", "hui:left-button-up", on_left_button_up)
+		event_x("graph", "hui:key-down", on_key_down)
 		event_x("graph", "hui:drag-drop", on_drag_drop)
 		event("add-node", open_node_list_panel)
 
@@ -168,7 +168,7 @@ Dialog x ''
 				request_redraw()
 
 
-	func mut _on_mouse_move()
+	func mut on_mouse_move()
 		let d = get_window()!.get_mouse_delta()
 		let m = get_window()!.get_mouse_position()
 		if mode == Mode.SELECTING
@@ -198,7 +198,7 @@ Dialog x ''
 		request_redraw()
 
 
-	func mut _on_mouse_wheel()
+	func mut on_mouse_wheel()
 		let d = get_window()!.get_scroll()
 		let m = get_window()!.get_mouse_position()
 		let mm = from_screen(m)
@@ -209,12 +209,12 @@ Dialog x ''
 		request_redraw()
 
 
-	func mut _on_mouse_leave()
+	func mut on_mouse_leave()
 		hover = nil
 		request_redraw()
 
 
-	func mut _on_left_button_down()
+	func mut on_left_button_down()
 		let m = get_window()!.get_mouse_position()
 		hover = get_hover(m)
 		selection = hover
@@ -247,7 +247,7 @@ Dialog x ''
 		request_redraw()
 
 
-	func mut _on_left_button_up()
+	func mut on_left_button_up()
 		let m = get_window()!.get_mouse_position()
 		if mode == Mode.CREATING_NEW_CABLE
 			for s in selection
@@ -264,21 +264,21 @@ Dialog x ''
 
 
 
-	func mut _on_key_down()
+	func mut on_key_down()
 		let key = get_window()!.get_key_code()
-		if key == xhui.KEY_CONTROL + xhui.KEY_Z
+		if key == hui.KEY_CONTROL + hui.KEY_Z
 			if graph_con.undoable()
 				graph_con.undo()
 				out_info("undo")
 			else
 				out_info("nothing to undo")
-		if key == xhui.KEY_CONTROL + xhui.KEY_Y
+		if key == hui.KEY_CONTROL + hui.KEY_Y
 			if graph_con.redoable()
 				graph_con.redo()
 				out_info("redo")
 			else
 				out_info("nothing to redo")
-		if key == xhui.KEY_DELETE or key == xhui.KEY_BACKSPACE
+		if key == hui.KEY_DELETE or key == hui.KEY_BACKSPACE
 			for s in selection
 				if s.type == HoverType.CABLE
 					graph_con.unconnect(graph.cables()[s.index])
@@ -290,9 +290,9 @@ Dialog x ''
 					selection = nil
 					hover = nil
 					open_node_panel(nil)
-		if key == xhui.KEY_TAB
+		if key == hui.KEY_TAB
 			open_node_list_panel()
-		if key == xhui.KEY_G
+		if key == hui.KEY_G
 			if len(selected_nodes) >= 2
 
 				let group = graph_con.group_nodes(selected_nodes)
@@ -340,14 +340,14 @@ Dialog x ''
 		for n in graph.nodes
 			draw_node(p, n)
 
-		p.set_font("", wash_f32(&xhui.theme.font_size), false, false)
+		p.set_font("", wash_f32(&hui.theme.font_size), false, false)
 
 
 		for n in graph.nodes
 			if n._state == NodeState.ERROR
-				let l = xhui.TextLayout.from_format_string(p, "<b>Error:</b> {{n.error_message}}")
-				let bg = Color.mix(Color(0.7, 0.2, 0.2, 1), xhui.theme.background_low, 0.3)
-				xhui.draw_text_layout_with_box(p, node_area(n).p00() + vec2(-10, -30), l, xhui.theme.text_label, bg)
+				let l = hui.TextLayout.from_format_string(p, "<b>Error:</b> {{n.error_message}}")
+				let bg = Color.mix(Color(0.7, 0.2, 0.2, 1), hui.theme.background_low, 0.3)
+				hui.draw_text_layout_with_box(p, node_area(n).p00() + vec2(-10, -30), l, hui.theme.text_label, bg)
 
 
 		let m = get_window()!.get_mouse_position()
@@ -381,10 +381,10 @@ Dialog x ''
 				HoverType.NODE =>     node_description(h.node)
 
 		if tip != ""
-			let l = xhui.TextLayout.from_format_string(p, tip)
-#			let fg = xhui.theme.text_label
-#			let bg = xhui.theme.background_button
-			xhui.draw_text_layout_with_box(p, m + vec2(-10, 30), l, xhui.theme.text_label, xhui.theme.background_button)
+			let l = hui.TextLayout.from_format_string(p, tip)
+#			let fg = hui.theme.text_label
+#			let bg = hui.theme.background_button
+			hui.draw_text_layout_with_box(p, m + vec2(-10, 30), l, hui.theme.text_label, hui.theme.background_button)
 
 		p.set_clip(clip0)
 		profiler.end(channel)
@@ -413,14 +413,14 @@ Dialog x ''
 		return spline_curve(A, A + vec2(0, 160*view_scale), B - vec2(0, 160*view_scale), B)
 
 	func draw_grid(out p: Painter)
-		p.set_color(xhui.theme.background)
+		p.set_color(hui.theme.background)
 		p.draw_rect(area)
 		p.set_line_width(max(1.0 * view_scale, 1.0))
 		p.set_contiguous(false)
 
 		let view_area = Rect(from_screen(area.p00()), from_screen(area.p11()))
-		let c0 = Color.mix(xhui.theme.background, xhui.theme.text_disabled, 0.07 * min(view_scale, 1.0))
-		let c1 = Color.mix(xhui.theme.background, xhui.theme.text_disabled, 0.15 * min(view_scale, 1.0))
+		let c0 = Color.mix(hui.theme.background, hui.theme.text_disabled, 0.07 * min(view_scale, 1.0))
+		let c1 = Color.mix(hui.theme.background, hui.theme.text_disabled, 0.15 * min(view_scale, 1.0))
 		let D = 20.0
 		var points: vec2[]
 		for i in i32(floor(view_area.y1 / D)):i32(ceil(view_area.y2 / D))
@@ -454,24 +454,24 @@ Dialog x ''
 
 
 	func draw_node(out p: Painter, n: Node)
-		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, true, false)
+		p.set_font("", wash_f32(&hui.theme.font_size) * view_scale, true, false)
 
 		# background
 		if in_list(&n, selected_nodes)
 			p.set_color(Color.RED.with_alpha(0.7))
 			p.set_roundness(14 * view_scale)
 			p.draw_rect(node_area(n).grow(4 * view_scale))
-		var bg = Color.mix(Color.ORANGE, xhui.theme.background_low, 0.3)
+		var bg = Color.mix(Color.ORANGE, hui.theme.background_low, 0.3)
 		if i32(n.flags & NodeFlags.RESOURCE) > 0
-			bg = Color.mix(Color(0.3, 0.4, 1, 1), xhui.theme.background_low, 0.3)
+			bg = Color.mix(Color(0.3, 0.4, 1, 1), hui.theme.background_low, 0.3)
 		else if i32(n.flags & NodeFlags.TIME_DEPENDENT) > 0
-			bg = Color.mix(Color(0, 0.7, 0, 1), xhui.theme.background_low, 0.3)
+			bg = Color.mix(Color(0, 0.7, 0, 1), hui.theme.background_low, 0.3)
 		else if i32(n.flags & NodeFlags.RENDERER) > 0
-			bg = Color.mix(Color(0.6, 0.3, 0.02, 1), xhui.theme.background_low, 0.3)
+			bg = Color.mix(Color(0.6, 0.3, 0.02, 1), hui.theme.background_low, 0.3)
 		else if i32(n.flags & NodeFlags.META) > 0
-			bg = Color.mix(Color(0.5, 0.5, 0.5, 1), xhui.theme.background_low, 0.3)
+			bg = Color.mix(Color(0.5, 0.5, 0.5, 1), hui.theme.background_low, 0.3)
 		else if n._state == NodeState.ERROR
-			bg = Color.mix(Color(0.7, 0.2, 0.2, 1), xhui.theme.background_low, 0.3)
+			bg = Color.mix(Color(0.7, 0.2, 0.2, 1), hui.theme.background_low, 0.3)
 		for h in hover
 			if h.type == HoverType.NODE and h.node == &n
 				bg = Color.mix(bg, Color.WHITE, 0.2)
@@ -481,7 +481,7 @@ Dialog x ''
 
 		# type
 		p.set_color(Color.WHITE)
-		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, true, false)
+		p.set_font("", wash_f32(&hui.theme.font_size) * view_scale, true, false)
 		if true
 			let name = list_last(n.name.explode(":"))
 			let w = p.get_str_width(name) / view_scale
@@ -490,7 +490,7 @@ Dialog x ''
 				p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2, 35)), "U")
 			else if n._state == NodeState.DIRTY
 				p.draw_str(to_screen(n.pos + vec2(NODE_WIDTH / 2, 35)), "*")
-		p.set_font("", wash_f32(&xhui.theme.font_size) * view_scale, false, false)
+		p.set_font("", wash_f32(&hui.theme.font_size) * view_scale, false, false)
 
 		# name?
 		for _ in n.name.find(":")

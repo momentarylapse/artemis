@@ -1,5 +1,5 @@
 use artemis.*
-use xhui
+use hui
 use plot.plotarea.*
 use image.Painter
 use profiler.*
@@ -42,7 +42,7 @@ class Plotter extends UiNode
 	func mut __init__()
 		super.__init__("Plotter")
 		panel = new PlotterPanel(&self)
-		background.set(xhui.theme.background_low)
+		background.set(hui.theme.background_low)
 
 
 	func override on_process()

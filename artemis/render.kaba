@@ -1,4 +1,4 @@
-use xhui
+use hui
 use .graph.*
 use .session.*
 use .data.*
@@ -12,9 +12,9 @@ func tex_white() -> shared![gfx.Texture]
 	return current_session().ctx!.tex_white
 
 
-class UiPanel extends xhui.Panel
+class UiPanel extends hui.Panel
 	var session: Session&
-	func mut __init__()
+	func override __init__()
 		super.__init__(p2s(&self))
 		session := current_session()
 

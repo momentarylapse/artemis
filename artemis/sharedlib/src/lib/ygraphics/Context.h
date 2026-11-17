@@ -14,6 +14,7 @@ namespace ygfx {
 
 class Context;
 class FontManager;
+class ShaderManager;
 
 struct DrawingHelperData {
 	explicit DrawingHelperData(Context*);
@@ -24,9 +25,9 @@ struct DrawingHelperData {
 #endif
 	Context* context;
 	VertexBuffer* vb = nullptr;
-	Shader* shader = nullptr;
-	Shader* shader_round = nullptr;
-	Shader* shader_lines = nullptr;
+	shared<Shader> shader;
+	shared<Shader> shader_round;
+	shared<Shader> shader_lines;
 #ifdef USING_VULKAN
 	vulkan::CommandBuffer* cb = nullptr;
 	vulkan::GraphicsPipeline* pipeline = nullptr;
@@ -55,6 +56,10 @@ struct DrawingHelperData {
 	VertexBuffer* get_line_vb(bool with_color = false);
 	const mat4* projection_matrix = nullptr;
 
+	shared_array<Texture> image_textures;
+	int num_image_textures_used = 0;
+	Texture* get_image_texture(const ::Image* image);
+
 	void reset_frame();
 };
 
@@ -73,7 +78,8 @@ public:
 #else
 	nix::Context* ctx = nullptr;
 #endif
-	base::result<Shader*> create_shader(const string& source) const;
+	owned<ShaderManager> shader_manager; // only internal
+	base::result<shared<Shader>> create_shader(const string& source);
 
 	void make_current();
 

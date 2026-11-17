@@ -3,7 +3,7 @@ use artemis.graph.*
 use yrenderer
 use simplevis as sv
 use image.Painter
-use xhui
+use hui
 use obs
 use profiler.*
 
@@ -14,7 +14,7 @@ func scale_area(area: Rect, scale: f32) -> Rect
 
 
 class extern ScenePanel extends render.UiPanel as obs.Node
-	var canvas: sv.Canvas
+	var canvas: shared![sv.Canvas]
 	var view_defined_by_user = false
 	var draw_calls: render.DrawCall3d&[]
 
@@ -26,9 +26,9 @@ class extern ScenePanel extends render.UiPanel as obs.Node
 
 	func mut override __init__()
 		from_source("
-Dialog x x padding=0
-		Overlay ? ''
-			DrawingArea area '' grabfocus
+Panel x x padding=0
+		Overlay overlay ''
+			.
 			Grid overlay-main-grid '' margin=25
 				Grid ? ''
 					Label ? '' ignorehover expandx
@@ -40,16 +40,19 @@ Dialog x x padding=0
 				Label ? '' ignorehover expandy
 ")
 
+		canvas = new sv.Canvas()
+		embed("overlay", 0, 0, canvas)
+
 		session.win.event_x(session.win.id, "hui:just-before-draw", on_just_before_draw)
-		event_x("area", "hui:draw", on_draw)
-		event_x("area", "hui:mouse-move", _on_mouse_move)
+#		event_x("area", "hui:draw", on_draw)
+#		event_x("area", "hui:mouse-move", on_mouse_move)
 #		event_x("area", "hui:left-button-down", func() mode = MouseMode.ROTATE)
 #		event_x("area", "hui:left-button-up", func() mode = MouseMode.NONE)
 #		event_x("area", "hui:middle-button-down", func() mode = MouseMode.MOVE)
 #		event_x("area", "hui:middle-button-up", func() mode = MouseMode.NONE)
 #		event_x("area", "hui:right-button-down", func() mode = MouseMode.ROTATE)
 #		event_x("area", "hui:right-button-up", func() mode = MouseMode.NONE)
-		event_x("area", "hui:mouse-wheel", _on_mouse_wheel)
+#		event_x("area", "hui:mouse-wheel", on_mouse_wheel)
 
 		event_x("cam-move", "hui:left-button-down", func() get_window()!.set_mouse_mode(0))
 		event_x("cam-move", "hui:left-button-up", func() get_window()!.set_mouse_mode(1))
@@ -59,7 +62,7 @@ Dialog x x padding=0
 		event_x("cam-rotate", "hui:mouse-move", on_cam_rotate_mouse_move)
 
 		canvas.cam.out_changed >> create_sink(func() view_defined_by_user = true)
-		canvas.out_redraw >> create_sink(request_redraw)
+	#	canvas.out_redraw >> create_sink(request_redraw)
 		canvas.f_draw = func()
 			for mut x in draw_calls
 				if x.active
@@ -82,7 +85,7 @@ Dialog x x padding=0
 
 
 	func mut on_just_before_draw(out p: Painter)
-		var pp = &p as xhui.Painter&
+		var pp = &p as hui.Painter&
 		let a0 = pp.area()
 		let na0 = pp.native_area
 		pp._area = area
@@ -93,11 +96,11 @@ Dialog x x padding=0
 
 
 	func mut on_pre_draw(out p: Painter)
-		canvas.before_draw(&p as xhui.Painter&)
+		canvas.before_draw(&p as hui.Painter&)
 
 
 	func mut on_draw(out p: Painter)
-		canvas.draw(&p as xhui.Painter&)
+		canvas.draw(&p as hui.Painter&)
 
 
 	func mut set_draw_calls(_draw_calls: render.DrawCall3d&[]) -> bool
@@ -119,21 +122,21 @@ Dialog x x padding=0
 		return true
 
 
-	func mut _on_mouse_move()
-		for w in get_window()
-			let d = w.get_mouse_delta()
-			canvas.on_mouse_move(d, w.left_button(), w.middle_button(), w.right_button())
+#	func mut on_mouse_move()
+#		for w in get_window()
+#			let d = w.get_mouse_delta()
+#			canvas.on_mouse_move(d, w.left_button(), w.middle_button(), w.right_button())
 
 
-	func mut _on_mouse_wheel()
-		canvas.on_mouse_wheel(get_window()!.get_scroll())
+#	func mut on_mouse_wheel()
+#		canvas.on_mouse_wheel(get_window()!.get_scroll())
 
 
 	func mut on_cam_move_mouse_move()
 		for w in get_window()
 			let d = w.get_mouse_delta()
 			if w.left_button()
-				if w.is_key_pressed(xhui.KEY_SHIFT)
+				if w.is_key_pressed(hui.KEY_SHIFT)
 					canvas.cam.move(vec3(0,0,d.y) / 800.0)
 				else
 					canvas.cam.move(vec3(-d.x, d.y, 0) / 800.0)
