@@ -164,11 +164,9 @@ class DefaultNodePanel extends hui.Panel
 	var node: Node&
 
 	func __init__(n: Node&, g: GraphController&)
-		super.__init__("node-panel")
-
 		node := n
 		from_source("
-Dialog x ''
+Panel default-node-panel ''
 	Grid node-panel '' class=card
 		Group node-group 'Test'
 			Grid settings-grid ''
@@ -178,7 +176,7 @@ Dialog x ''
 
 		for i=>s in node.settings
 			set_target("settings-grid")
-			add_control("Label", s.name, 0, i, "")
+			add_control("Label", "!right,disabled\\{{s.name}}", 0, i, "")
 			var panel = new shared SettingPanel(s, g)
 			match s.type
 				f64 => panel = new SettingPanelFloat(s, g)

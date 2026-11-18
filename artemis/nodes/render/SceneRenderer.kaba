@@ -28,7 +28,6 @@ class extern ScenePanel extends render.UiPanel as obs.Node
 		from_source("
 Panel x x padding=0
 		Overlay overlay ''
-			.
 			Grid overlay-main-grid '' margin=25
 				Grid ? ''
 					Label ? '' ignorehover expandx
@@ -165,6 +164,8 @@ class SceneRenderer extends render.UiNode
 	func __init__()
 		super.__init__("SceneRenderer")
 		scene_panel = new ScenePanel()
+		scene_panel.canvas.set_background(background())
+		scene_panel.canvas.set_hdr_exposure(brightness() as f32)
 		_state = NodeState.UNINITIALIZED
 
 
