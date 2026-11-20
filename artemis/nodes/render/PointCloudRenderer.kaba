@@ -35,7 +35,7 @@ class PointCloudRenderer extends Render3dNode
 
 	func override mut on_draw()
 		if not weak(cloud_renderer)
-			cloud_renderer = new cr.PointCloudRenderer(ctx)
+			cloud_renderer = new cr.PointCloudRenderer(canvas)
 			cloud_renderer!.initialize()
 
 		for points in in_points.value()

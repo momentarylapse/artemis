@@ -2,10 +2,9 @@ use hui
 use .graph.*
 use .session.*
 use .data.*
-use yrenderer
 use yrenderer.gfx
 use profiler.*
-use simplevis.common.SimpleContext
+use simplevis as sv
 
 func tex_white() -> shared![gfx.Texture]
 #shared<ygfx::Texture> get_tex_white() {
@@ -52,7 +51,8 @@ class Render3dNode extends Node
 	var active = Setting[bool](&self, "active", true)
 	#var emitter: shared![RenderEmitterNodeEmitter]
 	var channel_draw: i32
-	var ctx: SimpleContext&
+	var canvas: sv.Canvas&
+	var ctx: sv.Context&
 
 	func override __init__(name: string)
 		session := current_session()

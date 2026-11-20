@@ -1,15 +1,15 @@
 use artemis.*
-use simplevis.common.*
-use simplevis.volume as sv
+use simplevis as sv
+use simplevis.volume as svv
 
 
 class VolumeRenderer extends Render3dNode
 	var in_field = InPort[ScalarField](self, "field")
 	var solid = Setting[bool](self, "solid", false)
 	var scale = Setting[f64](self, "scale", 1.0)
-	var color_map = Setting[ColorMap](self, "color-map", default_color_map_transparent())
+	var color_map = Setting[sv.ColorMap](self, "color-map", sv.default_color_map_transparent())
 
-	var volume_renderer: owned[sv.VolumeRenderer]
+	var volume_renderer: owned[svv.VolumeRenderer]
 	var needs_update = false
 
 
@@ -27,7 +27,7 @@ class VolumeRenderer extends Render3dNode
 		if ctx.shadow_pass and !solid()
 			return
 		if not weak(volume_renderer)
-			volume_renderer = new sv.VolumeRenderer(ctx)
+			volume_renderer = new svv.VolumeRenderer(canvas)
 			volume_renderer!.initialize()
 
 		for f in in_field.value()

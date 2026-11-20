@@ -202,7 +202,7 @@ Dialog x ''
 		let d = get_window()!.get_scroll()
 		let m = get_window()!.get_mouse_position()
 		let mm = from_screen(m)
-		view_scale = clamp(view_scale * exp(0.1 * d.y), 0.5, 10.0)
+		view_scale = clamp(view_scale * exp(0.03 * d.y), 0.5, 10.0)
 		view_offset -= to_screen(mm) - m
 
 		hover = get_hover(m)

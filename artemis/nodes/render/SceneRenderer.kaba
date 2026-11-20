@@ -2,21 +2,20 @@ use artemis.render
 use artemis.graph.*
 use yrenderer
 use simplevis as sv
+use simplevis.grid.GridRenderer
 use image.Painter
 use hui
 use obs
 use profiler.*
 
 
-func scale_area(area: Rect, scale: f32) -> Rect
-	return Rect(area.p00() * scale, area.p11() * scale)
-
-
 
 class extern ScenePanel extends render.UiPanel as obs.Node
 	var canvas: shared![sv.Canvas]
+	var grid: owned![GridRenderer]
 	var view_defined_by_user = false
 	var draw_calls: render.DrawCall3d&[]
+	var show_grid: bool
 
 #	enum MouseMode
 #		NONE
@@ -42,17 +41,9 @@ Panel x x padding=0
 		canvas = new sv.Canvas()
 		embed("overlay", 0, 0, canvas)
 
-		session.win.event_x(session.win.id, "hui:just-before-draw", on_just_before_draw)
-#		event_x("area", "hui:draw", on_draw)
-#		event_x("area", "hui:mouse-move", on_mouse_move)
-#		event_x("area", "hui:left-button-down", func() mode = MouseMode.ROTATE)
-#		event_x("area", "hui:left-button-up", func() mode = MouseMode.NONE)
-#		event_x("area", "hui:middle-button-down", func() mode = MouseMode.MOVE)
-#		event_x("area", "hui:middle-button-up", func() mode = MouseMode.NONE)
-#		event_x("area", "hui:right-button-down", func() mode = MouseMode.ROTATE)
-#		event_x("area", "hui:right-button-up", func() mode = MouseMode.NONE)
-#		event_x("area", "hui:mouse-wheel", on_mouse_wheel)
+		grid = new GridRenderer(weak(canvas))
 
+		# overlay camera buttons
 		event_x("cam-move", "hui:left-button-down", func() get_window()!.set_mouse_mode(0))
 		event_x("cam-move", "hui:left-button-up", func() get_window()!.set_mouse_mode(1))
 		event_x("cam-move", "hui:mouse-move", on_cam_move_mouse_move)
@@ -61,8 +52,9 @@ Panel x x padding=0
 		event_x("cam-rotate", "hui:mouse-move", on_cam_rotate_mouse_move)
 
 		canvas.cam.out_changed >> create_sink(func() view_defined_by_user = true)
-	#	canvas.out_redraw >> create_sink(request_redraw)
 		canvas.f_draw = func()
+			if show_grid
+				grid.draw()
 			for mut x in draw_calls
 				if x.active
 					profiler.begin(x.node.channel_draw)
@@ -78,33 +70,14 @@ Panel x x padding=0
 
 	func mut build() -> bool
 		for ctx in session.ctx
-			canvas.initialize(&ctx)
 			return true
 		return false
-
-
-	func mut on_just_before_draw(out p: Painter)
-		var pp = &p as hui.Painter&
-		let a0 = pp.area()
-		let na0 = pp.native_area
-		pp._area = area
-		pp.native_area = scale_area(area, pp.ui_scale)
-		on_pre_draw(p)
-		pp._area = a0
-		pp.native_area = na0
-
-
-	func mut on_pre_draw(out p: Painter)
-		canvas.before_draw(&p as hui.Painter&)
-
-
-	func mut on_draw(out p: Painter)
-		canvas.draw(&p as hui.Painter&)
 
 
 	func mut set_draw_calls(_draw_calls: render.DrawCall3d&[]) -> bool
 		draw_calls = _draw_calls
 		for mut x in draw_calls
+			x.node.canvas := weak(canvas)
 			x.node.ctx := &canvas.ctx
 
 		var box: Box?
@@ -119,16 +92,6 @@ Panel x x padding=0
 		for b in box
 			set_content_bounding_box(b)
 		return true
-
-
-#	func mut on_mouse_move()
-#		for w in get_window()
-#			let d = w.get_mouse_delta()
-#			canvas.on_mouse_move(d, w.left_button(), w.middle_button(), w.right_button())
-
-
-#	func mut on_mouse_wheel()
-#		canvas.on_mouse_wheel(get_window()!.get_scroll())
 
 
 	func mut on_cam_move_mouse_move()
@@ -157,6 +120,7 @@ class SceneRenderer extends render.UiNode
 	var in_draw = InPort[render.DrawCall3d](&self, "draw", PortFlags.MULTI)
 	var background = Setting[Color](&self, "background", Color(0.12,0.12,0.12,1))
 	var brightness = Setting[f64](&self, "brightness", 1.0)
+	var show_grid = Setting[bool](&self, "show-grid", false)
 
 	var scene_panel: shared![ScenePanel]
 
@@ -178,6 +142,7 @@ class SceneRenderer extends render.UiNode
 		if scene_panel.set_draw_calls(in_draw.values())
 			scene_panel.canvas.set_background(background())
 			scene_panel.canvas.set_hdr_exposure(brightness() as f32)
+			scene_panel.show_grid = show_grid()
 			var d: render.RenderData
 			d.panel = scene_panel
 			out_draw.set(d)
